@@ -219,11 +219,7 @@ target_link_libraries(      concorde-bin PUBLIC ${LINKER_OPTIONS})
 target_link_libraries(      concorde-bin PUBLIC concorde)
 
 add_custom_command(TARGET concorde POST_BUILD
-        COMMAND gcc -fPIC -shared -o libconcorde_full.so -Wl,--whole-archive *.a ${CPLEX_LIBRARIES} -lstdc++ -Wl,--no-whole-archive
-        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        COMMENT "Creating libconcorde_full.so")
-
-add_custom_command(TARGET concorde POST_BUILD
+        COMMAND rm -f *.o libconcorde_full.a libconcorde_full.so
         COMMAND ar -x libconcorde_utils.a
         COMMAND ar -x libconcorde_lp.a
         COMMAND ar -x libconcorde_bigguy.a
@@ -240,8 +236,10 @@ add_custom_command(TARGET concorde POST_BUILD
         COMMAND ar -x libconcorde_tiny.a
         COMMAND ar -x libconcorde.a
         COMMAND ar -qc libconcorde_full.a *.o
+        COMMAND rm -f *.o libconcorde_utils.a libconcorde_lp.a libconcorde_bigguy.a libconcorde_heldkarp.a libconcorde_edgegen.a libconcorde_linkern.a libconcorde_localcut.a libconcorde_pq.a libconcorde_cut.a libconcorde_fmatch.a libconcorde_kdtree.a libconcorde_combs.a libconcorde_verify.a libconcorde_tiny.a
+        COMMAND gcc -fPIC -shared -o libconcorde_full.so -Wl,--whole-archive libconcorde_full.a ${CPLEX_LIBRARIES} -lstdc++ -Wl,--no-whole-archive
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        COMMENT "Creating libconcorde_full.a")
+        COMMENT "Creating libconcorde_full.a and libconcorde_full.so from individual libraries")
 
 add_custom_command(TARGET concorde POST_BUILD
         COMMAND cat config.h machdefs.h util.h bigguy.h combs.h cut.h delaunay.h edgegen.h fmatch.h heldkarp.h kdtree.h linkern.h lp.h tsp.h consec1.h localcut.h macrorus.h mlinkern.h necklace.h pqsets.h pq.h cuttree.h tinytsp.h tsp.h verify.h | grep -v '\#include \"' > ${CMAKE_CURRENT_BINARY_DIR}/concorde.h
@@ -249,7 +247,7 @@ add_custom_command(TARGET concorde POST_BUILD
         COMMENT "Creating concorde.h")
 
 add_custom_command(TARGET concorde-bin POST_BUILD
-        COMMAND rm *.c.o
+        COMMAND rm -f *.c.o || true
         COMMAND rm libconcorde_utils.a
         COMMAND rm libconcorde_lp.a
         COMMAND rm libconcorde_bigguy.a

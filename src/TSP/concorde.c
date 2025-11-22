@@ -80,7 +80,7 @@ static int valid_edges          = 0;
 static int dfs_branching        = 0;
 static int bfs_branching        = 1;
 static int simple_branching     = 0;
-static int usebranchcliques     = 1;  
+static int usebranchcliques     = 1;
 static int tentative_branch_num = 0;
 static int complete_price       = 0;
 static int want_rcnearest       = 0;
@@ -154,7 +154,7 @@ int main (int ac, char **av)
 
     rval = CCutil_print_command (ac, av);
     CCcheck_rval (rval, "CCutil_print_command failed");
-    
+
     szeit = CCutil_zeit ();
     seed = (int) CCutil_real_zeit ();
 
@@ -321,7 +321,7 @@ int main (int ac, char **av)
     rval = build_fulledges (&excount, &exlist, &exlen, ncount, ptour,
                             fullfname);
     CCcheck_rval (rval, "build_fulledges failed");
-    
+
     rval = CCtsp_init_cutpool (&ncount, poolfname, &pool);
     CCcheck_rval (rval, "CCtsp_init_cutpool failed");
 #ifdef CCtsp_USE_DOMINO_CUTS
@@ -373,7 +373,7 @@ int main (int ac, char **av)
     }
 
     CCutil_start_timer (&lp->stats.total);
-    
+
     ecount = 0;
     CC_IFFREE (elist, int);
     CC_IFFREE (elen, int);
@@ -540,7 +540,7 @@ int main (int ac, char **av)
         CCcheck_rval (rval, "CCtsp_depot_valid failed");
         goto DONE;
     }
-    
+
     if (dfs_branching) {
         upbound = lp->upperbound;
         bbcount = 0;
@@ -561,7 +561,7 @@ int main (int ac, char **av)
         CCcheck_rval (rval, "CCtsp_write_probroot_id failed");
         CCtsp_free_tsp_lp_struct (&lp);
 
-        rval = CCtsp_bfs_brancher (problname, id, lowbound, &sel, 
+        rval = CCtsp_bfs_brancher (problname, id, lowbound, &sel,
                 &tentativesel, &upbound, &bbcount, usebranchcliques, &dat,
                 ptour, pool, ncount, besttour, hostport, &branchzeit,
                 save_proof, tentative_branch_num, longedge_branching,
@@ -620,7 +620,7 @@ DONE:
             rval = 0;
         }
     }
-        
+
     rval = 0;
 
 CLEANUP:
@@ -771,12 +771,12 @@ static int build_edges (int *p_ecount, int **p_elist, int **p_elen,
     int *elist = (int *) NULL;
     int ecount;
     int i;
-    
+
     if (in_edgefname) {
         int *invperm = (int *) NULL;
 
         printf ("Read initial edge set\n"); fflush (stdout);
-        
+
         rval = CCutil_getedgelist (ncount, in_edgefname, p_ecount, p_elist,
                                    p_elen, 0);
         CCcheck_rval (rval, "CCutil_getedgelist failed");
@@ -793,7 +793,7 @@ static int build_edges (int *p_ecount, int **p_elist, int **p_elen,
         CC_FREE (invperm, int);
     } else if (dat) {
         CCedgegengroup plan;
-        
+
         if (in_edgegenfname) {
             rval = CCedgegen_read (in_edgegenfname, &plan);
             CCcheck_rval (rval, "CCedgegen_read failed");
@@ -829,7 +829,7 @@ static int build_fulledges (int *p_excount, int **p_exlist, int **p_exlen,
     int rval = 0;
     int *exlist;
     int excount;
-    
+
     if (in_fullfname) {
         int *invperm = (int *) NULL;
 
@@ -1174,7 +1174,7 @@ static int parseargs (int ac, char **av)
         return 1;
     }
 
-    if (datfname == (char *) NULL && nnodes_want == 0 && 
+    if (datfname == (char *) NULL && nnodes_want == 0 &&
         probfname == (char *) NULL && edgefname == (char *) NULL &&
         masterfname == (char *) NULL && grunthostname == (char *) NULL) {
         usage (av[0]);
@@ -1194,7 +1194,7 @@ static int parseargs (int ac, char **av)
             eliminate_edges = 0;
         }
     }
-    
+
     return 0;
 }
 
