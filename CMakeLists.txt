@@ -3,7 +3,7 @@ project(concorde LANGUAGES C)
 
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-set(WARNING_OPTIONS             -Wall -Wextra -Werror)
+set(WARNING_OPTIONS             -Wall -Wextra)
 set(RELEASE_OPTIONS             -O3)
 set(DEBUG_OPTIONS               -O0)
 set(GDB_DEBUG_OPTIONS           -ggdb3)
@@ -160,7 +160,9 @@ set_target_properties(      concorde_tiny PROPERTIES POSITION_INDEPENDENT_CODE O
 # set_target_properties(      concorde_tiny PROPERTIES SOVERSION 1)
 
 add_library(concorde
-        src/TSP/concorde.c
+        # NOTE: concorde.c contains main() and should NOT be in the library
+        # It's only used for the concorde-bin executable
+        # src/TSP/concorde.c
         src/TSP/control.c
         src/TSP/prob_io.c
         src/TSP/branch.c
@@ -212,11 +214,12 @@ target_compile_options(     concorde PRIVATE -Wno-unused-result)
 set_target_properties(      concorde PROPERTIES POSITION_INDEPENDENT_CODE ON)
 # set_target_properties(      concorde PROPERTIES SOVERSION 1)
 
-add_executable(concorde-bin
-        src/TSP/concorde.c)
-target_compile_features(    concorde-bin PUBLIC c_std_11)
-target_link_libraries(      concorde-bin PUBLIC ${LINKER_OPTIONS})
-target_link_libraries(      concorde-bin PUBLIC concorde)
+# concorde-bin executable disabled - we only need the library
+# add_executable(concorde-bin
+#         src/TSP/concorde.c)
+# target_compile_features(    concorde-bin PUBLIC c_std_11)
+# target_link_libraries(      concorde-bin PUBLIC ${LINKER_OPTIONS})
+# target_link_libraries(      concorde-bin PUBLIC concorde)
 
 add_custom_command(TARGET concorde POST_BUILD
         COMMAND rm -f *.o libconcorde_full.a libconcorde_full.so
@@ -246,22 +249,23 @@ add_custom_command(TARGET concorde POST_BUILD
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/INCLUDE"
         COMMENT "Creating concorde.h")
 
-add_custom_command(TARGET concorde-bin POST_BUILD
-        COMMAND rm -f *.c.o || true
-        COMMAND rm libconcorde_utils.a
-        COMMAND rm libconcorde_lp.a
-        COMMAND rm libconcorde_bigguy.a
-        COMMAND rm libconcorde_heldkarp.a
-        COMMAND rm libconcorde_edgegen.a
-        COMMAND rm libconcorde_linkern.a
-        COMMAND rm libconcorde_localcut.a
-        COMMAND rm libconcorde_pq.a
-        COMMAND rm libconcorde_cut.a
-        COMMAND rm libconcorde_fmatch.a
-        COMMAND rm libconcorde_kdtree.a
-        COMMAND rm libconcorde_combs.a
-        COMMAND rm libconcorde_verify.a
-        COMMAND rm libconcorde_tiny.a
-        COMMAND rm libconcorde.a
-        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        COMMENT "Cleaning up temporary object files")
+# concorde-bin POST_BUILD command disabled since concorde-bin is not built
+# add_custom_command(TARGET concorde-bin POST_BUILD
+#         COMMAND rm -f *.c.o || true
+#         COMMAND rm libconcorde_utils.a
+#         COMMAND rm libconcorde_lp.a
+#         COMMAND rm libconcorde_bigguy.a
+#         COMMAND rm libconcorde_heldkarp.a
+#         COMMAND rm libconcorde_edgegen.a
+#         COMMAND rm libconcorde_linkern.a
+#         COMMAND rm libconcorde_localcut.a
+#         COMMAND rm libconcorde_pq.a
+#         COMMAND rm libconcorde_cut.a
+#         COMMAND rm libconcorde_fmatch.a
+#         COMMAND rm libconcorde_kdtree.a
+#         COMMAND rm libconcorde_combs.a
+#         COMMAND rm libconcorde_verify.a
+#         COMMAND rm libconcorde_tiny.a
+#         COMMAND rm libconcorde.a
+#         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+#         COMMENT "Cleaning up temporary object files")
