@@ -67,7 +67,7 @@ int main (int ac, char **av)
     
     f = CCutil_snet_open (hostname, hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "Could not open connection to host %s\n", hostname);
+        CC_FPRINTF(stderr, "Could not open connection to host %s\n", hostname);
         rval = 1; goto CLEANUP;
     }
 
@@ -75,50 +75,50 @@ int main (int ac, char **av)
         if (savepool) {
             rval = CCutil_swrite_char (f, CCtsp_POOL_SAVECUTS);
             if (rval) {
-                fprintf (stderr, "CCutil_swrite_char failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
                 goto CLEANUP;
             }
         } else if (send_exit) {
             rval = CCutil_swrite_char (f, CCtsp_POOL_EXIT);
             if (rval) {
-                fprintf (stderr, "CCutil_swrite_char failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
                 goto CLEANUP;
             }
         } else {
-            fprintf (stderr, "Nothing to send to cutboss\n");
+            CC_FPRINTF(stderr, "Nothing to send to cutboss\n");
             rval = 1; goto CLEANUP;
         }
     } else if (telldomboss) {
         if (send_exit) {
             rval = CCutil_swrite_char (f, CCtsp_DOMINO_EXIT);
             if (rval) {
-                fprintf (stderr, "CCutil_swrite_char failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
                 goto CLEANUP;
             }
         } else {
-            fprintf (stderr, "Nothing to send to domboss\n");
+            CC_FPRINTF(stderr, "Nothing to send to domboss\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         if (deadnode >= 0) {
             rval = CCutil_swrite_char (f, CCtsp_BBREQ_DEADNODE);
             if (rval) {
-                fprintf (stderr, "CCutil_swrite_char failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
                 goto CLEANUP;
             }
             rval = CCutil_swrite_int (f, deadnode);
             if (rval) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 goto CLEANUP;
             }
         } else if (send_exit) {
             rval = CCutil_swrite_char (f, CCtsp_BBREQ_EXIT);
             if (rval) {
-                fprintf (stderr, "CCutil_swrite_char failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
                 goto CLEANUP;
             }
         } else {
-            fprintf (stderr, "Nothing to send to boss\n");
+            CC_FPRINTF(stderr, "Nothing to send to boss\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -126,7 +126,7 @@ int main (int ac, char **av)
     rval = CCutil_sclose (f);
     f = (CC_SFILE *) NULL;
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     
@@ -137,7 +137,7 @@ int main (int ac, char **av)
     }
     return rval;
 #else /* CC_NETREADY */
-    fprintf (stderr, "Networking disabled\n");
+    CC_FPRINTF(stderr, "Networking disabled\n");
     return 1;
 #endif /* CC_NETREADY */
 }
@@ -187,14 +187,14 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [-p port] -d deadnode hostname\n", f);
-    fprintf (stderr, "   or: %s [-p port] -x hostname\n", f);
-    fprintf (stderr, "   or: %s -c [-p port] -s cuthostname\n", f);
-    fprintf (stderr, "   or: %s -c [-p port] -x cuthostname\n", f);
-    fprintf (stderr, "   or: %s -D [-p port] -x domhostname\n", f);
-    fprintf (stderr, "   -d n tells the boss that node n is dead\n");
-    fprintf (stderr, "   -s   tells the cutboss to save the pool\n");
-    fprintf (stderr, "   -x   tells the (cut)boss to exit\n");
-    fprintf (stderr, "   -p n specifies the port the (cut)boss is listening to\n");
+    CC_FPRINTF(stderr, "Usage: %s [-p port] -d deadnode hostname\n", f);
+    CC_FPRINTF(stderr, "   or: %s [-p port] -x hostname\n", f);
+    CC_FPRINTF(stderr, "   or: %s -c [-p port] -s cuthostname\n", f);
+    CC_FPRINTF(stderr, "   or: %s -c [-p port] -x cuthostname\n", f);
+    CC_FPRINTF(stderr, "   or: %s -D [-p port] -x domhostname\n", f);
+    CC_FPRINTF(stderr, "   -d n tells the boss that node n is dead\n");
+    CC_FPRINTF(stderr, "   -s   tells the cutboss to save the pool\n");
+    CC_FPRINTF(stderr, "   -x   tells the (cut)boss to exit\n");
+    CC_FPRINTF(stderr, "   -p n specifies the port the (cut)boss is listening to\n");
 }
 

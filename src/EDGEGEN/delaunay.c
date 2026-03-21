@@ -234,9 +234,9 @@ int CCedgegen_delaunay (int ncount, CCdatagroup *dat, int wantlist,
 
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_SIZE_BITS) != CC_D2_NORM_SIZE) {
-        printf ("Cannot compute Delaunay triangulation with norm %d\n",
+        CC_PRINTF("Cannot compute Delaunay triangulation with norm %d\n",
                  norm);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         return 0;
     }
 
@@ -250,7 +250,7 @@ int CCedgegen_delaunay (int ncount, CCdatagroup *dat, int wantlist,
 
     freeinit (&dd.sfl, sizeof *dd.sites);
     if (set_up_sites (&dd, ncount, dat->x, dat->y)) {
-        fprintf (stderr, "set_up_sites failed\n");
+        CC_FPRINTF(stderr, "set_up_sites failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -353,7 +353,7 @@ int CCedgegen_delaunay (int ncount, CCdatagroup *dat, int wantlist,
     }
 
     if (intptr_check_leaks (&dd.intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs in delaunay\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs in delaunay\n",
                  total - onlist);
     }
 
@@ -417,8 +417,8 @@ static int set_up_sites (delaunaydat *dd, int ncount, double *x, double *y)
     dd->nsites = ncount;
     dd->sites = CC_SAFE_MALLOC (ncount, struct Site);
     if (!dd->sites) {
-        fprintf (stderr, "out of memory in set_up_sites\n");
-        fflush (stdout);
+        CC_FPRINTF(stderr, "out of memory in set_up_sites\n");
+        CC_FFLUSH(stdout);
         return 1;
     }
 
@@ -450,21 +450,21 @@ static int out_triple (delaunaydat *dd, struct Site *s1, struct Site *s2,
 /*
     to just print the triangles, use:
 
-    printf ("%d %d %d\n", s1->sitenbr, s2->sitenbr, s3->sitenbr);
+    CC_PRINTF("%d %d %d\n", s1->sitenbr, s2->sitenbr, s3->sitenbr);
 */
 
     if (put_in_table (dd, s1->sitenbr, s2->sitenbr, &added)) {
-        fprintf (stderr, "put_in_table failed\n");
+        CC_FPRINTF(stderr, "put_in_table failed\n");
         return 1;
     }
     *ntotal += added;
     if (put_in_table (dd, s2->sitenbr, s3->sitenbr, &added)) {
-        fprintf (stderr, "put_in_table failed\n");
+        CC_FPRINTF(stderr, "put_in_table failed\n");
         return 1;
     }
     *ntotal += added;
     if (put_in_table (dd, s3->sitenbr, s1->sitenbr, &added)) {
-        fprintf (stderr, "put_in_table failed\n");
+        CC_FPRINTF(stderr, "put_in_table failed\n");
         return 1;
     }
     *ntotal += added;
@@ -942,7 +942,7 @@ static char *vor_myalloc (delaunaydat *dd, unsigned n)
     char *t;
 
     if ((t = malloc (n)) == (char *) 0) {
-        fprintf (stderr, "Out of memory processing %d (%d bytes in use)\n",
+        CC_FPRINTF(stderr, "Out of memory processing %d (%d bytes in use)\n",
                  dd->siteidx, dd->total_alloc);
         exit (1);
     };

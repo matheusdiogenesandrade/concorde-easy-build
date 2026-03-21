@@ -72,14 +72,14 @@ int CCtsp_comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = CCtsp_test_pure_comb (g->ncount, c, &test, &ihandle);
     if (rval) {
-        fprintf (stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
     }
     if (!test) goto CLEANUP;
 
     handle = &c->cliques[ihandle];
     teeth = CC_SAFE_MALLOC (c->cliquecount - 1, CCtsp_lpclique *);
     if (teeth == (CCtsp_lpclique **) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_comb_to_cliquetree\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_comb_to_cliquetree\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < c->cliquecount; i++) {
@@ -90,7 +90,7 @@ int CCtsp_comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = comb_to_cliquetree (g, h, handle, nteeth, teeth, x, d);
     if (rval) {
-        fprintf (stderr, "comb_to_cliquetree failed\n");
+        CC_FPRINTF(stderr, "comb_to_cliquetree failed\n");
         goto CLEANUP;
     }
 
@@ -128,7 +128,7 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
     gset  = CC_SAFE_MALLOC (g->ncount, int);
     marks = CC_SAFE_MALLOC (g->ncount, int);
     if (gset == (int *) NULL || marks == (int *) NULL) {
-        fprintf (stderr, "out of memory in comb_to_cliquetree\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_cliquetree\n");
         rval = 1; goto CLEANUP;
     }
         
@@ -139,7 +139,7 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
 
     bigteeth = CC_SAFE_MALLOC (nteeth, CCtsp_lpclique *);
     if (!bigteeth) {
-        fprintf (stderr, "out of memory in comb_to_cliquetree\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_cliquetree\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -171,7 +171,7 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
 
         rval = CCtsp_clique_to_array (bigteeth[k], &ar, &acount);
         if (rval) {
-            fprintf (stderr, "CCtsp_clique_to_array failed\n");
+            CC_FPRINTF(stderr, "CCtsp_clique_to_array failed\n");
             goto CLEANUP;
         }
 
@@ -184,7 +184,7 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
                 rval = CCcombs_greedy_cut (h, &gcount, gset, 1, 2, 0, 2,
                                            (int *) NULL, &gval);
                 if (rval) {
-                    fprintf (stderr, "CCcombs_greedy_cut failed\n");
+                    CC_FPRINTF(stderr, "CCcombs_greedy_cut failed\n");
                     goto CLEANUP;
                 }
                 if (gcount >= 3) {
@@ -204,13 +204,13 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
             rval = CCcombs_greedy_cut (h, &gcount, gset, 1, 2, 0, 2,
                                        (int *) NULL, &gval);
             if (rval) {
-                fprintf (stderr, "CCcombs_greedy_cut failed\n");
+                CC_FPRINTF(stderr, "CCcombs_greedy_cut failed\n");
                 goto CLEANUP;
             }
 
             rval = CCtsp_array_to_lpclique (gset, gcount, &bunny);
             if (rval) {
-                fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
                 goto CLEANUP;
             }
 
@@ -263,18 +263,18 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
             if (t1val >= 0.1 && t2val >= 0.1) {
                 rval = CCtsp_array_to_lpclique (t1, 2, &ear1);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
                     goto CLEANUP;
                 }
                 rval = CCtsp_array_to_lpclique (t2, 2, &ear2);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
                     goto CLEANUP;
                 }
 
                 ctlist = CC_SAFE_MALLOC (nteeth + 2, CCtsp_lpclique *);
                 if (!ctlist) {
-                    fprintf (stderr, "out of memory in comb2ddecker\n");
+                    CC_FPRINTF(stderr, "out of memory in comb2ddecker\n");
                     CCtsp_free_lpclique (&ear1);
                     CCtsp_free_lpclique (&ear2);
                     CCtsp_free_lpclique (&bunny);
@@ -289,7 +289,7 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
                 rval = build_cliquetree (&dp, nteeth + 2, ctlist, handle,
                                          &bunny, g->ncount);
                 if (rval) {
-                    fprintf (stderr, "build_cliquegtee failed\n");
+                    CC_FPRINTF(stderr, "build_cliquegtee failed\n");
                     CCtsp_free_lpclique (&ear1);
                     CCtsp_free_lpclique (&ear2);
                     CCtsp_free_lpclique (&bunny);
@@ -298,7 +298,7 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
 
                 rval = CCtsp_test_pure_simple_cliquetree (g->ncount, dp, &test);
                 if (rval) {
-                    fprintf (stderr, "test_pure_simple_cliquetree failed\n");
+                    CC_FPRINTF(stderr, "test_pure_simple_cliquetree failed\n");
                     CCtsp_free_lpclique (&ear1);
                     CCtsp_free_lpclique (&ear2);
                     CCtsp_free_lpclique (&bunny);
@@ -306,7 +306,7 @@ static int comb_to_cliquetree (CCtsp_lpgraph *g, CC_GCgraph *h,
                     goto CLEANUP;
                 }
                 if (test == 0) {
-                    fprintf (stderr, "clique tree did not pass test\n");
+                    CC_FPRINTF(stderr, "clique tree did not pass test\n");
                     CCtsp_free_lpclique (&ear1);
                     CCtsp_free_lpclique (&ear2);
                     CCtsp_free_lpclique (&bunny);
@@ -358,20 +358,20 @@ static int build_cliquetree (CCtsp_lpcut_in **cut, int nteeth,
 
     dp->cliques = CC_SAFE_MALLOC (nteeth + 2, CCtsp_lpclique);
     if (!dp->cliques) {
-        fprintf (stderr, "out of memory in build_cliquetree\n");
+        CC_FPRINTF(stderr, "out of memory in build_cliquetree\n");
         CC_FREE (dp, CCtsp_lpcut_in);
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_copy_lpclique (hand1, &dp->cliques[0]);
     if (rval) {
-        fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
         CC_FREE (dp, CCtsp_lpcut_in);
         goto CLEANUP;
     }
     rval = CCtsp_copy_lpclique (hand2, &dp->cliques[1]);
     if (rval) {
-        fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
         CCtsp_free_lpclique (&dp->cliques[0]);
         CC_FREE (dp, CCtsp_lpcut_in);
         goto CLEANUP;
@@ -380,7 +380,7 @@ static int build_cliquetree (CCtsp_lpcut_in **cut, int nteeth,
     for (i = 0; i < nteeth; i++) {
         rval = CCtsp_copy_lpclique (teeth[i], &dp->cliques[i+2]);
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
             for (j = 0; j < i+2; j++) {
                 CCtsp_free_lpclique (&dp->cliques[j]);
             }
@@ -397,7 +397,7 @@ static int build_cliquetree (CCtsp_lpcut_in **cut, int nteeth,
 
     rval = CCtsp_construct_skeleton (dp, ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         CCtsp_free_lpcut_in (dp);
         goto CLEANUP;
     }
@@ -422,7 +422,7 @@ int CCtsp_test_pure_simple_cliquetree (int ncount, CCtsp_lpcut_in *c,
 
     marks = CC_SAFE_MALLOC (ncount, int);
     if (marks == (int *) NULL) {
-        fprintf (stderr, "out of memory in test_pure_simple_cliquetree\n");
+        CC_FPRINTF(stderr, "out of memory in test_pure_simple_cliquetree\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < c->cliquecount; i++) {
@@ -434,7 +434,7 @@ int CCtsp_test_pure_simple_cliquetree (int ncount, CCtsp_lpcut_in *c,
     for (i = 2; i < c->cliquecount; i++) {
         CCtsp_clique_marked_count (&c->cliques[i], marks, 1, &test);
         if (test > 0) {
-            fprintf (stderr, "teeth are not disjoint\n");
+            CC_FPRINTF(stderr, "teeth are not disjoint\n");
             *rtest = 0; goto CLEANUP;
         }
         CCtsp_mark_clique (&c->cliques[i], marks, 1);
@@ -448,7 +448,7 @@ int CCtsp_test_pure_simple_cliquetree (int ncount, CCtsp_lpcut_in *c,
     CCtsp_mark_clique (&c->cliques[0], marks, 1);
     CCtsp_clique_marked_count (&c->cliques[1], marks, 1, &test);
     if (test > 0) {
-        fprintf (stderr, "handles are not disjoint\n");
+        CC_FPRINTF(stderr, "handles are not disjoint\n");
         *rtest = 0; goto CLEANUP;
     }
     CCtsp_mark_clique (&c->cliques[0], marks, 0);
@@ -460,7 +460,7 @@ int CCtsp_test_pure_simple_cliquetree (int ncount, CCtsp_lpcut_in *c,
     for (i = 2; i < c->cliquecount; i++) {
         CCtsp_clique_marked_count (&c->cliques[i], marks, 0, &test);
         if (test == 0) {
-            fprintf (stderr, "tooth has no cavity\n");
+            CC_FPRINTF(stderr, "tooth has no cavity\n");
             *rtest = 0; goto CLEANUP;
         }
     }
@@ -477,11 +477,11 @@ int CCtsp_test_pure_simple_cliquetree (int ncount, CCtsp_lpcut_in *c,
              if (test > 0) k++;
          }
          if (k % 2 == 0) {
-             fprintf (stderr, "handle meets even number of teeth\n");
+             CC_FPRINTF(stderr, "handle meets even number of teeth\n");
              *rtest = 0; goto CLEANUP;
          }
          if (k < 3) {
-             fprintf (stderr, "handle meets only %d teeth\n", k);
+             CC_FPRINTF(stderr, "handle meets only %d teeth\n", k);
              *rtest = 0; goto CLEANUP;
          }
          CCtsp_mark_clique (&c->cliques[j], marks, 0);
@@ -498,7 +498,7 @@ int CCtsp_test_pure_simple_cliquetree (int ncount, CCtsp_lpcut_in *c,
         if (test > 0 && test2 > 0) k++;
     }
     if (k != 1) {
-        fprintf (stderr, "%d nonpendent teeth\n", k);
+        CC_FPRINTF(stderr, "%d nonpendent teeth\n", k);
         *rtest = 0; goto CLEANUP;
     }
 
@@ -506,7 +506,7 @@ int CCtsp_test_pure_simple_cliquetree (int ncount, CCtsp_lpcut_in *c,
 
     rhs = (2 * c->cliquecount) + (c->cliquecount - 3);
     if (rhs != c->rhs) {
-        fprintf (stderr, "rhs value is wrong\n");
+        CC_FPRINTF(stderr, "rhs value is wrong\n");
         *rtest = 0; goto CLEANUP;
     }
 

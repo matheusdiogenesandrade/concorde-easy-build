@@ -139,8 +139,8 @@ static void bigguy_neg (CCbigguy *x)
             } else {
                 x->ilo = 0;
                 if ((unsigned int) x->ihi == 32767) {
-                    fprintf (stderr, "OVERFLOW in bigguy_neg\n");
-                    fprintf (stderr, "BIGGUY errors are fatal\n");
+                    CC_FPRINTF(stderr, "OVERFLOW in bigguy_neg\n");
+                    CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
                     abort ();
                 } else if ((unsigned int) x->ihi < 65535) {
                     x->ihi = (unsigned int) x->ihi + 1;
@@ -199,8 +199,8 @@ CCbigguy CCbigguy_itobigguy (int d)
     }
 
     if (d < 0 || (d >> 16) >= 32768) {
-        fprintf (stderr, "OVERFLOW in CCbigguy_itobigguy\n");
-        fprintf (stderr, "BIGGUY errors are fatal\n");
+        CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_itobigguy\n");
+        CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
         abort ();
     }
     x.ihi = ((unsigned short) (d >> 16));
@@ -227,8 +227,8 @@ CCbigguy CCbigguy_dtobigguy (double d)
     }
 
     if (d / 65536.0 >= 32768.0) {
-        fprintf (stderr, "OVERFLOW in CCbigguy_dtobigguy (%.6f)\n", d * sgn);
-        fprintf (stderr, "BIGGUY errors are fatal\n");
+        CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_dtobigguy (%.6f)\n", d * sgn);
+        CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
         abort ();
     }
 
@@ -255,8 +255,8 @@ CCbigguy CCbigguy_ceil (CCbigguy x)
         x.ilo = (unsigned int) x.ilo + 1;
         if ((unsigned int) x.ilo == 0) {
             if ((unsigned int) x.ihi == 32767) {
-                fprintf (stderr, "OVERFLOW in CCbigguy_ceil\n");
-                fprintf (stderr, "BIGGUY errors are fatal\n");
+                CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_ceil\n");
+                CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
                 abort ();
             }
             x.ihi = (unsigned int) x.ihi + 1;
@@ -290,8 +290,8 @@ void CCbigguy_addmult (CCbigguy *x, CCbigguy y, int m)
     int mhi;
 
     if (m == -m && m != 0) {
-        fprintf (stderr, "OVERFLOW in CCbigguy_addmult (1)\n");
-        fprintf (stderr, "BIGGUY errors are fatal\n");
+        CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_addmult (1)\n");
+        CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
         abort ();
     }
 
@@ -311,13 +311,13 @@ void CCbigguy_addmult (CCbigguy *x, CCbigguy y, int m)
         mhi++;
     }
     if (mlo < -32768 || mlo > 32767) {
-        fprintf (stderr, "OVERFLOW in CCbigguy_addmult (2)\n");
-        fprintf (stderr, "BIGGUY errors are fatal\n");
+        CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_addmult (2)\n");
+        CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
         abort ();
     }
     if (mhi < -32768 || mhi > 32767) {
-        fprintf (stderr, "OVERFLOW in CCbigguy_addmult (3)\n");
-        fprintf (stderr, "BIGGUY errors are fatal\n");
+        CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_addmult (3)\n");
+        CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
         abort ();
     }
     
@@ -353,8 +353,8 @@ void CCbigguy_addmult (CCbigguy *x, CCbigguy y, int m)
         (carry == -1 && !(oldsgn == 1 && sgn == -1)) ||
         (carry == 0 && oldsgn != sgn) ||
         (carry == 1 && !(oldsgn == -1 && sgn == 1))) {
-        fprintf (stderr, "OVERFLOW in CCbigguy_addmult (4)\n");
-        fprintf (stderr, "BIGGUY errors are fatal\n");
+        CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_addmult (4)\n");
+        CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
         abort ();
     }
 
@@ -383,8 +383,8 @@ void CCbigguy_addmult (CCbigguy *x, CCbigguy y, int m)
         (carry == -1 && !(oldsgn == 1 && sgn == -1)) ||
         (carry == 0 && oldsgn != sgn) ||
         (carry == 1 && !(oldsgn == -1 && sgn == 1))) {
-        fprintf (stderr, "OVERFLOW in CCbigguy_addmult (4)\n");
-        fprintf (stderr, "BIGGUY errors are fatal\n");
+        CC_FPRINTF(stderr, "OVERFLOW in CCbigguy_addmult (4)\n");
+        CC_FPRINTF(stderr, "BIGGUY errors are fatal\n");
         abort ();
     }
 }

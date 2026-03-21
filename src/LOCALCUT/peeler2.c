@@ -32,27 +32,27 @@ static int add_clique (int *arr, int size, CC_UNUSED void *u_data)
 {
     int i;
     
-    printf ("(");
+    CC_PRINTF("(");
     for (i=0; i<size; i++) {
-        printf ("%d", arr[i]);
-        if (i < size-1) printf (" ");
+        CC_PRINTF("%d", arr[i]);
+        if (i < size-1) CC_PRINTF(" ");
     }
-    printf (") ");
+    CC_PRINTF(") ");
 
     return 0;
 }
 
 static int abort_cut (CC_UNUSED void *u_data)
 {
-    printf ("ABORTED\n");
-    fflush (stdout);
+    CC_PRINTF("ABORTED\n");
+    CC_FFLUSH(stdout);
     return 0;
 }
 
 static int finish_cut (int rhs, int *finished, CC_UNUSED void *u_data)
 {
-    printf (">= %d\n", rhs);
-    fflush (stdout);
+    CC_PRINTF(">= %d\n", rhs);
+    CC_FFLUSH(stdout);
     *finished = 0;
     return 0;
 }
@@ -77,7 +77,7 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
     coef = CC_SAFE_MALLOC (edgecount, int);
     if (elist == (int *) NULL ||
         coef == (int *) NULL) {
-        fprintf (stderr, "Out of memory\n");
+        CC_FPRINTF(stderr, "Out of memory\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -97,19 +97,19 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
     callback.u_data = (void *) NULL;
     
     for (i=0; i<nodecount; i++) {
-        printf ("With %d outside:\n", i);
+        CC_PRINTF("With %d outside:\n", i);
         rval = CCchunk_ineq_to_cut (nodecount, edgecount, elist, coef, rhs, i,
                             &callback);
         if (rval) {
-            fprintf (stderr, "CCchunk_ineq_to_cut failed\n");
+            CC_FPRINTF(stderr, "CCchunk_ineq_to_cut failed\n");
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 
-    printf ("Without callback:\n");
+    CC_PRINTF("Without callback:\n");
     rval = CCchunk_ineq_to_lpcut_in (nodecount, edgecount, elist, coef, rhs, &c);
     if (rval) {
-        fprintf (stderr, "CCchunk_ineq_to_lpcut_in failed\n");
+        CC_FPRINTF(stderr, "CCchunk_ineq_to_lpcut_in failed\n");
     }
     CCtsp_print_lpcut_in (&c);
     

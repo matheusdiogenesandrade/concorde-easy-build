@@ -160,7 +160,7 @@ void CCutil_init_timer (CCutil_timer *t, const char *name)
 void CCutil_start_timer (CCutil_timer *t)
 {
     if (t->szeit != -1.0) {
-        fprintf (stderr, "Warning: restarting running timer %s\n", t->name);
+        CC_FPRINTF(stderr, "Warning: restarting running timer %s\n", t->name);
     }
     t->szeit = CCutil_zeit ();
 }
@@ -168,7 +168,7 @@ void CCutil_start_timer (CCutil_timer *t)
 void CCutil_suspend_timer (CCutil_timer *t)
 {
     if (t->szeit == -1.0) {
-        fprintf (stderr, "Warning: suspended non-running timer %s\n", t->name);
+        CC_FPRINTF(stderr, "Warning: suspended non-running timer %s\n", t->name);
         return;
     }
     
@@ -179,7 +179,7 @@ void CCutil_suspend_timer (CCutil_timer *t)
 void CCutil_resume_timer (CCutil_timer *t)
 {
     if (t->szeit != -1.0) {
-        fprintf (stderr, "Warning: resuming running timer %s\n", t->name);
+        CC_FPRINTF(stderr, "Warning: resuming running timer %s\n", t->name);
         return;
     }
     t->szeit = CCutil_zeit ();
@@ -190,7 +190,7 @@ double CCutil_stop_timer (CCutil_timer *t, int printit)
     double z;
     
     if (t->szeit == -1.0) {
-        fprintf (stderr, "Warning: stopping non-running timer %s\n", t->name);
+        CC_FPRINTF(stderr, "Warning: stopping non-running timer %s\n", t->name);
         return 0.0;
     }
     z = CCutil_zeit() - t->szeit;
@@ -198,13 +198,13 @@ double CCutil_stop_timer (CCutil_timer *t, int printit)
     t->cum_zeit += z;
     t->count++;
     if (printit == 1 || (printit == 2 && z > 0.0)) {
-        printf ("Time for %s: %.2f seconds (%.2f total in %d calls)\n",
+        CC_PRINTF("Time for %s: %.2f seconds (%.2f total in %d calls)\n",
                 t->name, z, t->cum_zeit, t->count);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (printit == 3 || (printit == 4 && z > 0.0)) {
-        printf ("T %-34.34s %9.2f %9.2f %d\n",
+        CC_PRINTF("T %-34.34s %9.2f %9.2f %d\n",
                 t->name, z, t->cum_zeit, t->count);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
     return z;
 }
@@ -215,13 +215,13 @@ double CCutil_total_timer (CCutil_timer *t, int printit)
 
     if (t->szeit != -1.0) z += CCutil_zeit() - t->szeit;
     if (printit == 1 || (printit == 2 && z > 0.0)) {
-        printf ("Total time for %-34.34s %.2f seconds in %d%s calls\n",
+        CC_PRINTF("Total time for %-34.34s %.2f seconds in %d%s calls\n",
                 t->name, z, t->count, t->szeit == -1.0 ? "" : "+1");
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (printit == 3 || (printit == 4 && z > 0.0)) {
-        printf ("CT %-34.34s %9.2f %6d%s\n",
+        CC_PRINTF("CT %-34.34s %9.2f %6d%s\n",
                 t->name, z, t->count, t->szeit == -1.0 ? "" : "+1");
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
     return z;
 }

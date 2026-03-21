@@ -115,7 +115,7 @@ int main (int ac, char **av)
 
     if (!nodefile && norm == CC_SPARSE) {
         if (random_edge_count == 0) {
-            fprintf (stderr, "Must specify the number of edges\n");
+            CC_FPRINTF(stderr, "Must specify the number of edges\n");
             rval = 1; goto CLEANUP;
         }
         if (nearnum != 0 || quadnearnum != 0 || random_tour_count != 0 ||
@@ -126,7 +126,7 @@ int main (int ac, char **av)
             find_qboruvka_tour != 0 || find_fractional_2match != 0 ||
             find_spanning_tree != 0 || find_delaunay_edges != 0 ||
             find_mlinkern_edges != 0) {
-            fprintf (stderr, "Only permitted operation with SPARSE norm is a random edge set\n");
+            CC_FPRINTF(stderr, "Only permitted operation with SPARSE norm is a random edge set\n");
             rval = 1; goto CLEANUP;
         }
         ncount = nnodes_want;
@@ -139,13 +139,13 @@ int main (int ac, char **av)
         rval = CCutil_genedgelist (ncount, ecount, &elist, &elen,
                      (CCdatagroup *) NULL, maxlen, &rstate);
         if (rval) {
-            fprintf (stderr, "CCutil_genedgelist failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_genedgelist failed\n"); goto CLEANUP;
         }
         if (outfile) {
             rval = CCutil_writeedges_int (ncount, outfile, ecount, elist,
                                           elen, binary_out);
             if (rval) {
-                fprintf (stderr, "CCutil_writeedges_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_writeedges_int failed\n");
                 goto CLEANUP;
             }
         }
@@ -154,7 +154,7 @@ int main (int ac, char **av)
 
     if (tsplib_in) {
         if (CCutil_gettsplib (nodefile, &ncount, &dat)) {
-            fprintf (stderr, "could not read the TSPLIB file\n");
+            CC_FPRINTF(stderr, "could not read the TSPLIB file\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -184,7 +184,7 @@ int main (int ac, char **av)
     if (usenodeweights) {
         if (CCutil_getnodeweights (weightfile, ncount, random_weight_limit,
                                    &wcoord, &rstate)) {
-            fprintf (stderr, "could not read the nodeweight file\n");
+            CC_FPRINTF(stderr, "could not read the nodeweight file\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -192,7 +192,7 @@ int main (int ac, char **av)
 
     if (describefile) {
         if (CCedgegen_read (describefile, &plan)) {
-            fprintf (stderr, "CCedgegen_read failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_read failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -245,18 +245,18 @@ int main (int ac, char **av)
 
     if (CCedgegen_edges (&plan, ncount, &dat, wcoord, &ecount, &elist,
                          0, &rstate)) {
-        fprintf (stderr, "CCedgegen_edges failed\n");
+        CC_FPRINTF(stderr, "CCedgegen_edges failed\n");
         rval = 1;
         goto CLEANUP;
     }
 
-    printf ("Edgegen running time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_PRINTF("Edgegen running time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+    CC_FFLUSH(stdout);
 
     if (outfile && ecount) {
         if (CCutil_writeedges (ncount, outfile, ecount, elist, &dat,
                                binary_out)) {
-            fprintf (stderr, "Could not write the edge set\n");
+            CC_FPRINTF(stderr, "Could not write the edge set\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -264,7 +264,7 @@ int main (int ac, char **av)
 
     if (pointfile && ncount) {
         if (CCutil_writedata (pointfile, binary_out, ncount, &dat)) {
-            fprintf (stderr, "Could not write the point set\n");
+            CC_FPRINTF(stderr, "Could not write the point set\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -447,43 +447,43 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [- see below -] [dat file]\n", f);
-    fprintf (stderr, "   -b    dat file in binary-ints\n");
-    fprintf (stderr, "   -w f  node weight file\n");
-    fprintf (stderr, "   -W #  use random node weights, from 0 to # - 1\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -K #  in a SPARSE-norm problem, use edge weights from 0 to # - 1\n");
-    fprintf (stderr, "   -s #  random seed\n");
-    fprintf (stderr, "   -D f  description file\n");
-    fprintf (stderr, "   -e #  find # random edges\n");
-    fprintf (stderr, "   -n #  find # nearest graph\n");
-    fprintf (stderr, "   -q #  find quadrant # nearest graph\n");
-    fprintf (stderr, "   -d    find Delaunay triangulation\n");
-    fprintf (stderr, "   -f #  find # nearest using f2match reduced costs\n");
-    fprintf (stderr, "   -U #  find # random tours\n");
-    fprintf (stderr, "   -T #  find # nearest neighbor tours\n");
-    fprintf (stderr, "   -G    find greedy tour\n");
-    fprintf (stderr, "   -h    find boruvka tour\n");
-    fprintf (stderr, "   -i    find quick boruvka tour\n");
-    fprintf (stderr, "   -(A B C) #  find # (2opt, 2.5opt, 3opt) tours\n");
-    fprintf (stderr, "   -L #  find # linkern tours\n");
-    fprintf (stderr, "   -m #  find # linkern matchings\n");
-    fprintf (stderr, "   -r n  use nXn grid for random points, no dups if n<0\n");
-    fprintf (stderr, "   -R #  use # kicks in linkern (default: 100)\n");
-    fprintf (stderr, "   -u    use greedy starting tour for linkern\n");
-    fprintf (stderr, "   -H    use boruvka starting tour for linkern\n");
-    fprintf (stderr, "   -I    use quick boruvka starting tour for linkern\n");
-    fprintf (stderr, "   -v    use random starting tours for linkern\n");
-    fprintf (stderr, "   -x #  use # quadnearest in linkern\n");
-    fprintf (stderr, "   -y #  use # nearest in linkern (can use x & y)\n");
-    fprintf (stderr, "   -M #  find # nearest neighbor 2-matchings\n");
-    fprintf (stderr, "   -S    find min spanning tree\n");
-    fprintf (stderr, "   -F    find fractional twomatch (not priced)\n");
-    fprintf (stderr, "   -o f  write the cycle or edge set to f\n");
-    fprintf (stderr, "   -p f  write the point set to f\n");
-    fprintf (stderr, "   -O    use binary output\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
-    fprintf (stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
-    fprintf (stderr, "         17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "Usage: %s [- see below -] [dat file]\n", f);
+    CC_FPRINTF(stderr, "   -b    dat file in binary-ints\n");
+    CC_FPRINTF(stderr, "   -w f  node weight file\n");
+    CC_FPRINTF(stderr, "   -W #  use random node weights, from 0 to # - 1\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -K #  in a SPARSE-norm problem, use edge weights from 0 to # - 1\n");
+    CC_FPRINTF(stderr, "   -s #  random seed\n");
+    CC_FPRINTF(stderr, "   -D f  description file\n");
+    CC_FPRINTF(stderr, "   -e #  find # random edges\n");
+    CC_FPRINTF(stderr, "   -n #  find # nearest graph\n");
+    CC_FPRINTF(stderr, "   -q #  find quadrant # nearest graph\n");
+    CC_FPRINTF(stderr, "   -d    find Delaunay triangulation\n");
+    CC_FPRINTF(stderr, "   -f #  find # nearest using f2match reduced costs\n");
+    CC_FPRINTF(stderr, "   -U #  find # random tours\n");
+    CC_FPRINTF(stderr, "   -T #  find # nearest neighbor tours\n");
+    CC_FPRINTF(stderr, "   -G    find greedy tour\n");
+    CC_FPRINTF(stderr, "   -h    find boruvka tour\n");
+    CC_FPRINTF(stderr, "   -i    find quick boruvka tour\n");
+    CC_FPRINTF(stderr, "   -(A B C) #  find # (2opt, 2.5opt, 3opt) tours\n");
+    CC_FPRINTF(stderr, "   -L #  find # linkern tours\n");
+    CC_FPRINTF(stderr, "   -m #  find # linkern matchings\n");
+    CC_FPRINTF(stderr, "   -r n  use nXn grid for random points, no dups if n<0\n");
+    CC_FPRINTF(stderr, "   -R #  use # kicks in linkern (default: 100)\n");
+    CC_FPRINTF(stderr, "   -u    use greedy starting tour for linkern\n");
+    CC_FPRINTF(stderr, "   -H    use boruvka starting tour for linkern\n");
+    CC_FPRINTF(stderr, "   -I    use quick boruvka starting tour for linkern\n");
+    CC_FPRINTF(stderr, "   -v    use random starting tours for linkern\n");
+    CC_FPRINTF(stderr, "   -x #  use # quadnearest in linkern\n");
+    CC_FPRINTF(stderr, "   -y #  use # nearest in linkern (can use x & y)\n");
+    CC_FPRINTF(stderr, "   -M #  find # nearest neighbor 2-matchings\n");
+    CC_FPRINTF(stderr, "   -S    find min spanning tree\n");
+    CC_FPRINTF(stderr, "   -F    find fractional twomatch (not priced)\n");
+    CC_FPRINTF(stderr, "   -o f  write the cycle or edge set to f\n");
+    CC_FPRINTF(stderr, "   -p f  write the point set to f\n");
+    CC_FPRINTF(stderr, "   -O    use binary output\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
+    CC_FPRINTF(stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
+    CC_FPRINTF(stderr, "         17=GEOM, 18=JOHNSON\n");
 }

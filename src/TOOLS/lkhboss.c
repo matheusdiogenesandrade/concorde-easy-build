@@ -54,23 +54,23 @@ int main (int ac, char **av)
     }
 
     if ((norm & CC_NORM_SIZE_BITS) != CC_D2_NORM_SIZE) {
-        fprintf (stderr, "Only set up for 2D norms\n");
+        CC_FPRINTF(stderr, "Only set up for 2D norms\n");
         rval = 1;  goto CLEANUP;
     }
 
     if ((norm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-        fprintf (stderr, "Only set up for KD-tree norms\n");
+        CC_FPRINTF(stderr, "Only set up for KD-tree norms\n");
         rval = 1;  goto CLEANUP;
     }
 
-    printf ("Reading index ..."); fflush (stdout);
+    CC_PRINTF("Reading index ..."); CC_FFLUSH(stdout);
     rval = CCutil_read_subdivision_lkh_index (indexfname, &problabel, &i,
                                           &scount, &slist, &tourlen);
     CCcheck_rval (rval, "CCutil_read_subdivision_index failed");
-    printf ("DONE\n"); fflush (stdout);
+    CC_PRINTF("DONE\n"); CC_FFLUSH(stdout);
 
     if (i != ncount) {
-        fprintf (stderr, "index file does not match tsp file\n");
+        CC_FPRINTF(stderr, "index file does not match tsp file\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -80,20 +80,20 @@ int main (int ac, char **av)
     if (simpletour) {
         rval = CCutil_getcycle (ncount, tourfname, tour, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getcycle_tsplib failed\n");
+            CC_FPRINTF(stderr, "CCutil_getcycle_tsplib failed\n");
             goto CLEANUP;
         }
     } else {
         rval = CCutil_getcycle_tsplib (ncount, tourfname, tour);
         if (rval) {
-            fprintf (stderr, "CCutil_getcycle_tsplib failed\n");
+            CC_FPRINTF(stderr, "CCutil_getcycle_tsplib failed\n");
             goto CLEANUP;
         }
     }
 
     CCutil_cycle_len (ncount, &dat, tour, &val);
     if (val != tourlen) {
-        fprintf (stderr, "Cycle length does not match index file\n");
+        CC_FPRINTF(stderr, "Cycle length does not match index file\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -110,12 +110,12 @@ int main (int ac, char **av)
         }
     }
 
-    printf ("BEGINNING SUBDIV NET PROCESSING: %s\n\n", problabel);
-    fflush (stdout);
+    CC_PRINTF("BEGINNING SUBDIV NET PROCESSING: %s\n\n", problabel);
+    CC_FFLUSH(stdout);
 
     lport = CCutil_snet_listen (CC_SUBDIV_PORT);
     if (lport == (CC_SPORT *) NULL) {                                           
-        fprintf (stderr, "CCutil_snet_listen failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_listen failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -123,38 +123,38 @@ int main (int ac, char **av)
     while (nremain) {
         s = CCutil_snet_receive (lport);
         if (!s) {
-            fprintf (stderr, "CCutil_snet_receive failed, ignoring\n");
+            CC_FPRINTF(stderr, "CCutil_snet_receive failed, ignoring\n");
             continue;
         }
         rval = CCutil_sread_int (s, &id);
         if (rval) {
-            fprintf (stderr, "CCutil_sread_int failed, abort connection\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed, abort connection\n");
             rval = 0;
             goto CLOSE_CONN;
         }
         rval = CCutil_sread_double (s, &rtime);
         if (rval) {
             rval = 0;
-            fprintf (stderr, "CCutil_sread_double failed, abort connection\n");
+            CC_FPRINTF(stderr, "CCutil_sread_double failed, abort connection\n");
             goto CLOSE_CONN;
         }
         rval = CCutil_sread_double (s, &newlen);
         if (rval) {
             rval = 0;
-            fprintf (stderr, "CCutil_sread_double failed, abort connection\n");
+            CC_FPRINTF(stderr, "CCutil_sread_double failed, abort connection\n");
             goto CLOSE_CONN;
         }
         p = (CCsubdiv_lkh *) NULL;
         if (id == -1) goto GIVE_WORK;
         
         if (id < 0 || id >= scount) {
-            fprintf (stderr, "Finished unknown id %d, ignoring\n", id);
+            CC_FPRINTF(stderr, "Finished unknown id %d, ignoring\n", id);
             goto GIVE_WORK;
         }
         p = &slist[id];
 
         if (p->status != SUB_STAT_OPEN && p->status != SUB_STAT_WORK) {
-            fprintf (stderr, "Finished completed node %d, ignoring\n", id);
+            CC_FPRINTF(stderr, "Finished completed node %d, ignoring\n", id);
             goto GIVE_WORK;
         }
         if (newlen >= 0.0)  {
@@ -162,7 +162,7 @@ int main (int ac, char **av)
             delta = p->origlen - newlen;
             if (delta > 0.0) cumimprove += delta;
         } else {
-            printf ("SUBPROBLEM failed\n"); fflush (stdout);
+            CC_PRINTF("SUBPROBLEM failed\n"); CC_FFLUSH(stdout);
             nfail++;
         }
         p->status = SUB_STAT_DONE;
@@ -177,7 +177,7 @@ int main (int ac, char **av)
     GIVE_WORK:
 
         if (p) {
-            printf ("DONE %3d %7.2f sec %4.0f cum %7.0f delta %.2f ", p->id,
+            CC_PRINTF("DONE %3d %7.2f sec %4.0f cum %7.0f delta %.2f ", p->id,
                     p->newlen, rtime, cumtime, cumimprove);
         }
 
@@ -211,13 +211,13 @@ int main (int ac, char **av)
                  CCcheck_rval (rval, "CCutil_swrite_double failed");
              }
 
-             printf ("%-4s %2d rem %2d\n",
+             CC_PRINTF("%-4s %2d rem %2d\n",
                      curloc->status == SUB_STAT_OPEN ? "WORK" : "REWK",
                      curloc->id, nremain);
-             fflush (stdout);
+             CC_FFLUSH(stdout);
              curloc->status = SUB_STAT_WORK;
         } else {
-             printf ("\n"); fflush (stdout);
+             CC_PRINTF("\n"); CC_FFLUSH(stdout);
              CCutil_swrite_int (s, -1);
         }
 
@@ -225,10 +225,10 @@ int main (int ac, char **av)
 
         CCutil_sclose (s);
     }
-    printf ("\nFINISHED (%d failures): %.2f seconds\n", nfail, cumtime);
-    printf ("Total Improvement: %lf\n", cumimprove);
-    printf ("New Tour: %lf\n", tourlen - cumimprove);
-    fflush (stdout);
+    CC_PRINTF("\nFINISHED (%d failures): %.2f seconds\n", nfail, cumtime);
+    CC_PRINTF("Total Improvement: %lf\n", cumimprove);
+    CC_PRINTF("New Tour: %lf\n", tourlen - cumimprove);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -285,17 +285,17 @@ static int parseargs (int ac, char **av)
             if (boptind < ac) {
                 tspfname = av[boptind++];
             } else {
-                fprintf (stderr, "Missing one file\n");
+                CC_FPRINTF(stderr, "Missing one file\n");
                 usage (av[0]);
                 return 1;
             }
         } else {
-            fprintf (stderr, "Missing two files\n");
+            CC_FPRINTF(stderr, "Missing two files\n");
             usage (av[0]);
             return 1;
         }
     } else {
-        fprintf (stderr, "Missing indexfile, tourfile, and tspfile\n");
+        CC_FPRINTF(stderr, "Missing indexfile, tourfile, and tspfile\n");
         usage (av[0]);
         return 1;
     }
@@ -305,9 +305,9 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below] index_file tour_file tsp_or_dat_file\n", fname);
-    fprintf (stderr, "   -b    datfile in integer binary format\n");
-    fprintf (stderr, "   -t    tour file in concorde format (default TSPLIB)\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below] index_file tour_file tsp_or_dat_file\n", fname);
+    CC_FPRINTF(stderr, "   -b    datfile in integer binary format\n");
+    CC_FPRINTF(stderr, "   -t    tour file in concorde format (default TSPLIB)\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 17=GEOM, 18=JOHNSON\n");
 }

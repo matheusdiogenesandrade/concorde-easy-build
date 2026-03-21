@@ -127,7 +127,7 @@ int CCcut_linsub (int ncount, int ecount, int *endmark, int *elist, double *x,
     perm = CC_SAFE_MALLOC (ecount, int);
     eperm = CC_SAFE_MALLOC (ecount, int);
     if (!perm || !eperm) {
-        fprintf (stderr, "out of memory in CCcut_linsub\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_linsub\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ecount; i++) {
@@ -139,7 +139,7 @@ int CCcut_linsub (int ncount, int ecount, int *endmark, int *elist, double *x,
     ends = CC_SAFE_MALLOC (2*ecount, int);
     xends = CC_SAFE_MALLOC (ecount, double);
     if (!ends || !xends) {
-        fprintf (stderr, "out of memory in CCcut_linsub\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_linsub\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ecount; i++) {
@@ -167,7 +167,7 @@ int CCcut_linsub (int ncount, int ecount, int *endmark, int *elist, double *x,
             if (v < maxval) {
                 rval = (*cut_callback) (v, i, psh_minloc (&p), u_data);
                 if (rval) {
-                    fprintf (stderr, "cut_callback failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "cut_callback failed\n"); goto CLEANUP;
                 }
             }
         }
@@ -204,7 +204,7 @@ int CCcut_linsub_allcuts (int ncount, int ecount, int *perm, int *endmark,
     pendmark = CC_SAFE_MALLOC (ncount, int);
     if (perm_inv == (int *) NULL ||
         pendmark == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCcut_linsub_allcuts\n");
+        CC_FPRINTF(stderr, "Out of memory in CCcut_linsub_allcuts\n");
         CC_IFFREE (perm_inv, int);
         CC_IFFREE (pendmark, int);
         return -1;
@@ -223,7 +223,7 @@ int CCcut_linsub_allcuts (int ncount, int ecount, int *perm, int *endmark,
     }
 
     if (psh_init (&p, ncount, pendmark)) {
-        fprintf (stderr, "psh_init failed\n");
+        CC_FPRINTF(stderr, "psh_init failed\n");
         CC_IFFREE (perm_inv, int);
         CC_IFFREE (pendmark, int);
         return -1;
@@ -236,7 +236,7 @@ int CCcut_linsub_allcuts (int ncount, int ecount, int *perm, int *endmark,
     eperm = CC_SAFE_MALLOC (ecount, int);
     esort = CC_SAFE_MALLOC (ecount, int);
     if (eperm == (int *) NULL || esort == (int *) NULL) {
-        fprintf (stderr, "out of memory in CCcut_linsub_allcuts\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_linsub_allcuts\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ecount; i++) {
@@ -250,7 +250,7 @@ int CCcut_linsub_allcuts (int ncount, int ecount, int *perm, int *endmark,
     ends = CC_SAFE_MALLOC (2*ecount, int);
     xends = CC_SAFE_MALLOC (ecount, double);
     if (ends == (int *) NULL || xends == (double *) NULL) {
-        fprintf (stderr, "out of memory in CCcut_linsub_allcuts\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_linsub_allcuts\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ecount; i++) {
@@ -275,7 +275,7 @@ int CCcut_linsub_allcuts (int ncount, int ecount, int *perm, int *endmark,
         if (pendmark[i] & CC_LINSUB_LEFT_END) {
             rval = psh_enum (&p, i, maxval, u_data, cut_callback);
             if (rval) {
-                fprintf (stderr, "psh_enum failed\n");
+                CC_FPRINTF(stderr, "psh_enum failed\n");
                 goto CLEANUP;
             }
         }
@@ -456,7 +456,7 @@ static int psh_enum (psh *p, int cut_start, double maxval, void *u_data,
     rval = psh_enum_work (p, 1, p->base, 0.0, cut_start,
                           (maxval - 2.0) / 2.0, u_data, cut_callback);
     if (rval) {
-        fprintf (stderr, "psh_enum_work failed\n");
+        CC_FPRINTF(stderr, "psh_enum_work failed\n");
         return rval;
     }
     return 0;
@@ -473,7 +473,7 @@ static int psh_enum_work (psh *p, int n, int mul, double pre_sum,
         rval = (*cut_callback) (2.0 + 2.0*(pre_sum + p->sum[n]),
                 cut_start, n - p->base, u_data);
         if (rval) {
-            fprintf (stderr, "cut_callback failed\n");
+            CC_FPRINTF(stderr, "cut_callback failed\n");
             return rval;
         }
         return 0;

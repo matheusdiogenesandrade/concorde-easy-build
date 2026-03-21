@@ -68,7 +68,7 @@ int main (int ac, char **av)
         return 0;
 
     if (use_bnbtsp && depot == -1) {
-        fprintf (stderr, "Can only use bnb with msp format\n");
+        CC_FPRINTF(stderr, "Can only use bnb with msp format\n");
         return 0;
     }
 
@@ -81,19 +81,19 @@ int main (int ac, char **av)
         rval = getmsp (tspfile, &ncount, &ecount, &elist, &elen, &lower,
                        &upper);
         if (rval) {
-            fprintf (stderr, "getmsp failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "getmsp failed\n"); goto CLEANUP;
         }
     } else {
         rval = CCutil_getedgelist_n (&ncount, tspfile, &ecount, &elist,
                                      &elen, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getedgelist_n failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_getedgelist_n failed\n"); goto CLEANUP;
         }
         lower = CC_SAFE_MALLOC (ecount, int);
         upper = CC_SAFE_MALLOC (ecount, int);
         if (lower == (int *) NULL ||
             upper == (int *) NULL) {
-            fprintf (stderr, "Out of memory in main\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "Out of memory in main\n"); goto CLEANUP;
         }
         for (i=0; i<ecount; i++) {
             lower[i] = 0;
@@ -106,14 +106,14 @@ int main (int ac, char **av)
     } else {
         algname = "CCtiny_bnc_msp";
     }
-    printf ("Problem: %d nodes, %d edges (%s)\n", ncount, ecount, algname);
-    fflush (stdout);
+    CC_PRINTF("Problem: %d nodes, %d edges (%s)\n", ncount, ecount, algname);
+    CC_FFLUSH(stdout);
 
     szeit = CCutil_zeit ();
 
     xsol = CC_SAFE_MALLOC (ecount, int);
     if (!xsol) {
-        fprintf (stderr, "out of memory in main\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "out of memory in main\n"); goto CLEANUP;
     }
 
     if (use_bnbtsp) {
@@ -125,34 +125,34 @@ int main (int ac, char **av)
     }
 
     if (rval == CC_TINYTSP_INFEASIBLE) {
-        printf ("There is No Tour\n"); fflush (stdout);
+        CC_PRINTF("There is No Tour\n"); CC_FFLUSH(stdout);
         rval = 0; goto CLEANUP;
     } else if (rval == CC_TINYTSP_SEARCHLIMITEXCEEDED) {
-        printf ("Exeeded the search limit\n"); fflush (stdout);
+        CC_PRINTF("Exeeded the search limit\n"); CC_FFLUSH(stdout);
         rval = 0; goto CLEANUP;
     } else if (rval) {
-        fprintf (stderr, "CCtiny_bnc_msp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtiny_bnc_msp failed\n"); goto CLEANUP;
     }
 
-    printf ("Tour Length: %.2f\n", optval);
-    printf ("Tour: ");
+    CC_PRINTF("Tour Length: %.2f\n", optval);
+    CC_PRINTF("Tour: ");
     for (i = 0; i < ecount; i++) {
         if (xsol[i]) {
-            printf ("(%d, %d)", elist[2*i], elist[2*i+1]);
+            CC_PRINTF("(%d, %d)", elist[2*i], elist[2*i+1]);
             if (xsol[i] == 2.0) {
-                printf ("* ");
+                CC_PRINTF("* ");
             } else {
-                printf ("  ");
+                CC_PRINTF("  ");
             }
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
-    printf ("\n"); fflush (stdout);
+    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 
 CLEANUP:
     if (rval == 0) {
-        printf ("Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (elist, int);
@@ -176,7 +176,7 @@ static int getmsp (char *fname, int *ncount, int *ecount, int **elist,
 
     if ((in = fopen (fname, "r")) == (FILE *) NULL) {
         perror (fname);
-        fprintf (stderr, "Unable to open %s for input\n", fname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", fname);
         return 1;
     }
 
@@ -188,7 +188,7 @@ static int getmsp (char *fname, int *ncount, int *ecount, int **elist,
     *lower = CC_SAFE_MALLOC (*ecount, int);
     *upper = CC_SAFE_MALLOC (*ecount, int);
     if (!(*elist) || !(*elen) || !(*lower) || !(*upper)) {
-        fprintf (stderr, "out of memory in getmsp\n");
+        CC_FPRINTF(stderr, "out of memory in getmsp\n");
         fclose (in);
         CC_IFFREE (*elist, int);
         CC_IFFREE (*elen, int);
@@ -248,12 +248,12 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "usage: %s [- below -] edge_file\n", f);
-    fprintf (stderr, "    b     use bnb tsp solver\n");
-    fprintf (stderr, "    d #   use node # as a depot\n");
-    fprintf (stderr, "    m     edge_file is in msp format\n");
-    fprintf (stderr, "    M     maximize the tour length\n");
-    fprintf (stderr, "    S #   limit on number of search nodes\n");
-    fprintf (stderr, "    u #   upperbound on tour length\n");
-    fprintf (stderr, "    v     verify results\n");
+    CC_FPRINTF(stderr, "usage: %s [- below -] edge_file\n", f);
+    CC_FPRINTF(stderr, "    b     use bnb tsp solver\n");
+    CC_FPRINTF(stderr, "    d #   use node # as a depot\n");
+    CC_FPRINTF(stderr, "    m     edge_file is in msp format\n");
+    CC_FPRINTF(stderr, "    M     maximize the tour length\n");
+    CC_FPRINTF(stderr, "    S #   limit on number of search nodes\n");
+    CC_FPRINTF(stderr, "    u #   upperbound on tour length\n");
+    CC_FPRINTF(stderr, "    v     verify results\n");
 }

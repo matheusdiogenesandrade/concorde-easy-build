@@ -61,15 +61,15 @@ int main (int ac, char **av)
 
         if (in == (FILE *) NULL) {
             perror (cyclefilename);
-            fprintf (stderr, "Unable to open %s for input\n", cyclefilename);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", cyclefilename);
             rval = 1; goto CLEANUP;
         }
         ncount = CCutil_readint (in);
         i = CCutil_readint (in);
-        printf ("Number of nodes: %d\n", ncount);
-        fflush (stdout);
+        CC_PRINTF("Number of nodes: %d\n", ncount);
+        CC_FFLUSH(stdout);
         if (i != ncount) {
-            fprintf (stderr, "Not an edge-cycle file\n");
+            CC_FPRINTF(stderr, "Not an edge-cycle file\n");
             fclose (in);
             rval = 1; goto CLEANUP;
         }
@@ -79,20 +79,20 @@ int main (int ac, char **av)
             w = CCutil_readint (in);
             len += (double) w;
         }
-        printf ("Tour Length: %.0f\n", len);
-        fflush (stdout);
+        CC_PRINTF("Tour Length: %.0f\n", len);
+        CC_FFLUSH(stdout);
         fclose (in);
     }
 
     tour = CC_SAFE_MALLOC (ncount, int);
     if (!tour) {
-        fprintf (stderr, "out of memory in main\n");
+        CC_FPRINTF(stderr, "out of memory in main\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCutil_getcycle_edgelist (ncount, cyclefilename, tour, 0);
     if (rval) {
-        fprintf (stderr, "CCutil_getcycle_edgelist failed\n");
+        CC_FPRINTF(stderr, "CCutil_getcycle_edgelist failed\n");
         goto CLEANUP;
     }
 
@@ -103,7 +103,7 @@ int main (int ac, char **av)
         out = fopen (outfname, "w");
         if (!out) {
             perror (cyclefilename);
-            fprintf (stderr, "Unable to open %s for input\n", cyclefilename);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", cyclefilename);
             rval = 1; goto CLEANUP;
         }
 
@@ -113,8 +113,8 @@ int main (int ac, char **av)
         }
     }
 
-    printf ("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_PRINTF("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -154,6 +154,6 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s edge_cycle_file\n", f);
-    fprintf (stderr,  "    -o f output file for the tour\n"); 
+    CC_FPRINTF(stderr, "Usage: %s edge_cycle_file\n", f);
+    CC_FPRINTF(stderr,  "    -o f output file for the tour\n"); 
 }

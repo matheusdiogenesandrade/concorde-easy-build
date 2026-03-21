@@ -166,7 +166,7 @@ int main (int ac, char **av)
     rval = read_restart (resfname, &probname, &rootbbnode, &restart_upbound,
                         &restart_ncount, &bbcount, &branchzeit, &bbnode_world);
     if (rval) {
-        fprintf (stderr, "read_restart failed\n");
+        CC_FPRINTF(stderr, "read_restart failed\n");
         goto CLEANUP;
     }
 
@@ -174,21 +174,21 @@ int main (int ac, char **av)
         rval = draw_tree (probname, restart_upbound, bbcount, branchzeit,
                           arg_maxdepth, rootbbnode);
         if (rval) {
-            fprintf (stderr, "draw_tree failed\n");
+            CC_FPRINTF(stderr, "draw_tree failed\n");
             goto CLEANUP;
         }
     } else if (leafsummary || nodelist) {
         rval = report_leaves (probname, restart_upbound, bbcount, branchzeit,
                               mod, format, rootbbnode, nodelist);
         if (rval) {
-            fprintf (stderr, "report_leaves failed\n");
+            CC_FPRINTF(stderr, "report_leaves failed\n");
             goto CLEANUP;
         }
     } else {
         rval = report_tree (probname, restart_upbound, bbcount, branchzeit,
                             arg_maxdepth, mod, format, rootbbnode);
         if (rval) {
-            fprintf (stderr, "report_tree failed\n");
+            CC_FPRINTF(stderr, "report_tree failed\n");
             goto CLEANUP;
         }
     }
@@ -257,91 +257,91 @@ static void draw_prelude (int drawcnt, double lobound, double upbound,
     double labello;
     double m;
     
-    printf ("%%!PS-Adobe-2.0\n");
-    printf ("/yloc {%.2f exch sub %.2f mul %.2f div %.2f add} def\n", upbound,
+    CC_PRINTF("%%!PS-Adobe-2.0\n");
+    CC_PRINTF("/yloc {%.2f exch sub %.2f mul %.2f div %.2f add} def\n", upbound,
             (double) DRAWING_HEIGHT, upbound - lobound,
             (double) DRAWING_BOTTOM);
-    printf ("/xloc {%.2f mul %d div %.2f add} def\n", (double) DRAWING_WIDTH,
+    CC_PRINTF("/xloc {%.2f mul %d div %.2f add} def\n", (double) DRAWING_WIDTH,
             drawcnt, (double) DRAWING_LEFT);
-    printf ("/loc {yloc exch xloc exch} def\n");
-    printf ("/n {pop loc 1 0 360 arc fill} def\n");
-    printf ("/e {newpath 0.75 0.75 0.75 setrgbcolor loc moveto loc lineto stroke} def\n");
-    printf ("/dn {0 1 0 setrgbcolor n} def\n");
-    printf ("/cn {1 0 0 setrgbcolor n} def\n");
-    printf ("/bn {1 0 1 setrgbcolor n} def\n");
-    printf ("/un {1 1 0 setrgbcolor n} def\n");
-    printf ("/tbn {un} def\n");
-    printf ("/tcn {un} def\n");
-    printf ("/dw {gsave newpath 0 0 moveto true charpath pathbbox\n");
-    printf ("     exch 4 3 roll sub 3 1 roll sub grestore} def\n");
-    printf ("/lbl {gsave loc translate newpath 0 0 moveto %.2f 0 lineto stroke\n",
+    CC_PRINTF("/loc {yloc exch xloc exch} def\n");
+    CC_PRINTF("/n {pop loc 1 0 360 arc fill} def\n");
+    CC_PRINTF("/e {newpath 0.75 0.75 0.75 setrgbcolor loc moveto loc lineto stroke} def\n");
+    CC_PRINTF("/dn {0 1 0 setrgbcolor n} def\n");
+    CC_PRINTF("/cn {1 0 0 setrgbcolor n} def\n");
+    CC_PRINTF("/bn {1 0 1 setrgbcolor n} def\n");
+    CC_PRINTF("/un {1 1 0 setrgbcolor n} def\n");
+    CC_PRINTF("/tbn {un} def\n");
+    CC_PRINTF("/tcn {un} def\n");
+    CC_PRINTF("/dw {gsave newpath 0 0 moveto true charpath pathbbox\n");
+    CC_PRINTF("     exch 4 3 roll sub 3 1 roll sub grestore} def\n");
+    CC_PRINTF("/lbl {gsave loc translate newpath 0 0 moveto %.2f 0 lineto stroke\n",
             (double) -DRAWING_TIC);
-    printf ("      dup dw %.2f 0 moveto 2 div exch neg exch rmoveto show grestore} def\n",
+    CC_PRINTF("      dup dw %.2f 0 moveto 2 div exch neg exch rmoveto show grestore} def\n",
             (double) -(DRAWING_TIC + DRAWING_TICGAP));
-    printf ("gsave\n");
-    printf ("/Helvetica findfont 24 scalefont setfont\n");
-    printf ("0 0 0 setrgbcolor\n");
-    printf ("newpath\n");
-    printf ("%.2f 2 div %.2f add %.2f %.2f add moveto\n",
+    CC_PRINTF("gsave\n");
+    CC_PRINTF("/Helvetica findfont 24 scalefont setfont\n");
+    CC_PRINTF("0 0 0 setrgbcolor\n");
+    CC_PRINTF("newpath\n");
+    CC_PRINTF("%.2f 2 div %.2f add %.2f %.2f add moveto\n",
             (double) DRAWING_WIDTH, (double) DRAWING_LEFT,
             (double) DRAWING_HEIGHT, (double) DRAWING_BOTTOM);
-    printf ("(%s Branching Tree) dup stringwidth pop 2 div neg %.2f rmoveto show\n",
+    CC_PRINTF("(%s Branching Tree) dup stringwidth pop 2 div neg %.2f rmoveto show\n",
             probname, (double) DRAWING_TITLEGAP);
-    printf ("grestore\n");
+    CC_PRINTF("grestore\n");
     
-    printf ("gsave\n");
-    printf ("0 setlinewidth\n");
-    printf ("0 0 0 setrgbcolor\n");
-    printf ("/Helvetica findfont 10 scalefont setfont\n");
-    printf ("%.2f 0 translate\n", (double) -DRAWING_TICMARGIN);
+    CC_PRINTF("gsave\n");
+    CC_PRINTF("0 setlinewidth\n");
+    CC_PRINTF("0 0 0 setrgbcolor\n");
+    CC_PRINTF("/Helvetica findfont 10 scalefont setfont\n");
+    CC_PRINTF("%.2f 0 translate\n", (double) -DRAWING_TICMARGIN);
 
     m = fmod (lobound, labelstep);
     if (m == 0.0) labello = lobound;
     else          labello = lobound + labelstep - m;
 
-    printf ("newpath 0 %.2f loc moveto 0 %.2f loc lineto stroke\n",
+    CC_PRINTF("newpath 0 %.2f loc moveto 0 %.2f loc lineto stroke\n",
             lobound, upbound);
     
     for (m = labello; m <= upbound; m += labelstep) {
-        printf ("(%.0f) 0 %.2f lbl\n", m, m);
+        CC_PRINTF("(%.0f) 0 %.2f lbl\n", m, m);
     }
 
-    printf ("grestore\n");
+    CC_PRINTF("grestore\n");
 
-    printf ("gsave\n");
-    printf ("0.5 setlinewidth\n");
-    printf ("0 0 0 setrgbcolor\n");
-    printf ("\n");
+    CC_PRINTF("gsave\n");
+    CC_PRINTF("0.5 setlinewidth\n");
+    CC_PRINTF("0 0 0 setrgbcolor\n");
+    CC_PRINTF("\n");
 }
 
 static void draw_postlude (void)
 {
-    printf ("grestore\n");
-    printf ("showpage\n");
-    printf ("%%EOF\n");
+    CC_PRINTF("grestore\n");
+    CC_PRINTF("showpage\n");
+    CC_PRINTF("%%EOF\n");
 }
     
 static void draw_node (tsp_bbnode *bbnode, int depth)
 {
-    printf ("%d %.2f %d ", bbnode->number, bbnode->lowerbound, depth);
+    CC_PRINTF("%d %.2f %d ", bbnode->number, bbnode->lowerbound, depth);
     if (bbnode->status == BB_NEEDS_CUTTING) {
-        printf ("cn\n");
+        CC_PRINTF("cn\n");
     } else if (bbnode->status == BB_NEEDS_BRANCHING) {
-        printf ("bn\n");
+        CC_PRINTF("bn\n");
     } else if (bbnode->status == BB_NEEDS_TENTATIVE_CUTTING) {
-        printf ("tcn\n");
+        CC_PRINTF("tcn\n");
     } else if (bbnode->status == BB_NEEDS_TENTATIVE_BRANCHING) {
-        printf ("tbn\n");
+        CC_PRINTF("tbn\n");
     } else if (bbnode->status == BB_DONE) {
-        printf ("dn\n");
+        CC_PRINTF("dn\n");
     } else {
-        printf ("un\n");
+        CC_PRINTF("un\n");
     }
 }
 
 static void draw_edge (tsp_bbnode *bfrom, tsp_bbnode *bto)
 {
-    printf ("%d %.2f %d %.2f e\n", bfrom->number, bfrom->lowerbound,
+    CC_PRINTF("%d %.2f %d %.2f e\n", bfrom->number, bfrom->lowerbound,
             bto->number, bto->lowerbound);
 }
 
@@ -395,14 +395,14 @@ static int report_leaves (char *probname, double restart_upbound,
 
     leafvals = CC_SAFE_MALLOC (bbcount, double);
     if (leafvals == (double *) NULL) {
-        fprintf (stderr, "Out of memory in report_leaves\n");
+        CC_FPRINTF(stderr, "Out of memory in report_leaves\n");
         rval = 1; goto CLEANUP;
     }
 
     if (shownodes) {
         leafbbs = CC_SAFE_MALLOC (bbcount, tsp_bbnode *);
         if (leafbbs == (tsp_bbnode **) NULL) {
-            fprintf (stderr, "Out of memory in report_leaves\n");
+            CC_FPRINTF(stderr, "Out of memory in report_leaves\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -410,7 +410,7 @@ static int report_leaves (char *probname, double restart_upbound,
     lower = restart_upbound;
     collect_leaves (rootbbnode, &lower, &leafcount, leafvals, leafbbs);
 
-    printf ("%s: >= %.2f <= %.2f bb %d active %d time %.2f\n", probname, lower,
+    CC_PRINTF("%s: >= %.2f <= %.2f bb %d active %d time %.2f\n", probname, lower,
             restart_upbound, bbcount, leafcount, branchzeit);
 
     if (leafcount == 0) {
@@ -420,7 +420,7 @@ static int report_leaves (char *probname, double restart_upbound,
 
     leafperm = CC_SAFE_MALLOC (leafcount, int);
     if (leafperm == (int *) NULL) {
-        fprintf (stderr, "Out of memory in report_leaves\n");
+        CC_FPRINTF(stderr, "Out of memory in report_leaves\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -438,14 +438,14 @@ static int report_leaves (char *probname, double restart_upbound,
             sprintf (buf, format, v);
             outcnt += strlen(buf) + 1;
             if (outcnt >= 75) {
-                printf ("\n");
+                CC_PRINTF("\n");
                 outcnt = strlen(buf) + 1;
             }
-            printf ("%s ",buf);
+            CC_PRINTF("%s ",buf);
         }
     }
     if (!shownodes) {
-        printf ("\n");
+        CC_PRINTF("\n");
     }
     rval = 0;
     
@@ -463,22 +463,22 @@ static void print_node (tsp_bbnode *bbnode, double mod, char *format)
     
     switch (bbnode->status) {
     case BB_NEEDS_CUTTING:
-        printf ("C"); break;
+        CC_PRINTF("C"); break;
     case BB_NEEDS_BRANCHING:
-        printf ("B"); break;
+        CC_PRINTF("B"); break;
     case BB_NEEDS_TENTATIVE_CUTTING:
-        printf ("T"); break;
+        CC_PRINTF("T"); break;
     case BB_NEEDS_TENTATIVE_BRANCHING:
-        printf ("t"); break;
+        CC_PRINTF("t"); break;
     default:
-        printf ("?%d", bbnode->status); break;
+        CC_PRINTF("?%d", bbnode->status); break;
     }
-    printf (" %5d ", bbnode->id);
+    CC_PRINTF(" %5d ", bbnode->id);
     if (mod > 0.0) v = fmod (v, mod);
-    printf (format, v);
+    CC_PRINTF(format, v);
 
     (void) prob_name (buf, sizeof (buf), "", bbnode->id);
-    printf (" %s\n", buf);
+    CC_PRINTF(" %s\n", buf);
 }
 
 static void show_node (tsp_bbnode *bbnode, double mod, char *format)
@@ -493,12 +493,12 @@ static void show_node (tsp_bbnode *bbnode, double mod, char *format)
         for (j=0; j<bbnode->numtentative; j++) {
             b = bbnode->tentative_nodes[j].child0;
             if (b && b->status != BB_DONE) {
-                printf ("   ");
+                CC_PRINTF("   ");
                 print_node (b, mod, format);
             }
             b = bbnode->tentative_nodes[j].child1;
             if (b && b->status != BB_DONE) {
-                printf ("   ");
+                CC_PRINTF("   ");
                 print_node (b, mod, format);
             }
         }
@@ -516,7 +516,7 @@ static int report_tree (char *probname, double restart_upbound,
     lower = restart_upbound;
     collect_leaves (rootbbnode, &lower, &leafcount, (double *) NULL, (tsp_bbnode **) NULL);
 
-    printf ("%s: >= %.2f <= %.2f bb %d active %d time %.2f\n", probname, lower,
+    CC_PRINTF("%s: >= %.2f <= %.2f bb %d active %d time %.2f\n", probname, lower,
             restart_upbound, bbcount, leafcount, branchzeit);
 
     output_tree (rootbbnode, buf, 0, 0, maxdepth, mod, format);
@@ -535,16 +535,16 @@ static void output_tree (tsp_bbnode *bbnode, char *buf, int buflen,
     if (mod > 0.0) v = fmod(v, mod);
     sprintf (mybuf, "%d ", bbnode->id);
     sprintf (mybuf + strlen(mybuf), format, v);
-    printf ("%s", mybuf);
+    CC_PRINTF("%s", mybuf);
     if (bbnode->child0 == (tsp_bbnode *) NULL &&
         bbnode->child1 == (tsp_bbnode *) NULL) {
-        if (bbnode->status == BB_DONE) printf ("X");
-        printf ("\n");
+        if (bbnode->status == BB_DONE) CC_PRINTF("X");
+        CC_PRINTF("\n");
     } else if (maxdepth > 0 && depth >= maxdepth) {
-        if (bbnode->status == BB_DONE) printf ("+");
-        printf ("\n");
+        if (bbnode->status == BB_DONE) CC_PRINTF("+");
+        CC_PRINTF("\n");
     } else {
-        printf (" ");
+        CC_PRINTF(" ");
         outcnt = strlen(mybuf) + 1;
         if (bbnode->parent == (tsp_bbnode *) NULL ||
             bbnode->parent->child1 == bbnode) {
@@ -557,7 +557,7 @@ static void output_tree (tsp_bbnode *bbnode, char *buf, int buflen,
         output_tree (bbnode->child0, buf, buflen, depth+1, maxdepth,
                      mod, format);
         buf[buflen] = '\0';
-        printf ("%s", buf);
+        CC_PRINTF("%s", buf);
         output_tree (bbnode->child1, buf, buflen, depth+1, maxdepth,
                      mod, format);
     }
@@ -574,14 +574,14 @@ static int read_restart (char *restart_name, char **p_probname,
     f = fopen (restart_name, "r");
     if (f == (FILE*) NULL) {
         perror (restart_name);
-        fprintf (stderr, "Unable to open %s for input in read_restart\n",
+        CC_FPRINTF(stderr, "Unable to open %s for input in read_restart\n",
                  restart_name);
         rval = 1; goto CLEANUP;
     }
 
     probname = CC_SAFE_MALLOC (CCtsp_PROB_FILE_NAME_LEN, char);
     if (probname == (char *) NULL) {
-        fprintf (stderr, "Out of memory in read_restart\n");
+        CC_FPRINTF(stderr, "Out of memory in read_restart\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -591,18 +591,18 @@ static int read_restart (char *restart_name, char **p_probname,
             p_branchzeit);
     if (rval <= 0) {
         perror (restart_name);
-        fprintf (stderr, "fscanf from %s failed\n", restart_name);
+        CC_FPRINTF(stderr, "fscanf from %s failed\n", restart_name);
         rval = 1; goto CLEANUP;
     }
     rval = read_bbtree (f, p_rootbbnode, bbnode_world);
     if (rval) {
-        fprintf (stderr, "read_bbtree failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "read_bbtree failed\n"); goto CLEANUP;
     }
     
     rval = fclose (f);
     if (rval) {
         perror (restart_name);
-        fprintf (stderr, "fclose %s failed\n", restart_name);
+        CC_FPRINTF(stderr, "fclose %s failed\n", restart_name);
         rval = 1; goto CLEANUP;
     }
     f = (FILE *) NULL;
@@ -630,7 +630,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
 
     b = tsp_bbnode_alloc (bbnode_world);
     if (b == (tsp_bbnode *) NULL) {
-        fprintf (stderr, "tsp_bbnode_alloc failed\n");
+        CC_FPRINTF(stderr, "tsp_bbnode_alloc failed\n");
         rval = 1; goto CLEANUP;
     }
     init_bbnode (b);
@@ -640,7 +640,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
                     &b->cputime);
     if (rval <= 0) {
         perror ("restart_file");
-        fprintf (stderr, "fscanf failed reading restart file\n");
+        CC_FPRINTF(stderr, "fscanf failed reading restart file\n");
         rval = 1; goto CLEANUP;
     }
     b->workstatus = BB_IDLE;
@@ -649,7 +649,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
         rval = read_tentative_nodes (f, b->numtentative, &b->tentative_nodes,
                                      b, bbnode_world);
         if (rval) {
-            fprintf (stderr, "read_tentative_nodes failed\n");
+            CC_FPRINTF(stderr, "read_tentative_nodes failed\n");
             goto CLEANUP;
         }
     }
@@ -658,7 +658,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
         rval = read_bbtree (f, &(b->child0), bbnode_world);
         if (rval) goto CLEANUP;
         if (b->child0->id != child0) {
-            fprintf (stderr, "syntax error in restart file\n");
+            CC_FPRINTF(stderr, "syntax error in restart file\n");
             rval = 1; goto CLEANUP;
         }
         b->child0->parent = b;
@@ -667,7 +667,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
         rval = read_bbtree (f, &(b->child1), bbnode_world);
         if (rval) goto CLEANUP;
         if (b->child1->id != child1) {
-            fprintf (stderr, "syntax error in restart file\n");
+            CC_FPRINTF(stderr, "syntax error in restart file\n");
             rval = 1; goto CLEANUP;
         }
         b->child1->parent = b;
@@ -695,7 +695,7 @@ static int read_tentative_nodes (FILE *f, int count, tsp_tnode **list,
 
     *list = CC_SAFE_MALLOC (count, tsp_tnode);
     if (*list == (tsp_tnode *) NULL) {
-        fprintf (stderr, "out of memory in read_tentative_nodes\n");
+        CC_FPRINTF(stderr, "out of memory in read_tentative_nodes\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -703,13 +703,13 @@ static int read_tentative_nodes (FILE *f, int count, tsp_tnode **list,
         s = &((*list)[obtained]);
         child0 = tsp_bbnode_alloc (bbnode_world);
         if (child0 == (tsp_bbnode *) NULL) {
-            fprintf (stderr, "tsp_bbnode_alloc failed\n");
+            CC_FPRINTF(stderr, "tsp_bbnode_alloc failed\n");
             rval = 1; goto CLEANUP;
         }
         init_bbnode (child0);
         child1 = tsp_bbnode_alloc (bbnode_world);
         if (child1 == (tsp_bbnode *) NULL) {
-            fprintf (stderr, "tsp_bbnode_alloc failed\n");
+            CC_FPRINTF(stderr, "tsp_bbnode_alloc failed\n");
             tsp_bbnode_free (bbnode_world, child0);
             rval = 1; goto CLEANUP;
         }
@@ -722,7 +722,7 @@ static int read_tentative_nodes (FILE *f, int count, tsp_tnode **list,
                     &child1->lowerbound, &child1->cputime);
         if (rval <= 0) {
             perror ("restart_file");
-            fprintf (stderr, "fscanf failed reading tentative line\n");
+            CC_FPRINTF(stderr, "fscanf failed reading tentative line\n");
             rval = 1; goto CLEANUP;
         }
         child0->tparent = s;
@@ -778,7 +778,7 @@ static int prob_name (char *buf, size_t buflen, const char *f, int n)
     int d;
 
     if (l + 5 > (int) buflen || n < 0) {
-        fprintf (stderr, "Cannot generate filename for %s node %d\n",
+        CC_FPRINTF(stderr, "Cannot generate filename for %s node %d\n",
                  f, n);
         return -1;
     }
@@ -840,7 +840,7 @@ static int prob_name (char *buf, size_t buflen, const char *f, int n)
         buf[l++] = (d < 10) ? '0' + ((unsigned int) d)
                             : 'a' + ((unsigned int) (d-10));
     } else {
-        fprintf (stderr, "Node number %d too large\n", n);
+        CC_FPRINTF(stderr, "Node number %d too large\n", n);
         return -1;
     }
         
@@ -920,12 +920,12 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below] restart_fname\n", fname);
-    fprintf (stderr, "   -d n  dump only to depth n\n");
-    fprintf (stderr, "   -l    output leaf summary\n");
-    fprintf (stderr, "   -n    output leaf node summary\n");
-    fprintf (stderr, "   -p n  only show last n digits before decimal\n");
-    fprintf (stderr, "   -P N  only show first n digits after decimal\n");
-    fprintf (stderr, "   -g    create graphical (postscript) picture\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below] restart_fname\n", fname);
+    CC_FPRINTF(stderr, "   -d n  dump only to depth n\n");
+    CC_FPRINTF(stderr, "   -l    output leaf summary\n");
+    CC_FPRINTF(stderr, "   -n    output leaf node summary\n");
+    CC_FPRINTF(stderr, "   -p n  only show last n digits before decimal\n");
+    CC_FPRINTF(stderr, "   -P N  only show first n digits after decimal\n");
+    CC_FPRINTF(stderr, "   -g    create graphical (postscript) picture\n");
 }
 

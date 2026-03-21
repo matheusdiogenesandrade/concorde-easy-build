@@ -134,7 +134,7 @@ int CCcombs_greedy_cut (CC_GCgraph *g, int *setsize, int *set, int mark_fixed,
 
     rval = CCutil_priority_init (&gd.q, *setsize);
     if (rval) {
-        fprintf (stderr, "CCutil_priority_init failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_priority_init failed\n"); goto CLEANUP;
     }
     gd.set = set;
     gd.setsize = *setsize;
@@ -143,7 +143,7 @@ int CCcombs_greedy_cut (CC_GCgraph *g, int *setsize, int *set, int mark_fixed,
 
     rval = init_greedy (g, &gd);
     if (rval) {
-        fprintf (stderr, "init_greedy failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "init_greedy failed\n"); goto CLEANUP;
     }
 
     while ((n = (CC_GCnode *) CCutil_priority_findmin (&gd.q, &delta)) !=
@@ -161,12 +161,12 @@ int CCcombs_greedy_cut (CC_GCgraph *g, int *setsize, int *set, int mark_fixed,
         if (n->setloc >= 0) {
             rval = del_node (&gd, g, n, 1);
             if (rval) {
-                fprintf (stderr, "del_node failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "del_node failed\n"); goto CLEANUP;
             }
         } else {
             rval = add_node (&gd, g, n, 1);
             if (rval) {
-                fprintf (stderr, "add_node failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "add_node failed\n"); goto CLEANUP;
             }
         }
     }
@@ -206,7 +206,7 @@ static int init_greedy (CC_GCgraph *g, greedy_data *gd)
     for (i = 0; i < in_setsize; i++) {
         rval = add_node (gd, g, &nodelist[set[i]], 0);
         if (rval) {
-            fprintf (stderr, "add_node failed\n");
+            CC_FPRINTF(stderr, "add_node failed\n");
             return rval;
         }
     }
@@ -215,13 +215,13 @@ static int init_greedy (CC_GCgraph *g, greedy_data *gd)
         n = &nodelist[set[i]];
         rval = update_node (gd, n);
         if (rval) {
-            fprintf (stderr, "update_node failed\n");
+            CC_FPRINTF(stderr, "update_node failed\n");
             return rval;
         }
         for (j = 0; j < n->deg; j++) {
             rval = update_node (gd, &nodelist[n->adj[j].to]);
             if (rval) {
-                fprintf (stderr, "update_node failed\n");
+                CC_FPRINTF(stderr, "update_node failed\n");
                 return rval;
             }
         }
@@ -300,7 +300,7 @@ static int update_node (greedy_data *gd, CC_GCnode *n)
         if (n->qhandle < 0) {
             n->qhandle = CCutil_priority_insert (&(gd->q), (void *) n, delta);
             if (n->qhandle < 0) {
-                fprintf (stderr, "CCutil_priority_insert failed\n");
+                CC_FPRINTF(stderr, "CCutil_priority_insert failed\n");
                 return 1;
             }
         } else {
@@ -341,7 +341,7 @@ static int add_node (greedy_data *gd, CC_GCgraph *g, CC_GCnode *n,
         if (do_update) {
             rval = update_node (gd, &nodelist[m]);
             if (rval) {
-                fprintf (stderr, "update_node failed\n");
+                CC_FPRINTF(stderr, "update_node failed\n");
                 return rval;
             }
         }
@@ -350,7 +350,7 @@ static int add_node (greedy_data *gd, CC_GCgraph *g, CC_GCnode *n,
         n->status &= ~STAT_LASTDELTIED;
         rval = update_node (gd, n);
         if (rval) {
-            fprintf (stderr, "update_node failed\n");
+            CC_FPRINTF(stderr, "update_node failed\n");
             return rval;
         }
     }
@@ -390,7 +390,7 @@ static int del_node (greedy_data *gd, CC_GCgraph *g, CC_GCnode *n,
         if (do_update) {
             rval = update_node (gd, &nodelist[m]);
             if (rval) {
-                fprintf (stderr, "update_node failed\n");
+                CC_FPRINTF(stderr, "update_node failed\n");
                 return rval;
             }
         }
@@ -403,7 +403,7 @@ static int del_node (greedy_data *gd, CC_GCgraph *g, CC_GCnode *n,
         }
         rval = update_node (gd, n);
         if (rval) {
-            fprintf (stderr, "update_node failed\n");
+            CC_FPRINTF(stderr, "update_node failed\n");
             return rval;
         }
     }
@@ -423,14 +423,14 @@ int CCcombs_GC_build_graph (CC_GCgraph *G, int ncount, int ecount, int *elist,
     if (ncount) {
         G->nodelist = CC_SAFE_MALLOC (ncount, CC_GCnode);
         if (G->nodelist == (CC_GCnode *) NULL) {
-            fprintf (stderr, "out of memory in CCcombs_GC_build_graph\n");
+            CC_FPRINTF(stderr, "out of memory in CCcombs_GC_build_graph\n");
             rval = 1; goto CLEANUP;
         }
     }
     if (ecount) {
         G->edgespace = CC_SAFE_MALLOC (2 * ecount, CC_GCedge);
         if (G->edgespace == (CC_GCedge *) NULL) {
-            fprintf (stderr, "out of memory in CCcombs_GC_build_graph\n");
+            CC_FPRINTF(stderr, "out of memory in CCcombs_GC_build_graph\n");
             CC_IFFREE (G->nodelist, CC_GCnode);
             rval = 1; goto CLEANUP;
         }

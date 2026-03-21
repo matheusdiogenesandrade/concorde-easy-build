@@ -210,13 +210,13 @@ int CCtsp_connect_cuts (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     rval = CCcut_connect_components (ncount, ecount, elist, x, &ncomp,
                                      &compscount, &comps);
     if (rval) {
-        fprintf (stderr, "CCcut_connect_components failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_connect_components failed\n"); goto CLEANUP;
     }
 
     for (i = 0, k = 0; i < ncomp - 1; k += compscount[i], i++) {
         rval = CCtsp_array_to_subtour (&c, comps + k, compscount[i], ncount);
         if (rval) {
-            fprintf (stderr, "CCtsp_array_to_subtour failed\n");
+            CC_FPRINTF(stderr, "CCtsp_array_to_subtour failed\n");
             rval = 1; goto CLEANUP;
         }
         c->next = *cuts;
@@ -248,7 +248,7 @@ int CCtsp_segment_cuts (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
     endmark = CC_SAFE_MALLOC (ncount, int);
     if (endmark == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_segment_cuts\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_segment_cuts\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -272,7 +272,7 @@ int CCtsp_segment_cuts (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     rval = CCcut_linsub (ncount, ecount, endmark, elist, x, 2.0 - 0.0001,
                          (void *) &p, add_segment);
     if (rval) {
-        fprintf (stderr, "CCcut_linsub failed\n");
+        CC_FPRINTF(stderr, "CCcut_linsub failed\n");
         goto CLEANUP;
     }
 
@@ -296,7 +296,7 @@ int CCtsp_shrink_subtours (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 /*
     rval = CCtsp_connect_cuts (cuts, cutcount, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "CCtsp_connect_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_connect_cuts failed\n"); goto CLEANUP;
     }
 
     if (*cutcount > 0) {
@@ -311,7 +311,7 @@ int CCtsp_shrink_subtours (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     rval = CCcut_shrink_cuts (ncount, ecount, elist, x, 2.0 - 0.0001,
                        add_exact, (void *) &p);
     if (rval) {
-        fprintf (stderr, "CCcut_violated_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_violated_cuts failed\n"); goto CLEANUP;
     }
 
     *cutcount = p.cutcount;
@@ -332,7 +332,7 @@ int CCtsp_exact_subtours (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     *cutcount = 0;
     rval = CCtsp_connect_cuts (cuts, cutcount, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "CCtsp_connect_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_connect_cuts failed\n"); goto CLEANUP;
     }
 
     if (*cutcount > 0) {
@@ -346,7 +346,7 @@ int CCtsp_exact_subtours (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     rval = CCcut_violated_cuts (ncount, ecount, elist, x, 2.0 - 0.0001,
                        add_exact, (void *) &p);
     if (rval) {
-        fprintf (stderr, "CCcut_violated_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_violated_cuts failed\n"); goto CLEANUP;
     }
 
     *cutcount = p.cutcount;
@@ -363,18 +363,18 @@ int CCtsp_exact_subtours (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
         rval = CCtsp_build_lpgraph (&lg, ncount, ecount, elist, (int *) NULL);
         if (rval) {
-            fprintf (stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
         }
         rval = CCtsp_build_lpadj (&lg, 0, ecount);
         if (rval) {
             CCtsp_free_lpgraph (&lg);
-            fprintf (stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
         }
         for (c = p.cuts; c; c = c->next) {
             t = CCtsp_cutprice (&lg, c, x);
-            printf ("[%f] ", 2.0 + t); fflush (stdout);
+            CC_PRINTF("[%f] ", 2.0 + t); CC_FFLUSH(stdout);
         }
-        printf ("\n"); fflush (stdout);
+        CC_PRINTF("\n"); CC_FFLUSH(stdout);
         CCtsp_free_lpgraph (&lg);
     }
 #endif
@@ -392,14 +392,14 @@ static int add_segment (double val, int a, int b, void *pass_param)
     CCtsp_lpcut_in *c = (CCtsp_lpcut_in *) NULL;
 
     if (val > 2.0) {
-        printf ("Warning: Cut of value %f in add_segment\n", val);
-        fflush (stdout);
+        CC_PRINTF("Warning: Cut of value %f in add_segment\n", val);
+        CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
     rval = CCtsp_segment_to_subtour (&c, a, b, p->nodecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_segment_to_subtour failed\n");
+        CC_FPRINTF(stderr, "CCtsp_segment_to_subtour failed\n");
         rval = 1; goto CLEANUP;
     }
     c->next = p->cuts;
@@ -420,14 +420,14 @@ static int add_exact (double val, int count, int *cutarray, void *pass_param)
     if (count >= p->nodecount) goto CLEANUP;
 
     if (val > 2.0) {
-        printf ("Warning: Cut of value %f in add_exact\n", val);
-        fflush (stdout);
+        CC_PRINTF("Warning: Cut of value %f in add_exact\n", val);
+        CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
     rval = CCtsp_array_to_subtour (&c, cutarray, count, p->nodecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_subtour failed\n");
+        CC_FPRINTF(stderr, "CCtsp_array_to_subtour failed\n");
         rval = 1; goto CLEANUP;
     }
     c->next = p->cuts;
@@ -468,17 +468,17 @@ int CCtsp_tighten_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = grab_nonzero_x (ecount, elist, x, &newecount, &newelist, &newx,
                            X_FLUFF);
     if (rval) {
-        fprintf (stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
     }
 
     cutval = CC_SAFE_MALLOC (cuts->cutcount, double);
     if (!cutval) {
-        fprintf (stderr, "out of memory in CCtsp_tighten_lp\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_tighten_lp\n");
         rval = 1; goto CLEANUP;
     }
     rval = CCtsp_price_cuts (cuts, ncount, newecount, newelist, newx, cutval);
     if (rval) {
-        fprintf (stderr, "CCtsp_price_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_price_cuts failed\n"); goto CLEANUP;
     }
 
     CCtsp_init_lpgraph_struct (&lg);
@@ -486,12 +486,12 @@ int CCtsp_tighten_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = CCtsp_build_lpgraph (&lg, ncount, newecount, newelist,
                                 (int *) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
     }
     CC_FREE (newelist, int);
     rval = CCtsp_build_lpadj (&lg, 0, newecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
     }
 
     for (i = 0; i < cuts->cutcount; i++) {
@@ -500,13 +500,13 @@ int CCtsp_tighten_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
             /* && cuts->cuts[i].age < 3 */) {
             rval = CCtsp_lpcut_to_lpcut_in (cuts, &(cuts->cuts[i]), &old);
             if (rval) {
-                fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
+                CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
                 goto CLEANUP;
             }
             rval = CCtsp_tighten_lpcut_in (&lg, &old, newx, &new, stats,
                                            &improve);
             if (rval) {
-                fprintf (stderr, "CCtsp_tighten_lpcut failed\n");
+                CC_FPRINTF(stderr, "CCtsp_tighten_lpcut failed\n");
                 goto CLEANUP;
             }
             CCtsp_free_lpcut_in (&old);
@@ -521,7 +521,7 @@ int CCtsp_tighten_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
                                 &clistsize, count + 1, 1.3,
                                 sizeof (CCtsp_lpcut_in *));
                     if (rval) {
-                        fprintf (stderr, "CCutil_reallocrus_scale failed\n");
+                        CC_FPRINTF(stderr, "CCutil_reallocrus_scale failed\n");
                         rval = 1; goto CLEANUP;
                     }
                 }
@@ -529,7 +529,7 @@ int CCtsp_tighten_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
                     rval = CCutil_reallocrus_scale ((void **) &vlist,
                                 &vlistsize, count + 1, 1.3, sizeof (double));
                     if (rval) {
-                        fprintf (stderr, "CCutil_reallocrus_scale failed\n");
+                        CC_FPRINTF(stderr, "CCutil_reallocrus_scale failed\n");
                         rval = 1; goto CLEANUP;
                     }
                 }
@@ -545,7 +545,7 @@ int CCtsp_tighten_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     if (count) {
         perm = CC_SAFE_MALLOC (count, int);
         if (!perm) {
-            fprintf (stderr, "out of memory in CCtsp_tighten_lp\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_tighten_lp\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < count; i++) {
@@ -597,7 +597,7 @@ int CCtsp_double_decker_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = work_on_combs_in_lp (cuts, stats, cutsout, cutcount, ncount, ecount,
                 elist, x, testtol, maxcuts, CALL_DDECKER, viol, rstate);
     if (rval) {
-        fprintf (stderr, "work_on_combs_in_lp failed\n");
+        CC_FPRINTF(stderr, "work_on_combs_in_lp failed\n");
         goto CLEANUP;
     }
 
@@ -616,7 +616,7 @@ int CCtsp_teething_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = work_on_combs_in_lp (cuts, stats, cutsout, cutcount, ncount, ecount,
                 elist, x, testtol, maxcuts, CALL_TEETHING, viol, rstate);
     if (rval) {
-        fprintf (stderr, "work_on_combs_in_lp failed\n");
+        CC_FPRINTF(stderr, "work_on_combs_in_lp failed\n");
         goto CLEANUP;
     }
 
@@ -635,7 +635,7 @@ int CCtsp_cliquetree_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = work_on_combs_in_lp (cuts, stats, cutsout, cutcount, ncount, ecount,
                 elist, x, testtol, maxcuts, CALL_CLIQUETREE, viol, rstate);
     if (rval) {
-        fprintf (stderr, "work_on_combs_in_lp failed\n");
+        CC_FPRINTF(stderr, "work_on_combs_in_lp failed\n");
         goto CLEANUP;
     }
 
@@ -654,7 +654,7 @@ int CCtsp_star_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = work_on_combs_in_lp (cuts, stats, cutsout, cutcount, ncount, ecount,
                 elist, x, testtol, maxcuts, CALL_STAR, viol, rstate);
     if (rval) {
-        fprintf (stderr, "work_on_combs_in_lp failed\n");
+        CC_FPRINTF(stderr, "work_on_combs_in_lp failed\n");
         goto CLEANUP;
     }
 
@@ -673,7 +673,7 @@ int CCtsp_handling_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = work_on_combs_in_lp (cuts, stats, cutsout, cutcount, ncount, ecount,
                 elist, x, testtol, maxcuts, CALL_HANDLING, viol, rstate);
     if (rval) {
-        fprintf (stderr, "work_on_combs_in_lp failed\n");
+        CC_FPRINTF(stderr, "work_on_combs_in_lp failed\n");
         goto CLEANUP;
     }
 
@@ -716,36 +716,36 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     rval = grab_nonzero_x (ecount, elist, x, &newecount, &newelist, &newx,
                            X_FLUFF);
     if (rval) {
-        fprintf (stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
     }
 
     cutval = CC_SAFE_MALLOC (cuts->cutcount, double);
     if (!cutval) {
-        fprintf (stderr, "out of memory in CCtsp_tighten_lp\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_tighten_lp\n");
         rval = 1; goto CLEANUP;
     }
     rval = CCtsp_price_cuts (cuts, ncount, newecount, newelist, newx, cutval);
     if (rval) {
-        fprintf (stderr, "CCtsp_price_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_price_cuts failed\n"); goto CLEANUP;
     }
 
     rval = CCtsp_build_lpgraph (&lg, ncount, newecount, newelist,
                                 (int *) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
     }
     if (caller == CALL_DDECKER || caller == CALL_CLIQUETREE ||
         caller == CALL_STAR    || caller == CALL_HANDLING) {
         rval = CCcombs_GC_build_graph (&gg, ncount, newecount, newelist, newx);
         if (rval) {
-            fprintf (stderr, "CCcombs_GC_build_graph failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCcombs_GC_build_graph failed\n"); goto CLEANUP;
         }
     }
 
     CC_FREE (newelist, int);
     rval = CCtsp_build_lpadj (&lg, 0, newecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
     }
 
     for (i = 0; i < cuts->cutcount; i++) {
@@ -755,11 +755,11 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
         }
         rval = CCtsp_lpcut_to_lpcut_in (cuts, &(cuts->cuts[i]), &old);
         if (rval) {
-            fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n"); goto CLEANUP;
         }
         rval = CCtsp_test_pure_comb (ncount, &old, &test, (int *) NULL);
         if (rval) {
-            fprintf (stderr, "CCtsp_test_pure_comb failed\n");
+            CC_FPRINTF(stderr, "CCtsp_test_pure_comb failed\n");
             CCtsp_free_lpcut_in (&old);
             goto CLEANUP;
         }
@@ -768,39 +768,39 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
             case CALL_TEETHING:
                 rval = CCtsp_teething (&lg, newx, &old, &dd);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_teething failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "CCtsp_teething failed\n"); goto CLEANUP;
                 }
                 break;
             case CALL_DDECKER:
                 rval = CCtsp_comb_to_double_decker (&lg, &gg, newx, &old, &dd);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_comb_to_double_decker failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_comb_to_double_decker failed\n");
                     goto CLEANUP;
                 }
                 break;
             case CALL_CLIQUETREE:
                 rval = CCtsp_comb_to_cliquetree (&lg, &gg, newx, &old, &dd);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_comb_to_cliquetree failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_comb_to_cliquetree failed\n");
                     goto CLEANUP;
                 }
                 break;
             case CALL_STAR:
                 rval = CCtsp_comb_to_star (&lg, &gg, newx, &old, &dd);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_comb_to_star failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_comb_to_star failed\n");
                     goto CLEANUP;
                 }
                 break;
             case CALL_HANDLING:
                 rval = CCtsp_comb_handling (&lg, &gg, newx, &old, &dd);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_comb_handling failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_comb_handling failed\n");
                     goto CLEANUP;
                 }
                 break;
             default:
-                fprintf (stderr, "unknown caller in work_on_combs_in_lp\n");
+                CC_FPRINTF(stderr, "unknown caller in work_on_combs_in_lp\n");
                 rval = 1; goto CLEANUP;
             }
 
@@ -815,7 +815,7 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
                     rval = CCtsp_tighten_lpcut_in (&lg, dd, newx, &new,
                                                    stats, &improve);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_tighten_lpcut failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_tighten_lpcut failed\n");
                         goto CLEANUP;
                     }
                     CCtsp_free_lpcut_in (dd);
@@ -825,7 +825,7 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
                     if (-newslack > CCtsp_MIN_VIOL) {
                         c = CC_SAFE_MALLOC (1, CCtsp_lpcut_in);
                         if (!c) {
-                            fprintf (stderr,
+                            CC_FPRINTF(stderr,
                                "out of memory in work_on_combs_in_lp\n");
                             CCtsp_free_lpcut_in (&new);
                             rval = 1; goto CLEANUP;
@@ -837,7 +837,7 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
                                     &clistsize, count + 1, 1.3,
                                     sizeof (CCtsp_lpcut_in *));
                             if (rval) {
-                                fprintf (stderr,
+                                CC_FPRINTF(stderr,
                                     "CCutil_reallocrus_scale failed\n");
                                 rval = 1; goto CLEANUP;
                             }
@@ -847,7 +847,7 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
                                      &vlistsize, count + 1, 1.3,
                                      sizeof (double));
                             if (rval) {
-                                fprintf (stderr,
+                                CC_FPRINTF(stderr,
                                     "CCutil_reallocrus_scale failed\n");
                                 rval = 1; goto CLEANUP;
                             }
@@ -869,7 +869,7 @@ static int work_on_combs_in_lp (CCtsp_lpcuts *cuts, CCtsp_tighten_info *stats,
     if (count) {
         perm = CC_SAFE_MALLOC (count, int);
         if (!perm) {
-            fprintf (stderr, "out of memory in work_on_combs_in_lp\n");
+            CC_FPRINTF(stderr, "out of memory in work_on_combs_in_lp\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < count; i++) {
@@ -965,7 +965,7 @@ static int comb_to_domino (CCtsp_lpcut_in *c, CCtsp_lpcut_in **d, int ncount,
     int *tmpside;
 
 /*
-    printf ("comb_to_domino ...\n"); fflush (stdout);
+    CC_PRINTF("comb_to_domino ...\n"); CC_FFLUSH(stdout);
 */
 
     *d = (CCtsp_lpcut_in *) NULL;
@@ -1013,7 +1013,7 @@ static int comb_to_domino (CCtsp_lpcut_in *c, CCtsp_lpcut_in **d, int ncount,
                 }
             }
             if (!incount|| !outcount) {
-                fprintf (stderr, "error in converted domino\n");
+                CC_FPRINTF(stderr, "error in converted domino\n");
                 rval = 1;  goto CLEANUP;
             }
             inside = CC_SAFE_MALLOC (incount, int);
@@ -1058,7 +1058,7 @@ static int comb_to_domino (CCtsp_lpcut_in *c, CCtsp_lpcut_in **d, int ncount,
 CLEANUP:
 
 /*
-    printf ("DONE comb_to_domino: %d\n", rval); fflush (stdout);
+    CC_PRINTF("DONE comb_to_domino: %d\n", rval); CC_FFLUSH(stdout);
 */
 
     *in_marker = marker;
@@ -1087,13 +1087,13 @@ int CCtsp_file_cuts (char *cutfile, CCtsp_lpcut_in **cuts, int *cutcount,
 
     in = fopen (cutfile, "r");
     if  (in == (FILE *) NULL) {
-        fprintf (stderr, "unable to open %s for reading\n", cutfile);
+        CC_FPRINTF(stderr, "unable to open %s for reading\n", cutfile);
         return 0;
     }
 
     inv = CC_SAFE_MALLOC (ncount, int);
     if (!inv) {
-        fprintf (stderr, "out of memory in CCtsp_file_cuts\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_file_cuts\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
@@ -1113,14 +1113,14 @@ int CCtsp_file_cuts (char *cutfile, CCtsp_lpcut_in **cuts, int *cutcount,
         c->cliquecount = ncliques;
         c->cliques = CC_SAFE_MALLOC (ncliques, CCtsp_lpclique);
         if (!c->cliques) {
-            fprintf (stderr, "out of memory in CCtsp_file_cuts\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_file_cuts\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < ncliques; i++) {
             fscanf (in, "%d", &size);
             icliq = CC_SAFE_MALLOC (size, int);
             if (!icliq) {
-                fprintf (stderr, "out of memory in CCtsp_file_cuts\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_file_cuts\n");
                 rval = 1; goto CLEANUP;
             }
             for (j = 0; j < size; j++) {
@@ -1129,7 +1129,7 @@ int CCtsp_file_cuts (char *cutfile, CCtsp_lpcut_in **cuts, int *cutcount,
             }
             rval = CCtsp_array_to_lpclique (icliq, size, &(c->cliques[i]));
             if (rval) {
-                fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
                 goto CLEANUP;
             }
             CC_FREE (icliq, int);
@@ -1139,7 +1139,7 @@ int CCtsp_file_cuts (char *cutfile, CCtsp_lpcut_in **cuts, int *cutcount,
         c->branch = 0;
         rval = CCtsp_construct_skeleton (c, ncount);
         if (rval) {
-            fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+            CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
             goto CLEANUP;
         }
 
@@ -1150,10 +1150,10 @@ int CCtsp_file_cuts (char *cutfile, CCtsp_lpcut_in **cuts, int *cutcount,
 #if 1
         rval = CCverify_cut (c, CC_TYPE_ALL, &i);
         if (rval) {
-            fprintf (stderr, "Invalid file cut\n");
+            CC_FPRINTF(stderr, "Invalid file cut\n");
             goto CLEANUP;
         } else {
-            printf ("File cut type %d\n", i);
+            CC_PRINTF("File cut type %d\n", i);
         }
 #endif
     }
@@ -1176,7 +1176,7 @@ int CCtsp_file_cuts_write (const char *cutfile, CCtsp_lpcuts *cuts, int *tour)
 
     out = fopen (cutfile, "w");
     if  (out == (FILE *) NULL) {
-        fprintf (stderr, "unable to open %s for writing\n", cutfile);
+        CC_FPRINTF(stderr, "unable to open %s for writing\n", cutfile);
         return 1;
     }
 
@@ -1225,13 +1225,13 @@ int CCtsp_buildcut_addclique (CCtsp_cutinfo *cuts, int *arr, int size)
     CCtsp_lpcut_in *c = cuts->current;
 
     if (!c) {
-        fprintf (stderr, "Trying to add to nonexistent clique\n");
+        CC_FPRINTF(stderr, "Trying to add to nonexistent clique\n");
         return -1;
     }
 
     rval = CCcut_SRK_expand (&cuts->expand, arr, size, &newarr, &newsize);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_expand failed\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_expand failed\n");
         CCtsp_buildcut_abort (cuts);
         return rval;
     }
@@ -1239,7 +1239,7 @@ int CCtsp_buildcut_addclique (CCtsp_cutinfo *cuts, int *arr, int size)
     rval = CCutil_reallocrus_count ((void **) &(c->cliques), c->cliquecount+1,
                              sizeof (c->cliques[0]));
     if (rval) {
-        fprintf (stderr, "couldn't realloc cliques\n");
+        CC_FPRINTF(stderr, "couldn't realloc cliques\n");
         CC_IFFREE (newarr, int);
         CCtsp_buildcut_abort (cuts);
         return rval;
@@ -1249,7 +1249,7 @@ int CCtsp_buildcut_addclique (CCtsp_cutinfo *cuts, int *arr, int size)
 
     rval = CCtsp_array_to_lpclique (newarr, newsize, &(c->cliques[i]));
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
         CC_IFFREE (newarr, int);
         CCtsp_buildcut_abort (cuts);
         return rval;
@@ -1273,16 +1273,16 @@ int CCtsp_buildcut_finish (CCtsp_cutinfo *cuts, int rhs)
 #ifdef DUMP_BUILDCUT
     {
         int i, j, tmp;
-        printf ("new buildcut (%d):", c->cliquecount);
+        CC_PRINTF("new buildcut (%d):", c->cliquecount);
         for (i=0; i<c->cliquecount; i++) {
-            printf (" (");
+            CC_PRINTF(" (");
             CC_FOREACH_NODE_IN_CLIQUE (j, c->cliques[i], tmp) {
-                printf ("%d ",j);
+                CC_PRINTF("%d ",j);
             }
-            printf (")");
+            CC_PRINTF(")");
         }
-        printf (" >= %d\n", rhs);
-        fflush (stdout);
+        CC_PRINTF(" >= %d\n", rhs);
+        CC_FFLUSH(stdout);
     }
 #endif
 
@@ -1293,7 +1293,7 @@ int CCtsp_buildcut_finish (CCtsp_cutinfo *cuts, int rhs)
     rval = CCtsp_construct_skeleton (c,
             CCcut_SRK_original_ncount (&cuts->expand));
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         goto CLEANUP;
     }
 
@@ -1329,7 +1329,7 @@ static int grab_nonzero_x (int ecount, int *elist, double *x, int *new_ecount,
     *new_elist = CC_SAFE_MALLOC (2*count, int);
     *new_x = CC_SAFE_MALLOC (count, double);
     if (!(*new_elist) || !(*new_x)) {
-        fprintf (stderr, "out of memory in grab_nonzero_x\n");
+        CC_FPRINTF(stderr, "out of memory in grab_nonzero_x\n");
         CC_IFFREE (*new_elist, int);
         CC_IFFREE (*new_x, double);
         return 1;
@@ -1365,14 +1365,14 @@ int CCtsp_test_pure_comb (int ncount, CCtsp_lpcut_in *c, int *yes_no,
 
     rval = CCtsp_find_pure_handle (ncount, c, &ihandle);
     if (rval) {
-        fprintf (stderr, "CCtsp_find_pure_handle failed\n");
+        CC_FPRINTF(stderr, "CCtsp_find_pure_handle failed\n");
         goto CLEANUP;
     }
     if (ihandle == -1) goto CLEANUP;
 
     marks = CC_SAFE_MALLOC (ncount, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in CCtsp_test_pure_comb\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_test_pure_comb\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_cut (c, marks, 0);
@@ -1415,13 +1415,13 @@ int CCtsp_test_pseudocomb (int ncount, CCtsp_lpcut_in *c, int handle,
 
     *yes_no = 0;
     if (c->cliquecount <= 1 || c->cliquecount % 2 || c->sense != 'G') {
-        printf ("bad cliquecount or sense in pseudocomb\n"); fflush (stdout);
+        CC_PRINTF("bad cliquecount or sense in pseudocomb\n"); CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
     marks = CC_SAFE_MALLOC (ncount, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in CCtsp_test_pseudocomb\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_test_pseudocomb\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_cut (c, marks, 0);
@@ -1471,7 +1471,7 @@ int CCtsp_test_pseudocomb (int ncount, CCtsp_lpcut_in *c, int handle,
             if (k < 3) {
                 rval = CCtsp_clique_to_array (&c->cliques[i], &ends, &k);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_clique_to_array failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_clique_to_array failed\n");
                     goto CLEANUP;
                 }
                 if (ends[0] != 0 && ends[0] == ends[1]) goto CLEANUP;
@@ -1502,7 +1502,7 @@ int CCtsp_test_teeth_disjoint (int ncount, CCtsp_lpcut_in *c, int handle,
 
     marks = CC_SAFE_MALLOC (ncount, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in CCtsp_teeth_disjoint\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_teeth_disjoint\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_cut (c, marks, 0);
@@ -1534,7 +1534,7 @@ int CCtsp_find_pure_handle (int ncount, CCtsp_lpcut_in *c, int *handle)
 
     marks = CC_SAFE_MALLOC (ncount, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in CCtsp_pure_find_handle\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_pure_find_handle\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_cut (c, marks, 0);
@@ -1594,18 +1594,18 @@ int CCtsp_truncate_cutlist (CCtsp_lpcut_in **cuts, int ncount, int ecount,
     if (count > maxcuts) {
         rval = CCtsp_build_lpgraph (&lg, ncount, ecount, elist, (int *) NULL);
         if (rval) {
-            fprintf (stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
         }
         rval = CCtsp_build_lpadj (&lg, 0, ecount);
         if (rval) {
-            fprintf (stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
         }
 
         vlist = CC_SAFE_MALLOC (count, double);
         clist = CC_SAFE_MALLOC (count, CCtsp_lpcut_in *);
         perm  = CC_SAFE_MALLOC (count, int);
         if (!vlist || !clist || !perm) {
-            fprintf (stderr, "out of memory in CCtsp_tighten_lp\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_tighten_lp\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0, c = *cuts; c; c = c->next, i++) {
@@ -1675,9 +1675,9 @@ int CCtsp_new_domino (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     int **Handle = (int **) NULL;
     CCtsp_lpcut_in *c;
 
-    printf ("Call DPseparator ...\n"); fflush (stdout);
+    CC_PRINTF("Call DPseparator ...\n"); CC_FFLUSH(stdout);
     if (dombossname) {
-        printf ("Use Domino Boss: %s\n", dombossname); fflush (stdout);
+        CC_PRINTF("Use Domino Boss: %s\n", dombossname); CC_FFLUSH(stdout);
     }
 
     *cutcount = 0;
@@ -1702,8 +1702,8 @@ int CCtsp_new_domino (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
         (*cutcount)++;
     }
 
-    printf ("Found %d domino cuts (%d combs) ...\n", nIneq, nCombs);
-    fflush (stdout);
+    CC_PRINTF("Found %d domino cuts (%d combs) ...\n", nIneq, nCombs);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -1735,9 +1735,9 @@ int CCtsp_shrink_domino (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
     CCcut_SRK_init_expinfo (&expand);
 
-    printf ("Call DPseparator with shrinking ...\n"); fflush (stdout);
+    CC_PRINTF("Call DPseparator with shrinking ...\n"); CC_FFLUSH(stdout);
     if (dombossname) {
-        printf ("Use Domino Boss: %s\n", dombossname); fflush (stdout);
+        CC_PRINTF("Use Domino Boss: %s\n", dombossname); CC_FFLUSH(stdout);
     }
 
     *cutcount = 0;
@@ -1768,12 +1768,12 @@ int CCtsp_shrink_domino (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
             (*cutcount)++;
         }
     } else {
-        printf ("Skipping shrunk graph with %d nodes\n", planar_ncount);
-        fflush (stdout); 
+        CC_PRINTF("Skipping shrunk graph with %d nodes\n", planar_ncount);
+        CC_FFLUSH(stdout); 
     }
 
-    printf ("Found %d shunk domino cuts (%d combs) ...\n", nIneq, nCombs);
-    fflush (stdout);
+    CC_PRINTF("Found %d shunk domino cuts (%d combs) ...\n", nIneq, nCombs);
+    CC_FFLUSH(stdout);
 
 
 CLEANUP:
@@ -1830,9 +1830,9 @@ static int shrink_to_planar_graph (int ncount, int ecount, int *elist,
             rval = try_greedy_cut (oncount, oecount, oelist, oelen, 2,
                                   bad_ends, &bad_val, &bad_list, &bad_count);
             CCcheck_rval (rval, "try_greedy_cut failed");
-            printf ("Greedy Returned Cut Val = %f, Cnt = %d\n", bad_val,
+            CC_PRINTF("Greedy Returned Cut Val = %f, Cnt = %d\n", bad_val,
                      bad_count);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
 
             if (bad_val >= 2.0 + PLANAR_CUT_TOL) {
                 CC_IFFREE (bad_list, int);
@@ -1844,7 +1844,7 @@ static int shrink_to_planar_graph (int ncount, int ecount, int *elist,
             }
 
             if (bad_count < 2) {
-                fprintf (stderr, "illegal containing set\n");
+                CC_FPRINTF(stderr, "illegal containing set\n");
                 rval = 1;  goto CLEANUP;
             }
 
@@ -1870,9 +1870,9 @@ static int shrink_to_planar_graph (int ncount, int ecount, int *elist,
         } else {
             bad_edge = DPfindBadEdgeK (oncount, oecount, oelist, rand_minor);
         }
-        printf ("Shrunk ecount = %d, ncount = %d, bad edge = %d\n",
+        CC_PRINTF("Shrunk ecount = %d, ncount = %d, bad edge = %d\n",
                 oecount, oncount, bad_edge);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     *p_oncount = oncount;
@@ -1905,13 +1905,13 @@ static int try_greedy_cut (int ncount, int ecount, int *elist, double *elen,
 
     for (i = 0; i < scount; i++) (*clist)[i] = slist[i];
 
-    printf ("Call greedy with count = %d\n", *ccount); fflush (stdout);
+    CC_PRINTF("Call greedy with count = %d\n", *ccount); CC_FFLUSH(stdout);
 
     rval = CCcombs_greedy_cut (&G, ccount, *clist, 2, 0, 0, 0, (int *) NULL,
                                cval);
     CCcheck_rval (rval, "CCcombs_greedy_cut failed");
 
-    printf ("Greedy returns with with count = %d\n", *ccount); fflush (stdout);
+    CC_PRINTF("Greedy returns with with count = %d\n", *ccount); CC_FFLUSH(stdout);
     
 
 
@@ -2012,7 +2012,7 @@ static int build_dp_cut_expand (CCtsp_lpcut_in **cut, int ndomino, int *Acount,
                              comb);
     CCcheck_rval (rval, "check_raw_domino failed");
     if (!valid) {
-        fprintf (stderr, "Expanded domino is not valid\n");
+        CC_FPRINTF(stderr, "Expanded domino is not valid\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -2211,21 +2211,21 @@ static void  print_raw_domino (int hcount, int *hand, int dcount,
 {
     int i, j;
 
-    printf ("Raw Domino\n");
-    printf ("    Handle:");
+    CC_PRINTF("Raw Domino\n");
+    CC_PRINTF("    Handle:");
     for (i = 0; i < hcount; i++)  {
-        printf (" %d", hand[i]);
-        if (i % 15 == 14) printf ("\n           ");
+        CC_PRINTF(" %d", hand[i]);
+        if (i % 15 == 14) CC_PRINTF("\n           ");
     }
-    printf ("\n");
+    CC_PRINTF("\n");
     for (i = 0; i < dcount; i++) {
-        printf ("    Domino %d:", i);
-        for (j = 0; j < Acount[i]; j++) printf (" %d", A[i][j]); 
-        printf ("  |  ");
-        for (j = 0; j < Bcount[i]; j++) printf (" %d", B[i][j]); 
-        printf ("\n");
+        CC_PRINTF("    Domino %d:", i);
+        for (j = 0; j < Acount[i]; j++) CC_PRINTF(" %d", A[i][j]); 
+        CC_PRINTF("  |  ");
+        for (j = 0; j < Bcount[i]; j++) CC_PRINTF(" %d", B[i][j]); 
+        CC_PRINTF("\n");
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 }
 
 #endif

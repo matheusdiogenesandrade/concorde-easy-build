@@ -37,7 +37,7 @@ static int
 
 #define MOREDELTA(sum,bgx,dbx,msg) { \
     if (fabs((dbx)-CCbigguy_bigguytod((bgx))) > 1e-13 * fabs((dbx))) { \
-        fprintf (stderr, "Warning: (%s) %.16f != %.16f by %.16f\n", (msg), (dbx), CCbigguy_bigguytod((bgx)), fabs((dbx)-CCbigguy_bigguytod((bgx)))); \
+        CC_FPRINTF(stderr, "Warning: (%s) %.16f != %.16f by %.16f\n", (msg), (dbx), CCbigguy_bigguytod((bgx)), fabs((dbx)-CCbigguy_bigguytod((bgx)))); \
     } \
    sum += fabs((dbx)-CCbigguy_bigguytod((bgx))); \
 }
@@ -56,7 +56,7 @@ int main (int ac, char **av)
     CCutil_sprand (47, &rstate);
 
     if (ac > 1) {
-        fprintf (stderr, "Usage: %s < std_file > new_file\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s < std_file > new_file\n", av[0]);
         return 1;
     }
 
@@ -86,8 +86,8 @@ int main (int ac, char **av)
     CCutil_sclose (sfin);
     CCutil_sclose (sfout);
 
-    fprintf (stderr, "%d total errors\n", nerrs);
-    fprintf (stderr, "Total delta: %.20f\n", delta);
+    CC_FPRINTF(stderr, "%d total errors\n", nerrs);
+    CC_FPRINTF(stderr, "Total delta: %.20f\n", delta);
 
     return nerrs;
 }
@@ -206,7 +206,7 @@ static int bgcheck (CC_SFILE *sfin, CC_SFILE *sfout, CCbigguy x,
     CCbigguy_sread (sfin, &v);
     CCbigguy_swrite (sfout, x);
     if (CCbigguy_cmp(v,x)) {
-        fprintf (stderr, "%s misread (%.15f != %.15f)\n", name,
+        CC_FPRINTF(stderr, "%s misread (%.15f != %.15f)\n", name,
                  CCbigguy_bigguytod(v), CCbigguy_bigguytod(x));
         return 1;
     } else {

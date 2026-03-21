@@ -12,20 +12,20 @@ int main (int ac, char **av)
     FILE *out = (FILE *) NULL;
 
     if (ac < 3) {
-        printf ("usage %s: name id\n", *av);
+        CC_PRINTF("usage %s: name id\n", *av);
         rval = 1;  goto CLEANUP;
     }
 
     name = av[1];
     id = atoi(av[2]);
 
-    printf ("LKH Subproblem: %s %d\n", name, id);
-    fflush (stdout);
+    CC_PRINTF("LKH Subproblem: %s %d\n", name, id);
+    CC_FFLUSH(stdout);
 
     sprintf (buf, "%s_par.%d", name, id);
     out = fopen (buf, "w");
     if (!out) {
-        fprintf (stderr, "could not open %s for output\n", buf);
+        CC_FPRINTF(stderr, "could not open %s for output\n", buf);
         rval = 1; goto CLEANUP;
     }
 
@@ -41,14 +41,14 @@ int main (int ac, char **av)
     p = popen (buf, "r");
     if (!p) {
         perror (buf);
-        fprintf (stderr, "popen failed\n");
+        CC_FPRINTF(stderr, "popen failed\n");
         rval = 1; goto CLEANUP;
     }
 
     while ((fgets (buf2, sizeof (buf2), p)) != NULL) {
         buf2[sizeof (buf2) - 1] = '\0';
         fputs (buf2, stdout);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     
         if (sscanf (buf2, "%s", key) != EOF) {
             if (!strcmp (key, "Z")) {
@@ -56,7 +56,7 @@ int main (int ac, char **av)
                 tb += strlen (key);
                 while (*tb == ' ') tb++;
                 if (sscanf (tb, "%lf", &newcost) == EOF) {
-                    fprintf (stderr, "Could not read tourlen\n");
+                    CC_FPRINTF(stderr, "Could not read tourlen\n");
                     rval = 1;  goto CLEANUP;
                 }
             }
@@ -66,11 +66,11 @@ int main (int ac, char **av)
     pclose (p);
 
     if (newcost == -1) {
-       fprintf (stderr, "failed to produce a tourlen\n");
+       CC_FPRINTF(stderr, "failed to produce a tourlen\n");
        rval = 1; goto CLEANUP;
     }
 
-    printf ("New Tour Cost: %0.0f\n", newcost); fflush (stdout);
+    CC_PRINTF("New Tour Cost: %0.0f\n", newcost); CC_FFLUSH(stdout);
 
 CLEANUP:
 

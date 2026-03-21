@@ -84,14 +84,14 @@ static void check_indep (char *tour, char *touredges)
     }
     if (mul > 1e-6) {
         elim_coord[nindep] = j;
-        printf ("%d:",nindep+1);
-        for (i=0; i<nnodes; i++) printf (" %d",tour[i]);
-        printf (" (%g)\n",mul);
+        CC_PRINTF("%d:",nindep+1);
+        for (i=0; i<nnodes; i++) CC_PRINTF(" %d",tour[i]);
+        CC_PRINTF(" (%g)\n",mul);
 /*
         for (i=0; i<nedges; i++) {
-            printf ("%g ",ind_tri[nindep][i]);
+            CC_PRINTF("%g ",ind_tri[nindep][i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
 */
         nindep++;
     }
@@ -109,9 +109,9 @@ static void checktour (char *tour, char *touredges)
     }
 
     if (v < rhs) {
-        fprintf (stderr, "Whoa, tour ");
-        for (i=0; i<nnodes; i++) fprintf (stderr, "%d ",tour[i]);
-        fprintf (stderr, "has rhs %d\n",v);
+        CC_FPRINTF(stderr, "Whoa, tour ");
+        for (i=0; i<nnodes; i++) CC_FPRINTF(stderr, "%d ",tour[i]);
+        CC_FPRINTF(stderr, "has rhs %d\n",v);
         minrhs = v;
     }
     if (v == rhs) {
@@ -176,18 +176,18 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
     typesize[0] = MAXNUM;
     ntypes = 1;
 
-    printf ("cut: "); fflush (stdout);
+    CC_PRINTF("cut: "); CC_FFLUSH(stdout);
     scanf ("%d", &i);
     while (i != -1) {
         c = (cut *) malloc (sizeof (cut));
         if (!c) {
-            fprintf (stderr, "Out of memory\n");
+            CC_FPRINTF(stderr, "Out of memory\n");
             exit (1);
         }
         c->size = 0;
         while (i != -1) {
             if (i < 0 || i >= MAXNUM) {
-                fprintf (stderr, "Can only handle nodes >= 0 and < %d\n",
+                CC_FPRINTF(stderr, "Can only handle nodes >= 0 and < %d\n",
                          MAXNUM);
                 exit (1);
             }
@@ -196,11 +196,11 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
         }
         c->next = cutlist;
         cutlist = c;
-        printf ("cut: "); fflush (stdout);
+        CC_PRINTF("cut: "); CC_FFLUSH(stdout);
         scanf ("%d", &i);
     }
 
-    printf ("rhs: "); fflush (stdout);
+    CC_PRINTF("rhs: "); CC_FFLUSH(stdout);
     scanf ("%d", &rhs);
 
     for (c = cutlist; c; c = c->next) {
@@ -209,21 +209,21 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
         }
     }
 
-    printf ("%d node types\n", ntypes);
+    CC_PRINTF("%d node types\n", ntypes);
     if (ntypes > MAXNODE) {
-        fprintf (stderr, "Too many types\n");
+        CC_FPRINTF(stderr, "Too many types\n");
         exit (1);
     }
 
-    printf ("nodemap:");
+    CC_PRINTF("nodemap:");
     for (i=0; i<MAXNUM; i++) {
-        if (nodetype[i] != 0) printf (" %5d", i);
+        if (nodetype[i] != 0) CC_PRINTF(" %5d", i);
     }
-    printf ("\n        ");
+    CC_PRINTF("\n        ");
     for (i=0; i<MAXNUM; i++) {
-        if (nodetype[i] != 0) printf (" %5d", nodetype[i]);
+        if (nodetype[i] != 0) CC_PRINTF(" %5d", nodetype[i]);
     }
-    printf ("\n");
+    CC_PRINTF("\n");
 
     nnodes = ntypes;
     nedges = nnodes * (nnodes-1) / 2;
@@ -243,16 +243,16 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
         }
     }
 
-    printf ("ineq:");
+    CC_PRINTF("ineq:");
     for (i=0; i<nnodes; i++) {
         for (j=i+1; j<nnodes; j++) {
             if (lhs[EDGENUM(i,j)]) {
-                printf (" %d*(%d-%d)", lhs[EDGENUM(i,j)], i, j);
+                CC_PRINTF(" %d*(%d-%d)", lhs[EDGENUM(i,j)], i, j);
             }
         }
     }
-    printf (" >= %d\n", rhs);
-    fflush (stdout);
+    CC_PRINTF(" >= %d\n", rhs);
+    CC_FFLUSH(stdout);
 
     for (i=0; i<nedges; i++) {
         touredges[i] = 0;
@@ -266,19 +266,19 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
 
     enumtours (1, tour, touredges);
 
-    printf ("%d tours, %d tight, %d independent\n", ntours, ntight, nindep);
+    CC_PRINTF("%d tours, %d tight, %d independent\n", ntours, ntight, nindep);
     if (minrhs < rhs) {
-        printf ("VIOLATED - minimum %d\n", minrhs);
+        CC_PRINTF("VIOLATED - minimum %d\n", minrhs);
     } else if (nindep == nedges - nnodes) {
-        printf ("FACET!!!\n");
+        CC_PRINTF("FACET!!!\n");
     } else {
-        printf ("VALID, but not FACET\n");
+        CC_PRINTF("VALID, but not FACET\n");
     }
     for (i=0; i<nnodes; i++) {
         for (j=i+1; j<nnodes; j++) {
             k = EDGENUM(i,j);
             if (minval[k] == maxval[k]) {
-                printf ("Edge %d,%d always %d\n",i,j,minval[k]);
+                CC_PRINTF("Edge %d,%d always %d\n",i,j,minval[k]);
             }
         }
     }

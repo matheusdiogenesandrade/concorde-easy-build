@@ -156,7 +156,7 @@ int CCpq_check (CCpq_tree *T, int *status)
     T->nontrivial = 0;
     rval = reduce (T, l, 0, status);
     if (rval) {
-        fprintf (stderr, "reduce failed\n");
+        CC_FPRINTF(stderr, "reduce failed\n");
         return 1;
     }
     return 0;
@@ -175,7 +175,7 @@ static int apply_checked (CCpq_tree *T, int *status)
     T->nontrivial = 0;
     rval = reduce (T, l, 1, status);
     if (rval) {
-        fprintf (stderr, "reduce failed\n");
+        CC_FPRINTF(stderr, "reduce failed\n");
         return 1;
     }
     return 0;
@@ -187,17 +187,17 @@ int CCpq_apply (CCpq_tree *T, int *status)
 
     rval = CCpq_check (T, status);
     if (rval) {
-        fprintf (stderr, "CCpq_check failed\n");
+        CC_FPRINTF(stderr, "CCpq_check failed\n");
         return 1;
     }
     if (*status == CCpq_STATUS_NONTRIVIAL) {
         rval = apply_checked (T, status);
         if (rval) {
-            fprintf (stderr, "apply_checked failed\n");
+            CC_FPRINTF(stderr, "apply_checked failed\n");
             return 1;
         }
         if (*status != CCpq_STATUS_NONTRIVIAL) {
-            fprintf (stderr, "ERROR: apply_checked status != CCpq_check status\n");
+            CC_FPRINTF(stderr, "ERROR: apply_checked status != CCpq_check status\n");
             return -1;
         }
     }
@@ -252,20 +252,20 @@ int CCpq_tree_trivial (CCpq_tree *T, int nodecount, int extern_node)
     CCpq_tree_free (T);
 
     if (nodecount < 3) {
-        fprintf (stderr, "Can't build PQ tree with %d nodes\n", nodecount);
+        CC_FPRINTF(stderr, "Can't build PQ tree with %d nodes\n", nodecount);
         rval = 1; goto CLEANUP;
     }
 
     elems = CC_SAFE_MALLOC (nodecount, CCpq_node);
 
     if (elems == (CCpq_node *) NULL) {
-        fprintf (stderr, "Out of memory in CCpq_tree_trivial\n");
+        CC_FPRINTF(stderr, "Out of memory in CCpq_tree_trivial\n");
         rval = 1; goto CLEANUP;
     }
 
     root = PQ_node_alloc (&T->pqnode_world);
     if (root == (CCpq_node *) NULL) {
-        fprintf (stderr, "PQ_node_alloc failed\n");
+        CC_FPRINTF(stderr, "PQ_node_alloc failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -497,14 +497,14 @@ static int reduce (CCpq_tree *T, CCpq_node *l, int real, int *status)
 
             rval = template_p3_notroot (T, x, real, status);
             if (rval) {
-                fprintf (stderr, "template_p3_notroot failed\n");
+                CC_FPRINTF(stderr, "template_p3_notroot failed\n");
                 return 1;
             }
             if (*status == PQSTATUS_MATCHED) continue;
 
             rval = template_p5_notroot (T, x, real, status);
             if (rval) {
-                fprintf (stderr, "template_p5_notroot failed\n");
+                CC_FPRINTF(stderr, "template_p5_notroot failed\n");
                 return 1;
             }
             if (*status == PQSTATUS_MATCHED) continue;
@@ -538,7 +538,7 @@ static int reduce (CCpq_tree *T, CCpq_node *l, int real, int *status)
 
             rval = template_p2_root (T, x, real, status);
             if (rval) {
-                fprintf (stderr, "template_p2_root failed\n");
+                CC_FPRINTF(stderr, "template_p2_root failed\n");
                 return 1;
             }
             if (*status == PQSTATUS_MATCHED) {
@@ -549,7 +549,7 @@ static int reduce (CCpq_tree *T, CCpq_node *l, int real, int *status)
 
             rval = template_p4_root (T, x, real, status);
             if (rval) {
-                fprintf (stderr, "template_p4_root failed\n");
+                CC_FPRINTF(stderr, "template_p4_root failed\n");
                 return 1;
             }
             if (*status == PQSTATUS_MATCHED) {
@@ -560,7 +560,7 @@ static int reduce (CCpq_tree *T, CCpq_node *l, int real, int *status)
 
             rval = template_p6_root (T, x, real, status);
             if (rval) {
-                fprintf (stderr, "template_p6_root failed\n");
+                CC_FPRINTF(stderr, "template_p6_root failed\n");
                 return 1;
             }
             if (*status == PQSTATUS_MATCHED) {
@@ -642,12 +642,12 @@ static int template_p3_notroot (CCpq_tree *T, CCpq_node *x, int real,
     if (real) {
         rval = collect_full_children (T, x, PQ_QNODE);
         if (rval) {
-            fprintf (stderr, "collect_full_children failed\n");
+            CC_FPRINTF(stderr, "collect_full_children failed\n");
             return 1;
         }
         rval = collect_empty_children (T, &x, PQ_QNODE);
         if (rval) {
-            fprintf (stderr, "collect_empty_children failed\n");
+            CC_FPRINTF(stderr, "collect_empty_children failed\n");
             return 1;
         }
     }
@@ -678,7 +678,7 @@ static int template_p5_notroot (CCpq_tree *T, CCpq_node *x, int real,
     if (real) {
         rval = collect_full_children (T, x, PQ_QNODE);
         if (rval) {
-            fprintf (stderr, "collect_full_children failed\n");
+            CC_FPRINTF(stderr, "collect_full_children failed\n");
             return 1;
         }
 
@@ -833,7 +833,7 @@ static int template_p2_root (CCpq_tree *T, CCpq_node *x, int real, int *status)
     if (real) {
         rval = collect_full_children (T, x, PQ_PNODE);
         if (rval) {
-            fprintf (stderr, "collect_full_children failed\n");
+            CC_FPRINTF(stderr, "collect_full_children failed\n");
             return 1;
         }
     }
@@ -861,7 +861,7 @@ static int template_p4_root (CCpq_tree *T, CCpq_node *x, int real, int *status)
         if (real) {
             rval = collect_full_children (T, x, PQ_QNODE);
             if (rval) {
-                fprintf (stderr, "collect_full_children failed\n");
+                CC_FPRINTF(stderr, "collect_full_children failed\n");
                 return 1;
             }
             full_child = CCpq_set_LEFT_ELEM (x->full_children_set);
@@ -916,7 +916,7 @@ static int template_p6_root (CCpq_tree *T, CCpq_node *x, int real, int *status)
 
         rval = collect_full_children (T, x, PQ_QNODE);
         if (rval) {
-            fprintf (stderr, "collect_full_children failed\n");
+            CC_FPRINTF(stderr, "collect_full_children failed\n");
             return 1;
         }
 
@@ -1111,7 +1111,7 @@ static int collect_full_children (CCpq_tree *T, CCpq_node *x, int t)
     if (CCpq_set_SIZE (x->full_children_set) > 1) {
         new_node = PQ_node_alloc (&T->pqnode_world);
         if (new_node == (CCpq_node *) NULL) {
-            fprintf (stderr, "PQ_node_alloc failed\n");
+            CC_FPRINTF(stderr, "PQ_node_alloc failed\n");
             return 1;
         }
         node_init (T, new_node);
@@ -1161,7 +1161,7 @@ static int collect_empty_children (CCpq_tree *T, CCpq_node **p_x, int t)
         CCpq_set_SIZE (x->full_children_set) > 1) {
         new_node = PQ_node_alloc (&T->pqnode_world);
         if (new_node == (CCpq_node *) NULL) {
-            fprintf (stderr, "PQ_node_alloc failed\n");
+            CC_FPRINTF(stderr, "PQ_node_alloc failed\n");
             return 1;
         }
 
@@ -1395,8 +1395,8 @@ CCpq_node *CCpq_find_root (CCpq_tree *T)
 void CCpq_describe_solution (CCpq_tree *T)
 {
     describe_subtree (CCpq_find_root (T));
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 } /* END DESCRIBE_SOLUTION */
 
 static void describe_subtree (CCpq_node *x)
@@ -1407,7 +1407,7 @@ static void describe_subtree (CCpq_node *x)
 
     if (x->type == PQ_LEAF) return;
     if (x->type == PQ_PNODE) {
-        printf ("(");
+        CC_PRINTF("(");
         lcnt = 0;
         ccnt = 0;
         CCpq_set_FOREACH (x->children_set, z, children_elem, zprev, znext) {
@@ -1419,11 +1419,11 @@ static void describe_subtree (CCpq_node *x)
             ccnt++;
         }
         if (lcnt) {
-            printf ("%d-L ", lcnt);
+            CC_PRINTF("%d-L ", lcnt);
         }
-        printf (")<%d/%d> ", x->number, ccnt);
+        CC_PRINTF(")<%d/%d> ", x->number, ccnt);
     } else {
-        printf ("[");
+        CC_PRINTF("[");
         lcnt = 0;
         ccnt = 0;
         CCpq_set_FOREACH (x->children_set, z, children_elem, zprev, znext) {
@@ -1431,7 +1431,7 @@ static void describe_subtree (CCpq_node *x)
                 lcnt++;
             } else {
                 if (lcnt) {
-                    printf ("%d-L ", lcnt);
+                    CC_PRINTF("%d-L ", lcnt);
                     lcnt=0;
                 }
                 describe_subtree (z);
@@ -1439,18 +1439,18 @@ static void describe_subtree (CCpq_node *x)
             ccnt++;
         }
         if (lcnt) {
-            printf ("%d-L ", lcnt);
+            CC_PRINTF("%d-L ", lcnt);
             lcnt=0;
         }
-        printf ("]<%d/%d> ", x->number, ccnt);
+        CC_PRINTF("]<%d/%d> ", x->number, ccnt);
     }
 }
 
 void CCpq_dump_solution (CCpq_tree *T)
 {
     dump_subtree (CCpq_find_root (T));
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 } /* END DUMP_SOLUTION */
 
 static void dump_subtree (CCpq_node *x)
@@ -1458,19 +1458,19 @@ static void dump_subtree (CCpq_node *x)
     CCpq_node *z, *zprev, *znext;
 
     if (x->type == PQ_LEAF) {
-        printf ("%d ", x->number);
+        CC_PRINTF("%d ", x->number);
     } else if (x->type == PQ_PNODE) {
-        printf ("(");
+        CC_PRINTF("(");
         CCpq_set_FOREACH (x->children_set, z, children_elem, zprev, znext) {
             dump_subtree (z);
         }
-        printf (")<%d> ", x->number);
+        CC_PRINTF(")<%d> ", x->number);
     } else {
-        printf ("[");
+        CC_PRINTF("[");
         CCpq_set_FOREACH (x->children_set, z, children_elem, zprev, znext) {
             dump_subtree (z);
         }
-        printf ("]<%d> ", x->number);
+        CC_PRINTF("]<%d> ", x->number);
     }
 } /* END dump_subtree */
 
@@ -1517,12 +1517,12 @@ static int check_node (CCpq_tree *T, CCpq_node *x)
     CCpq_set_FOREACH (x->children_set, z, children_elem, zprev, znext) {
         cnt++;
         if (z->parenttype != x->type) {
-            printf ("Node %d has parenttype %d, parent %d has type %d\n",
+            CC_PRINTF("Node %d has parenttype %d, parent %d has type %d\n",
                     z->number, z->parenttype, x->number, x->type);
             return 0;
         }
         if (x->type == PQ_PNODE && z->parent != x) {
-            printf ("Node %d has parent %d, should be P-node %d\n",
+            CC_PRINTF("Node %d has parent %d, should be P-node %d\n",
                     z->number, z->parent->number,x->number);
             return 0;
         }
@@ -1530,46 +1530,46 @@ static int check_node (CCpq_tree *T, CCpq_node *x)
                z->children_elem.ptr2 != zprev) ||
               (z->children_elem.ptr2 == zprev &&
                z->children_elem.ptr1 != zprev))) {
-            printf ("Node %d has children ptr1 %d ptr2 %d, should be =, != %d\n",
+            CC_PRINTF("Node %d has children ptr1 %d ptr2 %d, should be =, != %d\n",
                     z->number, z->children_elem.ptr1->number,
                     z->children_elem.ptr2->number, zprev->number);
             return 0;
         }
     }
     if (x->type == PQ_PNODE && cnt != CCpq_set_SIZE (x->children_set)) {
-        printf ("P-node %d has %d children, set size %d\n",
+        CC_PRINTF("P-node %d has %d children, set size %d\n",
                 x->number, cnt, CCpq_set_SIZE (x->children_set));
         return 0;
     }
     if (x->type == PQ_QNODE &&
         CCpq_set_LEFT_ELEM (x->children_set)->parent != x) {
-        printf ("Q_node %d left child %d has parent %d\n",
+        CC_PRINTF("Q_node %d left child %d has parent %d\n",
                 x->number, CCpq_set_LEFT_ELEM (x->children_set)->number,
                 CCpq_set_LEFT_ELEM (x->children_set)->parent->number);
         return 0;
     }
     if (x->type == PQ_QNODE &&
         CCpq_set_RIGHT_ELEM (x->children_set)->parent != x) {
-        printf ("Q_node %d right child %d has parent %d\n",
+        CC_PRINTF("Q_node %d right child %d has parent %d\n",
                 x->number, CCpq_set_RIGHT_ELEM (x->children_set)->number,
                 CCpq_set_RIGHT_ELEM (x->children_set)->parent->number);
         return 0;
     }
     if (x->type != PQ_LEAF && CCpq_set_ISEMPTY (x->children_set)) {
-        printf ("node %d is type %d, but has no children\n",
+        CC_PRINTF("node %d is type %d, but has no children\n",
                 x->number, x->type);
         return 0;
     }
     if (x->type == PQ_LEAF && !CCpq_set_ISEMPTY (x->children_set)) {
-        printf ("leaf node %d has children\n", x->number);
+        CC_PRINTF("leaf node %d has children\n", x->number);
         return 0;
     }
     if (x->type == PQ_PNODE && cnt < 2) {
-        printf ("P-node %d only has %d children\n", x->number, cnt);
+        CC_PRINTF("P-node %d only has %d children\n", x->number, cnt);
         return 0;
     }
     if (x->type == PQ_QNODE && cnt < ((x->label == PARTIAL(T)) ? 2 : 3)) {
-        printf ("Q-node %d only has %d children\n", x->number, cnt);
+        CC_PRINTF("Q-node %d only has %d children\n", x->number, cnt);
         return 0;
     }
     return 1;
@@ -1605,12 +1605,12 @@ static int check_node_pert_work (CCpq_tree *T, CCpq_node *x)
             else if (z->label == FULL(T))
                 full_cnt++;
             else {
-                printf ("Node %d has label %d\n", z->number,
+                CC_PRINTF("Node %d has label %d\n", z->number,
                         z->label);
                 return 0;
             }
             if (!IS_EMPTY (z,T) && x != &T->pseudo_root && z->parent != x) {
-                printf ("Node %d has parent %d, should be %d\n",
+                CC_PRINTF("Node %d has parent %d, should be %d\n",
                         z->number, z->parent->number,
                         x->number);
                 return 0;
@@ -1618,13 +1618,13 @@ static int check_node_pert_work (CCpq_tree *T, CCpq_node *x)
         }
 
         if (full_cnt != CCpq_set_SIZE (x->full_children_set)) {
-            printf ("node %d has full children size %d, but has %d children full\n",
+            CC_PRINTF("node %d has full children size %d, but has %d children full\n",
                     x->number, CCpq_set_SIZE (x->full_children_set),
                     full_cnt);
             return 0;
         }
         if (partial_cnt != CCpq_set_SIZE (x->partial_children_set)) {
-            printf ("node %d has partial children size %d, but has %d children partial\n",
+            CC_PRINTF("node %d has partial children size %d, but has %d children partial\n",
                     x->number,
                     CCpq_set_SIZE (x->partial_children_set),
                     partial_cnt);
@@ -1642,7 +1642,7 @@ static int check_node_pert_work (CCpq_tree *T, CCpq_node *x)
               (z->full_children_elem.ptr1 == zprev &&
                z->full_children_elem.ptr2 == zprev &&
                zprev == (CCpq_node *) NULL))) {
-            printf ("Node %d has full_children ptr1 %d ptr2 %d, should be =, != %d\n",
+            CC_PRINTF("Node %d has full_children ptr1 %d ptr2 %d, should be =, != %d\n",
                     z->number,
                     z->full_children_elem.ptr1->number,
                     z->full_children_elem.ptr2->number,
@@ -1650,13 +1650,13 @@ static int check_node_pert_work (CCpq_tree *T, CCpq_node *x)
             return 0;
         }
         if (z->label != FULL(T)) {
-            printf ("Node %d has label %d, but is in full set\n",
+            CC_PRINTF("Node %d has label %d, but is in full set\n",
                     z->number, z->label);
             return 0;
         }
     }
     if (cnt != CCpq_set_SIZE (x->full_children_set)) {
-        printf ("node %d has %d full children, set size %d\n",
+        CC_PRINTF("node %d has %d full children, set size %d\n",
                 x->number, cnt,
                 CCpq_set_SIZE (x->full_children_set));
         return 0;
@@ -1672,7 +1672,7 @@ static int check_node_pert_work (CCpq_tree *T, CCpq_node *x)
               (z->partial_children_elem.ptr1 == zprev &&
                z->partial_children_elem.ptr2 == zprev &&
                zprev == (CCpq_node *) NULL))) {
-            printf ("Node %d has partial_children ptr1 %d ptr2 %d, should be =, != %d\n",
+            CC_PRINTF("Node %d has partial_children ptr1 %d ptr2 %d, should be =, != %d\n",
                     z->number,
                     z->partial_children_elem.ptr1->number,
                     z->partial_children_elem.ptr2->number,
@@ -1680,13 +1680,13 @@ static int check_node_pert_work (CCpq_tree *T, CCpq_node *x)
             return 0;
         }
         if (z->label != PARTIAL(T)) {
-            printf ("Node %d has label %d, but is in partial set\n",
+            CC_PRINTF("Node %d has label %d, but is in partial set\n",
                     z->number, z->label);
             return 0;
         }
     }
     if (cnt != CCpq_set_SIZE (x->partial_children_set)) {
-        printf ("node %d has %d partial children, set size %d\n",
+        CC_PRINTF("node %d has %d partial children, set size %d\n",
                 x->number, cnt,
                 CCpq_set_SIZE (x->partial_children_set));
         return 0;
@@ -1709,7 +1709,7 @@ int CCpq_cuttree_to_pq (CCtsp_cuttree *ct, CCpq_tree *pqT)
     CCpq_tree_free (pqT);
 
     if (nodecount < 3) {
-        fprintf (stderr, "Can't build PQ tree with %d nodes\n",
+        CC_FPRINTF(stderr, "Can't build PQ tree with %d nodes\n",
                  ct->nodecount);
         rval = 1; goto CLEANUP;
     }
@@ -1717,7 +1717,7 @@ int CCpq_cuttree_to_pq (CCtsp_cuttree *ct, CCpq_tree *pqT)
     elems = CC_SAFE_MALLOC (nodecount, CCpq_node);
 
     if (elems == (CCpq_node *) NULL) {
-        fprintf (stderr, "Out of memory in CCpq_tree_trivial\n");
+        CC_FPRINTF(stderr, "Out of memory in CCpq_tree_trivial\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1753,7 +1753,7 @@ int CCpq_cuttree_to_pq (CCtsp_cuttree *ct, CCpq_tree *pqT)
 
     root = cuttree_to_pqtree_work (r, ct->nodelist, pqT);
     if (root == (CCpq_node *) NULL) {
-        fprintf (stderr, "cuttree_to_pqtree_work failed\n");
+        CC_FPRINTF(stderr, "cuttree_to_pqtree_work failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1786,7 +1786,7 @@ static CCpq_node *cuttree_to_pqtree_work (CCtsp_cutnode *x,
 
     n = PQ_node_alloc (&T->pqnode_world);
     if (n == (CCpq_node *) NULL) {
-        fprintf (stderr, "Out of memory in cuttree_to_pqtree_work\n");
+        CC_FPRINTF(stderr, "Out of memory in cuttree_to_pqtree_work\n");
         goto FAILURE;
     }
 
@@ -1797,7 +1797,7 @@ static CCpq_node *cuttree_to_pqtree_work (CCtsp_cutnode *x,
     } else if (x->type == CCtsp_CUT_QNODE) {
         n->type = PQ_QNODE;
     } else {
-        fprintf (stderr, "Unknown node type %d\n", x->type);
+        CC_FPRINTF(stderr, "Unknown node type %d\n", x->type);
         goto FAILURE;
     }
 

@@ -73,8 +73,8 @@ int CCutil_karp_partition (int ncount, CCdatagroup *dat, int partsize,
     kpnode *p, *q;
     double pcutval, qcutval;
 
-    printf ("Create a Karp partition with bucketsize %d\n", partsize);
-    fflush (stdout);
+    CC_PRINTF("Create a Karp partition with bucketsize %d\n", partsize);
+    CC_FFLUSH(stdout);
 
     *p_slist = (CCsubdiv *) NULL;
     *partlist = (int **) NULL;
@@ -84,12 +84,12 @@ int CCutil_karp_partition (int ncount, CCdatagroup *dat, int partsize,
     thetree.root = (kpnode *) NULL;
 
     if ((norm & CC_NORM_SIZE_BITS) != CC_D2_NORM_SIZE) {
-        fprintf (stderr, "Only set up for 2D norms\n");
+        CC_FPRINTF(stderr, "Only set up for 2D norms\n");
         rval = 1;  goto CLEANUP;
     }
 
     if (ncount < 2*partsize) {
-        fprintf (stderr, "two few nodes for partition size\n");
+        CC_FPRINTF(stderr, "two few nodes for partition size\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -99,7 +99,7 @@ int CCutil_karp_partition (int ncount, CCdatagroup *dat, int partsize,
             mult *= 2;
         } while (ncount/(mult+2) > partsize);
         target = ncount/(mult+2);
-        printf ("With polar caps, using bucketsize %d\n", target);
+        CC_PRINTF("With polar caps, using bucketsize %d\n", target);
     }
 
     thetree.perm = CC_SAFE_MALLOC (ncount, int);
@@ -130,7 +130,7 @@ int CCutil_karp_partition (int ncount, CCdatagroup *dat, int partsize,
         p->loson = build (0, target, xlo, pcutval, ylo, yhi, &thetree, dat->x,
                           dat->y, partsize, &scount, rstate);
         if (!p->loson) {
-            fprintf (stderr, "initial loson build failed\n");
+            CC_FPRINTF(stderr, "initial loson build failed\n");
             rval = 1;  goto CLEANUP;
         } 
 
@@ -146,21 +146,21 @@ int CCutil_karp_partition (int ncount, CCdatagroup *dat, int partsize,
         q->hison = build (m+1, ncount-1, qcutval, xhi, ylo, yhi, &thetree,
                           dat->x, dat->y, partsize, &scount, rstate);
         if (!q->hison) {
-            fprintf (stderr, "q hison build failed\n");
+            CC_FPRINTF(stderr, "q hison build failed\n");
             rval = 1;  goto CLEANUP;
         } 
 
         q->loson = build (target+1, m, pcutval, qcutval, ylo, yhi, &thetree,
                           dat->x, dat->y, partsize, &scount, rstate);
         if (!q->loson) {
-            fprintf (stderr, "q loson build failed\n");
+            CC_FPRINTF(stderr, "q loson build failed\n");
             rval = 1;  goto CLEANUP;
         } 
     } else {
         thetree.root = build (0, ncount-1, xlo, xhi, ylo, yhi, &thetree,
                               dat->x, dat->y, partsize, &scount, rstate);
         if (!thetree.root) {
-            fprintf (stderr, "unable to build partition tree\n");
+            CC_FPRINTF(stderr, "unable to build partition tree\n");
             rval = 1;  goto CLEANUP;
         }
     }
@@ -218,9 +218,9 @@ static kpnode *build (int l, int u, double xlo, double xhi, double ylo,
         p->y[1] = yhi;
         p->lopt = l;
         p->hipt = u;
-        printf ("Part %d [%.2f, %.2f] [%.2f, %.2f]: %d points\n", 
+        CC_PRINTF("Part %d [%.2f, %.2f] [%.2f, %.2f]: %d points\n", 
                     *cnt, xlo, xhi, ylo, yhi, u - l + 1);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         (*cnt)++;
     } else {
         cutdim = findmaxspread (l, u, thetree, datx, daty);
@@ -345,7 +345,7 @@ int CCutil_write_subdivision_index (char *problabel, int ncount, int scount,
     if (index_name == (char *) NULL ||
         new_name == (char *) NULL ||
         back_name == (char *) NULL) {
-        fprintf (stderr, "Out of memory in CCutil_write_subdivision_index\n");
+        CC_FPRINTF(stderr, "Out of memory in CCutil_write_subdivision_index\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -359,7 +359,7 @@ int CCutil_write_subdivision_index (char *problabel, int ncount, int scount,
     f = fopen (new_name, "w");
     if (f == (FILE*) NULL) {
         perror (new_name);
-        fprintf (stderr,
+        CC_FPRINTF(stderr,
            "Unable to open %s for output in CCutil_write_subdivision_index\n",
             new_name);
         rval = 1; goto CLEANUP;
@@ -368,7 +368,7 @@ int CCutil_write_subdivision_index (char *problabel, int ncount, int scount,
     tval = fprintf (f, "%s %d\n", problabel, ncount);
     if (tval <= 0) {
         perror (new_name);
-        fprintf (stderr, "fprintf to %s failed\n", new_name);
+        CC_FPRINTF(stderr, "fprintf to %s failed\n", new_name);
         rval = 1; goto CLEANUP;
     }
 
@@ -383,7 +383,7 @@ int CCutil_write_subdivision_index (char *problabel, int ncount, int scount,
     tval = fclose (f);
     if (tval) {
         perror (new_name);
-        fprintf (stderr, "fclose %s failed\n", new_name);
+        CC_FPRINTF(stderr, "fclose %s failed\n", new_name);
         rval = 1; goto CLEANUP;
     }
     f = (FILE *) NULL;
@@ -392,7 +392,7 @@ int CCutil_write_subdivision_index (char *problabel, int ncount, int scount,
     tval = rename (new_name, index_name);
     if (tval) {
         perror (index_name);
-        fprintf (stderr, "rename %s to %s failed\n", new_name, index_name);
+        CC_FPRINTF(stderr, "rename %s to %s failed\n", new_name, index_name);
         rval = 1; goto CLEANUP;
     }
     
@@ -418,7 +418,7 @@ int CCutil_read_subdivision_index (char *index_name, char **p_problabel,
     f = fopen (index_name, "r");
     if (f == (FILE*) NULL) {
         perror (index_name);
-        fprintf (stderr,
+        CC_FPRINTF(stderr,
              "Unable to open %s for input in CCutil_read_subdivision_index\n",
                  index_name);
         rval = 1; goto CLEANUP;
@@ -426,7 +426,7 @@ int CCutil_read_subdivision_index (char *index_name, char **p_problabel,
 
     problabel = CC_SAFE_MALLOC (1024, char);
     if (problabel == (char *) NULL) {
-        fprintf (stderr, "Out of memory in read_index\n");
+        CC_FPRINTF(stderr, "Out of memory in read_index\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -435,7 +435,7 @@ int CCutil_read_subdivision_index (char *index_name, char **p_problabel,
     tval = fscanf (f, "%d\n", p_ncount);
     if (tval <= 0) {
         perror (index_name);
-        fprintf (stderr, "fscanf from %s failed\n", index_name);
+        CC_FPRINTF(stderr, "fscanf from %s failed\n", index_name);
         rval = 1; goto CLEANUP;
     }
 
@@ -457,7 +457,7 @@ int CCutil_read_subdivision_index (char *index_name, char **p_problabel,
     tval = fclose (f);
     if (tval) {
         perror (index_name);
-        fprintf (stderr, "fclose %s failed\n", index_name);
+        CC_FPRINTF(stderr, "fclose %s failed\n", index_name);
         rval = 1; goto CLEANUP;
     }
     f = (FILE *) NULL;
@@ -496,7 +496,7 @@ int CCutil_write_subdivision_lkh_index (char *problabel, int ncount,
     if (index_name == (char *) NULL ||
         new_name == (char *) NULL ||
         back_name == (char *) NULL) {
-        fprintf (stderr, "Out of memory in CCutil_write_subdivision_index\n");
+        CC_FPRINTF(stderr, "Out of memory in CCutil_write_subdivision_index\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -510,7 +510,7 @@ int CCutil_write_subdivision_lkh_index (char *problabel, int ncount,
     f = fopen (new_name, "w");
     if (f == (FILE*) NULL) {
         perror (new_name);
-        fprintf (stderr,
+        CC_FPRINTF(stderr,
            "Unable to open %s for output in CCutil_write_subdivision_index\n",
             new_name);
         rval = 1; goto CLEANUP;
@@ -519,7 +519,7 @@ int CCutil_write_subdivision_lkh_index (char *problabel, int ncount,
     tval = fprintf (f, "%s %d %0.0f\n", problabel, ncount, tourlen);
     if (tval <= 0) {
         perror (new_name);
-        fprintf (stderr, "fprintf to %s failed\n", new_name);
+        CC_FPRINTF(stderr, "fprintf to %s failed\n", new_name);
         rval = 1; goto CLEANUP;
     }
 
@@ -533,7 +533,7 @@ int CCutil_write_subdivision_lkh_index (char *problabel, int ncount,
     tval = fclose (f);  
     if (tval) {
         perror (new_name);
-        fprintf (stderr, "fclose %s failed\n", new_name);
+        CC_FPRINTF(stderr, "fclose %s failed\n", new_name);
         rval = 1; goto CLEANUP;
     }
     f = (FILE *) NULL;
@@ -542,7 +542,7 @@ int CCutil_write_subdivision_lkh_index (char *problabel, int ncount,
     tval = rename (new_name, index_name);
     if (tval) {
         perror (index_name);
-        fprintf (stderr, "rename %s to %s failed\n", new_name, index_name);
+        CC_FPRINTF(stderr, "rename %s to %s failed\n", new_name, index_name);
         rval = 1; goto CLEANUP;
     }
     
@@ -569,7 +569,7 @@ int CCutil_read_subdivision_lkh_index (char *index_name, char **p_problabel,
     f = fopen (index_name, "r");
     if (f == (FILE*) NULL) {
         perror (index_name);
-        fprintf (stderr,
+        CC_FPRINTF(stderr,
              "Unable to open %s for input in CCutil_read_subdivision_index\n",
                  index_name);
         rval = 1; goto CLEANUP;
@@ -577,7 +577,7 @@ int CCutil_read_subdivision_lkh_index (char *index_name, char **p_problabel,
 
     problabel = CC_SAFE_MALLOC (1024, char);
     if (problabel == (char *) NULL) {
-        fprintf (stderr, "Out of memory in read_index\n");
+        CC_FPRINTF(stderr, "Out of memory in read_index\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -586,7 +586,7 @@ int CCutil_read_subdivision_lkh_index (char *index_name, char **p_problabel,
     tval = fscanf (f, "%d %lf\n", p_ncount, p_tourlen);
     if (tval <= 0) {
         perror (index_name);
-        fprintf (stderr, "fscanf from %s failed\n", index_name);
+        CC_FPRINTF(stderr, "fscanf from %s failed\n", index_name);
         rval = 1; goto CLEANUP;
     }
 
@@ -607,7 +607,7 @@ int CCutil_read_subdivision_lkh_index (char *index_name, char **p_problabel,
     tval = fclose (f);
     if (tval) {
         perror (index_name);
-        fprintf (stderr, "fclose %s failed\n", index_name);
+        CC_FPRINTF(stderr, "fclose %s failed\n", index_name);
         rval = 1; goto CLEANUP;
     }
     f = (FILE *) NULL;

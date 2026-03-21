@@ -212,12 +212,12 @@ static node *nn_match (CCkdtree *kt, CCdatagroup *dat, data *D, matchings *M,
     int nei;
 
     if (D->print_level)
-        printf("\n  Start Nearest Neightbour Matching ...");
+        CC_PRINTF("\n  Start Nearest Neightbour Matching ...");
 
     M->very_best_match = CC_SAFE_MALLOC (D->nnodes, node);
     M->match           = CC_SAFE_MALLOC (D->nnodes, node);
     if (!M->very_best_match || !M->match) {
-        fprintf (stderr, "out of memory in nn_match\n");
+        CC_FPRINTF(stderr, "out of memory in nn_match\n");
         return (node *) NULL;
     }
 
@@ -238,13 +238,13 @@ static node *nn_match (CCkdtree *kt, CCdatagroup *dat, data *D, matchings *M,
         M->match[nei].weight = CCutil_dat_edgelen(nod, nei, dat);
     }
 
-    if (D->print_level) printf("\n  ... Ready !! ");
+    if (D->print_level) CC_PRINTF("\n  ... Ready !! ");
     sum=0.0;
     for (i = 0; i < D->nnodes; i++)
         sum += M->match[i].weight;
     sum /= 2;
     if (D->print_level)
-        printf("\n  The Nearest Neighbour Matching has weight %i",sum);
+        CC_PRINTF("\n  The Nearest Neighbour Matching has weight %i",sum);
 
     CCkdtree_undelete_all (kt, D->nnodes);
 
@@ -268,7 +268,7 @@ static int new_edge (data *D, graph *G, int x, int y)
     edge *e;
 
     if (G->edge_count >= D->nnodes + MAX_EXTRA_EDGES) {
-        fprintf (stderr, "\nToo many edges (%i)\n", G->edge_count);
+        CC_FPRINTF(stderr, "\nToo many edges (%i)\n", G->edge_count);
         return 1;
     }
     e = G->edge_graph+G->edge_count;
@@ -291,7 +291,7 @@ static int init_graph (data *D, graph *G)
     G->end_graph  = CC_SAFE_MALLOC (1, edge);
     G->adj_graph  = CC_SAFE_MALLOC (D->nnodes, edge*);
     if (!G->edge_graph || !G->end_graph || !G->adj_graph) {
-        fprintf (stderr, "out of memory in init_graph\n");
+        CC_FPRINTF(stderr, "out of memory in init_graph\n");
         return 1;
     }
     for (i = 0; i < D->nnodes; i++)
@@ -397,7 +397,7 @@ static int restore_match (data *D, matchings *M, graph *G, tflip *fli)
     int i;
 
     if (fli->flip_all_stack_count > fli->max_deep) {
-        fprintf (stderr, "\nfli->flip_all_stack_count = %i, over limit\n",
+        CC_FPRINTF(stderr, "\nfli->flip_all_stack_count = %i, over limit\n",
             fli->flip_all_stack_count);
         return 1;
     }
@@ -405,7 +405,7 @@ static int restore_match (data *D, matchings *M, graph *G, tflip *fli)
     for (i = 0; i < D->nnodes; i++) {
         if (i < M->match[i].neigh && in_graph (G, i, M->match[i].neigh) == 0) {
             if (new_edge (D, G, i, M->match[i].neigh)) {
-                fprintf (stderr, "new_edge failed\n");
+                CC_FPRINTF(stderr, "new_edge failed\n");
                 return 1;
             }
         }
@@ -467,7 +467,7 @@ static int opt_makegraph (CCkdtree *kt, CCdatagroup *dat, data *D,
     D->end = CC_SAFE_MALLOC (1, optedge);
     D->adj = CC_SAFE_MALLOC (D->nnodes, optedge *);
     if (!D->end || !D->adj) {
-        fprintf (stderr, "out of memory in opt_makegraph\n");
+        CC_FPRINTF(stderr, "out of memory in opt_makegraph\n");
         CC_IFFREE (D->end, optedge);
         CC_IFFREE (D->adj, optedge *);
         return 1;
@@ -482,13 +482,13 @@ static int opt_makegraph (CCkdtree *kt, CCdatagroup *dat, data *D,
     /* Edg_Opt_Nod Nearest Neighbours ! */
 
     if (D->print_level) {
-        printf("\n  Ich build the %i Nearest Neighbour Graph ..", Opt_Edg_Nod);
-        fflush(stdout);
+        CC_PRINTF("\n  Ich build the %i Nearest Neighbour Graph ..", Opt_Edg_Nod);
+        CC_FFLUSH(stdout);
     }
 
     D->edge_mem = CC_SAFE_MALLOC (Opt_Edg_Nod*D->nnodes, optedge);
     if (!D->edge_mem) {
-        fprintf (stderr, "out of memory in opt_makegraph\n");
+        CC_FPRINTF(stderr, "out of memory in opt_makegraph\n");
         CC_FREE (D->end, optedge);
         CC_FREE (D->adj, optedge *);
         return 1;
@@ -512,7 +512,7 @@ static int opt_makegraph (CCkdtree *kt, CCdatagroup *dat, data *D,
     }
 
     if (D->print_level) {
-        printf(" ... ready !! "); fflush(stdout);
+        CC_PRINTF(" ... ready !! "); CC_FFLUSH(stdout);
     }
     return 0;
 }
@@ -554,7 +554,7 @@ static int init (data *D, tflip *fli, mqueue *qu)
 
     if (!fli->flip_all_stack || !fli->flip_best_stack || !fli->flip_stack ||
         !D->u || !D->w || !qu->ok || !qu->ok_q || !qu->in) {
-        fprintf (stderr, "out of memory in init\n");
+        CC_FPRINTF(stderr, "out of memory in init\n");
         CC_IFFREE (fli->flip_all_stack, flip_coor);
         CC_IFFREE (fli->flip_best_stack, flip_coor);
         CC_IFFREE (fli->flip_stack, flip_coor);
@@ -907,25 +907,25 @@ static int m_lin_ker (CCkdtree *kt, CCdatagroup *dat, data *D, matchings *M,
 
     D->print_level = 0;
     if (D->print_level) {
-        printf("\n Initialization  ..");
-        fflush (stdout);
+        CC_PRINTF("\n Initialization  ..");
+        CC_FFLUSH(stdout);
     }
     if (init_graph (D, G)) {
-        fprintf (stderr, "init_graph failed\n");
+        CC_FPRINTF(stderr, "init_graph failed\n");
         return 1;
     }
     if (init (D, fli, qu)) {
-        fprintf (stderr, "init failed\n");
+        CC_FPRINTF(stderr, "init failed\n");
         return 1;
     }
     if (D->print_level) {
-        printf(".. ready !!! ");
-        fflush(stdout);
+        CC_PRINTF(".. ready !!! ");
+        CC_FFLUSH(stdout);
     }
 
     M->match = nn_match (kt, dat, D, M, rstate);
     if (!M->match) {
-        fprintf (stderr, "nn_match failed\n");
+        CC_FPRINTF(stderr, "nn_match failed\n");
         frei (D, fli, qu);
         return 1;
     }
@@ -940,29 +940,29 @@ static int m_lin_ker (CCkdtree *kt, CCdatagroup *dat, data *D, matchings *M,
     M->very_best_match_weight = M->match_weight;
 
     if (opt_makegraph (kt, dat, D, rstate)) {
-        fprintf (stderr, "opt_makegraph failed\n");
+        CC_FPRINTF(stderr, "opt_makegraph failed\n");
         frei (D, fli, qu);
         return 1;
     }
     init_queue (D, qu);
 
     if (D->print_level) {
-        printf("\n  Start LinKer with %i iterations ... ", max_iteration);
-        fflush(stdout);
+        CC_PRINTF("\n  Start LinKer with %i iterations ... ", max_iteration);
+        CC_FFLUSH(stdout);
     }
 
     ende = 0;
     for (D->iteration = 0; ende == 0; D->iteration++) {
         if (D->print_level)
-            printf("\n    %i. It., ..",D->iteration);
+            CC_PRINTF("\n    %i. It., ..",D->iteration);
         else
-            printf(".");
-        fflush(stdout);
+            CC_PRINTF(".");
+        CC_FFLUSH(stdout);
         lin_ker_do (D, M, fli, qu);
         if (D->print_level)
-            printf(" | Length:%f |", M->best_match_weight);
+            CC_PRINTF(" | Length:%f |", M->best_match_weight);
         if (restore_match (D, M, G, fli)) {
-            fprintf (stderr, "restore_match failed\n");
+            CC_FPRINTF(stderr, "restore_match failed\n");
             frei (D, fli, qu);
             return 1;
         }
@@ -1004,8 +1004,8 @@ static int m_lin_ker (CCkdtree *kt, CCdatagroup *dat, data *D, matchings *M,
             ende=1;
         }
         if (D->print_level) {
-            printf(" %i edg",G->edge_count);
-            fflush (stdout);
+            CC_PRINTF(" %i edg",G->edge_count);
+            CC_FFLUSH(stdout);
         }
     }
 
@@ -1037,15 +1037,15 @@ int CCedgegen_mlinkern (int ncount, CCdatagroup *dat, int wantlist,
 
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-        printf ("Cannot run matching Lin-Kernighan with this norm\n");
-        fflush (stdout);
+        CC_PRINTF("Cannot run matching Lin-Kernighan with this norm\n");
+        CC_FFLUSH(stdout);
         return 0;
     }
 
     /* Start linker */
 
     if (m_lin_ker (kt, dat, &D, &M, &G, &fli, &qu, iterations, rstate)) {
-        fprintf (stderr, "m_lin_ker failed\n");
+        CC_FPRINTF(stderr, "m_lin_ker failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -1055,7 +1055,7 @@ int CCedgegen_mlinkern (int ncount, CCdatagroup *dat, int wantlist,
     *ecount = G.edge_count;
     *elist = CC_SAFE_MALLOC (2 *(*ecount), int);
     if (!(*elist)) {
-        fprintf (stderr, "out of memory in mlinkern\n");
+        CC_FPRINTF(stderr, "out of memory in mlinkern\n");
         rval = 1;
         goto CLEANUP;
     }

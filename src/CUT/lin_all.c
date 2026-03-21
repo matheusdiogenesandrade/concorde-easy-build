@@ -38,7 +38,7 @@ int main (int ac, char **av)
     double szeit;
 
     if (ac < 2) {
-        fprintf (stderr, "Usage: %s edge_file\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s edge_file\n", av[0]);
         rval = -1;
         goto CLEANUP;
     }
@@ -51,7 +51,7 @@ int main (int ac, char **av)
     f = fopen (av[1], "r");
     if (f == (FILE *) NULL) {
         perror (av[1]);
-        fprintf (stderr, "Unable to open %s for input\n", av[1]);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", av[1]);
         rval = -1;
         goto CLEANUP;
     }
@@ -65,7 +65,7 @@ int main (int ac, char **av)
         x == (double *) NULL ||
         endmark == (int *) NULL ||
         perm == (int *) NULL) {
-        fprintf (stderr, "Out of memory\n");
+        CC_FPRINTF(stderr, "Out of memory\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -81,21 +81,21 @@ int main (int ac, char **av)
         endmark[i] = CC_LINSUB_BOTH_END;
     }
 
-    printf ("generating all CCtsp_segment cuts of weight <= %f\n", maxval);
+    CC_PRINTF("generating all CCtsp_segment cuts of weight <= %f\n", maxval);
 
     szeit = CCutil_zeit();
 
     rval = CCcut_linsub_allcuts (ncount, ecount, (int *) NULL, endmark,
             elist, x, maxval, (void *) NULL, dump_segment);
     if (rval) {
-        fprintf (stderr, "CCcut_linsub_allcuts failed\n");
+        CC_FPRINTF(stderr, "CCcut_linsub_allcuts failed\n");
         goto CLEANUP;
     }
 
-    printf ("done in %.2f seconds\n", CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_PRINTF("done in %.2f seconds\n", CCutil_zeit() - szeit);
+    CC_FFLUSH(stdout);
 
-    printf ("generating all CCtsp_segment cuts (even to *3) of weight <= %f\n",
+    CC_PRINTF("generating all CCtsp_segment cuts (even to *3) of weight <= %f\n",
             maxval);
 
     for (i=0; i<ncount; i++) {
@@ -113,14 +113,14 @@ int main (int ac, char **av)
     rval = CCcut_linsub_allcuts (ncount, ecount, (int *) NULL, endmark,
             elist, x, maxval, (void *) NULL, dump_segment);
     if (rval) {
-        fprintf (stderr, "CCcut_linsub_allcuts failed\n");
+        CC_FPRINTF(stderr, "CCcut_linsub_allcuts failed\n");
         goto CLEANUP;
     }
 
-    printf ("done in %.2f seconds\n", CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_PRINTF("done in %.2f seconds\n", CCutil_zeit() - szeit);
+    CC_FFLUSH(stdout);
 
-    printf ("generating all CCtsp_segment cuts rotated by 5 (even to *3) of weight <= %f\n",
+    CC_PRINTF("generating all CCtsp_segment cuts rotated by 5 (even to *3) of weight <= %f\n",
             maxval);
 
     for (i=0; i<ncount; i++) {
@@ -142,12 +142,12 @@ int main (int ac, char **av)
     rval = CCcut_linsub_allcuts (ncount, ecount, perm, endmark, elist, x,
                            maxval, (void *) NULL, dump_segment);
     if (rval) {
-        fprintf (stderr, "CCcut_linsub_allcuts failed\n");
+        CC_FPRINTF(stderr, "CCcut_linsub_allcuts failed\n");
         goto CLEANUP;
     }
 
-    printf ("done in %.2f seconds\n", CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_PRINTF("done in %.2f seconds\n", CCutil_zeit() - szeit);
+    CC_FFLUSH(stdout);
 
     rval = 0;
 
@@ -161,6 +161,6 @@ int main (int ac, char **av)
 static int dump_segment (double cut_val, int cut_start, int cut_end,
                          CC_UNUSED void *u_data)
 {
-    printf ("%d %d %.6f\n", cut_start, cut_end, cut_val);
+    CC_PRINTF("%d %d %.6f\n", cut_start, cut_end, cut_val);
     return 0;
 }

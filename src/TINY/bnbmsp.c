@@ -120,7 +120,7 @@ int CCtiny_bnb_msp (int nnodes, int nedges, int *elist, int *weight, int depot,
 #endif
 
     if (depot != OUTSIDE) {
-        fprintf (stderr, "bnbtsp doesn't know how to handle depot %d\n",
+        CC_FPRINTF(stderr, "bnbtsp doesn't know how to handle depot %d\n",
                  depot);
         return CC_TINYTSP_ERROR;
     }
@@ -181,7 +181,7 @@ int CCtiny_bnb_msp (int nnodes, int nedges, int *elist, int *weight, int depot,
     build_adj (&s);
 
 #ifdef DEBUG
-    printf ("Performing initial checks\n");
+    CC_PRINTF("Performing initial checks\n");
 #endif
     if (build_paths (&s)) {
         rval = CC_TINYTSP_INFEASIBLE;
@@ -198,7 +198,7 @@ int CCtiny_bnb_msp (int nnodes, int nedges, int *elist, int *weight, int depot,
             s.nodes[i].adjvec[s.nodes[i].pathend].value == -1) {
 #ifdef DEBUG
 #if DEBUG>1
-            printf ("node %d pathend, forcing %d to 0\n",
+            CC_PRINTF("node %d pathend, forcing %d to 0\n",
                     i,s.nodes[i].pathend);
 #endif
 #endif
@@ -210,39 +210,39 @@ int CCtiny_bnb_msp (int nnodes, int nedges, int *elist, int *weight, int depot,
     }
 
 #ifdef DEBUG
-    printf ("Beginning search\n");
+    CC_PRINTF("Beginning search\n");
 #endif
     s.searchcount = 0;
     search (&s);
 #ifdef DEBUG
-    printf ("Search finished\n");
+    CC_PRINTF("Search finished\n");
 #endif
 
     if (s.searchcount >= s.searchlimit) {
 #ifdef DEBUG
-        fprintf (stderr, "search node limit %d exceeded\n", s.searchlimit);
-        fprintf (stderr, "SNLE obj:\n");
-        fprintf (stderr, "%d %d\n", nnodes, nedges);
+        CC_FPRINTF(stderr, "search node limit %d exceeded\n", s.searchlimit);
+        CC_FPRINTF(stderr, "SNLE obj:\n");
+        CC_FPRINTF(stderr, "%d %d\n", nnodes, nedges);
         for (i=0; i<nedges; i++) {
-            fprintf (stderr, "%d %d %d %d %d\n", elist[2*i], elist[2*i+1],
+            CC_FPRINTF(stderr, "%d %d %d %d %d\n", elist[2*i], elist[2*i+1],
                      lbound[i], ubound[i], objdir * weight[i]);
         }
 #endif
 #ifdef TIMINGS
-        printf ("BNB Search Limit Nodes: %d   Time %.3f\n",
-                s.searchcount, CCutil_zeit() - sz); fflush (stdout);
+        CC_PRINTF("BNB Search Limit Nodes: %d   Time %.3f\n",
+                s.searchcount, CCutil_zeit() - sz); CC_FFLUSH(stdout);
 #endif
         rval = CC_TINYTSP_SEARCHLIMITEXCEEDED;
         goto CLEANUP;
     }
 
 #ifdef TIMINGS
-    printf ("BNB Search in Nodes: %d   Time %.3f\n",
-            s.searchcount, CCutil_zeit() - sz); fflush (stdout);
+    CC_PRINTF("BNB Search in Nodes: %d   Time %.3f\n",
+            s.searchcount, CCutil_zeit() - sz); CC_FFLUSH(stdout);
 #endif
 #ifdef DEBUG
-    printf ("bnbtsp search finished in %d nodes\n", s.searchcount);
-    fflush (stdout);
+    CC_PRINTF("bnbtsp search finished in %d nodes\n", s.searchcount);
+    CC_FFLUSH(stdout);
 #endif
 
     if (objval) *objval = objdir * s.bestval;
@@ -280,7 +280,7 @@ static int checkout_node (tspsearch *s, int i)
             while ((j = nodes[i].adjlist) != -1) {
 #ifdef DEBUG
 #if DEBUG>1
-                printf ("node %d avail 2, forcing %d to %d\n",
+                CC_PRINTF("node %d avail 2, forcing %d to %d\n",
                         i,j,nodes[i].adjvec[j].hi);
 #endif
 #endif
@@ -295,7 +295,7 @@ static int checkout_node (tspsearch *s, int i)
                 if (nodes[i].deg & 1) {
 #ifdef DEBUG
 #if DEBUG>1
-                    printf ("node %d single adj + odd deg, forcing %d to %d\n",
+                    CC_PRINTF("node %d single adj + odd deg, forcing %d to %d\n",
                              i,j,nodes[i].adjvec[j].lo + 1);
 #endif
 #endif
@@ -305,7 +305,7 @@ static int checkout_node (tspsearch *s, int i)
                            == 1) {
 #ifdef DEBUG
 #if DEBUG>1
-                    printf ("node %d single adj + even deg, forcing %d to %d\n",
+                    CC_PRINTF("node %d single adj + even deg, forcing %d to %d\n",
                              i,j,nodes[i].adjvec[j].lo);
 #endif
 #endif
@@ -314,7 +314,7 @@ static int checkout_node (tspsearch *s, int i)
             } else {
 #ifdef DEBUG
 #if DEBUG>1
-                printf ("node %d single adj, forcing %d to %d\n",
+                CC_PRINTF("node %d single adj, forcing %d to %d\n",
                         i,j,2-nodes[i].deg);
 #endif
 #endif
@@ -327,7 +327,7 @@ static int checkout_node (tspsearch *s, int i)
         while ((j = nodes[i].adjlist) != -1) {
 #ifdef DEBUG
 #if DEBUG>1
-            printf ("node %d deg 2, forcing %d to %d\n",
+            CC_PRINTF("node %d deg 2, forcing %d to %d\n",
                     i,j,nodes[i].adjvec[j].lo);
 #endif
 #endif
@@ -416,7 +416,7 @@ static void search (tspsearch *s)
 
     if (s->currentval + lowerbound(s) >= s->bestval) {
 #ifdef DEBUG
-        printf ("search, currentval %.0f lowerbound %.0f, bestval %.0f, returning\n",
+        CC_PRINTF("search, currentval %.0f lowerbound %.0f, bestval %.0f, returning\n",
                 s->currentval, lowerbound(s), s->bestval);
 #endif
         return;
@@ -437,7 +437,7 @@ static void search (tspsearch *s)
     if (s->nodes[n0].adjvec[n1].weight > 0) {
         for (i = lo; i<=hi; i++) {
 #ifdef DEBUG
-            printf ("branching %d-%d to %d (lo %d hi %d)\n",
+            CC_PRINTF("branching %d-%d to %d (lo %d hi %d)\n",
                     n0,n1,i,lo,hi);
 #endif
             if (!set_edge (s, n0, n1, i)) {
@@ -448,7 +448,7 @@ static void search (tspsearch *s)
     } else {
         for (i = hi; i>=lo; i--) {
 #ifdef DEBUG
-            printf ("branching %d-%d to %d (lo %d hi %d)\n",
+            CC_PRINTF("branching %d-%d to %d (lo %d hi %d)\n",
                     n0,n1,i,lo,hi);
 #endif
             if (!set_edge (s, n0, n1, i)) {
@@ -458,7 +458,7 @@ static void search (tspsearch *s)
         }
     }
 #ifdef DEBUG
-    printf ("done branching on %d-%d (lo %d hi %d)\n",
+    CC_PRINTF("done branching on %d-%d (lo %d hi %d)\n",
             n0,n1,lo,hi);
 #endif
     return;
@@ -474,7 +474,7 @@ static int set_edge(tspsearch *s, int n0, int n1, int v)
 
 #ifdef DEBUG
 #if DEBUG>2
-    printf ("set_edge %d-%d = %d\n",n0,n1,v);
+    CC_PRINTF("set_edge %d-%d = %d\n",n0,n1,v);
 #endif
 #endif
     if (n1 == OUTSIDE) {
@@ -536,7 +536,7 @@ static int set_edge(tspsearch *s, int n0, int n1, int v)
             (p0 != n0 || p1 != n1)) {
 #ifdef DEBUG
 #if DEBUG>1
-            printf ("Avoiding subtour, forcing %d-%d to 0\n",
+            CC_PRINTF("Avoiding subtour, forcing %d-%d to 0\n",
                     p0,p1);
 #endif
 #endif
@@ -562,7 +562,7 @@ static void unset_edge(tspsearch *s, histent *h)
 
 #ifdef DEBUG
 #if DEBUG>2
-    printf ("unset_edge %d-%d from %d\n",n0,n1,v);
+    CC_PRINTF("unset_edge %d-%d from %d\n",n0,n1,v);
 #endif
 #endif
     lo = nodes[n0].adjvec[n1].lo;
@@ -646,7 +646,7 @@ static int select_edge (tspsearch *s, int *n0, int *n1)
 
 #ifdef DEBUG
 #if DEBUG>1
-                    printf ("eval edge %d-%d =  %.0f %.0f = %.0f\n",
+                    CC_PRINTF("eval edge %d-%d =  %.0f %.0f = %.0f\n",
                             i,j,infeas0?-999.0:val0,infeas1?-999.0:val1,
                             TINYBRANCH_VAL (val0, val1));
 #endif
@@ -676,9 +676,9 @@ static int select_edge (tspsearch *s, int *n0, int *n1)
             }
         }
 #ifdef DEBUG
-        printf ("%d edges forced (bound %.0f val %.0f)\n",
+        CC_PRINTF("%d edges forced (bound %.0f val %.0f)\n",
                 nforced, s->currentval + lowerbound(s), bestval);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
 #endif
     } while (nforced);
 
@@ -757,7 +757,7 @@ static void savetour (tspsearch *s)
     int i, j;
 
 #ifdef DEBUG
-    printf ("Solution found, saving tour, value %.0f\n", s->currentval);
+    CC_PRINTF("Solution found, saving tour, value %.0f\n", s->currentval);
 #endif
 
     s->bestval = s->currentval;

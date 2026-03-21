@@ -164,7 +164,7 @@ int main (int ac, char **av)
     CCutil_printlabel ();
     CCutil_signal_init ();
     CCutil_sprand (seed, &rstate);
-    printf ("Using random seed %d\n", seed); fflush (stdout);
+    CC_PRINTF("Using random seed %d\n", seed); CC_FFLUSH(stdout);
 
     silent = run_silently;
 
@@ -173,11 +173,11 @@ int main (int ac, char **av)
         rval = CCtsp_grunt (grunthostname, hostport, poolfname, cutbossname,
                             problname, silent, &rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_grunt failed\n");
+            CC_FPRINTF(stderr, "CCtsp_grunt failed\n");
         }
         goto CLEANUP;
 #else  /* CC_NETREADY */
-        fprintf (stderr, "Networking not enabled\n");
+        CC_FPRINTF(stderr, "Networking not enabled\n");
         rval = 1; goto CLEANUP;
 #endif /* CC_NETREADY */
     }
@@ -209,7 +209,7 @@ int main (int ac, char **av)
     else if (masterfname) probname = CCtsp_problabel (masterfname);
     else                  probname = CCtsp_problabel ("unnamed");
     if (probname == (char *) NULL) {
-        fprintf (stderr, "CCtsp_problabel failed\n");
+        CC_FPRINTF(stderr, "CCtsp_problabel failed\n");
         rval = 1; goto CLEANUP;
     }
     if (problname == (char *) NULL) {
@@ -220,7 +220,7 @@ int main (int ac, char **av)
         rval = CCutil_getmaster (masterfname, &ncount, &dat, &ptour);
         CCcheck_rval (rval, "CCutil_getmaster failed");
         if (ncount < 10) {
-            fprintf (stderr, "Master file has less than 10 nodes - Abort.\n");
+            CC_FPRINTF(stderr, "Master file has less than 10 nodes - Abort.\n");
             rval = 1; goto CLEANUP;
         }
     }  else {
@@ -248,9 +248,9 @@ int main (int ac, char **av)
         /* Handle small instances */
 
         if (ncount < 3) {
-            printf ("Only %d nodes -- must have at least 3 nodes in a TSP\n",
+            CC_PRINTF("Only %d nodes -- must have at least 3 nodes in a TSP\n",
                      ncount);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
             rval = 1;  goto CLEANUP;
         } else if (ncount < 10) {
             besttour = CC_SAFE_MALLOC (ncount, int);
@@ -268,9 +268,9 @@ int main (int ac, char **av)
                                    outfname, output_tour_as_edges, silent);
             CCcheck_rval (rval, "CCtsp_dumptour failed");
 
-            printf ("Total Running Time: %.2f (seconds)\n",
+            CC_PRINTF("Total Running Time: %.2f (seconds)\n",
                      CCutil_zeit () - szeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
             goto CLEANUP;
         }
 
@@ -292,8 +292,8 @@ int main (int ac, char **av)
                                   &rstate);
             } else {
                 if (!silent) {
-                    printf ("Initial bnd %f - use short LK\n", initial_ub);
-                    fflush (stdout);
+                    CC_PRINTF("Initial bnd %f - use short LK\n", initial_ub);
+                    CC_FFLUSH(stdout);
                 }
                 rval = find_tour (ncount, &dat, ptour, &bnd, 0, silent,
                                  &rstate);
@@ -358,18 +358,18 @@ int main (int ac, char **av)
                     ecount, elist, elen, excount, exlist, exlen, valid_edges,
                     ptour, initial_ub, pool, dominopool, silent, &rstate);
     if (rval == 2) {
-        printf ("CCtsp_init_lp reports an infeasible LP\n");
+        CC_PRINTF("CCtsp_init_lp reports an infeasible LP\n");
         rval = CCtsp_verify_infeasible_lp (lp, &is_infeasible, silent);
         CCcheck_rval (rval, "CCtsp_verify_infeasible_lp failed");
         if (!is_infeasible) {
-            printf ("Couldn't verify infeasible LP\n"); fflush (stdout);
+            CC_PRINTF("Couldn't verify infeasible LP\n"); CC_FFLUSH(stdout);
             rval = 1; goto CLEANUP;
         }
         upbound = CCtsp_LP_MAXDOUBLE;
         bbcount = 1;
         goto DONE;
     } else if (rval) {
-        fprintf (stderr, "CCtsp_init_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_init_lp failed\n"); goto CLEANUP;
     }
 
     CCutil_start_timer (&lp->stats.total);
@@ -383,7 +383,7 @@ int main (int ac, char **av)
 
     if (0 && lp->full_edges_valid) {
         if (CCtsp_inspect_full_edges (lp)) {
-            fprintf (stderr, "full edge set does not contain all LP edges\n");
+            CC_FPRINTF(stderr, "full edge set does not contain all LP edges\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -391,7 +391,7 @@ int main (int ac, char **av)
     if (standalone_branch) {
         rval = CCtsp_do_interactive_branch (lp, silent, &rstate);
         CCcheck_rval (rval, "CCtsp_do_interactive_branch failed");
-        printf ("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+        CC_PRINTF("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
         goto CLEANUP;
     }
 
@@ -420,24 +420,24 @@ int main (int ac, char **av)
             rval = CCtsp_cutting_loop (lp, &sel, 1, silent, &rstate);
         }
         if (rval == 2) {
-            printf ("CCtsp_cutting_loop reports an infeasible LP\n");
+            CC_PRINTF("CCtsp_cutting_loop reports an infeasible LP\n");
             rval = CCtsp_verify_infeasible_lp (lp, &is_infeasible, silent);
             CCcheck_rval (rval, "CCtsp_verify_infeasible_lp failed");
             if (!is_infeasible) {
-                printf ("Couldn't verify infeasibile LP\n");
-                fflush (stdout);
+                CC_PRINTF("Couldn't verify infeasibile LP\n");
+                CC_FFLUSH(stdout);
                 rval = 1; goto CLEANUP;
             }
             upbound = CCtsp_LP_MAXDOUBLE;
             bbcount = 1;
             CCutil_stop_timer (&lp->stats.total, 1);
-            printf ("Final LP has %d rows, %d columns, %d nonzeros\n",
+            CC_PRINTF("Final LP has %d rows, %d columns, %d nonzeros\n",
                     CClp_nrows (lp->lp), CClp_ncols (lp->lp),
                     CClp_nnonzeros (lp->lp));
 
             goto DONE;
         } else if (rval) {
-            fprintf (stderr, "cutting_loop failed\n");
+            CC_FPRINTF(stderr, "cutting_loop failed\n");
             goto CLEANUP;
         }
     }
@@ -452,15 +452,15 @@ int main (int ac, char **av)
         else         CCutil_stop_timer (&lp->stats.linkern, 0);
 
         if (tourval < lp->upperbound) {
-            printf ("New upperbound from x-heuristic: %.2f\n", tourval);
+            CC_PRINTF("New upperbound from x-heuristic: %.2f\n", tourval);
             lp->upperbound = tourval;
             rval = CCtsp_dumptour (ncount, &dat, ptour, probname, besttour,
                                    (char *) NULL, 0, silent);
             CCcheck_rval (rval, "CCtsp_dumptour failed");
         }
-        printf ("Final lower bound %f, upper bound %f\n", lp->lowerbound,
+        CC_PRINTF("Final lower bound %f, upper bound %f\n", lp->lowerbound,
                                                           lp->upperbound);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     if (xfname) {
@@ -477,14 +477,14 @@ int main (int ac, char **av)
         CCbigguy bupper;
         rval = CCtsp_exact_price (lp, &bound, complete_price, 0, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_exact_price failed\n");
+            CC_FPRINTF(stderr, "CCtsp_exact_price failed\n");
             goto CLEANUP;
         }
         lp->exact_lowerbound = bound;
-        printf ("Exact lower bound: %.6f\n", CCbigguy_bigguytod (bound));
+        CC_PRINTF("Exact lower bound: %.6f\n", CCbigguy_bigguytod (bound));
         if (1 || !silent) {
-            printf ("DIFF: %f\n", lp->lowerbound - CCbigguy_bigguytod (bound));
-            fflush (stdout);
+            CC_PRINTF("DIFF: %f\n", lp->lowerbound - CCbigguy_bigguytod (bound));
+            CC_FFLUSH(stdout);
         }
 
         bupper = CCbigguy_dtobigguy (lp->upperbound);
@@ -494,16 +494,16 @@ int main (int ac, char **av)
             upbound = lp->upperbound;
             bbcount = 1;
             if (!dfs_branching && !bfs_branching) {
-                printf ("Optimal Solution: %.2f\n", upbound);
-                printf ("Number of bbnodes: %d\n", bbcount);
-                fflush (stdout);
+                CC_PRINTF("Optimal Solution: %.2f\n", upbound);
+                CC_PRINTF("Number of bbnodes: %d\n", bbcount);
+                CC_FFLUSH(stdout);
             }
             if (!silent) {
                 CCutil_stop_timer (&lp->stats.total, 1);
             } else {
                 CCutil_stop_timer (&lp->stats.total, 0);
             }
-            printf ("Final LP has %d rows, %d columns, %d nonzeros\n",
+            CC_PRINTF("Final LP has %d rows, %d columns, %d nonzeros\n",
                     CClp_nrows (lp->lp), CClp_ncols (lp->lp),
                     CClp_nnonzeros (lp->lp));
 
@@ -519,10 +519,10 @@ int main (int ac, char **av)
             CCcheck_rval (rval, "CCtsp_eliminate_variables failed");
         }
     } else {
-        printf ("During testing, do not exact price large problems\n");
-        fflush (stdout);
+        CC_PRINTF("During testing, do not exact price large problems\n");
+        CC_FFLUSH(stdout);
         CCutil_stop_timer (&lp->stats.total, 1);
-        printf ("Final LP has %d rows, %d columns, %d nonzeros\n",
+        CC_PRINTF("Final LP has %d rows, %d columns, %d nonzeros\n",
                 CClp_nrows (lp->lp), CClp_ncols (lp->lp),
                 CClp_nnonzeros (lp->lp));
 
@@ -530,10 +530,10 @@ int main (int ac, char **av)
     }
 
     CCutil_stop_timer (&lp->stats.total, 1);
-    printf ("Final LP has %d rows, %d columns, %d nonzeros\n",
+    CC_PRINTF("Final LP has %d rows, %d columns, %d nonzeros\n",
             CClp_nrows (lp->lp), CClp_ncols (lp->lp),
             CClp_nnonzeros (lp->lp));
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
     if (dat.ndepot > 0) {
         rval = CCtsp_depot_valid (lp, dat.ndepot, (int *) NULL);
@@ -572,9 +572,9 @@ int main (int ac, char **av)
 DONE:
 
     if (dfs_branching || bfs_branching || restartfname) {
-        printf ("Optimal Solution: %.2f\n", upbound);
-        printf ("Number of bbnodes: %d\n", bbcount);
-        fflush (stdout);
+        CC_PRINTF("Optimal Solution: %.2f\n", upbound);
+        CC_PRINTF("Number of bbnodes: %d\n", bbcount);
+        CC_FFLUSH(stdout);
         rval = CCtsp_dumptour (ncount, &dat, ptour, probname, besttour,
                                outfname, output_tour_as_edges, silent);
         CCcheck_rval (rval, "CCtsp_dumptour failed");
@@ -583,17 +583,17 @@ DONE:
         CCcheck_rval (rval, "CCtsp_write_probfile_sav failed");
     }
 
-    printf ("Total Running Time: %.2f (seconds)", CCutil_zeit () - szeit);
+    CC_PRINTF("Total Running Time: %.2f (seconds)", CCutil_zeit () - szeit);
     if (branchzeit != 0.0) {
-        printf ("  Branching Time: %.2f (seconds)", branchzeit);
+        CC_PRINTF("  Branching Time: %.2f (seconds)", branchzeit);
     }
-    printf ("\n"); fflush (stdout);
+    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 
     /*  CCtsp_output_statistics (&lp->stats);  */
 
     if (pool && pool->cutcount) {
         if (!silent) {
-            printf ("Final Pool: %d cuts\n", pool->cutcount); fflush (stdout);
+            CC_PRINTF("Final Pool: %d cuts\n", pool->cutcount); CC_FFLUSH(stdout);
         }
         sprintf (buf, "%s.pul", probname);
         rval = CCtsp_write_cutpool (ncount, buf, pool);
@@ -603,8 +603,8 @@ DONE:
 #ifdef CCtsp_USE_DOMINO_CUTS
     if (dominopool && dominopool->cutcount) {
         if (1 || !silent) {
-            printf ("Final Domino Pool: %d cuts\n", dominopool->cutcount);
-            fflush (stdout);
+            CC_PRINTF("Final Domino Pool: %d cuts\n", dominopool->cutcount);
+            CC_FFLUSH(stdout);
         }
         sprintf (buf, "%s.dominopul", probname);
         rval = CCtsp_write_cutpool (ncount, buf, dominopool);
@@ -616,7 +616,7 @@ DONE:
         rval = CCtsp_send_newcuts (ncount, pool, sel.remotehost,
                 sel.remoteport);
         if (rval) {
-            fprintf (stderr, "CCtsp_send_newcuts failed\n");
+            CC_FPRINTF(stderr, "CCtsp_send_newcuts failed\n");
             rval = 0;
         }
     }
@@ -627,44 +627,44 @@ CLEANUP:
 
     if (unlink_files) {
         if (!run_silently) {
-            printf ("Delete the temporary files: pul sav mas\n");
-            fflush (stdout);
+            CC_PRINTF("Delete the temporary files: pul sav mas\n");
+            CC_FFLUSH(stdout);
         }
 
         sprintf (buf, "%s.pul", probname);
         rval = unlink (buf);
         if (rval && !run_silently) {
-            printf ("CCutil_sdelete_file failed for %s\n", buf);
+            CC_PRINTF("CCutil_sdelete_file failed for %s\n", buf);
         }
 
         sprintf (buf, "O%s.pul", probname);
         rval = unlink (buf);
         if (rval && !run_silently) {
-            printf ("CCutil_sdelete_file failed for %s\n", buf);
+            CC_PRINTF("CCutil_sdelete_file failed for %s\n", buf);
         }
 
         sprintf (buf, "%s.sav", probname);
         rval = unlink (buf);
         if (rval && !run_silently) {
-            printf ("CCutil_sdelete_file failed for %s\n", buf);
+            CC_PRINTF("CCutil_sdelete_file failed for %s\n", buf);
         }
 
         sprintf (buf, "O%s.sav", probname);
         rval = unlink (buf);
         if (rval && !run_silently) {
-            printf ("CCutil_sdelete_file failed for %s\n", buf);
+            CC_PRINTF("CCutil_sdelete_file failed for %s\n", buf);
         }
 
         sprintf (buf, "%s.mas", probname);
         rval = unlink (buf);
         if (rval && !run_silently) {
-            printf ("CCutil_sdelete_file failed for %s\n", buf);
+            CC_PRINTF("CCutil_sdelete_file failed for %s\n", buf);
         }
 
         sprintf (buf, "O%s.mas", probname);
         rval = unlink (buf);
         if (rval && !run_silently) {
-            printf ("CCutil_sdelete_file failed for %s\n", buf);
+            CC_PRINTF("CCutil_sdelete_file failed for %s\n", buf);
         }
     }
 
@@ -707,9 +707,9 @@ static int handle_just_cuts (CCtsp_lp *lp, int the_cuts, CCrandstate *rstate,
         CCcheck_rval (rval, "CCtsp_subtour_and_blossom_loop failed");
     }
 
-    printf ("Bound: %f\n", lp->lowerbound); fflush (stdout);
+    CC_PRINTF("Bound: %f\n", lp->lowerbound); CC_FFLUSH(stdout);
     CCutil_stop_timer (&lp->stats.total, 1);
-    printf ("Final Root LP has %d rows, %d columns, %d nonzeros\n",
+    CC_PRINTF("Final Root LP has %d rows, %d columns, %d nonzeros\n",
             CClp_nrows (lp->lp), CClp_ncols (lp->lp), CClp_nnonzeros (lp->lp));
 
 CLEANUP:
@@ -730,13 +730,13 @@ static int run_hk (int ncount, CCdatagroup *dat, int *hk_tour)
     rval = CCheldkarp_small (ncount, dat, (double *) NULL, &hk_val,
                              &hk_found, 0, hk_tlist, 1000000, 2);
     CCcheck_rval (rval, "CCheldkarp_small failed");
-    printf ("Optimal Solution: %.2f\n", hk_val); fflush (stdout);
+    CC_PRINTF("Optimal Solution: %.2f\n", hk_val); CC_FFLUSH(stdout);
 
     rval = CCutil_edge_to_cycle (ncount, hk_tlist, &hk_yesno, hk_tour);
     CCcheck_rval (rval, "CCutil_edge_to_cycle failed");
 
     if (hk_yesno == 0) {
-        fprintf (stderr, "Held-Karp returned list that is not a tour\n");
+        CC_FPRINTF(stderr, "Held-Karp returned list that is not a tour\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -756,8 +756,8 @@ static void adjust_upbound (double *bound, int ncount, CCdatagroup *dat)
         bnd += CCutil_dat_edgelen (i-1, i, dat);
     }
     if (bnd < *bound) {
-        printf ("Set initial upperbound to %.0f (from tour)\n", bnd);
-        fflush (stdout);
+        CC_PRINTF("Set initial upperbound to %.0f (from tour)\n", bnd);
+        CC_FFLUSH(stdout);
         *bound = bnd;
     }
 }
@@ -775,16 +775,16 @@ static int build_edges (int *p_ecount, int **p_elist, int **p_elen,
     if (in_edgefname) {
         int *invperm = (int *) NULL;
 
-        printf ("Read initial edge set\n"); fflush (stdout);
+        CC_PRINTF("Read initial edge set\n"); CC_FFLUSH(stdout);
 
         rval = CCutil_getedgelist (ncount, in_edgefname, p_ecount, p_elist,
                                    p_elen, 0);
         CCcheck_rval (rval, "CCutil_getedgelist failed");
         ecount = *p_ecount;
         elist = *p_elist;
-        printf ("Initial edgeset: %d edges (%d nodes)\n", ecount, ncount);
-        printf ("Rearrange the edges to match the tour order\n");
-        fflush (stdout);
+        CC_PRINTF("Initial edgeset: %d edges (%d nodes)\n", ecount, ncount);
+        CC_PRINTF("Rearrange the edges to match the tour order\n");
+        CC_FFLUSH(stdout);
 
         invperm = CC_SAFE_MALLOC (ncount, int);
         CCcheck_NULL (invperm, "out of memory for invperm");
@@ -878,8 +878,8 @@ static int find_tour (int ncount, CCdatagroup *dat, int *perm, double *ub,
     }
 
     if (!silent) {
-        printf ("Finding a good tour for compression: %d\n", trials);
-        fflush (stdout);
+        CC_PRINTF("Finding a good tour for compression: %d\n", trials);
+        CC_FFLUSH(stdout);
     }
 
     cyc = CC_SAFE_MALLOC (ncount, int);
@@ -900,14 +900,14 @@ static int find_tour (int ncount, CCdatagroup *dat, int *perm, double *ub,
     CCcheck_rval (rval, "CCedgegen_edges failed");
 
     if (tcount != ncount) {
-        fprintf (stderr, "wrong edgeset from CCedgegen_edges\n");
+        CC_FPRINTF(stderr, "wrong edgeset from CCedgegen_edges\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCutil_edge_to_cycle (ncount, tlist, &istour, cyc);
     CCcheck_rval (rval, "CCutil_edge_to_cycle failed");
     if (istour == 0) {
-        fprintf (stderr, "Starting tour has an error\n");
+        CC_FPRINTF(stderr, "Starting tour has an error\n");
         rval = 1; goto CLEANUP;
     }
     CC_FREE (tlist, int);
@@ -941,9 +941,9 @@ static int find_tour (int ncount, CCdatagroup *dat, int *perm, double *ub,
     }
 
     if (!silent) {
-        printf ("Time to find compression tour: %.2f (seconds)\n",
+        CC_PRINTF("Time to find compression tour: %.2f (seconds)\n",
                 CCutil_zeit() - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -966,7 +966,7 @@ static int getedges (CCdatagroup *dat, CCedgegengroup *plan, int ncount,
     *elen = (int *) NULL;
 
     if (dat == (CCdatagroup *) NULL || plan == (CCedgegengroup *) NULL) {
-        fprintf (stderr, "getedges needs CCdatagroup and CCedgegengroup\n");
+        CC_FPRINTF(stderr, "getedges needs CCdatagroup and CCedgegengroup\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -1183,7 +1183,7 @@ static int parseargs (int ac, char **av)
 
     if (datfname == (char *) NULL && masterfname == (char *) NULL &&
         edgefname != (char *) NULL) {
-        fprintf (stderr, "cannot give edgefile without a dat or master file\n");
+        CC_FPRINTF(stderr, "cannot give edgefile without a dat or master file\n");
         return 1;
     }
 
@@ -1200,48 +1200,48 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [-see below-] [dat_file]\n", f);
-    fprintf (stderr, "   -B    do not branch\n");
-    fprintf (stderr, "   -C #  maximum chunk size in localcuts (default 16)\n");
-    fprintf (stderr, "   -d    use dfs branching instead of bfs\n");
-    fprintf (stderr, "   -D f  edgegen file for initial edge set\n");
-    fprintf (stderr, "   -e f  initial edge file\n");
-    fprintf (stderr, "   -E f  full edge file (must contain initial edge set)\n");
-    fprintf (stderr, "   -f    write optimal tour as edge file (default is tour file)\n");
-    fprintf (stderr, "   -F f  read extra cuts from file\n");
-    fprintf (stderr, "   -g h  be a grunt for boss h\n");
-    fprintf (stderr, "   -h    be a boss for the branching\n");
-    fprintf (stderr, "   -i    just solve the blossom polytope\n");
-    fprintf (stderr, "   -I    just solve the subtour polytope\n");
-    fprintf (stderr, "   -J #  number of tentative branches\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -K h  use cut server h\n");
-    fprintf (stderr, "   -M f  master file\n");
-    fprintf (stderr, "   -m    use multiple passes of cutting loop\n");
-    fprintf (stderr, "   -n s  problem location (just a name or host:name, not a file name)\n");
-    fprintf (stderr, "   -o f  output file name (for optimal tour)\n");
-    fprintf (stderr, "   -P f  cutpool file\n");
-    fprintf (stderr, "   -q    do not cut the root lp\n");
-    fprintf (stderr, "   -r #  use #x# grid for random points, no dups if #<0\n");
-    fprintf (stderr, "   -R f  restart file\n");
-    fprintf (stderr, "   -s #  random seed\n");
-    fprintf (stderr, "   -S f  problem file\n");
-    fprintf (stderr, "   -t f  tour file (in node node node format)\n");
+    CC_FPRINTF(stderr, "Usage: %s [-see below-] [dat_file]\n", f);
+    CC_FPRINTF(stderr, "   -B    do not branch\n");
+    CC_FPRINTF(stderr, "   -C #  maximum chunk size in localcuts (default 16)\n");
+    CC_FPRINTF(stderr, "   -d    use dfs branching instead of bfs\n");
+    CC_FPRINTF(stderr, "   -D f  edgegen file for initial edge set\n");
+    CC_FPRINTF(stderr, "   -e f  initial edge file\n");
+    CC_FPRINTF(stderr, "   -E f  full edge file (must contain initial edge set)\n");
+    CC_FPRINTF(stderr, "   -f    write optimal tour as edge file (default is tour file)\n");
+    CC_FPRINTF(stderr, "   -F f  read extra cuts from file\n");
+    CC_FPRINTF(stderr, "   -g h  be a grunt for boss h\n");
+    CC_FPRINTF(stderr, "   -h    be a boss for the branching\n");
+    CC_FPRINTF(stderr, "   -i    just solve the blossom polytope\n");
+    CC_FPRINTF(stderr, "   -I    just solve the subtour polytope\n");
+    CC_FPRINTF(stderr, "   -J #  number of tentative branches\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -K h  use cut server h\n");
+    CC_FPRINTF(stderr, "   -M f  master file\n");
+    CC_FPRINTF(stderr, "   -m    use multiple passes of cutting loop\n");
+    CC_FPRINTF(stderr, "   -n s  problem location (just a name or host:name, not a file name)\n");
+    CC_FPRINTF(stderr, "   -o f  output file name (for optimal tour)\n");
+    CC_FPRINTF(stderr, "   -P f  cutpool file\n");
+    CC_FPRINTF(stderr, "   -q    do not cut the root lp\n");
+    CC_FPRINTF(stderr, "   -r #  use #x# grid for random points, no dups if #<0\n");
+    CC_FPRINTF(stderr, "   -R f  restart file\n");
+    CC_FPRINTF(stderr, "   -s #  random seed\n");
+    CC_FPRINTF(stderr, "   -S f  problem file\n");
+    CC_FPRINTF(stderr, "   -t f  tour file (in node node node format)\n");
 #ifdef CCtsp_USE_DOMINO_CUTS
-    fprintf (stderr, "   -Z #  dp-cuts (#=1 normal, #=2 shrunk, #=3 both\n");
-    fprintf (stderr, "   -T h  use domino server h\n");
+    CC_FPRINTF(stderr, "   -Z #  dp-cuts (#=1 normal, #=2 shrunk, #=3 both\n");
+    CC_FPRINTF(stderr, "   -T h  use domino server h\n");
 #endif
-    fprintf (stderr, "   -u v  initial upperbound\n");
-    fprintf (stderr, "   -U    do not permit branching on subtour inequalities\n");
-    fprintf (stderr, "   -v    verbose (turn on lots of messages)\n");
-    fprintf (stderr, "   -V    just run fast cuts\n");
-    fprintf (stderr, "   -w    just subtours and trivial blossoms\n");
-    fprintf (stderr, "   -x    delete files on completion (sav pul mas)\n");
-    fprintf (stderr, "   -X f  write the last root fractional solution to f\n");
-    fprintf (stderr, "   -y    use simple cutting and branching in DFS\n");
-    fprintf (stderr, "   -z #  dump the #-lowest reduced cost edges to file xxx.rcn\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
-    fprintf (stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
-    fprintf (stderr, "         17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "   -u v  initial upperbound\n");
+    CC_FPRINTF(stderr, "   -U    do not permit branching on subtour inequalities\n");
+    CC_FPRINTF(stderr, "   -v    verbose (turn on lots of messages)\n");
+    CC_FPRINTF(stderr, "   -V    just run fast cuts\n");
+    CC_FPRINTF(stderr, "   -w    just subtours and trivial blossoms\n");
+    CC_FPRINTF(stderr, "   -x    delete files on completion (sav pul mas)\n");
+    CC_FPRINTF(stderr, "   -X f  write the last root fractional solution to f\n");
+    CC_FPRINTF(stderr, "   -y    use simple cutting and branching in DFS\n");
+    CC_FPRINTF(stderr, "   -z #  dump the #-lowest reduced cost edges to file xxx.rcn\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
+    CC_FPRINTF(stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
+    CC_FPRINTF(stderr, "         17=GEOM, 18=JOHNSON\n");
 }

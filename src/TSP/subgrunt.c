@@ -30,7 +30,7 @@ int main (int ac, char **av)
     CCdatagroup dat;
 
     if (ac != 2) {
-        fprintf (stderr, "Usage: %s boss\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s boss\n", av[0]);
         rval = 1; goto CLEANUP;
     }
 
@@ -42,7 +42,7 @@ int main (int ac, char **av)
     /* Hacky for subtours */
     jokeout = fopen ("all.cuts", "w");
     if (!jokeout) {
-        fprintf (stderr, "unable to open all.cuts for writing\n");
+        CC_FPRINTF(stderr, "unable to open all.cuts for writing\n");
         rval = 1;  goto CLEANUP;
     }
     jokepi = CC_SAFE_MALLOC (100000, double);
@@ -59,7 +59,7 @@ int main (int ac, char **av)
     while (1) {
         s = CCutil_snet_open (bosshost, CC_SUBDIV_PORT);
         if (!s) {
-            fprintf (stderr, "CCutil_snet_open failed\n");
+            CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
             rval = 1;  goto CLEANUP;
         }
 
@@ -91,8 +91,8 @@ int main (int ac, char **av)
         CCutil_sclose (s);
         s = (CC_SFILE *) NULL;
 
-        printf ("PROCESSING %s subproblem %d\n", probname, id);
-        fflush (stdout);
+        CC_PRINTF("PROCESSING %s subproblem %d\n", probname, id);
+        CC_FFLUSH(stdout);
 
         szeit = CCutil_zeit ();
 
@@ -108,15 +108,15 @@ int main (int ac, char **av)
 
 DONE:
     
-    printf ("No work available.  Shutting down.\n"); fflush (stdout);
-    printf ("Found %d cuts in total\n", jokecount);
-    printf ("Found %d negative pi values\n", jokeneg);
+    CC_PRINTF("No work available.  Shutting down.\n"); CC_FFLUSH(stdout);
+    CC_PRINTF("Found %d cuts in total\n", jokecount);
+    CC_PRINTF("Found %d negative pi values\n", jokeneg);
     {
         FILE *jokepiout = fopen ("all.pi", "w");
         int i = 0;
 
         if (!jokepiout) {
-            fprintf (stderr, "could not open all.pi for writing\n");
+            CC_FPRINTF(stderr, "could not open all.pi for writing\n");
             rval = 1;  goto CLEANUP;
         }
 
@@ -124,7 +124,7 @@ DONE:
             fprintf (jokepiout, "%f\n", jokepi[i]);
             i++;
         }
-        printf ("Found %d pi values\n", i);
+        CC_PRINTF("Found %d pi values\n", i);
         fclose (jokepiout);
     }
 
@@ -155,11 +155,11 @@ static int process_subproblem (char *probname, int id, int ncount,
     CCbigguy exbound;
 
 
-    printf ("ncount = %d, Depots = %d\n", ncount, dat->ndepot);
-    fflush (stdout);
+    CC_PRINTF("ncount = %d, Depots = %d\n", ncount, dat->ndepot);
+    CC_FFLUSH(stdout);
 
     CCutil_cycle_len (ncount, dat, ptour, &ptour_len);
-    printf ("initial tour: %.2f\n", ptour_len); fflush (stdout);
+    CC_PRINTF("initial tour: %.2f\n", ptour_len); CC_FFLUSH(stdout);
 
     rval = build_edges (dat, ncount, &ecount, &elist, &elen, silent, rstate);
     CCcheck_rval (rval, "build_edges failed");
@@ -185,9 +185,9 @@ static int process_subproblem (char *probname, int id, int ncount,
     CCcheck_rval (rval, "CCtsp_get_lp_result failed");
     sel.roundtol = 0.0001 * lb;
     sel.nexttol  = 0.001 * lb;
-    printf ("Setting tolerances: next cuts %.4f next round %.4f\n",
+    CC_PRINTF("Setting tolerances: next cuts %.4f next round %.4f\n",
                 sel.nexttol, sel.roundtol);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 /*
     rval = CCtsp_cutselect_set_tols (&sel, lp, 1, silent);
     CCcheck_rval (rval, "CCtsp_cutselect_set_tols failed");
@@ -247,7 +247,7 @@ static int process_subproblem (char *probname, int id, int ncount,
         for (i = 0; i < ncount; i++) {
             if (lp->perm[i] < orig) {
                 if (pi[i] < -0.001) {
-                    fprintf (stderr, "Oh no, negative %f\n", pi[i]);
+                    CC_FPRINTF(stderr, "Oh no, negative %f\n", pi[i]);
                     jokeneg++;
                 } 
             }
@@ -265,13 +265,13 @@ static int process_subproblem (char *probname, int id, int ncount,
             CCcheck_rval (rval, "CCtsp_lpcut_to_lpcut_in failed");
 
             if (c.cliquecount != 1) {
-                fprintf (stderr, "HEY!  This is not a subtour\n"); 
+                CC_FPRINTF(stderr, "HEY!  This is not a subtour\n"); 
                 exit (1);
             }
  
             rval = CCtsp_clique_to_array (&c.cliques[0], &ar, &acount);
             if (rval) {
-                fprintf (stderr, "CCtsp_clique_to_array failed");
+                CC_FPRINTF(stderr, "CCtsp_clique_to_array failed");
                 rval = 1;  goto CLEANUP;
             }
 
@@ -314,32 +314,32 @@ static int process_subproblem (char *probname, int id, int ncount,
         rval = CCtsp_call_x_heuristic (lp, &tourval, besttour, silent,
                                        rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_call_x_heuristic failed\n");
+            CC_FPRINTF(stderr, "CCtsp_call_x_heuristic failed\n");
             goto CLEANUP;
         }
         CCutil_stop_timer (&lp->stats.linkern, 0);
         if (tourval < lp->upperbound) {
-            printf ("New upperbound from x-heuristic: %.2f\n", tourval);
+            CC_PRINTF("New upperbound from x-heuristic: %.2f\n", tourval);
             lp->upperbound = tourval;
         }
     }
 */
 
 
-    printf ("Final LP has %d rows, %d columns, %d nonzeros\n",
+    CC_PRINTF("Final LP has %d rows, %d columns, %d nonzeros\n",
             CClp_nrows (lp->lp), CClp_ncols (lp->lp),
             CClp_nnonzeros (lp->lp));
-    printf ("Final lower bound %f, upper bound %f\n", lp->lowerbound,
+    CC_PRINTF("Final lower bound %f, upper bound %f\n", lp->lowerbound,
                                                       lp->upperbound);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
     rval = CCtsp_exact_price (lp, &exbound, 1, 0, silent);
     CCcheck_rval (rval, "CCtsp_exact_price failed");
 
     lp->exact_lowerbound = exbound;
-    printf ("Exact lower bound: %.6f\n", CCbigguy_bigguytod (exbound));
-    printf ("DIFF: %f\n", lp->lowerbound - CCbigguy_bigguytod (exbound));
-    fflush (stdout);
+    CC_PRINTF("Exact lower bound: %.6f\n", CCbigguy_bigguytod (exbound));
+    CC_PRINTF("DIFF: %f\n", lp->lowerbound - CCbigguy_bigguytod (exbound));
+    CC_FFLUSH(stdout);
 
     rval = CCtsp_depot_valid (lp, dat->ndepot, &yesno);
     CCcheck_rval (rval, "CCtsp_depot_valid failed");

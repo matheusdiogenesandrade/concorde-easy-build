@@ -229,25 +229,25 @@ static void free_linked_world (graph *G)
     int ntotal;
     int nreserve;
     if (node_check_leaks (&G->node_world, &ntotal, &nreserve)) {
-        fprintf (stderr, "WARNING: Outstanding nodes %d (total %d)\n",
+        CC_FPRINTF(stderr, "WARNING: Outstanding nodes %d (total %d)\n",
                  ntotal - nreserve, ntotal);
     }
     CCptrworld_delete (&G->node_world);
 
     if (edge_check_leaks (&G->edge_world, &ntotal, &nreserve)) {
-        fprintf (stderr, "WARNING: Outstanding edges %d (total %d)\n",
+        CC_FPRINTF(stderr, "WARNING: Outstanding edges %d (total %d)\n",
                  ntotal - nreserve, ntotal);
     }
     CCptrworld_delete (&G->edge_world);
 
     if (edgeptr_check_leaks (&G->edgeptr_world, &ntotal, &nreserve)) {
-        fprintf (stderr, "WARNING: Outstanding edgeptrs %d (total %d)\n",
+        CC_FPRINTF(stderr, "WARNING: Outstanding edgeptrs %d (total %d)\n",
                  ntotal - nreserve, ntotal);
     }
     CCptrworld_delete (&G->edgeptr_world);
 
     if (shortedge_check_leaks (&G->shortedge_world, &ntotal, &nreserve)) {
-        fprintf (stderr, "WARNING: Outstanding shortedges %d (total %d)\n",
+        CC_FPRINTF(stderr, "WARNING: Outstanding shortedges %d (total %d)\n",
                  ntotal - nreserve, ntotal);
     }
     CCptrworld_delete (&G->shortedge_world);
@@ -268,13 +268,13 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist, int *elen)
     G->ncount = ncount;
     G->nodenames = CC_SAFE_MALLOC (ncount, node *);
     if (G->nodenames == (node **) NULL) {
-        fprintf (stderr, "out of memory in buildgraph\n"); return 1;
+        CC_FPRINTF(stderr, "out of memory in buildgraph\n"); return 1;
     }
 
     for (i = 0; i < ncount; i++) {
         n = nodealloc (&G->node_world);
         if (n == (node *) NULL) {
-            fprintf (stderr, "out of memory in buildgraph\n"); return 1;
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n"); return 1;
         }
         n->name = i;
         n->adj = (edgeptr *) NULL;
@@ -286,7 +286,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist, int *elen)
         e = newedge (G, G->nodenames[elist[2 * i]],
                      G->nodenames[elist[(2 * i) + 1]]);
         if (e == (edge *) NULL) {
-            fprintf (stderr, "out of memory in buildgraph\n"); return 1;
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n"); return 1;
         }
         e->weight = elen[i] + elen[i];
     }
@@ -377,105 +377,105 @@ int CCfmatch_fractional_2match (int ncount, int ecount, int *elist, int *elen,
 
     rval = buildgraph (&G, ncount, ecount, elist, elen);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
 
     initmat (&G);
     rval = twomatch (&G);
     if (rval) {
-        fprintf (stderr, "twomatch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "twomatch failed\n"); goto CLEANUP;
     }
     rval = chkmat (&G, &v);
     if (rval) {
-        fprintf (stderr, "Chkmat found error in matching\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "Chkmat found error in matching\n"); goto CLEANUP;
     }
 
     if (!silent) {
-        printf ("Fractional Matching: %.1f\n", v);
-        printf ("Initial Running Time: %.2f (seconds)\n",
+        CC_PRINTF("Fractional Matching: %.1f\n", v);
+        CC_PRINTF("Initial Running Time: %.2f (seconds)\n",
                 CCutil_zeit () - tzeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     if (wantbasic) {
         szeit = CCutil_zeit ();
         if (basicrun (&G)) {
-            fprintf (stderr, "Did not find a basic optimal solution\n");
+            CC_FPRINTF(stderr, "Did not find a basic optimal solution\n");
             rval = 1;
             goto CLEANUP;
         }
         if (chkmat (&G, &vbasic)) {
-            fprintf (stderr, "Chkmat found error in matching\n");
+            CC_FPRINTF(stderr, "Chkmat found error in matching\n");
             rval = 1;
             goto CLEANUP;
         }
         if (vbasic != v) {
-            fprintf (stderr, "ERROR: Basis routine altered objective\n");
+            CC_FPRINTF(stderr, "ERROR: Basis routine altered objective\n");
             rval = 1;
             goto CLEANUP;
         }
         if (!silent) {
-            printf ("Basis Running Time: %.2f (seconds)\n",
+            CC_PRINTF("Basis Running Time: %.2f (seconds)\n",
                     CCutil_zeit () - szeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
 
     if (dat != (CCdatagroup *) NULL) {
         if (!silent) {
-            printf ("Price-Repair ...\n"); fflush (stdout);
+            CC_PRINTF("Price-Repair ...\n"); CC_FFLUSH(stdout);
         }
         szeit = CCutil_zeit ();
         rval = fixmatch (&G, &added, dat, rstate);
         if (rval) {
-            fprintf (stderr, "fixmatch failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "fixmatch failed\n"); goto CLEANUP;
         }
         if (chkmat (&G, &v)) {
-            fprintf (stderr, "Chkmat found error in matching\n");
+            CC_FPRINTF(stderr, "Chkmat found error in matching\n");
             rval = 1;
             goto CLEANUP;
         }
         if (wantbasic) {
             do  {
                 if (!silent) {
-                    printf ("Find basis ...\n"); fflush (stdout);
+                    CC_PRINTF("Find basis ...\n"); CC_FFLUSH(stdout);
                 }
                 if (basicrun (&G)) {
-                    fprintf (stderr, "Did not find a basic solution\n");
+                    CC_FPRINTF(stderr, "Did not find a basic solution\n");
                     rval = 1;
                     goto CLEANUP;
                 }
                 if (chkmat (&G, &vbasic)) {
-                    fprintf (stderr, "Chkmat found error in matching\n");
+                    CC_FPRINTF(stderr, "Chkmat found error in matching\n");
                     rval = 1;
                     goto CLEANUP;
                 }
                 if (vbasic != v) {
-                    fprintf (stderr, "ERROR: Basis routine altered obj\n");
+                    CC_FPRINTF(stderr, "ERROR: Basis routine altered obj\n");
                     rval = 1;
                     goto CLEANUP;
                 }
 
                 if (!silent) {
-                    printf ("Price-repair basic solution ...\n");
-                    fflush (stdout);
+                    CC_PRINTF("Price-repair basic solution ...\n");
+                    CC_FFLUSH(stdout);
                 }
                 rval = fixmatch (&G, &added, dat, rstate);
                 if (rval) {
-                    fprintf (stderr, "fixmatch failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "fixmatch failed\n"); goto CLEANUP;
                 }
                 if (chkmat (&G, &v)) {
-                    fprintf (stderr, "Chkmat found error in matching\n");
+                    CC_FPRINTF(stderr, "Chkmat found error in matching\n");
                     rval = 1;
                     goto CLEANUP;
                 }
             } while (added);
         }
         if (!silent) {
-            printf ("Running Time for Price-Repair: %.2f\n",
+            CC_PRINTF("Running Time for Price-Repair: %.2f\n",
                     CCutil_zeit () - szeit);
-            printf ("Fractional Matching on Complete Graph: %.1f\n",v);
-            fflush (stdout);
+            CC_PRINTF("Fractional Matching on Complete Graph: %.1f\n",v);
+            CC_FFLUSH(stdout);
         }
     }
 
@@ -515,9 +515,9 @@ CLEANUP:
     free_linked_world (&G);
 
     if (!silent) {
-        printf ("Total fractional matching time: %.2f (seconds)\n",
+        CC_PRINTF("Total fractional matching time: %.2f (seconds)\n",
                  CCutil_zeit () - tzeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     return rval;
@@ -556,7 +556,7 @@ static int chkmat (graph *G, double *val)   /* val may be 1/2 integer and big */
         for (ep = n->adj; ep; ep = ep->next)
             k += (unsigned int) ep->this->x;
         if (k != 2 * MATCHDEGREE) {
-            fprintf (stderr, "Not a matching, node %d has 2-degree %d\n",
+            CC_FPRINTF(stderr, "Not a matching, node %d has 2-degree %d\n",
                                                                n->name, k);
             return 1;
         }
@@ -568,7 +568,7 @@ static int chkmat (graph *G, double *val)   /* val may be 1/2 integer and big */
         case (unsigned int) TWO:
             if (e->z < 0 ||
                     e->z != e->ends[0]->y + e->ends[1]->y - e->weight) {
-                fprintf (stderr, "Error in dual solution - 2\n");
+                CC_FPRINTF(stderr, "Error in dual solution - 2\n");
                 return 1;
             }
             v += (double) e->weight;
@@ -578,19 +578,19 @@ static int chkmat (graph *G, double *val)   /* val may be 1/2 integer and big */
         case (unsigned int) ONE:
             if (e->z != 0 ||
                     e->ends[0]->y + e->ends[1]->y != e->weight) {
-                fprintf (stderr, "Error in dual solution - 1\n");
+                CC_FPRINTF(stderr, "Error in dual solution - 1\n");
                 return 1;
             }
             v += (double) e->weight;
             break;
         case (unsigned int) ZERO:
             if (e->z != 0 || e->ends[0]->y + e->ends[1]->y > e->weight) {
-                fprintf (stderr, "Error in dual solution - 0\n");
+                CC_FPRINTF(stderr, "Error in dual solution - 0\n");
                 return 1;
             }
             break;
         default:
-            fprintf (stderr, "Error in matching values\n");
+            CC_FPRINTF(stderr, "Error in matching values\n");
             return 1;
         }
     }
@@ -598,7 +598,7 @@ static int chkmat (graph *G, double *val)   /* val may be 1/2 integer and big */
     dualval /= 2.0;
 
     if (v != dualval) {
-        fprintf (stderr, "The primal and dual objective values differ.\n");
+        CC_FPRINTF(stderr, "The primal and dual objective values differ.\n");
         return 1;
     }
     *val = v;
@@ -618,7 +618,7 @@ static int twomatch (graph *G)
         while ((unsigned int) n->matchcnt != (unsigned int) TWO) {
             rval = augment (G, n);
             if (rval) {
-                fprintf (stderr, "augment failed - probably no fmatching\n");
+                CC_FPRINTF(stderr, "augment failed - probably no fmatching\n");
                 return rval;
             }
         }
@@ -647,7 +647,7 @@ static int augment (graph *G, node *n)
             auglist = auglist->pnext;
         }
     }
-    fprintf (stderr, "Error - dual change did not create new edges\n");
+    CC_FPRINTF(stderr, "Error - dual change did not create new edges\n");
     return 1;
 }
 
@@ -725,11 +725,11 @@ static node *dualchange (node *n, int PLUS, int MINUS)
 
     minalpha (n, &new, &alpha, PLUS, MINUS);
     if (alpha == MAXWEIGHT) {
-        fprintf (stderr, "Dual change required, but no candidate edges\n");
+        CC_FPRINTF(stderr, "Dual change required, but no candidate edges\n");
         return (node *) NULL;
     }
     if (alpha & 0x1) {
-        fprintf (stderr, "Whoops, 2 * alpha = %d, not even\n", alpha);
+        CC_FPRINTF(stderr, "Whoops, 2 * alpha = %d, not even\n", alpha);
         return (node *) NULL;
     }
     alpha /= 2;
@@ -1035,7 +1035,7 @@ static int basic_check_scan (graph *G, node *n)
     if (basic_checkout_basic (n, 0, &odd_circuit, G->PLUS, G->MINUS))
         return 1;
     if (odd_circuit == (edge *) NULL) {
-        printf ("No odd circuit\n");
+        CC_PRINTF("No odd circuit\n");
         return 1;
     }
     return 0;
@@ -1064,7 +1064,7 @@ static int basicgrow (graph *G, node *n)
                 expandlist = expandlist->pnext;
             }
         }
-        fprintf (stderr, "ERROR: No dual change in basis finding code\n");
+        CC_FPRINTF(stderr, "ERROR: No dual change in basis finding code\n");
         return 1;
     }
 }
@@ -1091,8 +1091,8 @@ static int basic_grab_ones (node *n, int parity, edge **odd_circuit,
                     *odd_circuit = e;
                     e->basic = 1;
                 } else if (*odd_circuit != e) {
-                    fprintf (stderr, "ERROR: Two odd circuits in 1-graph\n");
-                    printf ("Circuit forming edges: %d-%d  %d-%d\n",
+                    CC_FPRINTF(stderr, "ERROR: Two odd circuits in 1-graph\n");
+                    CC_PRINTF("Circuit forming edges: %d-%d  %d-%d\n",
                          (*odd_circuit)->ends[0]->name,
                          (*odd_circuit)->ends[1]->name,
                          e->ends[0]->name,
@@ -1100,8 +1100,8 @@ static int basic_grab_ones (node *n, int parity, edge **odd_circuit,
                     return 1;
                 }
             } else {
-                fprintf (stderr, "ERROR: Even circuit in 1-graph\n");
-                printf ("Circuit forming edge: %d-%d\n",
+                CC_FPRINTF(stderr, "ERROR: Even circuit in 1-graph\n");
+                CC_PRINTF("Circuit forming edge: %d-%d\n",
                               e->ends[0]->name,
                               e->ends[1]->name);
                 return 1;
@@ -1132,8 +1132,8 @@ static int basic_checkout_basic (node *n, int parity, edge **odd_circuit,
                 if (*odd_circuit == (edge *) NULL) {
                     *odd_circuit = e;
                 } else if (*odd_circuit != e) {
-                    fprintf (stderr, "ERROR: Two odd circuits in basish\n");
-                    printf ("Circuit forming edges: %d-%d  %d-%d\n",
+                    CC_FPRINTF(stderr, "ERROR: Two odd circuits in basish\n");
+                    CC_PRINTF("Circuit forming edges: %d-%d  %d-%d\n",
                          (*odd_circuit)->ends[0]->name,
                          (*odd_circuit)->ends[1]->name,
                          e->ends[0]->name,
@@ -1141,8 +1141,8 @@ static int basic_checkout_basic (node *n, int parity, edge **odd_circuit,
                     return 1;
                 }
             } else {
-                fprintf (stderr, "ERROR: Even circuit in basis\n");
-                printf ("Circuit forming edge: %d-%d\n",
+                CC_FPRINTF(stderr, "ERROR: Even circuit in basis\n");
+                CC_PRINTF("Circuit forming edge: %d-%d\n",
                               e->ends[0]->name,
                               e->ends[1]->name);
                 return 1;
@@ -1233,7 +1233,7 @@ static node *basic_dualchange (node *n, int PLUS, int MINUS)
         /* reverse sense of PLUS and MINUS */
         basic_minalpha (n, &new, &alpha, 1, PLUS, MINUS);
         if (alpha == MAXWEIGHT) {
-            printf ("Basic dual change required, but no candidate edges\n");
+            CC_PRINTF("Basic dual change required, but no candidate edges\n");
             return (node *) NULL;
         }
         alpha /= 2;
@@ -1364,12 +1364,12 @@ static int checkoutedge (graph *G, node *n1, node *n2, int *hit,
     if (wbar < 0) {
         if ((e = findedge (n1, n2)) != (edge *) NULL) {
             if (e->z != -wbar) {
-                printf ("Hmmm.  edge (%d-%d) has z %d, wbar %d\n",
+                CC_PRINTF("Hmmm.  edge (%d-%d) has z %d, wbar %d\n",
                 e->ends[0]->name, e->ends[1]->name, e->z, wbar);
             }
         } else {
             if (addbadedge (G, n1, n2, w)) {
-                fprintf (stderr, "addbadedge failed\n");
+                CC_FPRINTF(stderr, "addbadedge failed\n");
                 return 1;
             }
             *hit = 1;
@@ -1391,7 +1391,7 @@ static int precheckoutedge (node *n1, node *n2, shortedge **list,
     if (wbar < 0) {
         if ((e = findedge (n1, n2)) != (edge *) NULL) {
             if (e->z != -wbar) {
-                printf ("Hmmm.  edge (%d-%d) has z %d, wbar %d\n",
+                CC_PRINTF("Hmmm.  edge (%d-%d) has z %d, wbar %d\n",
                 e->ends[0]->name, e->ends[1]->name, e->z, wbar);
             }
         } else {
@@ -1465,8 +1465,8 @@ static int kd_fixmatch (graph *G, int *radded, CCdatagroup *dat,
         if (n->y > maxy)
             maxy = n->y;
     }
-    printf ("Node weight spread: (%d, %d)\n", miny, maxy);
-    fflush (stdout);
+    CC_PRINTF("Node weight spread: (%d, %d)\n", miny, maxy);
+    CC_FFLUSH(stdout);
 
 /*
     THIS CODE CANNOT BE USED UNDER OS2 WITH CURRENT RADIX
@@ -1549,9 +1549,9 @@ static int kd_fixmatch (graph *G, int *radded, CCdatagroup *dat,
     }
 
 
-    printf ("Truncated %d nodes to get spread: (%d, %d)\n",
+    CC_PRINTF("Truncated %d nodes to get spread: (%d, %d)\n",
         nheavy, order[top + 1]->y, order[bottom - 1]->y);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 
     if (nheavy) {
@@ -1659,7 +1659,7 @@ static int kd_fixmatch (graph *G, int *radded, CCdatagroup *dat,
         for (i = 0; i < nlight; i++)
             wcoord[i] = ((double) (maxy - light[i]->y)) * 0.5;
         if (CCkdtree_build (&localkt, nlight, &ldat, wcoord, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -1682,7 +1682,7 @@ static int kd_fixmatch (graph *G, int *radded, CCdatagroup *dat,
                 nodeschecked++;
                 if (CCkdtree_node_k_nearest (&localkt, nlight, i, NEAR_TRY_NUM,
                                            &ldat, wcoord, list, rstate)) {
-                    fprintf (stderr, "node nearest failed\n");
+                    CC_FPRINTF(stderr, "node nearest failed\n");
                     CCkdtree_free (&localkt);
                     rval = 1;
                     goto CLEANUP;
@@ -1755,15 +1755,15 @@ static int kd_fixmatch (graph *G, int *radded, CCdatagroup *dat,
             }
         }
 
-        printf ("Need to check %d edges (saved %d checks)\n", added, saver);
-        fflush (stdout);
+        CC_PRINTF("Need to check %d edges (saved %d checks)\n", added, saver);
+        CC_FFLUSH(stdout);
         CCkdtree_free (&localkt);
 
         added = 0;
         for (s = slist; s; s = snext) {
             snext = s->next;
             if (checkoutedge (G, s->ends[0], s->ends[1], &hit, dat)) {
-                fprintf (stderr, "checkoutedge failed\n");
+                CC_FPRINTF(stderr, "checkoutedge failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -1771,9 +1771,9 @@ static int kd_fixmatch (graph *G, int *radded, CCdatagroup *dat,
             shortedgefree (&G->shortedge_world, s);
         }
         totaladded += added;
-        printf ("Pass %d: %d edges added (%d total), %d nodes checked\n",
+        CC_PRINTF("Pass %d: %d edges added (%d total), %d nodes checked\n",
                               passcount++, added, totaladded, nodeschecked);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } while (added);
     *radded = totaladded;
 
@@ -1847,7 +1847,7 @@ static int x_fixmatch (graph *G, int *radded, CCdatagroup *dat)
     CCutil_dat_getnorm (dat, &datnorm);
     if ((datnorm & CC_NORM_BITS) != CC_X_NORM_TYPE &&
         (datnorm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-        fprintf (stderr, "Cannot run x_fixmatch with norm %d\n", datnorm);
+        CC_FPRINTF(stderr, "Cannot run x_fixmatch with norm %d\n", datnorm);
         return 1;
     }
 
@@ -1876,7 +1876,7 @@ static int x_fixmatch (graph *G, int *radded, CCdatagroup *dat)
                      n2 = n2->sort.next) {
                     edgeschecked++;
                     if (checkoutedge (G, n1, n2, &hit, dat)) {
-                        fprintf (stderr, "checkoutedge failed\n");
+                        CC_FPRINTF(stderr, "checkoutedge failed\n");
                         return 1;
                     }
                     added += hit;
@@ -1886,7 +1886,7 @@ static int x_fixmatch (graph *G, int *radded, CCdatagroup *dat)
                      n2 = n2->sort.next) {
                     edgeschecked++;
                     if (checkoutedge (G, n1, n2, &hit, dat)) {
-                        fprintf (stderr, "checkoutedge failed\n");
+                        CC_FPRINTF(stderr, "checkoutedge failed\n");
                         return 1;
                     }
                     added += hit;
@@ -1902,9 +1902,9 @@ static int x_fixmatch (graph *G, int *radded, CCdatagroup *dat)
             n2->sort.prev = &n1->sort.next;
         }
         totaladded += added;
-        printf ("Forward pass completed, %d nodes checked, %d edges checked\n",
+        CC_PRINTF("Forward pass completed, %d nodes checked, %d edges checked\n",
                 nodeschecked, edgeschecked);
-        printf ("    %d edges added, total %d edges added\n",
+        CC_PRINTF("    %d edges added, total %d edges added\n",
                 added, totaladded);
         if (added == 0)
             break;
@@ -1923,7 +1923,7 @@ static int x_fixmatch (graph *G, int *radded, CCdatagroup *dat)
                      n2 = n2->sort.next) {
                     edgeschecked++;
                     if (checkoutedge (G, n1, n2, &hit, dat)) {
-                        fprintf (stderr, "checkoutedge failed\n");
+                        CC_FPRINTF(stderr, "checkoutedge failed\n");
                         return 1;
                     }
                     added += hit;
@@ -1933,7 +1933,7 @@ static int x_fixmatch (graph *G, int *radded, CCdatagroup *dat)
                      n2 = n2->sort.next) {
                     edgeschecked++;
                     if (checkoutedge (G, n1, n2, &hit, dat)) {
-                        fprintf (stderr, "checkoutedge failed\n");
+                        CC_FPRINTF(stderr, "checkoutedge failed\n");
                         return 1;
                     }
                     added += hit;
@@ -1949,9 +1949,9 @@ static int x_fixmatch (graph *G, int *radded, CCdatagroup *dat)
             n2->sort.prev = &n1->sort.next;
         }
         totaladded += added;
-        printf ("Backward pass completed, %d nodes checked, %d edges checked\n",
+        CC_PRINTF("Backward pass completed, %d nodes checked, %d edges checked\n",
                 nodeschecked, edgeschecked);
-        printf ("    %d edges added, total %d edges added\n",
+        CC_PRINTF("    %d edges added, total %d edges added\n",
                 added, totaladded);
     } while (added);
     *radded = totaladded;
@@ -1970,16 +1970,16 @@ static int junk_fixmatch (graph *G, int *radded, CCdatagroup *dat)
         for (n1 = G->nodelist; n1; n1 = n1->next) {
             for (n2 = n1->next; n2; n2 = n2->next) {
                 if (checkoutedge (G, n1, n2, &hit, dat)) {
-                    fprintf (stderr, "checkoutedge failed\n");
+                    CC_FPRINTF(stderr, "checkoutedge failed\n");
                     return 1;
                 }
                 added += hit;
             }
         }
         totaladded += added;
-        printf ("Pass completed: %d edges added, total %d edges added\n",
+        CC_PRINTF("Pass completed: %d edges added, total %d edges added\n",
                  added, totaladded);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } while (added);
 
     *radded = totaladded;

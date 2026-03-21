@@ -141,7 +141,7 @@ int CCutil_priority_insert (CCpriority *pri, void *data, double keyval)
     pri->pri_info[i].data = data;
     pri->heap.key[i] = keyval;
     if (CCutil_dheap_insert (&pri->heap, i)) {
-        fprintf (stderr, "Unexpected failure from CCutil_dheap_insert\n");
+        CC_FPRINTF(stderr, "Unexpected failure from CCutil_dheap_insert\n");
         return -1;
     }
     return i;

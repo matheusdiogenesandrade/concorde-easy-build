@@ -251,7 +251,7 @@ int CClinkern_fixed (int ncount, CCdatagroup *dat, int ecount, int *elist,
     CCptrworld edgelook_world;
 
     if (silent == 0) {
-        printf ("linkern ...\n"); fflush (stdout);
+        CC_PRINTF("linkern ...\n"); CC_FFLUSH(stdout);
     }
     startzeit = CCutil_zeit ();
 
@@ -262,8 +262,8 @@ int CClinkern_fixed (int ncount, CCdatagroup *dat, int ecount, int *elist,
     G.rstate = rstate;
 
     if (ncount < 10 && nkicks > 0) {
-        printf ("Less than 10 nodes, setting nkicks to 0\n");  
-        fflush (stdout);
+        CC_PRINTF("Less than 10 nodes, setting nkicks to 0\n");  
+        CC_FFLUSH(stdout);
         nkicks = 0;
     }
 
@@ -271,13 +271,13 @@ int CClinkern_fixed (int ncount, CCdatagroup *dat, int ecount, int *elist,
      * allocs will not fail, and thus do not need to be tested */
     rval = intptr_bulkalloc (&intptr_world, 3*ncount);
     if (rval) {
-        fprintf (stderr, "Unable to allocate initial intptrs\n");
+        CC_FPRINTF(stderr, "Unable to allocate initial intptrs\n");
         goto CLEANUP;
     }
 
     rval = edgelook_bulkalloc (&edgelook_world, MAX_BACK * (BACKTRACK + 3));
     if (rval) {
-        fprintf (stderr, "Unable to allocate initial edgelooks\n");
+        CC_FPRINTF(stderr, "Unable to allocate initial edgelooks\n");
         goto CLEANUP;
     }
 
@@ -289,7 +289,7 @@ int CClinkern_fixed (int ncount, CCdatagroup *dat, int ecount, int *elist,
     
     rval = buildgraph (&G, ncount, ecount, elist, &D);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
 
     rval = init_fixededges (&G, fcount, flist,  &intptr_world);
@@ -298,13 +298,13 @@ int CClinkern_fixed (int ncount, CCdatagroup *dat, int ecount, int *elist,
     if (incycle) {
         for (i = 0; i < ncount; i++) tcyc[i] = incycle[i];
     } else {
-        fprintf (stderr, "with fixed linkern a cycle must be given");
+        CC_FPRINTF(stderr, "with fixed linkern a cycle must be given");
         rval = 1;  goto CLEANUP;
     }
 
     *val = cycle_length (ncount, tcyc, &D);
     if (silent == 0) {
-        printf ("Starting Cycle: %.0f\n", *val); fflush (stdout);
+        CC_PRINTF("Starting Cycle: %.0f\n", *val); CC_FFLUSH(stdout);
     }
 
     rval = repeated_lin_kernighan (&G, &D, tcyc, nkicks,
@@ -312,10 +312,10 @@ int CClinkern_fixed (int ncount, CCdatagroup *dat, int ecount, int *elist,
     CCcheck_rval (rval, "repeated_lin_kernighan failed");
 
     if (silent == 0) {
-        printf ("Best path length: %.0f\n", *val);
-        printf ("Lin-Kernighan Running Time: %.2f\n",
+        CC_PRINTF("Best path length: %.0f\n", *val);
+        CC_PRINTF("Lin-Kernighan Running Time: %.2f\n",
                   CCutil_zeit () - startzeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     rval = check_cycle (&G, tcyc, fcount);
@@ -363,26 +363,26 @@ static int repeated_lin_kernighan (graph *G, distobj *D, int *cyc,
     init_adddel (&E);
     rval = build_aqueue (&Q, ncount, intptr_world);
     if (rval) {
-        fprintf (stderr, "build_aqueue failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_aqueue failed\n"); goto CLEANUP;
     }
     rval = build_adddel (&E, ncount);
     if (rval) {
-        fprintf (stderr, "build_adddel failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_adddel failed\n"); goto CLEANUP;
     }
 
     hit = 2 * (MAXDEPTH + 7 + KICK_MAXDEPTH);
     rval = init_flipstack (&fstack, hit, 0);
     if (rval) {
-        fprintf (stderr, "init_flipstack failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "init_flipstack failed\n"); goto CLEANUP;
     }
     rval = init_flipstack (&winstack, 500 + ncount / 50, hit);
     if (rval) {
-        fprintf (stderr, "init_flipstack failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "init_flipstack failed\n"); goto CLEANUP;
     }
 
     win_cycle = CC_SAFE_MALLOC (ncount, int);
     if (win_cycle == (int *) NULL) {
-        fprintf (stderr, "out of memory in repeated_lin_kernighan\n");
+        CC_FPRINTF(stderr, "out of memory in repeated_lin_kernighan\n");
         rval = 1; goto CLEANUP;
     }
     win_cycle[0] = -1;
@@ -398,7 +398,7 @@ static int repeated_lin_kernighan (graph *G, distobj *D, int *cyc,
 
         tcyc = CC_SAFE_MALLOC (ncount, int);
         if (tcyc == (int *) NULL) {
-            fprintf (stderr, "out of memory in repeated_lin_kernighan\n");
+            CC_FPRINTF(stderr, "out of memory in repeated_lin_kernighan\n");
             rval = 1; goto CLEANUP;
         }
         /* init active_queue with random order */
@@ -417,12 +417,12 @@ static int repeated_lin_kernighan (graph *G, distobj *D, int *cyc,
 
     if (silent == 0) {
         if (count > 0) {
-            printf ("%4d Steps   Best: %.0f   %.2f seconds\n", round, best,
+            CC_PRINTF("%4d Steps   Best: %.0f   %.2f seconds\n", round, best,
                                 CCutil_zeit () - szeit);
         } else {
-            printf ("LK Cycle: %.0f\n", best);
+            CC_PRINTF("LK Cycle: %.0f\n", best);
         }
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     while (round < count) {
@@ -472,13 +472,13 @@ static int repeated_lin_kernighan (graph *G, distobj *D, int *cyc,
 
         round++;
         if (silent == 0 && (hit || (round % 1000 == 999))) {
-            printf ("%4d Steps   Best: %.0f   %.2f seconds\n",
+            CC_PRINTF("%4d Steps   Best: %.0f   %.2f seconds\n",
                                round, best, CCutil_zeit () - szeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
     if (silent == 0 && round > 0) {
-        printf ("%4d Total Steps.\n", round); fflush (stdout);
+        CC_PRINTF("%4d Total Steps.\n", round); CC_FFLUSH(stdout);
     }
 
     CClinkern_flipper_cycle (&F, cyc);
@@ -486,8 +486,8 @@ static int repeated_lin_kernighan (graph *G, distobj *D, int *cyc,
 
     t = cycle_length (ncount, cyc, D);
     if (t != best) {
-        printf ("WARNING: LK incremental counter was off by %.0f\n", t-best);
-        fflush (stdout);
+        CC_PRINTF("WARNING: LK incremental counter was off by %.0f\n", t-best);
+        CC_FFLUSH(stdout);
         best = t;
     }
     *val = best;
@@ -1531,7 +1531,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
     G->edgespace = CC_SAFE_MALLOC ((2 * ecount) + ncount, edge);
     if (G->goodlist == (edge **) NULL || G->degree == (int *) NULL ||
         G->edgespace == (edge *) NULL)  {
-        fprintf (stderr, "out of memory in buildgraph\n");
+        CC_FPRINTF(stderr, "out of memory in buildgraph\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1587,10 +1587,10 @@ static void linkern_free_world (CCptrworld *intptr_world,
     int total, onlist;
 
     if (intptr_check_leaks (intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs\n", total-onlist);
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs\n", total-onlist);
     }
     if (edgelook_check_leaks (edgelook_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding edgelooks\n", total-onlist);
+        CC_FPRINTF(stderr, "WARNING: %d outstanding edgelooks\n", total-onlist);
     }
     CCptrworld_delete (intptr_world);
     CCptrworld_delete (edgelook_world);
@@ -1604,7 +1604,7 @@ static int init_flipstack (flipstack *f, int total, int single)
 
     f->stack = CC_SAFE_MALLOC (total + single, flippair);
     if (f->stack == (flippair *) NULL) {
-        fprintf (stderr, "out of memory in init_flipstack\n"); return 1;
+        CC_FPRINTF(stderr, "out of memory in init_flipstack\n"); return 1;
     }
     f->max = total;
 
@@ -1645,7 +1645,7 @@ static int build_adddel (adddel *E, int ncount)
     E->add_edges = CC_SAFE_MALLOC (M, char);
     E->del_edges = CC_SAFE_MALLOC (M, char);
     if (E->add_edges == (char *) NULL || E->del_edges == (char *) NULL) {
-        fprintf (stderr, "out of memory in build_adddel\n");
+        CC_FPRINTF(stderr, "out of memory in build_adddel\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < M; i++) {
@@ -1692,7 +1692,7 @@ static int build_aqueue (aqueue *Q, int ncount, CCptrworld *intptr_world)
 
     Q->active = CC_SAFE_MALLOC (ncount, char);
     if (Q->active == (char *) NULL) {
-        fprintf (stderr, "out of memory in build_aqueue\n");
+        CC_FPRINTF(stderr, "out of memory in build_aqueue\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) Q->active[i] = 0;
@@ -1785,7 +1785,7 @@ static int build_distobj (distobj *D, int ncount, CCdatagroup *dat)
     D->cacheind = CC_SAFE_MALLOC (D->cacheM, int);
     D->cacheval = CC_SAFE_MALLOC (D->cacheM, int);
     if (D->cacheind == (int *) NULL || D->cacheval == (int *) NULL) {
-        fprintf (stderr, "out of memory in build_distobj\n");
+        CC_FPRINTF(stderr, "out of memory in build_distobj\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < D->cacheM; i++) {

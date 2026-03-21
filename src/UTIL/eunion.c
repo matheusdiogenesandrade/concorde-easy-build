@@ -60,21 +60,21 @@ int CCutil_edge_file_union (int ncount, int nfiles, char **flist, int *ecount,
 
     rval = CCutil_edgehash_init (&h, 2*ncount);
     if (rval) {
-        fprintf (stderr, "CCutil_edgehash_init failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_edgehash_init failed\n"); goto CLEANUP;
     }
 
     for (i = 0; i < nfiles; i++) {
         rval = CCutil_getedgelist (ncount, flist[i], &tcount, &tlist,
                                    &telen, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
         }
 
         for (j = 0; j < tcount; j++) {
             rval = CCutil_edgehash_set (&h, tlist[2*j], tlist[2*j+1],
                                         telen[j]);
             if (rval) {
-                fprintf (stderr, "CCutil_edgehash_set failed\n"); 
+                CC_FPRINTF(stderr, "CCutil_edgehash_set failed\n"); 
                 goto CLEANUP;
             }
         }
@@ -83,7 +83,7 @@ int CCutil_edge_file_union (int ncount, int nfiles, char **flist, int *ecount,
             int yesno;
             rval = CCutil_edge_to_cycle (ncount, tlist, &yesno, (int *) NULL);
             if (rval) {
-                fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
             }
             if (yesno) {
                 *foundtour = 1;
@@ -106,7 +106,7 @@ int CCutil_edge_file_union (int ncount, int nfiles, char **flist, int *ecount,
 
     rval = CCutil_edgehash_getall (&h, ecount, elist, elen);
     if (rval) {
-        fprintf (stderr, "CCutil_edgehash_getall failed\n");
+        CC_FPRINTF(stderr, "CCutil_edgehash_getall failed\n");
         goto CLEANUP;
     }
 

@@ -199,13 +199,13 @@ int CCcut_gomory_hu (CC_GHtree *T, int ncount, int ecount, int *elist,
 
     rval = buildgraph (&G, ncount, ecount, elist, ecap, markcount, marks);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
     if (markcount == 0) markcount = ncount;   /* all nodes are terminals */
 
     supply = CC_SAFE_MALLOC (markcount + 1, cuttree_node);
     if (!supply) {
-        fprintf (stderr, "out of memory in CCcut_gomory_hu\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_gomory_hu\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -221,13 +221,13 @@ int CCcut_gomory_hu (CC_GHtree *T, int ncount, int ecount, int *elist,
     for (i = 0; i < G.ncount; i++) {
         rval = addtonodeset (&nlist, &(G.nodelist[i]), &G.nodeptr_world);
         if (rval) {
-            fprintf (stderr, "addtonodeset failed\n");
+            CC_FPRINTF(stderr, "addtonodeset failed\n");
             goto CLEANUP;
         }
         if (G.nodelist[i].mark == 1) {
             rval = addtonodeset (&special, &(G.nodelist[i]), &G.nodeptr_world);
             if (rval) {
-                fprintf (stderr, "addtonodeset failed\n");
+                CC_FPRINTF(stderr, "addtonodeset failed\n");
                 goto CLEANUP;
             }
         }
@@ -235,7 +235,7 @@ int CCcut_gomory_hu (CC_GHtree *T, int ncount, int ecount, int *elist,
 
     rval = gh_work (&G, root, &nlist, &special, supply, &supplyhead, rstate);
     if (rval) {
-        fprintf (stderr, "gh_work failed\n");
+        CC_FPRINTF(stderr, "gh_work failed\n");
         goto CLEANUP;
     }
 
@@ -248,7 +248,7 @@ int CCcut_gomory_hu (CC_GHtree *T, int ncount, int ecount, int *elist,
 
     rval = copy_cuttree (root, ncount, markcount, T);
     if (rval) {
-        fprintf (stderr, "copy_cuttree failed\n"); fflush (stdout);
+        CC_FPRINTF(stderr, "copy_cuttree failed\n"); CC_FFLUSH(stdout);
     }
 
     /* CCcut_GHtreeprint (T); */
@@ -271,19 +271,19 @@ static void ghlink_free_world (graph *G)
     int total, onlist;
 
     if (edge_check_leaks (&G->edge_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding GH-edges\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding GH-edges\n",
                  total - onlist);
     }
     CCptrworld_delete (&G->edge_world);
     
     if (edgeptr_check_leaks (&G->edgeptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding GH-edgeptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding GH-edgeptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (&G->edgeptr_world);
 
     if (nodeptr_check_leaks (&G->nodeptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding GH-nodeptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding GH-nodeptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (&G->nodeptr_world);
@@ -295,7 +295,7 @@ static int addtonodeset (nodeset *s, node *n, CCptrworld *nodeptr_world)
 
     nnew = nodeptralloc (nodeptr_world);
     if (nnew == (nodeptr *) NULL) {
-        fprintf (stderr, "nodeptralloc failed\n");
+        CC_FPRINTF(stderr, "nodeptralloc failed\n");
         return 1;
     }
     nnew->this = n;
@@ -442,7 +442,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
             if (p->this->magiclabel != G->magicnum) {
                 rval = addtonodeset (&n->nlist, p->this, &G->nodeptr_world);
                 if (rval) {
-                    fprintf (stderr, "addtonodeset failed\n");
+                    CC_FPRINTF(stderr, "addtonodeset failed\n");
                     goto CLEANUP;
                 }
             }
@@ -457,7 +457,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
 
     names = CC_SAFE_MALLOC (ncount, node *);
     if (!names) {
-        fprintf (stderr, "out of memory in gh_work\n");
+        CC_FPRINTF(stderr, "out of memory in gh_work\n");
         rval = 1;  goto CLEANUP;
     }
     for (i = 0, p = nlist->head; p; p = p->next, i++) {
@@ -474,7 +474,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
     elist = CC_SAFE_MALLOC (2*ecount, int);
     ecap  = CC_SAFE_MALLOC (ecount, double);
     if (!elist || !ecap) {
-        fprintf (stderr, "out of memory in gh_work\n");
+        CC_FPRINTF(stderr, "out of memory in gh_work\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -507,7 +507,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
     rval = CCcut_mincut_st (ncount, ecount, elist, ecap, anode->num,
                             bnode->num, &cutvalue, &cut, &cutcount);
     if (rval) {
-        fprintf (stderr, "CCcut_mincut_st failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_mincut_st failed\n"); goto CLEANUP;
     }
     CC_IFFREE (elist, int);
     CC_IFFREE (ecap, double);
@@ -527,12 +527,12 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
     splitset (special, &a_special, &b_special, G->magicnum);
 
     if (!a_special.head) {
-        fprintf (stderr, "Yipes! a_special is null\n");
+        CC_FPRINTF(stderr, "Yipes! a_special is null\n");
         if (!b_special.head)
-            fprintf (stderr, "And so is b_special\n");
+            CC_FPRINTF(stderr, "And so is b_special\n");
         rval = 1; goto CLEANUP;
     } else if (!b_special.head) {
-        fprintf (stderr, "Yipes! b_special is null\n");
+        CC_FPRINTF(stderr, "Yipes! b_special is null\n");
         rval = 1; goto CLEANUP;
     }
     newcut = &(supply[(*supplyhead)++]);
@@ -568,7 +568,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
     newnode.magiclabel = 0;
     rval = shrinkdown (G, &a_nlist, &newnode, &esave, G->magicnum);
     if (rval) {
-        fprintf (stderr, "shrinkdown failed\n");
+        CC_FPRINTF(stderr, "shrinkdown failed\n");
         goto CLEANUP;
     }
 
@@ -577,7 +577,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
 
     rval = addtonodeset (&a_nlist, &newnode, &G->nodeptr_world);
     if (rval) {
-        fprintf (stderr, "addtonodeset failed\n");
+        CC_FPRINTF(stderr, "addtonodeset failed\n");
         goto CLEANUP;
     }
     rval = gh_work (G, a_cut, &a_nlist, &a_special, supply, supplyhead,
@@ -593,7 +593,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
 
     rval = shrinkdown (G, &b_nlist, &newnode, &esave, G->magicnum);
     if (rval) {
-        fprintf (stderr, "shrinkdown failed\n");
+        CC_FPRINTF(stderr, "shrinkdown failed\n");
         goto CLEANUP;
     }
 
@@ -602,7 +602,7 @@ static int gh_work (graph *G, cuttree_node *n, nodeset *nlist,
 
     rval = addtonodeset (&b_nlist, &newnode, &G->nodeptr_world);
     if (rval) {
-        fprintf (stderr, "addtonodeset failed\n");
+        CC_FPRINTF(stderr, "addtonodeset failed\n");
         goto CLEANUP;
     }
     rval = gh_work (G, b_cut, &b_nlist, &b_special, supply, supplyhead,
@@ -709,12 +709,12 @@ static int shrinkdown (graph *G, nodeset *a, node *pseudo, edgeset *esave,
         if (cumx > 0.0) {
             e = edgeptralloc (&G->edgeptr_world);
             if (e == (edgeptr *) NULL) {
-                fprintf (stderr, "edgeptralloc failed\n");
+                CC_FPRINTF(stderr, "edgeptralloc failed\n");
                 return 1;
             }
             e->this = edgealloc (&G->edge_world);
             if (e->this == (edge *) NULL) {
-                fprintf (stderr, "edgealloc failed\n");
+                CC_FPRINTF(stderr, "edgealloc failed\n");
                 edgeptrfree (&G->edgeptr_world, e);
                 return 1;
             }
@@ -727,7 +727,7 @@ static int shrinkdown (graph *G, nodeset *a, node *pseudo, edgeset *esave,
             e->this->x = cumx;
             e = edgeptralloc (&G->edgeptr_world);
             if (e == (edgeptr *) NULL) {
-                fprintf (stderr, "edgealloc failed\n");
+                CC_FPRINTF(stderr, "edgealloc failed\n");
                 return 1;
             }
             e->this = enew.head->this;
@@ -796,7 +796,7 @@ static int copy_cuttree (cuttree_node *root, int ncount, int markcount,
     T->supply =    CC_SAFE_MALLOC (markcount + 1, CC_GHnode);
     T->listspace = CC_SAFE_MALLOC (ncount + 1, int);
     if (!T->supply || !T->listspace) {
-        fprintf (stderr, "out of memory in copy_cuttree\n");
+        CC_FPRINTF(stderr, "out of memory in copy_cuttree\n");
         rval = 1; goto CLEANUP;
     }
     k = 0;
@@ -875,7 +875,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
     G->edgelist = CC_SAFE_MALLOC (ecount, edge);
 
     if (!G->nodelist || !G->edgelist) {
-        fprintf (stderr, "out of memory in buildgraph\n");
+        CC_FPRINTF(stderr, "out of memory in buildgraph\n");
         rval = 1; goto CLEANUP;
     }
     G->ncount = ncount;
@@ -899,7 +899,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
     for (i = ecount, e = G->edgelist; i; i--, e++) {
         e1 = edgeptralloc (&G->edgeptr_world);
         if (!e1) {
-            fprintf (stderr, "out of memory in buildgraph\n");
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n");
             rval = 1; goto CLEANUP;
         }
         e1->next = e->ends[0]->adj.head;
@@ -910,7 +910,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
         }
         e1 = edgeptralloc (&G->edgeptr_world);
         if (!e1) {
-            fprintf (stderr, "out of memory in buildgraph\n");
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n");
             rval = 1; goto CLEANUP;
         }
         e1->next = e->ends[1]->adj.head;
@@ -988,7 +988,7 @@ static void freegraph (graph *G)
 void CCcut_GHtreeprint (CC_GHtree *T)
 {
     if (T) {
-        printf ("GOMORY-HU TREE\n"); fflush (stdout);
+        CC_PRINTF("GOMORY-HU TREE\n"); CC_FFLUSH(stdout);
         print_tree_work (T->root);
     }
 }
@@ -997,24 +997,24 @@ static void print_tree_work (CC_GHnode *n)
 {
     int i;
 
-    printf ("T%d: ", n->num);
-    printf ("Set (");
+    CC_PRINTF("T%d: ", n->num);
+    CC_PRINTF("Set (");
     for (i = 0; i < n->listcount; i++) {
-        printf ("%d,", n->nlist[i]);
+        CC_PRINTF("%d,", n->nlist[i]);
     }
-    printf ("[%d]), ", n->special);
-    if (n->parent) printf ("Parent %d, ", n->parent->num);
-    else           printf ("Parent NULL, ");
-    if (n->child)  printf ("Child %d, ", n->child->num);
-    else           printf ("Child NULL, ");
-    if (n->sibling) printf ("Sibling %d, ", n->sibling->num);
-    else            printf ("Sibling NULL, ");
+    CC_PRINTF("[%d]), ", n->special);
+    if (n->parent) CC_PRINTF("Parent %d, ", n->parent->num);
+    else           CC_PRINTF("Parent NULL, ");
+    if (n->child)  CC_PRINTF("Child %d, ", n->child->num);
+    else           CC_PRINTF("Child NULL, ");
+    if (n->sibling) CC_PRINTF("Sibling %d, ", n->sibling->num);
+    else            CC_PRINTF("Sibling NULL, ");
     if (n->parent) {
-        printf ("Cnt %d, Val %.2f\n", n->ndescendants, n->cutval);
-        fflush (stdout);
+        CC_PRINTF("Cnt %d, Val %.2f\n", n->ndescendants, n->cutval);
+        CC_FFLUSH(stdout);
     } else {
-        printf ("Cnt %d, ROOT\n", n->ndescendants); 
-        fflush (stdout);
+        CC_PRINTF("Cnt %d, ROOT\n", n->ndescendants); 
+        CC_FFLUSH(stdout);
     }
 
     for (n = n->child; n; n = n->sibling) {

@@ -156,52 +156,52 @@ int CCchunk_lift (CCchunk_graph *c, CCchunk_fault *fault,
     a.coef = (int *) NULL;
     
 #ifdef DUMPCHUNKS
-    printf ("CCchunk_lift\n");
-    printf ("%d %d\n", c->ncount, c->ecount);
+    CC_PRINTF("CCchunk_lift\n");
+    CC_PRINTF("%d %d\n", c->ncount, c->ecount);
     for (i=0; i<c->ecount; i++) {
-        printf ("%d %d %.16f %d\n",c->end0[i], c->end1[i], c->weight[i],
+        CC_PRINTF("%d %d %.16f %d\n",c->end0[i], c->end1[i], c->weight[i],
                 c->fixed[i]);
     }
     for (i=0; i<c->ncount; i++) {
-        if (i>0) printf (" ");
-        printf ("%d",c->equality[i]);
+        if (i>0) CC_PRINTF(" ");
+        CC_PRINTF("%d",c->equality[i]);
     }
-    printf ("\n");
+    CC_PRINTF("\n");
     for (i=0; i<c->ecount; i++) {
-        printf ("%d ", fault->a.coef[i]);
+        CC_PRINTF("%d ", fault->a.coef[i]);
     }
-    printf ("<= %d\n", fault->a.rhs);
+    CC_PRINTF("<= %d\n", fault->a.rhs);
 #ifdef DUMPCHUNKSOLS
-    printf ("%d\n", fault->nsols);
+    CC_PRINTF("%d\n", fault->nsols);
     for (i=0; i<fault->nsols; i++) {
         int j;
         for (j=0; j<c->ecount; j++) {
-            printf ("%d ", fault->sols[i*c->ecount+j]);
+            CC_PRINTF("%d ", fault->sols[i*c->ecount+j]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 #else /* DUMPCHUNKSOLS */
-    printf ("0\n");
+    CC_PRINTF("0\n");
 #endif /* DUMPCHUNKSOLS */
-    printf ("viol %.6f\n", -chunk_slack (c, &fault->a));
-    fflush (stdout);
+    CC_PRINTF("viol %.6f\n", -chunk_slack (c, &fault->a));
+    CC_FFLUSH(stdout);
 #endif /* DUMPCHUNKS */
 
-/*    printf ("Slack %.6f\n", chunk_slack (c, &fault->a));*/
+/*    CC_PRINTF("Slack %.6f\n", chunk_slack (c, &fault->a));*/
 
     CCchunk_intmat_init (&mat);
     paths_init (&pinfo);
 
     if (chunk_slack (c, &fault->a) >= -EPS) {
 #ifdef DEBUG
-        printf ("No violation - nothing to do\n");
+        CC_PRINTF("No violation - nothing to do\n");
 #endif
         rval = 0; goto CLEANUP;
     }
 
     a.coef = CC_SAFE_MALLOC (c->ecount, int);
     if (a.coef == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCchunk_lift\n");
+        CC_FPRINTF(stderr, "Out of memory in CCchunk_lift\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<c->ecount; i++) {
@@ -211,7 +211,7 @@ int CCchunk_lift (CCchunk_graph *c, CCchunk_fault *fault,
 
     rval = paths_build (&pinfo, c->ncount);
     if (rval) {
-        fprintf (stderr, "paths_build failed\n");
+        CC_FPRINTF(stderr, "paths_build failed\n");
         goto CLEANUP;
     }
 
@@ -219,14 +219,14 @@ int CCchunk_lift (CCchunk_graph *c, CCchunk_fault *fault,
        and liberate_fixed modify the chunk */
     cnew = chunk_dup (c);
     if (!cnew) {
-        fprintf (stderr, "chunk_dup failed\n");
+        CC_FPRINTF(stderr, "chunk_dup failed\n");
         rval = -1;
         goto CLEANUP;
     }
 
     rval = fix_paths (cnew);
     if (rval) {
-        fprintf (stderr, "fix_paths failed\n");
+        CC_FPRINTF(stderr, "fix_paths failed\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -234,63 +234,63 @@ int CCchunk_lift (CCchunk_graph *c, CCchunk_fault *fault,
     rval = load_initial_sols (&mat, cnew, &a, fault->nsols,
                               fault->sols, &pinfo);
     if (rval) {
-        fprintf (stderr, "load_initial_sols failed\n");
+        CC_FPRINTF(stderr, "load_initial_sols failed\n");
         goto CLEANUP;
     }
 
     liberate_equality (cnew, &a, timer);
 
 #ifdef DEBUG
-    printf ("Equality liberated to:");
+    CC_PRINTF("Equality liberated to:");
     for (i=0; i<cnew->ecount; i++) {
-        printf (" %d", a.coef[i]);
+        CC_PRINTF(" %d", a.coef[i]);
     }
-    printf (" <= %d (viol %f)\n", a.rhs, -chunk_slack (cnew, &a));
-    fflush (stdout);
+    CC_PRINTF(" <= %d (viol %f)\n", a.rhs, -chunk_slack (cnew, &a));
+    CC_FFLUSH(stdout);
 #endif /* DEBUG */
 
     if (chunk_slack (cnew, &a) >= -EPS) {
 #ifdef DEBUG
-        printf ("violation vanished\n");
-        fflush (stdout);
+        CC_PRINTF("violation vanished\n");
+        CC_FFLUSH(stdout);
 #endif
         rval = 0; goto CLEANUP;
     }
 
     rval = strengthen_edges (cnew, &a, &mat, &pinfo, timer);
     if (rval) {
-        fprintf (stderr, "strengthen_edges failed\n");
+        CC_FPRINTF(stderr, "strengthen_edges failed\n");
         goto CLEANUP;
     }
 
 #ifdef DEBUG
-    printf ("Edge strengthened to:");
+    CC_PRINTF("Edge strengthened to:");
     for (i=0; i<cnew->ecount; i++) {
-        printf (" %d", a.coef[i]);
+        CC_PRINTF(" %d", a.coef[i]);
     }
-    printf (" <= %d (viol %f)\n", a.rhs, -chunk_slack (cnew, &a));
-    fflush (stdout);
+    CC_PRINTF(" <= %d (viol %f)\n", a.rhs, -chunk_slack (cnew, &a));
+    CC_FFLUSH(stdout);
 #endif
 
     rval = strengthen_equality (cnew, &a, &mat, &pinfo, timer);
     if (rval) {
-        fprintf (stderr, "strengthen_equality failed\n");
+        CC_FPRINTF(stderr, "strengthen_equality failed\n");
         goto CLEANUP;
     }
 
 #ifdef DEBUG
-    printf ("Equality strengthened to:");
+    CC_PRINTF("Equality strengthened to:");
     for (i=0; i<cnew->ecount; i++) {
-        printf (" %d", a.coef[i]);
+        CC_PRINTF(" %d", a.coef[i]);
     }
-    printf (" <= %d (viol %f)\n", a.rhs, -chunk_slack (cnew, &a));
-    fflush (stdout);
+    CC_PRINTF(" <= %d (viol %f)\n", a.rhs, -chunk_slack (cnew, &a));
+    CC_FFLUSH(stdout);
 #endif
 
     if (chunk_slack (cnew, &a) >= -EPS) {
 #ifdef DEBUG
-        printf ("violation vanished\n");
-        fflush (stdout);
+        CC_PRINTF("violation vanished\n");
+        CC_FFLUSH(stdout);
 #endif
         rval = 0; goto CLEANUP;
     }
@@ -299,7 +299,7 @@ int CCchunk_lift (CCchunk_graph *c, CCchunk_fault *fault,
     rval = decompose (cnew, &a, &mat, &pinfo, timer, callback, &finished);
     CCutil_stop_timer (&timer->decompose, 0);
     if (rval) {
-        fprintf (stderr, "decompose failed\n");
+        CC_FPRINTF(stderr, "decompose failed\n");
         goto CLEANUP;
     }
 
@@ -328,7 +328,7 @@ static int fix_paths (CCchunk_graph *c)
 
     deg = CC_SAFE_MALLOC (ncount, int);
     if (deg == (int *) NULL) {
-        fprintf (stderr, "Out of memory\n");
+        CC_FPRINTF(stderr, "Out of memory\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -363,13 +363,13 @@ static int fix_paths (CCchunk_graph *c)
 
     for (i=0; i<ncount; i++) {
         if (deg[i] == 2) {
-            fprintf (stderr, "COULDN'T FIX PATHS\n");
+            CC_FPRINTF(stderr, "COULDN'T FIX PATHS\n");
             rval = 1; goto CLEANUP;
         }
     }
 
 #ifdef DEBUG
-    printf ("%d edges unfixed to break paths\n", nfixed);
+    CC_PRINTF("%d edges unfixed to break paths\n", nfixed);
 #endif
     rval = 0;
 
@@ -388,13 +388,13 @@ static CCchunk_graph *chunk_complete (CCchunk_graph *c, CCchunk_ineq *a, CCchunk
 
     cnew = CCchunk_graph_alloc (c->ncount, ecount);
     if (!cnew) {
-        fprintf (stderr, "CCchunk_graph_alloc failed\n");
+        CC_FPRINTF(stderr, "CCchunk_graph_alloc failed\n");
         goto CLEANUP;
     }
 
     anew->coef = CC_SAFE_MALLOC (ecount, int);
     if (!anew->coef) {
-        fprintf (stderr, "Out of memory\n");
+        CC_FPRINTF(stderr, "Out of memory\n");
         goto CLEANUP;
     }
 
@@ -402,7 +402,7 @@ static CCchunk_graph *chunk_complete (CCchunk_graph *c, CCchunk_ineq *a, CCchunk
         cnew->equality[i] = c->equality[i];
         cnew->members[i] = member_dup (c->members[i]);
         if (!cnew->members[i]) {
-            fprintf (stderr, "member_dup failed\n");
+            CC_FPRINTF(stderr, "member_dup failed\n");
             goto CLEANUP;
         }
         for (j=0; j<i; j++) {
@@ -438,7 +438,7 @@ static CCchunk_graph *chunk_dup (CCchunk_graph *c)
 
     cnew = CCchunk_graph_alloc (c->ncount, c->ecount);
     if (!cnew) {
-        fprintf (stderr, "CCchunk_graph_alloc failed\n");
+        CC_FPRINTF(stderr, "CCchunk_graph_alloc failed\n");
         goto CLEANUP;
     }
 
@@ -446,7 +446,7 @@ static CCchunk_graph *chunk_dup (CCchunk_graph *c)
         cnew->equality[i] = c->equality[i];
         cnew->members[i] = member_dup (c->members[i]);
         if (!cnew->members[i]) {
-            fprintf (stderr, "member_dup failed\n");
+            CC_FPRINTF(stderr, "member_dup failed\n");
             goto CLEANUP;
         }
     }
@@ -476,7 +476,7 @@ static int *member_dup (int *omem)
 
     nmem = CC_SAFE_MALLOC (cnt, int);
     if (!nmem) {
-        fprintf (stderr, "Out of memory in member_dup\n");
+        CC_FPRINTF(stderr, "Out of memory in member_dup\n");
         return (int *) NULL;
     }
 
@@ -506,7 +506,7 @@ static int load_initial_sols (CCchunk_intmat *mat, CCchunk_graph *ch, CCchunk_in
 
     rval = CCchunk_intmat_build (mat, unfixed);
     if (rval) {
-        fprintf (stderr, "CCchunk_intmat_build failed\n");
+        CC_FPRINTF(stderr, "CCchunk_intmat_build failed\n");
         goto CLEANUP;
     }
 
@@ -514,16 +514,16 @@ static int load_initial_sols (CCchunk_intmat *mat, CCchunk_graph *ch, CCchunk_in
         if (slack (ecount, a, sols + i*ecount) == 0) {
 #ifdef DEBUG
             int j;
-            printf ("pilgrim:");
+            CC_PRINTF("pilgrim:");
             for (j=0; j<ecount; j++) {
-                printf (" %d", sols[i*ecount+j]);
+                CC_PRINTF(" %d", sols[i*ecount+j]);
             }
-            printf ("\n");
+            CC_PRINTF("\n");
 #endif /* DEBUG */
             paths_newpath (pinfo, ch, a, sols + i*ecount);
             rval = intmat_newpath (mat, ch, sols + i*ecount);
             if (rval) {
-                fprintf (stderr, "intmat_newpath failed\n");
+                CC_FPRINTF(stderr, "intmat_newpath failed\n");
                 goto CLEANUP;
             }
         }
@@ -594,7 +594,7 @@ static int strengthen_equality (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intm
 
     v.coef = CC_SAFE_MALLOC (ecount, int);
     if (v.coef == (int *) NULL) {
-        fprintf (stderr, "Out of memory in strengthen_equality\n");
+        CC_FPRINTF(stderr, "Out of memory in strengthen_equality\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -618,7 +618,7 @@ static int strengthen_equality (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intm
             }
             rval = strengthen_work (ch, a, mat, &v, pinfo, timer);
             if (rval) {
-                fprintf (stderr, "strengthen_work failed\n");
+                CC_FPRINTF(stderr, "strengthen_work failed\n");
                 goto CLEANUP;
             }
         }
@@ -647,7 +647,7 @@ static int strengthen_edges (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat 
 
     v.coef = CC_SAFE_MALLOC (ecount, int);
     if (v.coef == (int *) NULL) {
-        fprintf (stderr, "Out of memory in strengthen_edges\n");
+        CC_FPRINTF(stderr, "Out of memory in strengthen_edges\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -664,7 +664,7 @@ static int strengthen_edges (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat 
                 v.rhs = -1;
                 rval = strengthen_work (ch, a, mat, &v, pinfo, timer);
                 if (rval) {
-                    fprintf (stderr, "strengthen_work failed\n");
+                    CC_FPRINTF(stderr, "strengthen_work failed\n");
                     goto CLEANUP;
                 }
             }
@@ -673,7 +673,7 @@ static int strengthen_edges (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat 
                 v.rhs = 0;
                 rval = strengthen_work (ch, a, mat, &v, pinfo, timer);
                 if (rval) {
-                    fprintf (stderr, "strengthen_work failed\n");
+                    CC_FPRINTF(stderr, "strengthen_work failed\n");
                     goto CLEANUP;
                 }
             }
@@ -708,7 +708,7 @@ static int strengthen_work (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *
     if (z == (int *) NULL ||
         z1 == (int *) NULL ||
         a1.coef == (int *) NULL) {
-        fprintf (stderr, "Out of memory in strengthen_work\n");
+        CC_FPRINTF(stderr, "Out of memory in strengthen_work\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -717,14 +717,14 @@ static int strengthen_work (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *
 
     rval = tilt (ch, a, v, z, &a1, z1, timer);
     if (rval) {
-        fprintf (stderr, "tilt failed\n");
+        CC_FPRINTF(stderr, "tilt failed\n");
         goto CLEANUP;
     }
 
     paths_newpath (pinfo, ch, &a1, z1);
     rval = intmat_newpath (mat, ch, z1);
     if (rval) {
-        fprintf (stderr, "intmat_newpath failed\n");
+        CC_FPRINTF(stderr, "intmat_newpath failed\n");
         goto CLEANUP;
     }
 
@@ -770,7 +770,7 @@ static int decompose (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *mat,
     z1 = CC_SAFE_MALLOC (ecount, int);
     z2 = CC_SAFE_MALLOC (ecount, int);
     if (!c.coef || !a1.coef || !a2.coef || !y || !z1 || !z2) {
-        fprintf (stderr, "Out of memory in decompose\n");
+        CC_FPRINTF(stderr, "Out of memory in decompose\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -782,72 +782,72 @@ static int decompose (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *mat,
             rval = liberate_fixed (ch, a, pinfo, timer, callback, finished);
             CCutil_resume_timer (&timer->decompose);
             if (rval) {
-                fprintf (stderr, "liberate_fixed failed\n");
+                CC_FPRINTF(stderr, "liberate_fixed failed\n");
             }
             goto CLEANUP;
         } else if (rval) {
-            fprintf (stderr, "find_orthovec failed\n");
+            CC_FPRINTF(stderr, "find_orthovec failed\n");
             goto FAILED_ADD;
         }
 
         rval = find_nontight (ch, a, y);
         if (rval) {
-            fprintf (stderr, "find_nontight failed\n");
+            CC_FPRINTF(stderr, "find_nontight failed\n");
             goto CLEANUP;
         }
 
         rval = adjust (ecount, a, &c, y);
         if (rval) {
-            fprintf (stderr, "adjust failed\n");
+            CC_FPRINTF(stderr, "adjust failed\n");
             goto FAILED_ADD;
         }
 
 #ifdef DEBUG
-        printf ("TILTING BY ORTHOGONAL\n");
-        fflush (stdout);
+        CC_PRINTF("TILTING BY ORTHOGONAL\n");
+        CC_FFLUSH(stdout);
 #endif
 
         flip (ecount, &c);
 
 #ifdef DEBUG
-        printf ("first tilt\n");
+        CC_PRINTF("first tilt\n");
 #endif
         rval = tilt (ch, a, &c, y, &a1, z1, timer);
         if (rval) {
-            fprintf (stderr, "tilt failed\n");
+            CC_FPRINTF(stderr, "tilt failed\n");
             goto FAILED_ADD;
         }
 
         flip (ecount, &c);
         if (slack (ecount, a, z1) == 0) {
 #ifdef DEBUG
-            printf ("first slack 0\n");
+            CC_PRINTF("first slack 0\n");
 #endif
             paths_newpath (pinfo, ch, a, z1);
             rval = intmat_newpath (mat, ch, z1);
             if (rval) {
-                fprintf (stderr, "intmat_newpath failed\n");
+                CC_FPRINTF(stderr, "intmat_newpath failed\n");
                 goto CLEANUP;
             }
 
             nadded++;
         } else {
 #ifdef DEBUG
-            printf ("second tilt\n");
+            CC_PRINTF("second tilt\n");
 #endif
             rval = tilt (ch, a, &c, y, &a2, z2, timer);
             if (rval) {
-                fprintf (stderr, "tilt failed\n");
+                CC_FPRINTF(stderr, "tilt failed\n");
                 goto FAILED_ADD;
             }
             if (slack (ecount, a, z2) == 0) {
 #ifdef DEBUG
-                printf ("second slack 0\n");
+                CC_PRINTF("second slack 0\n");
 #endif
                 paths_newpath (pinfo, ch, a, z2);
                 rval = intmat_newpath (mat, ch, z2);
                 if (rval) {
-                    fprintf (stderr, "intmat_newpath failed\n");
+                    CC_FPRINTF(stderr, "intmat_newpath failed\n");
                     goto CLEANUP;
                 }
                 nadded++;
@@ -861,7 +861,7 @@ static int decompose (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *mat,
                 }
                 rval = paths_copy (pinfo, &psave);
                 if (rval) {
-                    fprintf (stderr, "paths_copy failed\n");
+                    CC_FPRINTF(stderr, "paths_copy failed\n");
                     goto CLEANUP;
                 }
 
@@ -869,19 +869,19 @@ static int decompose (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *mat,
                     paths_newpath (pinfo, ch, &a1, z1);
                     rval = intmat_newpath (mat, ch, z1);
                     if (rval) {
-                        fprintf (stderr, "intmat_newpath failed\n");
+                        CC_FPRINTF(stderr, "intmat_newpath failed\n");
                         goto CLEANUP;
                     }
                     nadded++;
 #ifdef DEBUG
-                    printf ("recursive decompose 1\n");
+                    CC_PRINTF("recursive decompose 1\n");
 #endif
                     rval = decompose (ch, &a1, mat, pinfo, timer, callback,
                                       finished);
                     if (rval == CC_CHUNK_ORACLE_SEARCHLIMITEXCEEDED) {
-                        fprintf (stderr, "decompose node limit exceeded\n");
+                        CC_FPRINTF(stderr, "decompose node limit exceeded\n");
                     } else if (rval) {
-                        fprintf (stderr, "decompose failed\n");
+                        CC_FPRINTF(stderr, "decompose failed\n");
                         goto CLEANUP;
                     }
                     CCchunk_intmat_dellastrows (mat, 1);
@@ -892,19 +892,19 @@ static int decompose (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *mat,
                     paths_newpath (&psave, ch, &a2, z2);
                     rval = intmat_newpath (mat, ch, z2);
                     if (rval) {
-                        fprintf (stderr, "intmat_newpath failed\n");
+                        CC_FPRINTF(stderr, "intmat_newpath failed\n");
                         goto CLEANUP;
                     }
                     nadded++;
 #ifdef DEBUG
-                    printf ("recursive decompose 2\n");
+                    CC_PRINTF("recursive decompose 2\n");
 #endif
                     rval = decompose (ch, &a2, mat, &psave, timer, callback,
                                       finished);
                     if (rval == CC_CHUNK_ORACLE_SEARCHLIMITEXCEEDED) {
-                        fprintf (stderr, "decompose node limit exceeded\n");
+                        CC_FPRINTF(stderr, "decompose node limit exceeded\n");
                     } else if (rval) {
-                        fprintf (stderr, "decompose failed\n");
+                        CC_FPRINTF(stderr, "decompose failed\n");
                         goto CLEANUP;
                     }
                     CCchunk_intmat_dellastrows (mat, 1);
@@ -919,12 +919,12 @@ static int decompose (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_intmat *mat,
 
  FAILED_ADD:
 #ifdef ADD_NONFACET
-    fprintf (stderr, "ADDING POSSIBLE NON-FACET\n");
+    CC_FPRINTF(stderr, "ADDING POSSIBLE NON-FACET\n");
     CCutil_suspend_timer (&timer->decompose);
     rval = liberate_fixed (ch, a, pinfo, timer, callback, finished);
     CCutil_resume_timer (&timer->decompose);
     if (rval) {
-        fprintf (stderr, "liberate_fixed failed\n");
+        CC_FPRINTF(stderr, "liberate_fixed failed\n");
     }
 #endif /* ADD_NONFACET */
 
@@ -969,7 +969,7 @@ static int find_nontight (CCchunk_graph *ch, CCchunk_ineq *a, int *y)
             return 0;
         }
     }
-    fprintf (stderr, "WHOA, unable to find nontight\n");
+    CC_FPRINTF(stderr, "WHOA, unable to find nontight\n");
     return -1;
 }
 
@@ -982,13 +982,13 @@ static int adjust (int ecount, CCchunk_ineq *a, CCchunk_ineq *c, int *y)
     int a_lim, c_lim;
 
 #ifdef DEBUG
-    printf ("Adjust a (slack %d):", mu);
-    for (i=0; i<ecount; i++) printf (" %d", a->coef[i]);
-    printf (" <= %d\n", a->rhs);
-    printf ("Adjust c (slack %d, div %d):", lambda, divv);
-    for (i=0; i<ecount; i++) printf (" %d", c->coef[i]);
-    printf (" <= %d\n", c->rhs);
-    fflush (stdout);
+    CC_PRINTF("Adjust a (slack %d):", mu);
+    for (i=0; i<ecount; i++) CC_PRINTF(" %d", a->coef[i]);
+    CC_PRINTF(" <= %d\n", a->rhs);
+    CC_PRINTF("Adjust c (slack %d, div %d):", lambda, divv);
+    for (i=0; i<ecount; i++) CC_PRINTF(" %d", c->coef[i]);
+    CC_PRINTF(" <= %d\n", c->rhs);
+    CC_FFLUSH(stdout);
 #endif
     if (divv > 1) {
         lambda /= divv;
@@ -999,14 +999,14 @@ static int adjust (int ecount, CCchunk_ineq *a, CCchunk_ineq *c, int *y)
     c_lim = MULTLIMIT(mu);
     for (i=0; i<ecount; i++) {
         if (CC_OURABS(c->coef[i]) > c_lim || CC_OURABS(a->coef[i]) > a_lim) {
-            fprintf (stderr, "overflow in adjust: lambda %d mu %d\n", lambda,
+            CC_FPRINTF(stderr, "overflow in adjust: lambda %d mu %d\n", lambda,
                      mu);
             return LIFT_OVERFLOW;
         }
         c->coef[i] = mu * c->coef[i] - lambda * a->coef[i];
     }
     if (CC_OURABS(c->rhs) > c_lim || CC_OURABS(a->rhs) > a_lim) {
-        fprintf (stderr, "overflow in adjust: lambda %d mu %d\n", lambda,
+        CC_FPRINTF(stderr, "overflow in adjust: lambda %d mu %d\n", lambda,
                  mu);
         return LIFT_OVERFLOW;
     }
@@ -1073,7 +1073,7 @@ static int find_orthovec (CCchunk_graph *ch, CCchunk_intmat *mat,
     amat = CC_SAFE_MALLOC (unfixed, int);
     orthomat = CC_SAFE_MALLOC (unfixed, int);
     if (amat == (int *) NULL || orthomat == (int *) NULL) {
-        fprintf (stderr, "Out of memory in find_orthovec\n");
+        CC_FPRINTF(stderr, "Out of memory in find_orthovec\n");
         goto CLEANUP;
     }
 
@@ -1085,7 +1085,7 @@ static int find_orthovec (CCchunk_graph *ch, CCchunk_intmat *mat,
 
     rval = CCchunk_intmat_ortho (mat, orthomat, &ortho->rhs, amat);
     if (rval && rval != CC_CHUNK_INTMAT_NOORTHO) {
-        fprintf (stderr, "CCchunk_intmat_ortho failed\n");
+        CC_FPRINTF(stderr, "CCchunk_intmat_ortho failed\n");
     }
     if (rval == 0) {
         for (i=0, j=0; i<ecount; i++) {
@@ -1113,19 +1113,19 @@ static int tilt (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_ineq *cin,
 #ifdef DEBUG
     {
         int i;
-        printf ("Tilting:");
-        for (i=0; i<ecount; i++) printf (" %d", a->coef[i]);
-        printf (" <= %d\n", a->rhs);
-        printf ("by:");
-        for (i=0; i<ecount; i++) printf (" %d", cin->coef[i]);
-        printf (" <= %d\n", cin->rhs);
-        fflush (stdout);
+        CC_PRINTF("Tilting:");
+        for (i=0; i<ecount; i++) CC_PRINTF(" %d", a->coef[i]);
+        CC_PRINTF(" <= %d\n", a->rhs);
+        CC_PRINTF("by:");
+        for (i=0; i<ecount; i++) CC_PRINTF(" %d", cin->coef[i]);
+        CC_PRINTF(" <= %d\n", cin->rhs);
+        CC_FFLUSH(stdout);
     }
 #endif
 
     z = CC_SAFE_MALLOC (ecount, int);
     if (!z) {
-        fprintf (stderr, "Out of memory in tilt\n");
+        CC_FPRINTF(stderr, "Out of memory in tilt\n");
         return -1;
     }
 
@@ -1141,31 +1141,31 @@ static int tilt (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_ineq *cin,
             rval = 0;
             goto CLEANUP;
         } else if (rval == CC_CHUNK_ORACLE_SEARCHLIMITEXCEEDED) {
-            fprintf (stderr, "CCchunk_oracle node limit exceeded\n");
+            CC_FPRINTF(stderr, "CCchunk_oracle node limit exceeded\n");
             goto CLEANUP;
         } else if (rval) {
-            fprintf (stderr, "CCchunk_oracle failed\n");
+            CC_FPRINTF(stderr, "CCchunk_oracle failed\n");
             goto CLEANUP;
         }
 #ifdef DEBUG
         {
             int i;
-            printf ("tsp oracle found:");
+            CC_PRINTF("tsp oracle found:");
             for (i=0; i<ecount; i++) {
-                printf (" %d", z[i]);
+                CC_PRINTF(" %d", z[i]);
             }
-            printf ("\n");
-            fflush (stdout);
+            CC_PRINTF("\n");
+            CC_FFLUSH(stdout);
         }
 #endif
         mu = slack (ecount, a, z);
         if (mu < 0) {
-            fprintf (stderr, "ERROR - tilt found point with slack %d\n", mu);
+            CC_FPRINTF(stderr, "ERROR - tilt found point with slack %d\n", mu);
             rval = -1;
             goto CLEANUP;
         } else if (mu == 0) {
 #ifdef DEBUG
-            printf ("Didn't need to tilt\n");
+            CC_PRINTF("Didn't need to tilt\n");
 #endif
             copy_ineq (ecount, a, c);
             copy_tour (ecount, z, y);
@@ -1174,7 +1174,7 @@ static int tilt (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_ineq *cin,
         } else {
             rval = adjust (ecount, a, c, z);
             if (rval) {
-                fprintf (stderr, "adjust failed\n");
+                CC_FPRINTF(stderr, "adjust failed\n");
                 goto CLEANUP;
             }
             copy_tour (ecount, z, y);
@@ -1187,14 +1187,14 @@ static int tilt (CCchunk_graph *ch, CCchunk_ineq *a, CCchunk_ineq *cin,
     if (rval == 0) {
         int i;
 
-        printf ("Tilted to:");
-        for (i=0; i<ecount; i++) printf (" %d", c->coef[i]);
-        printf (" <= %d (viol %f)\n", c->rhs, -chunk_slack (ch, c));
-        printf ("Tilt found:");
+        CC_PRINTF("Tilted to:");
+        for (i=0; i<ecount; i++) CC_PRINTF(" %d", c->coef[i]);
+        CC_PRINTF(" <= %d (viol %f)\n", c->rhs, -chunk_slack (ch, c));
+        CC_PRINTF("Tilt found:");
         for (i=0; i<ecount; i++) {
-            printf (" %d", y[i]);
+            CC_PRINTF(" %d", y[i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 #endif
 
@@ -1231,7 +1231,7 @@ static int intmat_newpath (CCchunk_intmat *mat, CCchunk_graph *c, int *x)
 
     xmat = (int *) CC_SAFE_MALLOC (ecount, int);
     if (xmat == (int *) NULL) {
-        fprintf (stderr, "Out of memory in intmat_newpath\n");
+        CC_FPRINTF(stderr, "Out of memory in intmat_newpath\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1243,7 +1243,7 @@ static int intmat_newpath (CCchunk_intmat *mat, CCchunk_graph *c, int *x)
 
     rval = CCchunk_intmat_addrow (mat, xmat);
     if (rval) {
-        fprintf (stderr, "CCchunk_intmat_addrow failed\n");
+        CC_FPRINTF(stderr, "CCchunk_intmat_addrow failed\n");
         goto CLEANUP;
     }
 
@@ -1291,7 +1291,7 @@ static int paths_build (paths_info *p, int ncount)
         p->edge_dead == (int *) NULL ||
         p->pathend   == (int *) NULL) {
         paths_free (p);
-        fprintf (stderr, "Out of memory in paths_build\n");
+        CC_FPRINTF(stderr, "Out of memory in paths_build\n");
         return 1;
     }
     for (i=0; i<p->ncount; i++) {
@@ -1317,7 +1317,7 @@ static int paths_copy (paths_info *p1, paths_info *p2)
 
     rval = paths_build (p2, ncount);
     if (rval) {
-        fprintf (stderr, "paths_build failed\n");
+        CC_FPRINTF(stderr, "paths_build failed\n");
         goto CLEANUP;
     }
 
@@ -1392,7 +1392,7 @@ static void paths_newpath (paths_info *pinfo, CCchunk_graph *c,
                     j != pathend[i]) {
 #ifdef DEBUG
                     if (edge_dead[TRIMAT(i,j)] == 0) {
-                        printf ("edge %d-%d is dead\n", i, j);
+                        CC_PRINTF("edge %d-%d is dead\n", i, j);
                     }
 #endif
                     edge_dead[TRIMAT(i,j)] = 1;
@@ -1411,12 +1411,12 @@ static void report_facet (CCchunk_graph *ch, CCchunk_ineq *a)
     int i;
     int ecount = ch->ecount;
 
-    printf ("FACET: ");
+    CC_PRINTF("FACET: ");
     for (i=0; i<ecount; i++) {
-        printf ("%d ", a->coef[i]);
+        CC_PRINTF("%d ", a->coef[i]);
     }
-    printf ("<= %d (viol %f)\n", a->rhs, -chunk_slack(ch, a));
-    fflush (stdout);
+    CC_PRINTF("<= %d (viol %f)\n", a->rhs, -chunk_slack(ch, a));
+    CC_FFLUSH(stdout);
 }
 */
 
@@ -1431,29 +1431,29 @@ static int verify_cut (CCchunk_graph *ch, CCchunk_ineq *a, CCutil_timer *timer)
 
     for (i=0; i<ecount; i++) {
         if (a->coef[i] < 0) {
-            fprintf (stderr, "WHOA, SUPPOSED FACET HAS NEGATIVE COEFFICIENT\n");
+            CC_FPRINTF(stderr, "WHOA, SUPPOSED FACET HAS NEGATIVE COEFFICIENT\n");
             return -1;
         }
     }
     if (a->rhs <= 0) {
-        fprintf (stderr, "WHOA, SUPPOSED FACET HAS NONPOSITIVE RHS\n");
+        CC_FPRINTF(stderr, "WHOA, SUPPOSED FACET HAS NONPOSITIVE RHS\n");
         return -1;
     }
 
     for (i=0, k=0; i<ncount; i++) {
         if (ch->equality[i]) {
-            fprintf (stderr, "Verifying cut, equality %d, expected 0\n",
+            CC_FPRINTF(stderr, "Verifying cut, equality %d, expected 0\n",
                      ch->equality[i]);
             return -1;
         }
         for (j=0; j<i; j++) {
             if (ch->end0[k] != j || ch->end1[k] != i) {
-                fprintf (stderr, "Verifying cut, ends (%d,%d) expected (%d,%d)\n",
+                CC_FPRINTF(stderr, "Verifying cut, ends (%d,%d) expected (%d,%d)\n",
                          ch->end0[k], ch->end1[k],i,j);
                 return -1;
             }
             if (ch->fixed[k] != -1) {
-                fprintf (stderr, "Verifying cut, fixed %d, expected -1\n",
+                CC_FPRINTF(stderr, "Verifying cut, fixed %d, expected -1\n",
                          ch->fixed[k]);
                 return -1;
             }
@@ -1461,7 +1461,7 @@ static int verify_cut (CCchunk_graph *ch, CCchunk_ineq *a, CCutil_timer *timer)
         }
     }
     if (k != ecount) {
-        fprintf (stderr, "Verifying cut, ecount %d, expected %d\n", ecount, k);
+        CC_FPRINTF(stderr, "Verifying cut, ecount %d, expected %d\n", ecount, k);
         return -1;
     }
 
@@ -1469,7 +1469,7 @@ static int verify_cut (CCchunk_graph *ch, CCchunk_ineq *a, CCutil_timer *timer)
     rval = CCchunk_verify (ch, a);
     CCutil_stop_timer (timer, 0);
     if (rval) {
-        fprintf (stderr, "CCchunk_verify failed\n");
+        CC_FPRINTF(stderr, "CCchunk_verify failed\n");
         return rval;
     }
 
@@ -1497,7 +1497,7 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
 
     cnew = chunk_complete (ch, a, &anew);
     if (cnew == (CCchunk_graph *) NULL) {
-        fprintf (stderr, "chunk_complete failed\n");
+        CC_FPRINTF(stderr, "chunk_complete failed\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -1509,7 +1509,7 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
     for (i=0; i<ecount; i++) {
         if (anew.coef[i] == 0 && fixed[i] == -1) {
 #ifdef DEBUG
-            printf ("new edge %d-%d fixed at 0\n", cnew->end0[i],
+            CC_PRINTF("new edge %d-%d fixed at 0\n", cnew->end0[i],
                     cnew->end1[i]);
 #endif
             fixed[i] = 0;
@@ -1520,7 +1520,7 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
 
     xsol = CC_SAFE_MALLOC (ecount, int);
     if (xsol == (int *) NULL) {
-        fprintf (stderr, "Out of memory in liberate_fixed\n");
+        CC_FPRINTF(stderr, "Out of memory in liberate_fixed\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -1537,19 +1537,19 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
             CCutil_stop_timer (&timer->liberate_oracle, 0);
             if (rval) {
 /*
-                fprintf (stderr, "CCchunk_oracle failed in liberate_fixed\n");
+                CC_FPRINTF(stderr, "CCchunk_oracle failed in liberate_fixed\n");
 */
                 goto CLEANUP;
             }
 #ifdef DEBUG
-            printf ("Edge %d (%d-%d) was fixed at 1.  coef %d->%d, rhs %d->%d, tour:\n",
+            CC_PRINTF("Edge %d (%d-%d) was fixed at 1.  coef %d->%d, rhs %d->%d, tour:\n",
                     i, cnew->end0[i], cnew->end1[i], anew.coef[i],
                     anew.coef[i] + v0 - v1, anew.rhs, v0);
             for (j=0; j<ecount; j++) {
-                printf ("%d ", xsol[j]);
+                CC_PRINTF("%d ", xsol[j]);
             }
-            printf ("\n");
-            fflush (stdout);
+            CC_PRINTF("\n");
+            CC_FFLUSH(stdout);
 #endif /* DEBUG */
             anew.coef[i] += v0 - v1;
             anew.rhs = v0;
@@ -1559,7 +1559,7 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
                 xsol[i] = 0;
                 edge_dead[TRIMAT(cnew->end0[i],cnew->end1[i])] = 1;
 #ifdef DEBUG
-                printf ("surprise - fixed edge %d-%d killed\n",
+                CC_PRINTF("surprise - fixed edge %d-%d killed\n",
                         cnew->end0[i], cnew->end1[i]);
 #endif
             } else {
@@ -1589,19 +1589,19 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
             CCutil_stop_timer (&timer->liberate_oracle, 0);
             if (rval) {
 /*
-                fprintf (stderr, "CCchunk_oracle failed in liberate_fixed\n");
+                CC_FPRINTF(stderr, "CCchunk_oracle failed in liberate_fixed\n");
 */
                 goto CLEANUP;
             }
 #ifdef DEBUG
-            printf ("Edge %d (%d-%d) was fixed at 0.  coef %d->%d, rhs %d->%d, tour:\n",
+            CC_PRINTF("Edge %d (%d-%d) was fixed at 0.  coef %d->%d, rhs %d->%d, tour:\n",
                     i, cnew->end0[i], cnew->end1[i], anew.coef[i],
                     anew.coef[i] + v0 - v1, anew.rhs, v0);
             for (j=0; j<ecount; j++) {
-                printf ("%d ", xsol[j]);
+                CC_PRINTF("%d ", xsol[j]);
             }
-            printf ("\n");
-            fflush (stdout);
+            CC_PRINTF("\n");
+            CC_FFLUSH(stdout);
 #endif /* DEBUG */
             anew.coef[i] += v0 - v1;
             anew.rhs = v0;
@@ -1611,7 +1611,7 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
                 xsol[i] = 0;
                 edge_dead[TRIMAT(cnew->end0[i],cnew->end1[i])] = 1;
 #ifdef DEBUG
-                printf ("zero edge %d-%d killed\n", cnew->end0[i],
+                CC_PRINTF("zero edge %d-%d killed\n", cnew->end0[i],
                         cnew->end1[i]);
 #endif
             } else {
@@ -1641,7 +1641,7 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
 #ifdef EXTRA_VERIFY
     rval = verify_cut (cnew, &anew, &timer->verify_oracle);
     if (rval) {
-        fprintf (stderr, "verify_cut failed\n");
+        CC_FPRINTF(stderr, "verify_cut failed\n");
         goto CLEANUP;
     }
 #endif
@@ -1650,7 +1650,7 @@ static int liberate_fixed (CCchunk_graph *ch, CCchunk_ineq *a, paths_info *pinfo
     rval = collect_facet (cnew, &anew, callback, finished);
     CCutil_resume_timer (&timer->liberate_fixed);
     if (rval) {
-        fprintf (stderr, "collect_facet failed\n");
+        CC_FPRINTF(stderr, "collect_facet failed\n");
         goto CLEANUP;
     }
     rval = 0;
@@ -1677,18 +1677,18 @@ static int collect_facet (CCchunk_graph *ch, CCchunk_ineq *a,
 
     rval = build_graph (ch, a, &nodes, &alladj, &allcoef);
     if (rval) {
-        fprintf (stderr, "build_graph failed\n");
+        CC_FPRINTF(stderr, "build_graph failed\n");
         goto CLEANUP;
     }
 
     rval = strip_graph (ch, ch->ncount, nodes, callback, -2*a->rhs, finished);
     if (rval) {
-        fprintf (stderr, "strip_graph failed\n");
+        CC_FPRINTF(stderr, "strip_graph failed\n");
         goto CLEANUP;
     }
 
 #ifdef DUMP_FACETS
-    printf (" (viol %.6f)\n", -chunk_slack (ch, a));
+    CC_PRINTF(" (viol %.6f)\n", -chunk_slack (ch, a));
 #endif
 
     rval = 0;
@@ -1720,12 +1720,12 @@ static int lpcut_add_clique (int *arr, int size, void *u_data)
     rval = CCutil_reallocrus_count ((void **) &(c->cliques), c->cliquecount+1,
                                     sizeof (c->cliques[0]));
     if (rval) {
-        fprintf (stderr, "couldn't realloc cliques\n");
+        CC_FPRINTF(stderr, "couldn't realloc cliques\n");
         return rval;
     }
     rval = CCtsp_array_to_lpclique (arr, size, &(c->cliques[c->cliquecount]));
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
         return rval;
     }
     c->cliquecount++;
@@ -1749,7 +1749,7 @@ static int lpcut_finish (int rhs, int *finished, void *u_data)
     
     rval = CCtsp_construct_skeleton (c, CCtsp_max_node (c));
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         return rval;
     }
 
@@ -1776,7 +1776,7 @@ int CCchunk_ineq_to_lpcut_in (int ncount, int ecount, int *elist, int *ecoef,
 
     rval = CCchunk_ineq_to_cut (ncount, ecount, elist, ecoef, rhs, 0, &ccb);
     if (rval) {
-        fprintf (stderr, "CCchunk_ineq_to_cut failed\n");
+        CC_FPRINTF(stderr, "CCchunk_ineq_to_cut failed\n");
         CCtsp_free_lpcut_in (c);
     }
     return rval;
@@ -1805,7 +1805,7 @@ int CCchunk_ineq_to_cut (int ncount, int ecount, int *elist, int *ecoef,
     if (nodes == (stripnode *) NULL ||
         alladj == (int *) NULL ||
         allcoef == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCchunk_ineq_to_cut\n");
+        CC_FPRINTF(stderr, "Out of memory in CCchunk_ineq_to_cut\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -1897,7 +1897,7 @@ int CCchunk_ineq_to_cut (int ncount, int ecount, int *elist, int *ecoef,
 
     rval = strip_graph_nomembers (ncount, nodes, callback, -2*rhs, &finished);
     if (rval) {
-        fprintf (stderr, "strip_graph_nomembers failed\n");
+        CC_FPRINTF(stderr, "strip_graph_nomembers failed\n");
         goto CLEANUP;
     }
 
@@ -1923,7 +1923,7 @@ static int strip_graph (CCchunk_graph *ch, int nnodes, stripnode *nodes,
 
     rval = (*callback->begin_cut) (callback->u_data);
     if (rval) {
-        fprintf (stderr, "callback begin_cut failed\n");
+        CC_FPRINTF(stderr, "callback begin_cut failed\n");
         goto CLEANUP;
     }
 
@@ -1933,7 +1933,7 @@ static int strip_graph (CCchunk_graph *ch, int nnodes, stripnode *nodes,
     if (!work1) goto CLEANUP;
 
 #ifdef DUMP_FACETS
-    printf ("FACET: ");
+    CC_PRINTF("FACET: ");
 #endif
 
     while (1) {
@@ -1942,22 +1942,22 @@ static int strip_graph (CCchunk_graph *ch, int nnodes, stripnode *nodes,
             CC_FREE (work1, int);
             CC_FREE (maxclique, int);
 #ifdef DUMP_FACETS
-            printf (" >= %d", rhs);
+            CC_PRINTF(" >= %d", rhs);
 #endif
             rval = (*callback->finish_cut) (rhs, finished, callback->u_data);
             if (rval) {
-                fprintf (stderr, "callback finish_cut failed\n");
+                CC_FPRINTF(stderr, "callback finish_cut failed\n");
                 goto CLEANUP;
             }
             return 0;
         }
 #ifdef  DUMP_FACETS
-        printf ("(");
+        CC_PRINTF("(");
         for (i=0; i<deg; i++) {
-            printf ("%d",maxclique[i]);
-            if (i+1<deg) printf (" ");
+            CC_PRINTF("%d",maxclique[i]);
+            if (i+1<deg) CC_PRINTF(" ");
         }
-        printf (")");
+        CC_PRINTF(")");
 #endif
         for (i=0, cliquesize=0; i<deg; i++) {
             for (p = ch->members[maxclique[i]]; *p != -1; p++) {
@@ -1967,7 +1967,7 @@ static int strip_graph (CCchunk_graph *ch, int nnodes, stripnode *nodes,
         rhs += 2*deg;
         rval = (*callback->add_clique) (work1, cliquesize, callback->u_data);
         if (rval) {
-            fprintf (stderr, "callback add_clique failed\n");
+            CC_FPRINTF(stderr, "callback add_clique failed\n");
             goto CLEANUP;
         }
     }
@@ -1989,7 +1989,7 @@ static int strip_graph_nomembers (int nnodes, stripnode *nodes,
 
     rval = (*callback->begin_cut) (callback->u_data);
     if (rval) {
-        fprintf (stderr, "callback begin_cut failed\n");
+        CC_FPRINTF(stderr, "callback begin_cut failed\n");
         goto FAILURE;
     }
 
@@ -2005,7 +2005,7 @@ static int strip_graph_nomembers (int nnodes, stripnode *nodes,
             CC_FREE (maxclique, int);
             rval = (*callback->finish_cut) (rhs, finished, callback->u_data);
             if (rval) {
-                fprintf (stderr, "callback finish_cut failed\n");
+                CC_FPRINTF(stderr, "callback finish_cut failed\n");
                 goto FAILURE;
             }
             return 0;
@@ -2013,7 +2013,7 @@ static int strip_graph_nomembers (int nnodes, stripnode *nodes,
         rhs += 2*deg;
         rval = (*callback->add_clique) (maxclique, deg, callback->u_data);
         if (rval) {
-            fprintf (stderr, "callback add_clique failed\n");
+            CC_FPRINTF(stderr, "callback add_clique failed\n");
             goto FAILURE;
         }
     }
@@ -2074,7 +2074,7 @@ static int strip_maxclique (int nnodes, stripnode *nodes, int *maxclique,
                     }
                 }
                 if (size != k) {
-                    fprintf (stderr, "Size mismatch 1\n");
+                    CC_FPRINTF(stderr, "Size mismatch 1\n");
                     simpsize = k;
                 }
             } else if (mindeg > size-1 && size > nonsize) {
@@ -2087,7 +2087,7 @@ static int strip_maxclique (int nnodes, stripnode *nodes, int *maxclique,
                     }
                 }
                 if (size != k) {
-                    fprintf (stderr, "Size mismatch 2\n");
+                    CC_FPRINTF(stderr, "Size mismatch 2\n");
                     nonsize = k;
                 }
                 for (ia=0; ia<nodes[i].nadj; ia++) {
@@ -2211,10 +2211,10 @@ static void print_vector (int ecount, int v[])
     int i;
 
     for (i=0; i<ecount; i++) {
-        printf ("%d ", v[i]);
+        CC_PRINTF("%d ", v[i]);
     }
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 }
 
 static void print_ineq (int ecount, CCchunk_ineq *a)
@@ -2222,9 +2222,9 @@ static void print_ineq (int ecount, CCchunk_ineq *a)
     int i;
 
     for (i=0; i<ecount; i++) {
-        printf ("%d ", a->coef[i]);
+        CC_PRINTF("%d ", a->coef[i]);
     }
-    printf ("<= %d\n", a->rhs);
-    fflush (stdout);
+    CC_PRINTF("<= %d\n", a->rhs);
+    CC_FFLUSH(stdout);
 }
 */

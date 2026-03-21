@@ -98,7 +98,7 @@ int doit( int scount, int *slist, dat, int *tour, int ncount )
       /* Take set of edges from the big tour */
       int big_tour_snode = big_tournr[snode];
       if (small_nr[tour[big_tour_snode]] != snode) 
-	printf("Something is wrong !!\n");
+	CC_PRINTF("Something is wrong !!\n");
 
       i2 = big_tour_snode;
       do { /** loop until we are at a node inside subset again */
@@ -112,7 +112,7 @@ int doit( int scount, int *slist, dat, int *tour, int ncount )
 	  new_tour[j++] = tour[i2];
 	} while (in_out[tour[i2]]==0);
 	if (small_nr[tour[i2]] != next_snode) {
-	  printf("Something is wrong II !!\n");	  
+	  CC_PRINTF("Something is wrong II !!\n");	  
 	}
       }
       else {
@@ -123,7 +123,7 @@ int doit( int scount, int *slist, dat, int *tour, int ncount )
 	  new_tour[j++] = tour[i2];
 	} while (in_out[tour[i2]]==0);
 	if (small_nr[tour[i2]] != next_snode) {
-	  printf("Something is wrong III !!\n");	  
+	  CC_PRINTF("Something is wrong III !!\n");	  
 	}
       }
     }

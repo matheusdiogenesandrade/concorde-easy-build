@@ -332,37 +332,37 @@ void CCtsp_free_branchobj (CCtsp_branchobj *b)
 void CCtsp_print_branchhistory (CCtsp_lp *lp)
 {
     int j;
-    printf ("Branch History\n"); fflush (stdout);
+    CC_PRINTF("Branch History\n"); CC_FFLUSH(stdout);
     if (lp->branchdepth == 0) {
-        printf ("    Root Node\n");
+        CC_PRINTF("    Root Node\n");
     } else {
         for (j = 0; j < lp->branchdepth; j++) {
-            printf ("    ");
+            CC_PRINTF("    ");
             print_branchobj (&lp->branchhistory[j]);
         }
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 }
 
 static void print_branchobj (CCtsp_branchobj *b)
 {
     int i;
 
-    printf ("Depth %d:  ", b->depth);
+    CC_PRINTF("Depth %d:  ", b->depth);
     if (b->ends[0] != -1) {
-        printf ("Edge (%d,%d) set to %d\n", b->ends[0], b->ends[1], b->rhs);
+        CC_PRINTF("Edge (%d,%d) set to %d\n", b->ends[0], b->ends[1], b->rhs);
     } else {
-        printf ("Clique ");
+        CC_PRINTF("Clique ");
         for (i = 0; i < b->clique->segcount; i++) {
-            printf ("%d->%d ", b->clique->nodes[i].lo, b->clique->nodes[i].hi);
+            CC_PRINTF("%d->%d ", b->clique->nodes[i].lo, b->clique->nodes[i].hi);
         }
         if (b->sense == 'L') {
-            printf ("at most %d\n", b->rhs);
+            CC_PRINTF("at most %d\n", b->rhs);
         } else {
-            printf ("at least %d\n", b->rhs);
+            CC_PRINTF("at least %d\n", b->rhs);
         }
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 }
 
 int CCtsp_find_branch (CCtsp_lp *lp, int nwant, int *ngot,
@@ -385,41 +385,41 @@ int CCtsp_find_branch (CCtsp_lp *lp, int nwant, int *ngot,
     if (cyc) *cyc = (int *) NULL;
 
     if (nwant <= 0) {
-        fprintf (stderr, "CCtsp_find_branch called with no nwant\n");
+        CC_FPRINTF(stderr, "CCtsp_find_branch called with no nwant\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_find_branch_edge (lp, &n0, &n1, val, cyc,
                                    CCtsp_BRANCH_MIDDLE, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_find_branch_edge failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_find_branch_edge failed\n"); goto CLEANUP;
     }
 
     if (n0 == -1 && n1 == -1) {
         if (!silent) {
-            printf ("Integral solution: %f\n", *val); fflush (stdout);
+            CC_PRINTF("Integral solution: %f\n", *val); CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
 
     rval = find_strongbranch_edges (lp, nwant, &egot, &elist, &eval, silent);
     if (rval) {
-        fprintf (stderr, "find_strongbranch_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "find_strongbranch_edges failed\n"); goto CLEANUP;
     }
 
     if (longedge_branching || usecliques) {
         rval = CCtsp_find_branch_cliques (lp, nwant, longedge_branching,
                                           &cgot, &clist, &cval, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_find_branch_cliques failed\n");
+            CC_FPRINTF(stderr, "CCtsp_find_branch_cliques failed\n");
             goto CLEANUP;
         }
         if (!silent) {
-            printf ("Cliques found:\n"); fflush (stdout);
+            CC_PRINTF("Cliques found:\n"); CC_FFLUSH(stdout);
             for (i = 0; i < cgot; i++) {
                 CCtsp_print_lpclique (&clist[i]);
             }
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
 
@@ -427,18 +427,18 @@ int CCtsp_find_branch (CCtsp_lp *lp, int nwant, int *ngot,
         rval = merge_edge_clique (lp, nwant, ngot, bobj, egot, elist, eval,
                                                          cgot, clist, cval);
         if (rval) {
-            fprintf (stderr, "merge_edge_clique failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "merge_edge_clique failed\n"); goto CLEANUP;
         }
     } else {
         CCtsp_branchobj *b;
         if (!silent) {
-            printf ("found no edges or cliques, use the middle branch edge\n");
-            fflush (stdout);
+            CC_PRINTF("found no edges or cliques, use the middle branch edge\n");
+            CC_FFLUSH(stdout);
         }
 
         b = CC_SAFE_MALLOC (1, CCtsp_branchobj);
         if (!b) {
-            fprintf (stderr, "out of memory in CCtsp_find_branch\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_find_branch\n");
             rval = 1; goto CLEANUP;
         }
         CCtsp_init_branchobj (b);
@@ -486,12 +486,12 @@ int CCtsp_find_fast_branch (CCtsp_lp *lp, int *ngot, CCtsp_branchobj **bobj,
     rval = CCtsp_find_branch_edge (lp, &n0, &n1, val, cyc,
                                    CCtsp_BRANCH_MIDDLE, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_find_branch_edge failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_find_branch_edge failed\n"); goto CLEANUP;
     }
 
     if (n0 == -1 && n1 == -1) {
         if (!silent) {
-            printf ("Integral solution: %f\n", *val); fflush (stdout);
+            CC_PRINTF("Integral solution: %f\n", *val); CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
@@ -500,23 +500,23 @@ int CCtsp_find_fast_branch (CCtsp_lp *lp, int *ngot, CCtsp_branchobj **bobj,
         if (longedge_branching) {
             rval = find_longedge_cliques2 (lp, 10, &ccount, &cliques, silent);
             if (rval) {
-                fprintf (stderr, "find_longedge_cliques failed\n");
+                CC_FPRINTF(stderr, "find_longedge_cliques failed\n");
                 goto CLEANUP;
             }
         } else {
             rval = find_candidate_cliques (lp, 10, &ccount, &cliques, 1, silent);
             if (rval) {
-                fprintf (stderr, "find_candidate_cliques failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "find_candidate_cliques failed\n"); goto CLEANUP;
             }
         }
         if (!silent) {
-            printf ("Found %d candidate cliques\n", ccount); fflush (stdout);
+            CC_PRINTF("Found %d candidate cliques\n", ccount); CC_FFLUSH(stdout);
         }
     }
 
     b = CC_SAFE_MALLOC (1, CCtsp_branchobj);
     if (!b) {
-        fprintf (stderr, "out of memory in CCtsp_find_branch\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_find_branch\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_init_branchobj (b);
@@ -527,7 +527,7 @@ int CCtsp_find_fast_branch (CCtsp_lp *lp, int *ngot, CCtsp_branchobj **bobj,
     if (ccount) {
         rval = CClp_get_warmstart (lp->lp, &warmstart);
         if (rval) {
-            fprintf (stderr, "CClp_get_warmstart failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CClp_get_warmstart failed\n"); goto CLEANUP;
         }
         for (i = 0; i < ccount; i++) {
             double st;
@@ -536,14 +536,14 @@ int CCtsp_find_fast_branch (CCtsp_lp *lp, int *ngot, CCtsp_branchobj **bobj,
             rval = test_cut_branch (lp, &cliques[i], &down, &up, 25, silent,
                                     warmstart);
             if (rval) {
-                fprintf (stderr, "test_cut_branch failed\n");
+                CC_FPRINTF(stderr, "test_cut_branch failed\n");
                 goto CLEANUP;
             }
             st = CCutil_stop_timer (&timer, 0);
             if (!silent) {
-                printf ("SB CLIQUE %d:  %f  %f  (%.2f seconds)\n",
+                CC_PRINTF("SB CLIQUE %d:  %f  %f  (%.2f seconds)\n",
                            i, down, up, st);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             sval = TSP_BRANCH_STRONG_VAL (down, up);
             if (sval > bestval) {
@@ -554,21 +554,21 @@ int CCtsp_find_fast_branch (CCtsp_lp *lp, int *ngot, CCtsp_branchobj **bobj,
 
         rval = CClp_opt (lp->lp, CClp_METHOD_DUAL);
         if (rval) {
-            fprintf (stderr, "CClp_opt failed\n");
+            CC_FPRINTF(stderr, "CClp_opt failed\n");
         }
 
         if (besti == -1) {
-            fprintf (stderr, "ERROR in CCtsp_find_fast_branch\n");
+            CC_FPRINTF(stderr, "ERROR in CCtsp_find_fast_branch\n");
             rval = 1; goto CLEANUP;
         } else {
             b->clique = CC_SAFE_MALLOC (1, CCtsp_lpclique);
             if (!b->clique) {
-                fprintf (stderr, "out of memory in merge_edge_clique\n");
+                CC_FPRINTF(stderr, "out of memory in merge_edge_clique\n");
                 rval = 1; goto CLEANUP;
             }
             rval = CCtsp_copy_lpclique (&(cliques[besti]), b->clique);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_clique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_clique failed\n");
                 CC_FREE (b, CCtsp_branchobj);
                 goto CLEANUP;
             }
@@ -681,7 +681,7 @@ static int checkclique (CCtsp_lp *lp, CCtsp_lpclique *cliq, double delta,
         inlen == (int *) NULL || outlen == (int *) NULL ||
         inperm == (int *) NULL || outperm == (int *) NULL ||
         innodes == (ds_node *) NULL) {
-        fprintf (stderr, "Out of memory in checkclique\n");
+        CC_FPRINTF(stderr, "Out of memory in checkclique\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -732,9 +732,9 @@ static int checkclique (CCtsp_lp *lp, CCtsp_lpclique *cliq, double delta,
         *downpen = (((delta - 2.0) / 2.0) * edges[e].len);
     }
 #ifdef DEBUG
-    printf ("clique ");
+    CC_PRINTF("clique ");
     CCtsp_print_lpclique (cliq);
-    printf ("delta %.6f outlen %d inlen %d uppen %.6f downpen %.6f\n",
+    CC_PRINTF("delta %.6f outlen %d inlen %d uppen %.6f downpen %.6f\n",
             delta, outlen[outperm[0]], edges[e].len, *uppen, *downpen);
 #endif
     
@@ -769,7 +769,7 @@ static int newclique (int nwant, CCtsp_lpclique *clist, double *cval,
         CCtsp_free_lpclique (&clist[bin]);
         rval = CCtsp_copy_lpclique (c, &clist[bin]);
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
             return rval;
         }
     }
@@ -815,7 +815,7 @@ static int build_le_graph (le_graph *g, int nnodes, int nedges, int *elist,
         g->edges == (le_edge *) NULL ||
         g->adjs  == (le_adj *)  NULL ||
         perm     == (int *)     NULL) {
-        fprintf (stderr, "Out of memory in build_le_graph\n");
+        CC_FPRINTF(stderr, "Out of memory in build_le_graph\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1010,7 +1010,7 @@ static int newclique2 (int nwant, CCtsp_lpclique *clist, double *cval,
 
         rval = CCtsp_array_to_lpclique (workarr, cnt, &clist[bin]);
         if (rval) {
-            fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
             return rval;
         }
         penalties[bin] = *pen;
@@ -1293,11 +1293,11 @@ static int le_getcliques (int ncnt, le_node **nodes, le_info *le_dat)
             return rval;
         }
         
-        printf ("clique ");
+        CC_PRINTF("clique ");
         CCtsp_print_lpclique (&cliq);
-        printf ("delta %.6f outlen %d inlen %d uppen %.6f downpen %.6f\n",
+        CC_PRINTF("delta %.6f outlen %d inlen %d uppen %.6f downpen %.6f\n",
                 delta, outlen, inlen, uppen, downpen);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         CCtsp_free_lpclique (&cliq);
         CC_IFFREE (arr, int);
     }
@@ -1310,7 +1310,7 @@ static int le_getcliques (int ncnt, le_node **nodes, le_info *le_dat)
                        downpen, uppen, le_dat->workarr, &pen,
                        le_dat->penalties);
     if (rval) {
-        fprintf (stderr, "newclique2 failed\n");
+        CC_FPRINTF(stderr, "newclique2 failed\n");
         return rval;
     }
 
@@ -1337,7 +1337,7 @@ static int le_foreach_clique (le_graph *g, int (*func)(int ncnt,
         cnodes[1] = edges[i].ends[1];
         rval = (*func)(2, cnodes, le_dat);
         if(rval) {
-            fprintf(stderr, "le_foreach_clique callback failed\n");
+            CC_FPRINTF(stderr, "le_foreach_clique callback failed\n");
             return rval;
         }
     }
@@ -1355,7 +1355,7 @@ static int le_foreach_clique (le_graph *g, int (*func)(int ncnt,
                     }
                     rval = (*func)(3, cnodes, le_dat);
                     if (rval) {
-                        fprintf (stderr, "le_foreach_clique callback failed\n");
+                        CC_FPRINTF(stderr, "le_foreach_clique callback failed\n");
                         return rval;
                     }
                 }
@@ -1367,11 +1367,11 @@ static int le_foreach_clique (le_graph *g, int (*func)(int ncnt,
     for(i = 0; i < nedges && nnodes >= 4; i++) {
         if(edges[i].live) {
             if(edges[i].ends[0] == edges[i].ends[1]) {
-                fprintf(stderr, "Whoops, trying to contract self-loop\n");
+                CC_FPRINTF(stderr, "Whoops, trying to contract self-loop\n");
                 continue;
             }
 #ifdef DEBUG
-            printf ("contracting %d: %d - %d\n",
+            CC_PRINTF("contracting %d: %d - %d\n",
                     i, edges[i].ends[0]->number, edges[i].ends[1]->number);
 #endif /* DEBUG */
             n = le_contract(edges[i].ends[0], edges[i].ends[1]);
@@ -1381,7 +1381,7 @@ static int le_foreach_clique (le_graph *g, int (*func)(int ncnt,
                     cnodes[1] = a->this->ends[1];
                     rval = (*func)(2, cnodes, le_dat);
                     if(rval) {
-                        fprintf(stderr, "le_foreach_clique callback failed\n");
+                        CC_FPRINTF(stderr, "le_foreach_clique callback failed\n");
                         return rval;
                     }
 #ifdef LONGEDGE_TRIANGLES
@@ -1391,7 +1391,7 @@ static int le_foreach_clique (le_graph *g, int (*func)(int ncnt,
                                 cnodes[2] = LE_OTHEREND (b->this, n);
                                 rval = (*func) (3, cnodes, le_dat);
                                 if (rval) {
-                                    fprintf (stderr, "le_foreach_clique callback failed\n");
+                                    CC_FPRINTF(stderr, "le_foreach_clique callback failed\n");
                                     return rval;
                                 }
                             }
@@ -1403,7 +1403,7 @@ static int le_foreach_clique (le_graph *g, int (*func)(int ncnt,
                                 if (cnodes[2] != n) {
                                     rval = (*func) (3, cnodes, le_dat);
                                     if (rval) {
-                                        fprintf (stderr, "le_foreach_clique callback failed\n");
+                                        CC_FPRINTF(stderr, "le_foreach_clique callback failed\n");
                                         return rval;
                                     }
                                 }
@@ -1446,11 +1446,11 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
     CCutil_start_timer (&timer);
 
     if (!silent) {
-        printf ("Finding long-edge cliques\n"); fflush (stdout);
+        CC_PRINTF("Finding long-edge cliques\n"); CC_FFLUSH(stdout);
     }
     
     if (nwant <= 0) {
-        fprintf (stderr, "find_longedge_cliques called with no nwant\n");
+        CC_FPRINTF(stderr, "find_longedge_cliques called with no nwant\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1458,19 +1458,19 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
                                 &xlist, &x, (double **) NULL,
                                 (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
         goto CLEANUP;
     }
 
     if (xcount != lp->graph.ecount) {
-        fprintf (stderr, "Whoops, xcount %d ecount %d\n", xcount,
+        CC_FPRINTF(stderr, "Whoops, xcount %d ecount %d\n", xcount,
                  lp->graph.ecount);
         rval = 1; goto CLEANUP;
     }
 
     len = CC_SAFE_MALLOC (xcount, int);
     if (len == (int *) NULL) {
-        fprintf (stderr, "Out of memory in find_longedge_cliques\n");
+        CC_FPRINTF(stderr, "Out of memory in find_longedge_cliques\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<xcount; i++) {
@@ -1480,7 +1480,7 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
 #if 0
     rval = build_le_graph (&g, ncount, xcount, xlist, len, x);
     if (rval) {
-        fprintf (stderr, "build_le_graph failed\n");
+        CC_FPRINTF(stderr, "build_le_graph failed\n");
         goto CLEANUP;
     }
 
@@ -1489,14 +1489,14 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
     
     rval = le_foreach_clique (&g, le_findmax, &le_dat);
     if (rval) {
-        fprintf (stderr, "le_foreach_clique failed\n");
+        CC_FPRINTF(stderr, "le_foreach_clique failed\n");
         goto CLEANUP;
     }
 
 /*
     rval = le_foreach_clique2 (&g, lp->dat, le_findmax, &le_dat);
     if (rval) {
-        fprintf (stderr, "le_foreach_clique2 failed\n");
+        CC_FPRINTF(stderr, "le_foreach_clique2 failed\n");
         goto CLEANUP;
     }
 */
@@ -1520,7 +1520,7 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
         cval == (double *) NULL ||
         penalties == (le_penalty *) NULL ||
         workarr == (int *) NULL) {
-        fprintf (stderr, "Out of memory in find_longedge_cliques\n");
+        CC_FPRINTF(stderr, "Out of memory in find_longedge_cliques\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1537,13 +1537,13 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
     
     rval = build_le_graph (&g, ncount, xcount, xlist, len, x);
     if (rval) {
-        fprintf (stderr, "build_le_graph failed\n");
+        CC_FPRINTF(stderr, "build_le_graph failed\n");
         goto CLEANUP;
     }
 
     rval = le_foreach_clique (&g, le_getcliques, &le_dat);
     if (rval) {
-        fprintf (stderr, "le_foreach_clique failed\n");
+        CC_FPRINTF(stderr, "le_foreach_clique failed\n");
         goto CLEANUP;
     }
 
@@ -1563,7 +1563,7 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
 
     *list = CC_SAFE_MALLOC (k, CCtsp_lpclique);
     if (!(*list)) {
-        fprintf (stderr, "Out of memory in find_longedge_cliques\n");
+        CC_FPRINTF(stderr, "Out of memory in find_longedge_cliques\n");
         rval = 1; goto CLEANUP;
     }
     *ngot = k;
@@ -1572,20 +1572,20 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
         if (cval[i] >= 0.0) {
             if (!silent) {
                 int j;
-                printf ("%d: (%.6f) ", i, cval[i]);
+                CC_PRINTF("%d: (%.6f) ", i, cval[i]);
                 CCtsp_print_lpclique (&clist[i]);
-                printf ("%d: delta %.6f inlen %d outlen %d uppen_bad %.6f downpen_bad %.6f uppen %.6f downpen %.6f uppen2 %.6f downpen2 %.6f uppen3 %.6f downpen3 %.6f uppen4 %.6f downpen4 %.6f\n",
+                CC_PRINTF("%d: delta %.6f inlen %d outlen %d uppen_bad %.6f downpen_bad %.6f uppen %.6f downpen %.6f uppen2 %.6f downpen2 %.6f uppen3 %.6f downpen3 %.6f uppen4 %.6f downpen4 %.6f\n",
                     i, penalties[i].delta, penalties[i].inlen, penalties[i].outlen,
                     penalties[i].uppen_bad, penalties[i].downpen_bad, 
                     penalties[i].uppen, penalties[i].downpen, 
                     penalties[i].uppen2, penalties[i].downpen2, 
                     penalties[i].uppen3, penalties[i].downpen3, 
                     penalties[i].uppen4, penalties[i].downpen4);
-                printf ("%d: nodes", i);
+                CC_PRINTF("%d: nodes", i);
                 for (j=0; j<penalties[i].ncnt && j < 4; j++) {
-                    printf (" %d", penalties[i].nodes[j]);
+                    CC_PRINTF(" %d", penalties[i].nodes[j]);
                 }
-                printf ("\n");
+                CC_PRINTF("\n");
             }
             (*list)[k] = clist[i];
             k++;
@@ -1594,8 +1594,8 @@ static int find_longedge_cliques2 (CCtsp_lp *lp, int nwant, int *ngot,
 
     st = CCutil_stop_timer (&timer, 0);
     if (!silent) {
-        printf ("%d long-edge cliques found in %.2f seconds\n", *ngot, st);
-        fflush (stdout);
+        CC_PRINTF("%d long-edge cliques found in %.2f seconds\n", *ngot, st);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (clist, CCtsp_lpclique);
@@ -1632,13 +1632,13 @@ static int merge_edge_clique (CCtsp_lp *lp, int nwant, int *ngot,
     *bobj = (CCtsp_branchobj *) NULL;
 
     if (ecount + ccount == 0) {
-        fprintf (stderr, "no elements in merge_edge_clique\n");
+        CC_FPRINTF(stderr, "no elements in merge_edge_clique\n");
         rval = 1; goto CLEANUP;
     }
 
     slist = CC_SAFE_MALLOC (nwant + 1, sbitem);
     if (!slist) {
-        fprintf (stderr, "out of memory in merge_edge_clique\n");
+        CC_FPRINTF(stderr, "out of memory in merge_edge_clique\n");
         rval = 1; goto CLEANUP;
     }
     init_sblist (slist, nwant);
@@ -1656,13 +1656,13 @@ static int merge_edge_clique (CCtsp_lp *lp, int nwant, int *ngot,
         }
     }
     if (k == 0) {
-        fprintf (stderr, "nothing appeares in merge_edge_clique\n");
+        CC_FPRINTF(stderr, "nothing appeares in merge_edge_clique\n");
         rval = 1; goto CLEANUP;
     }
 
     *bobj = CC_SAFE_MALLOC (k, CCtsp_branchobj);
     if (!(*bobj)) {
-        fprintf (stderr, "out of memory in merge_edge_clique\n");
+        CC_FPRINTF(stderr, "out of memory in merge_edge_clique\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1676,14 +1676,14 @@ static int merge_edge_clique (CCtsp_lp *lp, int nwant, int *ngot,
             } else {
                 b->clique = CC_SAFE_MALLOC (1, CCtsp_lpclique);
                 if (!b->clique) {
-                    fprintf (stderr, "out of memory in merge_edge_clique\n");
+                    CC_FPRINTF(stderr, "out of memory in merge_edge_clique\n");
                     rval = 1; goto CLEANUP;
                 } else {
                     rval = CCtsp_copy_lpclique (&clist[slist[i].name - ecount],
                                                 b->clique);
                 }
                 if (!b->clique || rval) {
-                    fprintf (stderr, "CCtsp_copy_clique failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_copy_clique failed\n");
                     for (i = 0; i < k; i++) {
                         if ((*bobj)[i].clique) {
                             CCtsp_free_lpclique ((*bobj)[i].clique);
@@ -1729,7 +1729,7 @@ int CCtsp_check_integral (CCtsp_lp *lp, double *val, int **cyc, int *yesno,
                           &xlist, &x, (double **) NULL, (double **) NULL,
                           (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n"); goto CLEANUP;
     }
 
     for (i = 0; i < xcount; i++) {
@@ -1742,7 +1742,7 @@ int CCtsp_check_integral (CCtsp_lp *lp, double *val, int **cyc, int *yesno,
 
     elist = CC_SAFE_MALLOC (2*ncount, int);
     if (!elist) {
-        fprintf (stderr, "out of memory in CCtsp_check_integral\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_check_integral\n");
     }
     ecount = 0;
 
@@ -1750,7 +1750,7 @@ int CCtsp_check_integral (CCtsp_lp *lp, double *val, int **cyc, int *yesno,
         if (x[i] > CCtsp_INTTOL) {
             j = CCtsp_find_edge (&lp->graph, xlist[2*i], xlist[2*i+1]);
             if (j < 0) {
-                fprintf (stderr, "x edge not in graph\n");
+                CC_FPRINTF(stderr, "x edge not in graph\n");
                 rval = 1; goto CLEANUP;
             }
             eval += ((double) lp->graph.edges[j].len);
@@ -1762,33 +1762,33 @@ int CCtsp_check_integral (CCtsp_lp *lp, double *val, int **cyc, int *yesno,
     rval = CCcut_connect_components (ncount, ecount, elist, (double *) NULL,
                                      &ncomp, &compscount, &comps);
     if (rval) {
-        fprintf (stderr, "CCcut_connect_components failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_connect_components failed\n"); goto CLEANUP;
     }
     if (ncomp > 1) {
         if (!silent) {
-            printf ("integral solution not connected\n"); fflush (stdout);
+            CC_PRINTF("integral solution not connected\n"); CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
     if (!silent) {
-        printf ("Integral Solution of Value %.2f\n", eval); fflush (stdout);
+        CC_PRINTF("Integral Solution of Value %.2f\n", eval); CC_FFLUSH(stdout);
     }
 
     if (cyc) {
         int istour;
         *cyc = CC_SAFE_MALLOC (ncount, int);
         if (!(*cyc)) {
-            fprintf (stderr, "out of memory in CCtsp_check_integral\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_check_integral\n");
             rval = 1; goto CLEANUP;
         }
         rval = CCutil_edge_to_cycle (ncount, elist, &istour, *cyc);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n");
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n");
             CC_FREE (*cyc, int);
             goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: integral, connected solution not tour\n");
+            CC_FPRINTF(stderr, "ERROR: integral, connected solution not tour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -1824,13 +1824,13 @@ int CCtsp_find_branch_edge (CCtsp_lp *lp, int *n0, int *n1, double *val,
 
     rval = CCtsp_check_integral (lp, val, cyc, &test, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_check_integral failed\n");
+        CC_FPRINTF(stderr, "CCtsp_check_integral failed\n");
         goto CLEANUP;
     }
     if (test) {
         if (!silent) {
-            printf ("Integral solution detected in CCtsp_find_branch_edge\n");
-            fflush (stdout);
+            CC_PRINTF("Integral solution detected in CCtsp_find_branch_edge\n");
+            CC_FFLUSH(stdout);
         }
         *n0 = -1;
         *n1 = -1;
@@ -1841,7 +1841,7 @@ int CCtsp_find_branch_edge (CCtsp_lp *lp, int *n0, int *n1, double *val,
                           &xlist, &x, (double **) NULL, (double **) NULL,
                           (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n"); goto CLEANUP;
     }
 
     besti = -1;
@@ -1850,7 +1850,7 @@ int CCtsp_find_branch_edge (CCtsp_lp *lp, int *n0, int *n1, double *val,
     for (i = 0; i < xcount; i++) {
         j = CCtsp_find_edge (&lp->graph, xlist[2*i], xlist[2*i+1]);
         if (j < 0) {
-            fprintf (stderr, "edge should be in LP\n");
+            CC_FPRINTF(stderr, "edge should be in LP\n");
             rval = 1; goto CLEANUP;
         }
         if (!lp->graph.edges[j].fixed && !lp->graph.edges[j].branch) {
@@ -1869,7 +1869,7 @@ int CCtsp_find_branch_edge (CCtsp_lp *lp, int *n0, int *n1, double *val,
     }
 
     if (besti == -1) {
-        fprintf (stderr, "All edges are either branched or fixed\n");
+        CC_FPRINTF(stderr, "All edges are either branched or fixed\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -1881,7 +1881,7 @@ int CCtsp_find_branch_edge (CCtsp_lp *lp, int *n0, int *n1, double *val,
     case CCtsp_BRANCH_STRONG:
         rval = find_strong_branch (lp, n0, n1, silent);
         if (rval) {
-            fprintf (stderr, "find_strong_branch failed\n");
+            CC_FPRINTF(stderr, "find_strong_branch failed\n");
             goto CLEANUP;
         }
         if (*n0 == -1) {
@@ -1890,7 +1890,7 @@ int CCtsp_find_branch_edge (CCtsp_lp *lp, int *n0, int *n1, double *val,
         }
         break;
     default:
-        fprintf (stderr, "unknown branchtype\n");
+        CC_FPRINTF(stderr, "unknown branchtype\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1914,14 +1914,14 @@ static int find_strong_branch (CCtsp_lp *lp, int *n0, int *n1, int silent)
     rval = find_strongbranch_edges (lp, 1, &ngot, &elist, (double **) NULL,
                                     silent);
     if (rval) {
-        fprintf (stderr, "find_strongbranch_edges failed\n");
+        CC_FPRINTF(stderr, "find_strongbranch_edges failed\n");
         goto CLEANUP;
     }
 
     if (ngot == 0) {
         if (!silent) {
-            printf ("WARNING: nothing from find_strongbranch_edges\n");
-            fflush (stdout);
+            CC_PRINTF("WARNING: nothing from find_strongbranch_edges\n");
+            CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
@@ -1930,8 +1930,8 @@ static int find_strong_branch (CCtsp_lp *lp, int *n0, int *n1, int silent)
     *n1 = lp->graph.edges[elist[0]].ends[1];
 
     if (!silent) {
-        printf ("STRONG branch edge: %d %d\n", *n0, *n1);
-        fflush (stdout);
+        CC_PRINTF("STRONG branch edge: %d %d\n", *n0, *n1);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -1964,27 +1964,27 @@ static int find_strongbranch_edges (CCtsp_lp *lp, int nwant, int *ngot,
     rval = find_candidate_edges (lp, nwant * TSP_BRANCH_STRONG_CHOICES_MULT,
                              &ncand, &candlist, silent);
     if (rval) {
-        fprintf (stderr, "find_candidate_edges failed\n");
+        CC_FPRINTF(stderr, "find_candidate_edges failed\n");
         goto CLEANUP;
     }
 
     if (ncand == 0) {
         if (!silent) {
-            printf ("WARNING: find_candidate edges did not find anything\n");
-            fflush (stdout);
+            CC_PRINTF("WARNING: find_candidate edges did not find anything\n");
+            CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
 
     if (!silent) {
-        printf ("Run strongbranch with %d candidate edges\n", ncand);
-        fflush (stdout);
+        CC_PRINTF("Run strongbranch with %d candidate edges\n", ncand);
+        CC_FFLUSH(stdout);
     }
 
     downpen = CC_SAFE_MALLOC (ncand, double);
     uppen   = CC_SAFE_MALLOC (ncand, double);
     if (!downpen || !uppen) {
-        fprintf (stderr, "out of memory in find_strongbranch_edges\n");
+        CC_FPRINTF(stderr, "out of memory in find_strongbranch_edges\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1992,7 +1992,7 @@ static int find_strongbranch_edges (CCtsp_lp *lp, int nwant, int *ngot,
     rval = CClp_strongbranch (lp->lp, candlist, ncand, downpen, uppen,
                 TSP_BRANCH_STRONG_ITERATIONS, lp->upperbound);
     if (rval) {
-        fprintf (stderr, "CClp_strongbranch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_strongbranch failed\n"); goto CLEANUP;
     }
     if (!silent) {
         CCutil_stop_timer (&lp->stats.strongbranch_opt, 1);
@@ -2003,18 +2003,18 @@ static int find_strongbranch_edges (CCtsp_lp *lp, int nwant, int *ngot,
     lpwant = TSP_BRANCH_STRONG_LP_CHOICES_MULT * nwant;
     slist = CC_SAFE_MALLOC (lpwant + 1, sbitem);
     if (!slist) {
-        fprintf (stderr, "out of memory in find_strongbranch_edges\n");
+        CC_FPRINTF(stderr, "out of memory in find_strongbranch_edges\n");
         rval = 1; goto CLEANUP;
     }
     init_sblist (slist, lpwant);
 
     for (i = 0; i < ncand; i++) {
         if (!silent) {
-            printf ("SB Edge (%d, %d):  %.4f  %.4f\n",
+            CC_PRINTF("SB Edge (%d, %d):  %.4f  %.4f\n",
                     lp->graph.edges[candlist[i]].ends[0],
                     lp->graph.edges[candlist[i]].ends[1],
                     downpen[i], uppen[i]);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
         sval = TSP_BRANCH_STRONG_VAL (downpen[i], uppen[i]);
         insert_sblist (slist, sval, candlist[i]);
@@ -2022,25 +2022,25 @@ static int find_strongbranch_edges (CCtsp_lp *lp, int nwant, int *ngot,
     }
 
     if (ncand && !silent) {
-        printf ("Average Edge Value: %f\n", meanval / ((double) ncand));
-        fflush (stdout);
+        CC_PRINTF("Average Edge Value: %f\n", meanval / ((double) ncand));
+        CC_FFLUSH(stdout);
     }
     
     for (i = lpwant - 1, lpcand = 0; i >= 0; i--) {
         if (slist[i].name != -1) {
             if (!silent) {
-                printf ("First Stage Top Edge: (%d, %d)  (%f)\n",
+                CC_PRINTF("First Stage Top Edge: (%d, %d)  (%f)\n",
                         lp->graph.edges[slist[i].name].ends[0],
                         lp->graph.edges[slist[i].name].ends[1],
                         slist[i].val);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             candlist[lpcand++] = slist[i].name;
         }
     }
  
     if (lpcand == 0 && !silent) {
-        printf ("WARNING: no edges appeared in strongbranch\n");
+        CC_PRINTF("WARNING: no edges appeared in strongbranch\n");
         goto CLEANUP;
     }
 
@@ -2048,7 +2048,7 @@ static int find_strongbranch_edges (CCtsp_lp *lp, int nwant, int *ngot,
     rval = CClp_strongbranch (lp->lp, candlist, lpcand, downpen, uppen,
                 TSP_BRANCH_STRONG_EXTRA_ITERATIONS, lp->upperbound);
     if (rval) {
-        fprintf (stderr, "CClp_strongbranch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_strongbranch failed\n"); goto CLEANUP;
     }
     if (!silent) {
         CCutil_stop_timer (&lp->stats.strongbranch_opt, 1);
@@ -2060,11 +2060,11 @@ static int find_strongbranch_edges (CCtsp_lp *lp, int nwant, int *ngot,
     init_sblist (slist, nwant);
     for (i = 0; i < lpcand; i++) {
         if (!silent) {
-            printf ("SB2 Edge (%d, %d):  %.4f  %.4f\n",
+            CC_PRINTF("SB2 Edge (%d, %d):  %.4f  %.4f\n",
                         lp->graph.edges[candlist[i]].ends[0],
                         lp->graph.edges[candlist[i]].ends[1],
                         downpen[i], uppen[i]);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
         sval = TSP_BRANCH_STRONG_VAL (downpen[i], uppen[i]);
         insert_sblist (slist, sval, candlist[i]);
@@ -2072,40 +2072,40 @@ static int find_strongbranch_edges (CCtsp_lp *lp, int nwant, int *ngot,
     }
 
     if (lpcand && !silent) {
-        printf ("Average Edge Value: %f\n", meanval / ((double) lpcand));
-        fflush (stdout);
+        CC_PRINTF("Average Edge Value: %f\n", meanval / ((double) lpcand));
+        CC_FFLUSH(stdout);
     }
     
     for (i = nwant - 1, k = 0; i >= 0; i--) {
         if (slist[i].name != -1) {
             k++;
             if (!silent) {
-                printf ("Top Edge: (%d, %d)  (%f)\n",
+                CC_PRINTF("Top Edge: (%d, %d)  (%f)\n",
                     lp->graph.edges[slist[i].name].ends[0],
                     lp->graph.edges[slist[i].name].ends[1],
                     slist[i].val);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
     }
 
     if (k == 0) {
         if (!silent) {
-            printf ("WARNING: no edges appeared in strongbranch\n");
-            fflush (stdout);
+            CC_PRINTF("WARNING: no edges appeared in strongbranch\n");
+            CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
 
     *elist = CC_SAFE_MALLOC (k, int);
     if (!(*elist)) {
-        fprintf (stderr, "out of memory in find_strongbranch_edges\n");
+        CC_FPRINTF(stderr, "out of memory in find_strongbranch_edges\n");
         rval = 1; goto CLEANUP;
     }
     if (eval) {
         *eval = CC_SAFE_MALLOC (k, double);
         if (!(*eval)) {
-            fprintf (stderr, "out of memory in find_strongbranch_edges\n");
+            CC_FPRINTF(stderr, "out of memory in find_strongbranch_edges\n");
             CC_IFFREE (*elist, int);
             rval = 1; goto CLEANUP;
         }
@@ -2149,7 +2149,7 @@ static int find_candidate_edges (CCtsp_lp *lp, int nwant, int *ngot,
     if (nwant == TSP_BRANCH_STRONG_ALL_CHOICES) {
         rval = find_all_candidate_edges (lp, ngot, list);
         if (rval) {
-            fprintf (stderr, "find_all_candidate_edges failed\n");
+            CC_FPRINTF(stderr, "find_all_candidate_edges failed\n");
             goto CLEANUP;
         }
         goto CLEANUP;
@@ -2157,7 +2157,7 @@ static int find_candidate_edges (CCtsp_lp *lp, int nwant, int *ngot,
 
     slist = CC_SAFE_MALLOC (nwant + 1, sbitem);
     if (!slist) {
-        fprintf (stderr, "out of memory in find_strongbranch\n");
+        CC_FPRINTF(stderr, "out of memory in find_strongbranch\n");
         rval = 1; goto CLEANUP;
     }
     init_sblist (slist, nwant);
@@ -2167,15 +2167,15 @@ static int find_candidate_edges (CCtsp_lp *lp, int nwant, int *ngot,
     downpen = CC_SAFE_MALLOC (nrows, double);
     uppen   = CC_SAFE_MALLOC (nrows, double);
     if (!goodlist || !downpen || !uppen) {
-        fprintf (stderr, "out of memory in find_strongbranch\n");
+        CC_FPRINTF(stderr, "out of memory in find_strongbranch\n");
         rval = 1; goto CLEANUP;
     }
     rval = CClp_getgoodlist (lp->lp, goodlist, &ngood, downpen, uppen);
     if (rval) {
-        fprintf (stderr, "CClp_getgoodlist failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_getgoodlist failed\n"); goto CLEANUP;
     }
     if (!silent) {
-        printf ("Found %d good edges\n", ngood); fflush (stdout);
+        CC_PRINTF("Found %d good edges\n", ngood); CC_FFLUSH(stdout);
     }
 
     for (i = 0; i < ngood; i++) {
@@ -2192,15 +2192,15 @@ static int find_candidate_edges (CCtsp_lp *lp, int nwant, int *ngot,
     }
     if (k == 0) {
         if (!silent) {
-            printf ("WARNING: CClp_getgoodlist returned no edges\n");
-            fflush (stdout);
+            CC_PRINTF("WARNING: CClp_getgoodlist returned no edges\n");
+            CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
 
     *list = CC_SAFE_MALLOC (k, int);
     if (!(*list)) {
-        fprintf (stderr, "out of memory in find_candidate list\n");
+        CC_FPRINTF(stderr, "out of memory in find_candidate list\n");
         rval = 1; goto CLEANUP;
     }
     *ngot = k;
@@ -2234,7 +2234,7 @@ static int find_all_candidate_edges (CCtsp_lp *lp, int *ngot, int **list)
                           &xlist, &x, (double **) NULL, (double **) NULL,
                           (double **) NULL);
     if (rval) {
-        fprintf (stderr, "get_lp_result failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "get_lp_result failed\n"); goto CLEANUP;
     }
 
     count = 0;
@@ -2245,13 +2245,13 @@ static int find_all_candidate_edges (CCtsp_lp *lp, int *ngot, int **list)
     }
 
     if (!count) {
-        fprintf (stderr, "WARNING: The solution is integral\n");
+        CC_FPRINTF(stderr, "WARNING: The solution is integral\n");
         goto CLEANUP;
     }
 
     *list = CC_SAFE_MALLOC (count, int);
     if (!(*list)) {
-        fprintf (stderr, "out of memory in find_all_candidate_edges\n");
+        CC_FPRINTF(stderr, "out of memory in find_all_candidate_edges\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2260,7 +2260,7 @@ static int find_all_candidate_edges (CCtsp_lp *lp, int *ngot, int **list)
         if (x[i] >= CCtsp_INTTOL && x[i] <= 1.0 - CCtsp_INTTOL) {
             j = CCtsp_find_edge (&lp->graph, xlist[2 * i], xlist[2 * i + 1]);
             if (j < 0) {
-                fprintf (stderr, "edge not in lp in find_all_candiate_edges\n");
+                CC_FPRINTF(stderr, "edge not in lp in find_all_candiate_edges\n");
                 CC_IFFREE (*list, int);
                 rval = 1; goto CLEANUP;
             }
@@ -2340,31 +2340,31 @@ int CCtsp_find_branch_cliques (CCtsp_lp *lp, int nwant, int longedge_branching,
         rval = find_longedge_cliques2 (lp, nwant * TSP_STRONG_CUT_CHOICES_MULT,
                                        &ccount, &cliques, silent);
         if (rval) {
-            fprintf (stderr, "find_longedge_cliques failed\n");
+            CC_FPRINTF(stderr, "find_longedge_cliques failed\n");
             goto CLEANUP;
         }
     } else {
         rval = find_candidate_cliques (lp, nwant * TSP_STRONG_CUT_CHOICES_MULT,
                                        &ccount, &cliques, 1, silent);
         if (rval) {
-            fprintf (stderr, "find_candidate_cliques failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "find_candidate_cliques failed\n"); goto CLEANUP;
         }
     }
     if (!silent) {
-        printf ("Found %d candidate cliques\n", ccount); fflush (stdout);
+        CC_PRINTF("Found %d candidate cliques\n", ccount); CC_FFLUSH(stdout);
     }
 
     lpwant = TSP_STRONG_CUT_LP_CHOICES_MULT * nwant;
     slist = CC_SAFE_MALLOC (lpwant + 1, sbitem);
     if (!slist) {
-        fprintf (stderr, "out of memory in find_branch_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in find_branch_cliques\n");
         rval = 1; goto CLEANUP;
     }
     init_sblist (slist, lpwant);
 
     rval = CClp_get_warmstart (lp->lp, &warmstart);
     if (rval) {
-        fprintf (stderr, "CClp_get_warmstart failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_get_warmstart failed\n"); goto CLEANUP;
     }
     for (i = 0; i < ccount; i++) {
         double st;
@@ -2372,14 +2372,14 @@ int CCtsp_find_branch_cliques (CCtsp_lp *lp, int nwant, int longedge_branching,
         rval = test_cut_branch (lp, &cliques[i], &down, &up,
                               TSP_BRANCH_STRONG_ITERATIONS, silent, warmstart);
         if (rval) {
-            fprintf (stderr, "test_cut_branch failed\n");
+            CC_FPRINTF(stderr, "test_cut_branch failed\n");
             goto CLEANUP;
         }
         st = CCutil_stop_timer (&timer, 0);
         if (!silent) {
-            printf ("SB CLIQUE %d:  %f  %f  (%.2f seconds)\n",
+            CC_PRINTF("SB CLIQUE %d:  %f  %f  (%.2f seconds)\n",
                        i, down, up, st);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
         sval = TSP_BRANCH_STRONG_VAL (down, up);
         insert_sblist (slist, sval, i);
@@ -2388,33 +2388,33 @@ int CCtsp_find_branch_cliques (CCtsp_lp *lp, int nwant, int longedge_branching,
 
     rval = CClp_opt (lp->lp, CClp_METHOD_DUAL);
     if (rval) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
     }
 
     if (ccount && !silent) {
-        printf ("Average Clique Value: %f\n", meanval / ((double) ccount));
-        fflush (stdout);
+        CC_PRINTF("Average Clique Value: %f\n", meanval / ((double) ccount));
+        CC_FFLUSH(stdout);
     }
 
     lpcand = CC_SAFE_MALLOC (lpwant, int);
     if (lpcand == (int *) NULL) {
-        fprintf (stderr, "out of memory in find_branch_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in find_branch_cliques\n");
         rval = 1; goto CLEANUP;
     }
     for (i = lpwant - 1, lpcount = 0; i >= 0; i--) {
         if (slist[i].name != -1) {
             if (!silent) {
-                printf ("First Stage Top Clique: %d  (%f)\n", slist[i].name,
+                CC_PRINTF("First Stage Top Clique: %d  (%f)\n", slist[i].name,
                                                               slist[i].val);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             lpcand[lpcount++] = slist[i].name;
         }
     }
     if (lpcount == 0) {
         if (!silent) {
-            printf ("WARNING: no branching cliques were found\n");
-            fflush (stdout);
+            CC_PRINTF("WARNING: no branching cliques were found\n");
+            CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
@@ -2427,14 +2427,14 @@ int CCtsp_find_branch_cliques (CCtsp_lp *lp, int nwant, int longedge_branching,
         rval = test_cut_branch (lp, &cliques[lpcand[i]], &down, &up,
                       TSP_BRANCH_STRONG_EXTRA_ITERATIONS, silent, warmstart);
         if (rval) {
-            fprintf (stderr, "test_cut_branch failed\n");
+            CC_FPRINTF(stderr, "test_cut_branch failed\n");
             goto CLEANUP;
         }
         st = CCutil_stop_timer (&timer, 0);
         if (!silent) {
-            printf ("SB2 CLIQUE %d:  %f  %f  (%.2f seconds)\n",
+            CC_PRINTF("SB2 CLIQUE %d:  %f  %f  (%.2f seconds)\n",
                        i, down, up, st);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
         sval = TSP_BRANCH_STRONG_VAL (down, up);
         insert_sblist (slist, sval, lpcand[i]);
@@ -2443,41 +2443,41 @@ int CCtsp_find_branch_cliques (CCtsp_lp *lp, int nwant, int longedge_branching,
 
     rval = CClp_opt (lp->lp, CClp_METHOD_DUAL);
     if (rval) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
     }
 
     if (lpcount && !silent) {
-        printf ("Average Clique Value: %f\n", meanval / ((double) lpcount));
-        fflush (stdout);
+        CC_PRINTF("Average Clique Value: %f\n", meanval / ((double) lpcount));
+        CC_FFLUSH(stdout);
     }
 
     for (i = nwant - 1, k = 0; i >= 0; i--) {
         if (slist[i].name != -1) {
             k++;
             if (!silent) {
-                printf ("Top Clique: %d  (%f)\n", slist[i].name, slist[i].val);
-                fflush (stdout);
+                CC_PRINTF("Top Clique: %d  (%f)\n", slist[i].name, slist[i].val);
+                CC_FFLUSH(stdout);
             }
         }
     }
 
     if (k == 0) {
         if (!silent) {
-            printf ("WARNING: no branching cliques were found\n");
-            fflush (stdout);
+            CC_PRINTF("WARNING: no branching cliques were found\n");
+            CC_FFLUSH(stdout);
         }
         goto CLEANUP;
     }
 
     *bcliques = CC_SAFE_MALLOC (k, CCtsp_lpclique);
     if (!(*bcliques)) {
-        fprintf (stderr, "out of memory in CCtsp_find_branch_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_find_branch_cliques\n");
         rval = 1; goto CLEANUP;
     }
     if (bval) {
         *bval = CC_SAFE_MALLOC (k, double);
         if (!(*bval)) {
-            fprintf (stderr, "out of memory in CCtsp_find_branch_cliques\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_find_branch_cliques\n");
             CC_IFFREE (*bcliques, CCtsp_lpclique);
             rval = 1; goto CLEANUP;
         }
@@ -2488,7 +2488,7 @@ int CCtsp_find_branch_cliques (CCtsp_lp *lp, int nwant, int longedge_branching,
             rval = CCtsp_copy_lpclique (&cliques[slist[i].name],
                                         &(*bcliques)[k]);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_clique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_clique failed\n");
                 for (i = 0; i < k; i++) {
                     CC_IFFREE ((*bcliques)[i].nodes, CCtsp_segment);
                 }
@@ -2542,7 +2542,7 @@ static int find_candidate_cliques (CCtsp_lp *lp, int nwant, int *ngot,
                      &xlist, &x, (double **) NULL, (double **) NULL,
                      (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n"); goto CLEANUP;
     }
 
     ntry = (use_getweight ? (TSP_STRONG_CUT_CANDIDATES +
@@ -2551,11 +2551,11 @@ static int find_candidate_cliques (CCtsp_lp *lp, int nwant, int *ngot,
     rval = CCtsp_branch_cutpool_cliques (lp->pool, &cliques, &ccount,
               lp->graph.ncount, xcount, xlist, x, ntry, &cval, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_branch_cutpool_cliques failed\n");
+        CC_FPRINTF(stderr, "CCtsp_branch_cutpool_cliques failed\n");
         goto CLEANUP;
     }
     if (ccount == 0) {
-        fprintf (stderr, "WARNING: no cutpool cliques were found\n");
+        CC_FPRINTF(stderr, "WARNING: no cutpool cliques were found\n");
         goto CLEANUP;
     }
 
@@ -2566,13 +2566,13 @@ static int find_candidate_cliques (CCtsp_lp *lp, int nwant, int *ngot,
 
         weights = CC_SAFE_MALLOC (TSP_STRONG_GETWEIGHT_BATCH, double);
         if (!weights) {
-            fprintf (stderr, "out of memory in find_candidate_cliques\n");
+            CC_FPRINTF(stderr, "out of memory in find_candidate_cliques\n");
             rval = 1; goto CLEANUP;
         }
 
         slist = CC_SAFE_MALLOC (nwant + 1, sbitem);
         if (!slist) {
-            fprintf (stderr, "out of memory in find_candidate_cliques\n");
+            CC_FPRINTF(stderr, "out of memory in find_candidate_cliques\n");
             rval = 1; goto CLEANUP;
         }
         init_sblist (slist, nwant);
@@ -2582,21 +2582,21 @@ static int find_candidate_cliques (CCtsp_lp *lp, int nwant, int *ngot,
             nzlist = CCtsp_lpcut_in_nzlist (&lp->graph, &cu);
             rval = CCtsp_add_nzlist_to_lp (lp, nzlist, 2, 'G', &cr);
             if (rval) {
-                fprintf (stderr, "CCtsp_add_nzlist_to_lp failed\n");
+                CC_FPRINTF(stderr, "CCtsp_add_nzlist_to_lp failed\n");
                 goto CLEANUP;
             }
             if ((i+1) % TSP_STRONG_GETWEIGHT_BATCH == 0 || i == ccount - 1) {
                 rval = CCutil_reallocrus_count ((void **) &(cr.begin),
                             cr.rowcnt + 1, sizeof (int));
                 if (rval) {
-                    fprintf (stderr, "out of memory\n");
+                    CC_FPRINTF(stderr, "out of memory\n");
                     goto CLEANUP;
                 }
                 cr.begin[cr.rowcnt] = cr.nzcnt;
                 rval = CClp_getweight (lp->lp, cr.rowcnt, cr.begin,
                                        cr.indices, cr.entries, weights);
                 if (rval) {
-                    fprintf (stderr, "CClp_getweight failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "CClp_getweight failed\n"); goto CLEANUP;
                 }
 
                 for (j = 0; j < cr.rowcnt; j++) {
@@ -2619,15 +2619,15 @@ static int find_candidate_cliques (CCtsp_lp *lp, int nwant, int *ngot,
         }
         if (k == 0) {
             if (!silent) {
-                printf ("WARNING: no candidate branching cliques were found\n");
-                fflush (stdout);
+                CC_PRINTF("WARNING: no candidate branching cliques were found\n");
+                CC_FFLUSH(stdout);
             }
             goto CLEANUP;
         }
 
         *list = CC_SAFE_MALLOC (k, CCtsp_lpclique);
         if (!(*list)) {
-            fprintf (stderr, "out of memory in CCtsp_find_branch_cliques\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_find_branch_cliques\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0, k = 0; i < nwant; i++) {
@@ -2635,7 +2635,7 @@ static int find_candidate_cliques (CCtsp_lp *lp, int nwant, int *ngot,
                 rval = CCtsp_copy_lpclique (&cliques[slist[i].name],
                                             &(*list)[k++]);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_copy_clique failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_copy_clique failed\n");
                     for (i = 0; i < k; i++) {
                         CC_IFFREE ((*list)[i].nodes, CCtsp_segment);
                     }
@@ -2691,85 +2691,85 @@ static int test_cut_branch (CCtsp_lp *lp, CCtsp_lpclique *c, double *down,
     nzlist = CCtsp_lpcut_in_nzlist (&lp->graph, &cu);
     rval = CCtsp_add_nzlist_to_lp (lp, nzlist, 2, 'L', &cr);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_nzlist_to_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_add_nzlist_to_lp failed\n"); goto CLEANUP;
     }
     rval = CCtsp_add_multiple_rows (lp, &cr);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_multiple_rows failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_add_multiple_rows failed\n"); goto CLEANUP;
     }
     CCutil_start_timer (&lp->stats.strongbranch_opt);
     
     rval = CClp_limited_dualopt (lp->lp, iter, &status, &lp->upperbound);
     if (rval) {
-        fprintf (stderr, "CClp_limited_dualopt failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_limited_dualopt failed\n"); goto CLEANUP;
     }
     CCutil_stop_timer (&lp->stats.strongbranch_opt, 0);
     if (status == CClp_INFEASIBLE) {
         if (!silent) {
-            printf ("Down side of cut branch is infeasible\n");
-            fflush (stdout);
+            CC_PRINTF("Down side of cut branch is infeasible\n");
+            CC_FFLUSH(stdout);
         }
         *down = lp->upperbound;
     } else if (status == CClp_UNKNOWN) {
         if (!silent) {
-            printf ("Down side information is not available\n");
-            fflush (stdout);
+            CC_PRINTF("Down side information is not available\n");
+            CC_FFLUSH(stdout);
         }
         *down = lp->lowerbound;
     } else {
         rval = CClp_objval (lp->lp, down);
         if (rval) {
-            fprintf (stderr, "CClp_objval failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CClp_objval failed\n"); goto CLEANUP;
         }
         if (*down > lp->upperbound) *down = lp->upperbound;
     }
 
     rval = CCtsp_delete_cut (lp, lp->cuts.cutcount);
     if (rval) {
-        fprintf (stderr, "CCtsp_delete_cut failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_delete_cut failed\n"); goto CLEANUP;
     }
     rval = CClp_load_warmstart (lp->lp, warmstart);
     if (rval) {
-        fprintf (stderr, "CClp_load_warmstart failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_load_warmstart failed\n"); goto CLEANUP;
     }
 
     cr.sense[0] = 'G';
     cr.rhs[0] = 4.0;
     rval = CCtsp_add_multiple_rows (lp, &cr);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_multiple_rows failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_add_multiple_rows failed\n"); goto CLEANUP;
     }
     CCutil_start_timer (&lp->stats.strongbranch_opt);
     rval = CClp_limited_dualopt (lp->lp, iter, &status, &lp->upperbound);
     if (rval) {
-        fprintf (stderr, "CClp_limited_dualopt failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_limited_dualopt failed\n"); goto CLEANUP;
     }
     CCutil_stop_timer (&lp->stats.strongbranch_opt, 0);
     if (status == CClp_INFEASIBLE) {
         if (!silent) {
-            printf ("Up side of cut branch is infeasible\n"); fflush (stdout);
+            CC_PRINTF("Up side of cut branch is infeasible\n"); CC_FFLUSH(stdout);
         }
         *up = lp->upperbound;
     } else if (status == CClp_UNKNOWN) {
         if (!silent) {
-            printf ("Up side information is not available\n"); fflush (stdout);
+            CC_PRINTF("Up side information is not available\n"); CC_FFLUSH(stdout);
         }
         *up = lp->lowerbound;
     } else {
         rval = CClp_objval (lp->lp, up);
         if (rval) {
-            fprintf (stderr, "CClp_objval failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CClp_objval failed\n"); goto CLEANUP;
         }
         if (*up > lp->upperbound) *up = lp->upperbound;
     }
 
     rval = CCtsp_delete_cut (lp, lp->cuts.cutcount);
     if (rval) {
-        fprintf (stderr, "CCtsp_delete_cut failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_delete_cut failed\n"); goto CLEANUP;
     }
     rval = CClp_load_warmstart (lp->lp, warmstart);
     if (rval) {
-        fprintf (stderr, "CClp_load_warmstart failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_load_warmstart failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -2788,7 +2788,7 @@ int CCtsp_execute_branch (CCtsp_lp *lp, CCtsp_branchobj *b, int silent,
     int i, j;
 
     if (!b) {
-        fprintf (stderr, "CCtsp_execute_branch called without a CCtsp_branchobj\n");
+        CC_FPRINTF(stderr, "CCtsp_execute_branch called without a CCtsp_branchobj\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2796,13 +2796,13 @@ int CCtsp_execute_branch (CCtsp_lp *lp, CCtsp_branchobj *b, int silent,
         n0 = b->ends[0];
         n1 = b->ends[1];
         if (!silent) {
-            printf ("Branch Edge (%d,%d), to value %d\n", n0, n1, b->rhs);
-            fflush (stdout);
+            CC_PRINTF("Branch Edge (%d,%d), to value %d\n", n0, n1, b->rhs);
+            CC_FFLUSH(stdout);
         }
 
         if (n0 >= lp->graph.ncount || n0 < 0 ||
             n1 >= lp->graph.ncount || n1 < 0) {
-            fprintf (stderr, "CCtsp_execute_branch has invalid nodes\n");
+            CC_FPRINTF(stderr, "CCtsp_execute_branch has invalid nodes\n");
             rval = 1; goto CLEANUP;
         }
 
@@ -2812,29 +2812,29 @@ int CCtsp_execute_branch (CCtsp_lp *lp, CCtsp_branchobj *b, int silent,
 
         j = CCtsp_find_edge (&lp->graph, n0, n1);
         if  (j < 0) {
-            fprintf (stderr, "branching edge is not in the LP edgeset\n");
+            CC_FPRINTF(stderr, "branching edge is not in the LP edgeset\n");
             rval = 1; goto CLEANUP;
         }
         if (lp->graph.edges[j].fixed) {
-            fprintf (stderr, "branching edge is fixed to 1 in the LP\n");
+            CC_FPRINTF(stderr, "branching edge is fixed to 1 in the LP\n");
             rval = 1; goto CLEANUP;
         }
         if (lp->graph.edges[j].branch) {
-            fprintf (stderr, "branching edge has already been branched\n");
+            CC_FPRINTF(stderr, "branching edge has already been branched\n");
             rval = 1; goto CLEANUP;
         }
 
         if (b->rhs) {
             rval = CClp_setbnd (lp->lp, j, 'L', 1.0);
             if (rval) {
-                fprintf (stderr, "CClp_setbnd failed\n");
+                CC_FPRINTF(stderr, "CClp_setbnd failed\n");
                 rval = 1; goto CLEANUP;
             }
             lp->graph.edges[j].branch = lp->branchdepth + 1;
         } else {
             rval = CClp_setbnd (lp->lp, j, 'U', 0.0);
             if (rval) {
-                fprintf (stderr, "CClp_setbnd failed\n");
+                CC_FPRINTF(stderr, "CClp_setbnd failed\n");
                 rval = 1; goto CLEANUP;
             }
             lp->graph.edges[j].branch = -(lp->branchdepth + 1);
@@ -2844,33 +2844,33 @@ int CCtsp_execute_branch (CCtsp_lp *lp, CCtsp_branchobj *b, int silent,
         CCtsp_lpcut_in d;
 
         if (!b->clique) {
-            fprintf (stderr, "CCtsp_branchobj has no edge or clique\n");
+            CC_FPRINTF(stderr, "CCtsp_branchobj has no edge or clique\n");
             rval = 1; goto CLEANUP;
         }
 
         if (!silent) {
-            printf ("Branch Clique "); fflush (stdout);
+            CC_PRINTF("Branch Clique "); CC_FFLUSH(stdout);
             for (i = 0; i < b->clique->segcount; i++) {
-                printf ("%d->%d ", b->clique->nodes[i].lo,
+                CC_PRINTF("%d->%d ", b->clique->nodes[i].lo,
                                    b->clique->nodes[i].hi);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (b->sense == 'G') {
-                printf ("to at least %d\n", b->rhs);
+                CC_PRINTF("to at least %d\n", b->rhs);
             } else {
-                printf ("to at most %d\n", b->rhs);
+                CC_PRINTF("to at most %d\n", b->rhs);
             }
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
 
         c = CC_SAFE_MALLOC (1, CCtsp_lpclique);
         if (!c) {
-            fprintf (stderr, "out of memory in CCtsp_execute_branch\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_execute_branch\n");
             rval = 1; goto CLEANUP;
         }
         rval = CCtsp_copy_lpclique (b->clique, c);
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
             rval = 1; goto CLEANUP;
         }
 
@@ -2883,19 +2883,19 @@ int CCtsp_execute_branch (CCtsp_lp *lp, CCtsp_branchobj *b, int silent,
 
         rval = CCtsp_construct_skeleton (&d, lp->graph.ncount);
         if (rval) {
-            fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+            CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
             rval = 1; goto CLEANUP;
         }
         
         CCtsp_init_lprow (&cr);
         rval = CCtsp_add_cut (lp, &d, &cr);
         if (rval) {
-            fprintf (stderr, "CCtsp_add_cut failed\n");
+            CC_FPRINTF(stderr, "CCtsp_add_cut failed\n");
             rval = 1; goto CLEANUP;
         }
         rval = CCtsp_add_multiple_rows (lp, &cr);
         if (rval) {
-            fprintf (stderr, "CCtsp_add_multiple_rows failed\n");
+            CC_FPRINTF(stderr, "CCtsp_add_multiple_rows failed\n");
             rval = 1; goto CLEANUP;
         }
         CCtsp_free_lprow (&cr);
@@ -2908,14 +2908,14 @@ int CCtsp_execute_branch (CCtsp_lp *lp, CCtsp_branchobj *b, int silent,
         if (rval == 2) {
             int tval;
             if (!silent) {
-                printf ("Problem is really infeasible (CCtsp_execute_branch)\n");
-                fflush (stdout);
+                CC_PRINTF("Problem is really infeasible (CCtsp_execute_branch)\n");
+                CC_FFLUSH(stdout);
             }
 
 /* Bico Added on February 3, 1998 */
             tval = CCtsp_update_result (lp);
             if (tval) {
-                fprintf (stderr, "CCtsp_update_result failed - ignoring\n");
+                CC_FPRINTF(stderr, "CCtsp_update_result failed - ignoring\n");
                 /* rval = 1; goto CLEANUP;  Bico Deleted on October 10, 2003 */
             }
             CCtsp_free_bigdual (&lp->exact_dual);
@@ -2923,17 +2923,17 @@ int CCtsp_execute_branch (CCtsp_lp *lp, CCtsp_branchobj *b, int silent,
 
             goto CLEANUP;
         } else if (rval) {
-            fprintf (stderr, "CCtsp_infeas_recover failed\n");
+            CC_FPRINTF(stderr, "CCtsp_infeas_recover failed\n");
             rval = 1; goto CLEANUP;
         }
     } else if (rval) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_update_result (lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_update_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_update_result failed\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_free_bigdual (&lp->exact_dual);
@@ -2945,7 +2945,7 @@ CLEANUP:
         sval = CCutil_reallocrus_count ((void **) &(lp->branchhistory),
                    lp->branchdepth + 1, sizeof (CCtsp_branchobj));
         if (sval) {
-            fprintf (stderr, "CCutil_reallocrus_count failed\n"); return 1;
+            CC_FPRINTF(stderr, "CCutil_reallocrus_count failed\n"); return 1;
         }
         CCtsp_init_branchobj (&lp->branchhistory[lp->branchdepth]);
         lp->branchhistory[lp->branchdepth].depth   = lp->branchdepth + 1;
@@ -2955,12 +2955,12 @@ CLEANUP:
         if (b->clique) {
             c = CC_SAFE_MALLOC (1, CCtsp_lpclique);
             if (!c) {
-                fprintf (stderr, "out of memory in CCtsp_execute_branch\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_execute_branch\n");
                 return 1;
             }
             sval = CCtsp_copy_lpclique (b->clique, c);
             if (sval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n"); return 1;
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n"); return 1;
             }
             lp->branchhistory[lp->branchdepth].clique = c;
         } else {
@@ -2984,12 +2984,12 @@ int CCtsp_execute_unbranch (CCtsp_lp *lp, CClp_warmstart *warmstart,
     int j;
 
     if (depth <= 0) {
-        fprintf (stderr, "CCtsp_execute_unbranch called at depth 0\n");
+        CC_FPRINTF(stderr, "CCtsp_execute_unbranch called at depth 0\n");
         rval = 1; goto CLEANUP;
     }
 
     if (lp->branchhistory[depth - 1].depth != depth) {
-        fprintf (stderr, "branchhistory is corrupted\n");
+        CC_FPRINTF(stderr, "branchhistory is corrupted\n");
         rval = 1; goto CLEANUP;
     }
     b = &lp->branchhistory[depth - 1];
@@ -2998,8 +2998,8 @@ int CCtsp_execute_unbranch (CCtsp_lp *lp, CClp_warmstart *warmstart,
         n0    = b->ends[0];
         n1    = b->ends[1];
         if (!silent) {
-            printf ("Unbranch Edge (%d,%d), from value %d\n", n0, n1, b->rhs);
-            fflush (stdout);
+            CC_PRINTF("Unbranch Edge (%d,%d), from value %d\n", n0, n1, b->rhs);
+            CC_FFLUSH(stdout);
         }
 
         if (n0 > n1) {
@@ -3008,47 +3008,47 @@ int CCtsp_execute_unbranch (CCtsp_lp *lp, CClp_warmstart *warmstart,
 
         j = CCtsp_find_edge (&lp->graph, n0, n1);
         if  (j < 0) {
-            fprintf (stderr, "ERROR: unbranching 1-edge is not in LP\n");
+            CC_FPRINTF(stderr, "ERROR: unbranching 1-edge is not in LP\n");
             rval = 1; goto CLEANUP;
         }
         if (b->rhs) {
             if (lp->graph.edges[j].branch <= 0) {
-                fprintf (stderr, "unbranching 1-edge not branched to 1\n");
+                CC_FPRINTF(stderr, "unbranching 1-edge not branched to 1\n");
                 rval = 1; goto CLEANUP;
             }
             rval = CClp_setbnd (lp->lp, j, 'L', 0.0);
             if (rval) {
-                fprintf (stderr, "CClp_setbnd failed\n");
+                CC_FPRINTF(stderr, "CClp_setbnd failed\n");
                 rval = 1; goto CLEANUP;
             }
         } else {
             if (lp->graph.edges[j].branch >= 0) {
-                fprintf (stderr, "unbranching 0-edge not branched to 0\n");
+                CC_FPRINTF(stderr, "unbranching 0-edge not branched to 0\n");
                 rval = 1; goto CLEANUP;
             }
 
             rval = CClp_setbnd (lp->lp, j, 'U', 1.0);
             if (rval) {
-                fprintf (stderr, "CClp_setbnd failed\n");
+                CC_FPRINTF(stderr, "CClp_setbnd failed\n");
                 rval = 1; goto CLEANUP;
             }
         }
         lp->graph.edges[j].branch = 0;
     } else {
         if (!b->clique) {
-            fprintf (stderr, "branchhistory has no edge or clique\n");
+            CC_FPRINTF(stderr, "branchhistory has no edge or clique\n");
             rval = 1; goto CLEANUP;
         }
         rval = find_branched_clique (lp, b->clique, b->sense, b->rhs, &num);
         if (rval) {
-            fprintf (stderr, "find_branched_clique failed\n");
+            CC_FPRINTF(stderr, "find_branched_clique failed\n");
             rval = 1; goto CLEANUP;
         }
         if (!silent) {
-            printf ("The unbranching clique is cut %d\n", num); fflush (stdout);
+            CC_PRINTF("The unbranching clique is cut %d\n", num); CC_FFLUSH(stdout);
          }
         if (lp->cuts.cuts[num].branch == 0) {
-            fprintf (stderr, "the unbranching clique is not set to branch\n");
+            CC_FPRINTF(stderr, "the unbranching clique is not set to branch\n");
             rval = 1; goto CLEANUP;
         }
 
@@ -3057,19 +3057,19 @@ int CCtsp_execute_unbranch (CCtsp_lp *lp, CClp_warmstart *warmstart,
             CCtsp_lpcut *cu = &lp->cuts.cuts[num];
             CCtsp_lpclique *t;
 
-            printf ("Sense: %c  RHS: %d  Cliques: %d  Branch: %d\n",
+            CC_PRINTF("Sense: %c  RHS: %d  Cliques: %d  Branch: %d\n",
                  cu->sense, cu->rhs, cu->cliquecount, cu->branch);
             t = &lp->cuts.cliques[cu->cliques[0]];
-            printf ("Clique: ");
+            CC_PRINTF("Clique: ");
             for (q = 0; q < t->segcount; q++) {
-                printf ("%d->%d ", t->nodes[q].lo, t->nodes[q].hi);
+                CC_PRINTF("%d->%d ", t->nodes[q].lo, t->nodes[q].hi);
             }
-            printf ("\n"); fflush (stdout);
+            CC_PRINTF("\n"); CC_FFLUSH(stdout);
         }
 
         rval = CCtsp_delete_cut (lp, num);
         if (rval) {
-            fprintf (stderr, "CCtsp_delete_cut failed\n");
+            CC_FPRINTF(stderr, "CCtsp_delete_cut failed\n");
             rval = 1; goto CLEANUP;
         }
         CCtsp_delete_cut_from_cutlist (&lp->cuts, num);
@@ -3078,7 +3078,7 @@ int CCtsp_execute_unbranch (CCtsp_lp *lp, CClp_warmstart *warmstart,
     if (warmstart) {
         rval = CClp_load_warmstart (lp->lp, warmstart);
         if (rval) {
-            fprintf (stderr, "CClp_load_warmstart failed\n");
+            CC_FPRINTF(stderr, "CClp_load_warmstart failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -3087,33 +3087,33 @@ int CCtsp_execute_unbranch (CCtsp_lp *lp, CClp_warmstart *warmstart,
 
 /* Bico Added on February 3, 1998 */
     if (rval == 2) {
-        fprintf (stderr, "infeasible lp in CCtsp_execute_unbranch\n");
+        CC_FPRINTF(stderr, "infeasible lp in CCtsp_execute_unbranch\n");
         rval = CCtsp_infeas_recover (lp, silent, rstate);
         if (rval == 2) {
             int tval;
             if (!silent) {
-                printf ("Problem is really infeasible (CCtsp_execute_unbranch)\n");
-                fflush (stdout);
+                CC_PRINTF("Problem is really infeasible (CCtsp_execute_unbranch)\n");
+                CC_FFLUSH(stdout);
             }
             tval = CCtsp_update_result (lp);
             if (tval) {
-                fprintf (stderr, "CCtsp_update_result failed\n");
+                CC_FPRINTF(stderr, "CCtsp_update_result failed\n");
                 rval = 1; goto CLEANUP;
             }
             CCtsp_free_bigdual (&lp->exact_dual);
             goto CLEANUP;
         } else if (rval) {
-            fprintf (stderr, "CCtsp_infeas_recover failed\n");
+            CC_FPRINTF(stderr, "CCtsp_infeas_recover failed\n");
             rval = 1; goto CLEANUP;
         }
 /* End Bico */
     } else if (rval) {
-        fprintf (stderr, "CClp_opt failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_opt failed\n"); goto CLEANUP;
     }
 
     rval = CCtsp_update_result (lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_update_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_update_result failed\n");
         rval = 1;  goto CLEANUP;
     }
     CCtsp_free_bigdual (&lp->exact_dual);
@@ -3137,28 +3137,28 @@ int CCtsp_add_branchhistory_to_lp (CCtsp_lp *lp)
         b = &lp->branchhistory[i];
         if (b->ends[0] != -1) {
             if (lp->graph.ecount == 0) {
-                printf ("No graph - can't add edge %d,%d = %d from branch history\n",
+                CC_PRINTF("No graph - can't add edge %d,%d = %d from branch history\n",
                         b->ends[0], b->ends[1], b->rhs);
             } else {
                 k = CCtsp_find_edge (&lp->graph, b->ends[0], b->ends[1]);
                 if (k == -1) {
-                    fprintf (stderr, "edge in branch history is not in LP\n");
+                    CC_FPRINTF(stderr, "edge in branch history is not in LP\n");
                     rval = 1; goto CLEANUP;
                 }
                 if (lp->graph.edges[k].fixed || lp->graph.edges[k].branch) {
-                    fprintf (stderr, "edge in branch history is fixed/branched\n");
+                    CC_FPRINTF(stderr, "edge in branch history is fixed/branched\n");
                     rval = 1; goto CLEANUP;
                 }
                 if (b->rhs) {
                     rval = CClp_setbnd (lp->lp, k, 'L', 1.0);
                     if (rval) {
-                        fprintf (stderr, "CClp_setbnd failed\n"); goto CLEANUP;
+                        CC_FPRINTF(stderr, "CClp_setbnd failed\n"); goto CLEANUP;
                     }
                     lp->graph.edges[k].branch = b->depth;
                 } else {
                     rval = CClp_setbnd (lp->lp, k, 'U', 0.0);
                     if (rval) {
-                        fprintf (stderr, "CClp_setbnd failed\n"); goto CLEANUP;
+                        CC_FPRINTF(stderr, "CClp_setbnd failed\n"); goto CLEANUP;
                     }
                     lp->graph.edges[k].branch = -(b->depth);
                 }
@@ -3167,7 +3167,7 @@ int CCtsp_add_branchhistory_to_lp (CCtsp_lp *lp)
             rval = find_branched_clique (lp, b->clique, b->sense,
                                              b->rhs, &num);
             if (rval) {
-                fprintf (stderr, "find_branch_clique failed\n");
+                CC_FPRINTF(stderr, "find_branch_clique failed\n");
                 goto CLEANUP;
             }
             lp->cuts.cuts[num].branch = 1;
@@ -3200,7 +3200,7 @@ static int find_branched_clique (CCtsp_lp *lp, CCtsp_lpclique *c, char sense,
                 if (*cutnum == -1) {
                     *cutnum = i;
                 } else {
-                    fprintf (stderr, "two copies of branched clique\n");
+                    CC_FPRINTF(stderr, "two copies of branched clique\n");
                     return 1;
                 }
             }
@@ -3208,7 +3208,7 @@ static int find_branched_clique (CCtsp_lp *lp, CCtsp_lpclique *c, char sense,
     }
 
     if (*cutnum == -1) {
-        fprintf (stderr, "did not find branched clique\n");
+        CC_FPRINTF(stderr, "did not find branched clique\n");
         return 1;
     } else {
         return 0;
@@ -3234,53 +3234,53 @@ int CCtsp_bb_find_branch (char *probname, int probnum, int ncount,
     rval = CCtsp_bb_init_lp (&lp, probname, probnum, ncount, dat, ptour,
                *upperbound, pool, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
     }
 
     if (lp->lowerbound >= *upperbound - 0.9) {
-        printf ("Do not branch, the lp is within 1.0 of the upperbound\n");
-        fflush (stdout);
+        CC_PRINTF("Do not branch, the lp is within 1.0 of the upperbound\n");
+        CC_FFLUSH(stdout);
 
         rval = CCtsp_verify_lp_prune (lp, &test, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_lp_prune failed\n");
+            CC_FPRINTF(stderr, "CCtsp_verify_lp_prune failed\n");
             goto CLEANUP;
         }
         if (test) {
             if (!silent) {
-                printf ("verified that LP can be pruned\n");
-                fflush (stdout);
+                CC_PRINTF("verified that LP can be pruned\n");
+                CC_FFLUSH(stdout);
             }
             *prune = 1;
             goto CLEANUP;
         } else {
-            printf ("exact pricing could not prune search - need to branch\n");
-            fflush (stdout);
+            CC_PRINTF("exact pricing could not prune search - need to branch\n");
+            CC_FFLUSH(stdout);
         }
     }
 
     rval = CCtsp_find_branch (lp, nwant, ngot, b, &tval, &cyc, usecliques,
                               longedge_branching, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_find_branch failed\n");
+        CC_FPRINTF(stderr, "CCtsp_find_branch failed\n");
         goto CLEANUP;
     }
 
     if (*ngot == 0) {
         if (!silent) {
-            printf ("No branch, found tour of value %.2f\n", tval);
-            fflush (stdout);
+            CC_PRINTF("No branch, found tour of value %.2f\n", tval);
+            CC_FFLUSH(stdout);
         }
         if (tval < lp->upperbound) lp->upperbound = tval;
         rval = CCtsp_verify_lp_prune (lp, &test, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_lp_prune failed\n");
+            CC_FPRINTF(stderr, "CCtsp_verify_lp_prune failed\n");
             goto CLEANUP;
         }
         if (test) {
             if (!silent) {
-                printf ("verified that LP can now be pruned\n");
-                fflush (stdout);
+                CC_PRINTF("verified that LP can now be pruned\n");
+                CC_FFLUSH(stdout);
             }
             *foundtour = 1;
             if (tval < *upperbound) {
@@ -3293,12 +3293,12 @@ int CCtsp_bb_find_branch (char *probname, int probnum, int ncount,
             }
             goto CLEANUP;
         } else {
-            fprintf (stderr, "new tour did not permit exact pruning\n");
+            CC_FPRINTF(stderr, "new tour did not permit exact pruning\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         if (!silent) {
-            printf ("found branch\n"); fflush (stdout);
+            CC_PRINTF("found branch\n"); CC_FFLUSH(stdout);
         }
     }
 
@@ -3326,24 +3326,24 @@ int CCtsp_bb_splitprob (char *probname, int probnum, int ncount,
     rval = CCtsp_bb_init_lp (&lp, probname, probnum, ncount, dat, ptour,
                initial_ub, pool, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
     }
 
     rval = branch_side (lp, b, 0, child0, val0, prune0, silent, rstate);
     if (rval) {
-        fprintf (stderr, "branch_side failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "branch_side failed\n"); goto CLEANUP;
     }
 
     CCtsp_free_tsp_lp_struct (&lp);
     rval = CCtsp_bb_init_lp (&lp, probname, probnum, ncount, dat, ptour,
                initial_ub, pool, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
     }
 
     rval = branch_side (lp, b, 1, child1, val1, prune1, silent, rstate);
     if (rval) {
-        fprintf (stderr, "branch_side failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "branch_side failed\n"); goto CLEANUP;
     }
 
 
@@ -3368,9 +3368,9 @@ static int branch_side (CCtsp_lp *lp, CCtsp_branchobj *b, int side, int child,
 
     if (b->ends[0] != -1) {
         if (!silent) {
-            printf ("Creating child %d of LP %d: Set Edge (%d, %d) to %d\n",
+            CC_PRINTF("Creating child %d of LP %d: Set Edge (%d, %d) to %d\n",
                          side, lp->id, b->ends[0], b->ends[1], side);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
         if (side == 0) {
             b->rhs = 0;
@@ -3380,34 +3380,34 @@ static int branch_side (CCtsp_lp *lp, CCtsp_branchobj *b, int side, int child,
     } else {
         if (side == 0) {
             if (!silent) {
-                printf ("Creating child 0 of LP %d: Set Clique <= 2\n", lp->id);
-                fflush (stdout);
+                CC_PRINTF("Creating child 0 of LP %d: Set Clique <= 2\n", lp->id);
+                CC_FFLUSH(stdout);
             }
             b->rhs = 2; b->sense = 'L';
         } else {
             if (!silent) {
-                printf ("Creating child 1 of LP %d: Set Clique >= 4\n", lp->id);
-                fflush (stdout);
+                CC_PRINTF("Creating child 1 of LP %d: Set Clique >= 4\n", lp->id);
+                CC_FFLUSH(stdout);
             }
             b->rhs = 4; b->sense = 'G';
         }
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
     rval = CCtsp_execute_branch (lp, b, silent, rstate);
     if (rval && rval != 2) {
-        fprintf (stderr, "CCtsp_execute_branch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_execute_branch failed\n"); goto CLEANUP;
     } else if (rval == 2) {
-        printf ("Branched-LP is infeasible\n"); fflush (stdout);
+        CC_PRINTF("Branched-LP is infeasible\n"); CC_FFLUSH(stdout);
         rval = CCtsp_verify_infeasible_lp (lp, &test, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_infeasible_lp failed\n");
+            CC_FPRINTF(stderr, "CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (test) {
             if (!silent) {
-                printf ("Creating child leafnode - infeasible\n");
-                fflush (stdout);
+                CC_PRINTF("Creating child leafnode - infeasible\n");
+                CC_FFLUSH(stdout);
             }
             *val = CCtsp_LP_MAXDOUBLE;
             *prune = 1;
@@ -3415,12 +3415,12 @@ static int branch_side (CCtsp_lp *lp, CCtsp_branchobj *b, int side, int child,
             lp->id = child;
             rval = CCtsp_write_probleaf_id (lp);
             if (rval) {
-                fprintf (stderr, "CCtsp_write_probleaf_id failed\n");
+                CC_FPRINTF(stderr, "CCtsp_write_probleaf_id failed\n");
                 goto CLEANUP;
             }
             rval = 0;
         } else {
-            fprintf (stderr, "did not verify an infeasible LP\n");
+            CC_FPRINTF(stderr, "did not verify an infeasible LP\n");
             rval = 1; goto CLEANUP;
         }
     } else {
@@ -3435,8 +3435,8 @@ static int branch_side (CCtsp_lp *lp, CCtsp_branchobj *b, int side, int child,
             CCcheck_rval (rval, "CCtsp_verify_lp_prune failed");
             if (test) {
                 if (!silent) {
-                    printf ("verified that child can be pruned\n");
-                    fflush (stdout);
+                    CC_PRINTF("verified that child can be pruned\n");
+                    CC_FFLUSH(stdout);
                 }
                 *prune = 1;
                 lp->parent_id = oldid;
@@ -3444,8 +3444,8 @@ static int branch_side (CCtsp_lp *lp, CCtsp_branchobj *b, int side, int child,
                 rval = CCtsp_write_probleaf_id (lp);
                 CCcheck_rval (rval,"CCtsp_write_probleaf_id failed");
             } else {
-                printf ("exact pricing could not prune child\n");
-                fflush (stdout);
+                CC_PRINTF("exact pricing could not prune child\n");
+                CC_FFLUSH(stdout);
             }
         }
 
@@ -3476,7 +3476,7 @@ int CCtsp_splitprob (CCtsp_lp *lp, CCtsp_branchobj *b, int child0, int child1,
 
     rval = CClp_get_warmstart (lp->lp, &warmstart);
     if (rval) {
-        fprintf (stderr, "CClp_get_warmstart failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_get_warmstart failed\n"); goto CLEANUP;
     }
 
     lp->parent_id = lp->id;
@@ -3492,18 +3492,18 @@ int CCtsp_splitprob (CCtsp_lp *lp, CCtsp_branchobj *b, int child0, int child1,
     rval = CCtsp_execute_branch (lp, b, silent, rstate);
     if (rval == 2) {
         rval = 0;
-        printf ("The down side of the branch was infeasible\n");
-        fflush (stdout);
+        CC_PRINTF("The down side of the branch was infeasible\n");
+        CC_FFLUSH(stdout);
     } else if (rval) {
-        fprintf (stderr, "CCtsp_execute_branch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_execute_branch failed\n"); goto CLEANUP;
     }
     rval = CCtsp_write_probfile_id (lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_write_probfile_id failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_write_probfile_id failed\n"); goto CLEANUP;
     }
     rval = CCtsp_execute_unbranch (lp, warmstart, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_execute_unbranch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_execute_unbranch failed\n"); goto CLEANUP;
     }
 
     if (b->ends[0] != -1) {
@@ -3517,18 +3517,18 @@ int CCtsp_splitprob (CCtsp_lp *lp, CCtsp_branchobj *b, int child0, int child1,
     rval = CCtsp_execute_branch (lp, b, silent, rstate);
     if (rval == 2) {
         rval = 0;
-        printf ("The up side of the branch was infeasible\n");
-        fflush (stdout);
+        CC_PRINTF("The up side of the branch was infeasible\n");
+        CC_FFLUSH(stdout);
     } else if (rval) {
-        fprintf (stderr, "CCtsp_execute_branch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_execute_branch failed\n"); goto CLEANUP;
     }
     rval = CCtsp_write_probfile_id (lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_write_probfile_id failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_write_probfile_id failed\n"); goto CLEANUP;
     }
     rval = CCtsp_execute_unbranch (lp, warmstart, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_execute_unbranch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_execute_unbranch failed\n"); goto CLEANUP;
     }
 
 
@@ -3552,7 +3552,7 @@ int CCtsp_dumptour (int ncount, CCdatagroup *dat, int *perm, char *probname,
     char buf[1024];
 
     if (!perm || !tour) {
-        fprintf (stderr, "bad input for CCtsp_dumptour\n");
+        CC_FPRINTF(stderr, "bad input for CCtsp_dumptour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -3564,7 +3564,7 @@ int CCtsp_dumptour (int ncount, CCdatagroup *dat, int *perm, char *probname,
 
     cyc = CC_SAFE_MALLOC (ncount, int);
     if (!cyc) {
-        fprintf (stderr, "out of memory in CCtsp_dumptour\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_dumptour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -3576,7 +3576,7 @@ int CCtsp_dumptour (int ncount, CCdatagroup *dat, int *perm, char *probname,
     }
     for (i = 0; i < ncount; i++) {
         if (cyc[i] == 0) {
-            fprintf (stderr, "array is not a tour in CCtsp_dumptour\n");
+            CC_FPRINTF(stderr, "array is not a tour in CCtsp_dumptour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -3590,29 +3590,29 @@ int CCtsp_dumptour (int ncount, CCdatagroup *dat, int *perm, char *probname,
         }
         len += (double) CCutil_dat_edgelen (tour[ncount-1], tour[0], dat);
         if (!silent) {
-            printf ("Write tour of length %.2f to %s\n", len, buf);
-            fflush (stdout);
+            CC_PRINTF("Write tour of length %.2f to %s\n", len, buf);
+            CC_FFLUSH(stdout);
         }
     } else {
         if (!silent) {
-            printf ("Write tour to %s\n", buf); fflush (stdout);
+            CC_PRINTF("Write tour to %s\n", buf); CC_FFLUSH(stdout);
         }
     }
 
     if (!writeedges) {
         rval = CCutil_writecycle (ncount, buf, cyc, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_writecycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_writecycle failed\n"); goto CLEANUP;
         }
     } else {
         if (!dat) {
-            fprintf (stderr, "need datagroup to write edge file\n");
+            CC_FPRINTF(stderr, "need datagroup to write edge file\n");
             rval = 1; goto CLEANUP;
         } else {
             fout = fopen (buf, "w");
             if (fout == (FILE *) NULL) {
                 perror (buf);
-                fprintf (stderr, "Unable to open %s for output\n", buf);
+                CC_FPRINTF(stderr, "Unable to open %s for output\n", buf);
                 rval = 1; goto CLEANUP;
             }
             fprintf (fout, "%d %d\n", ncount, ncount);

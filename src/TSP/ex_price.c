@@ -123,33 +123,33 @@ int CCtsp_exact_price (CCtsp_lp *lp, CCbigguy *bound, int complete_price,
     *bound = CCbigguy_ZERO;
 
     if (!lp->dat && !lp->full_edges_valid) {
-        fprintf (stderr, "must have dat file or full edge set\n");
+        CC_FPRINTF(stderr, "must have dat file or full edge set\n");
         return 1;
     }
 
     if (!lp->dat && complete_price) {
-        fprintf (stderr, "must have dat file for complete price\n");
+        CC_FPRINTF(stderr, "must have dat file for complete price\n");
         return 1;
     }
 
     if (phase1) {
-        printf ("phase 1 pricing\n");
-        fflush (stdout);
+        CC_PRINTF("phase 1 pricing\n");
+        CC_FFLUSH(stdout);
     }
 
     use_full_edges = lp->full_edges_valid;
     
     if (complete_price) {
-        printf ("Pricing COMPLETE GRAPH\n");
-        fflush (stdout);
+        CC_PRINTF("Pricing COMPLETE GRAPH\n");
+        CC_FFLUSH(stdout);
         use_full_edges = 0;
     }
 
     if (!lp->exact_dual || lp->exact_dual->cutcount != lp->cuts.cutcount) {
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         rval = CCtsp_exact_dual (lp);
         if (rval) {
-            fprintf (stderr, "CCtsp_exact_dual failed\n");
+            CC_FPRINTF(stderr, "CCtsp_exact_dual failed\n");
             goto CLEANUP;
         }
     }
@@ -214,12 +214,12 @@ int CCtsp_exact_price (CCtsp_lp *lp, CCbigguy *bound, int complete_price,
                     q = CCtsp_find_edge (&lp->graph, inlist[i].ends[0],
                                    inlist[i].ends[1]);
                     if (q == -1) {
-                        printf ("YIPES: %f [%d, %d %d]: %f %f\n",
+                        CC_PRINTF("YIPES: %f [%d, %d %d]: %f %f\n",
                           CCbigguy_bigguytod (inlist[i].rc), inlist[i].ends[0],
                           inlist[i].ends[1], inlist[i].len,
                           CCbigguy_bigguytod (node_pi[inlist[i].ends[0]]),
                           CCbigguy_bigguytod (node_pi[inlist[i].ends[1]]));
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                 }
 #endif
@@ -242,7 +242,7 @@ int CCtsp_exact_price (CCtsp_lp *lp, CCbigguy *bound, int complete_price,
             rval = add_to_inlist (lp, use_full_edges, inlist, &incount,
                                   end0, end1, phase1);
             if (rval) {
-                fprintf (stderr, "add_to_inlist failed\n");
+                CC_FPRINTF(stderr, "add_to_inlist failed\n");
                 goto CLEANUP;
             }
         }
@@ -253,7 +253,7 @@ int CCtsp_exact_price (CCtsp_lp *lp, CCbigguy *bound, int complete_price,
                 rval = add_to_inlist (lp, use_full_edges, inlist, &incount,
                                       end0, end1, phase1);
                 if (rval) {
-                    fprintf (stderr, "add_to_inlist failed\n");
+                    CC_FPRINTF(stderr, "add_to_inlist failed\n");
                     goto CLEANUP;
                 }
             }
@@ -288,8 +288,8 @@ int CCtsp_exact_price (CCtsp_lp *lp, CCbigguy *bound, int complete_price,
     CCbigguy_add (bound, penalty);
 
     if (!silent) {
-        printf ("Exact Price Time: %.2f seconds\n", CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("Exact Price Time: %.2f seconds\n", CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
     }
     rval = 0;
 
@@ -326,7 +326,7 @@ static int add_to_inlist (CCtsp_lp *lp, int use_full_edges, bigpredge *inlist,
                 }
             }
             if (j == adj[end0].deg) {
-                fprintf (stderr, "ERROR: fixed edge not in fulladj\n");
+                CC_FPRINTF(stderr, "ERROR: fixed edge not in fulladj\n");
                 rval = 1; goto CLEANUP;
             }
         } else {
@@ -368,15 +368,15 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
     /* call edge_elimination at the root LP).                             */
 
     if (CCbigguy_cmp (lp->exact_lowerbound, CCbigguy_MINBIGGUY) == 0) {
-        fprintf (stderr, "need an exact lowerbound to run elimination\n");
+        CC_FPRINTF(stderr, "need an exact lowerbound to run elimination\n");
         return 1;
     }
     if (lp->upperbound == CCtsp_LP_MAXDOUBLE) {
-        fprintf (stderr, "need an exact upperbound to run elimination\n");
+        CC_FPRINTF(stderr, "need an exact upperbound to run elimination\n");
         return 1;
     }
     if (!lp->exact_dual || lp->exact_dual->cutcount != lp->cuts.cutcount) {
-        fprintf (stderr, "no exact_dual in CCtsp_edge_elimination\n");
+        CC_FPRINTF(stderr, "no exact_dual in CCtsp_edge_elimination\n");
         return 1;
     }
 
@@ -388,12 +388,12 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
     negcutoff = CCbigguy_ZERO;
     CCbigguy_sub (&negcutoff, cutoff);
     if (!silent) {
-        printf ("Edge Elimination Cutoff: %f\n", CCbigguy_bigguytod (cutoff));
-        fflush (stdout);
+        CC_PRINTF("Edge Elimination Cutoff: %f\n", CCbigguy_bigguytod (cutoff));
+        CC_FFLUSH(stdout);
     }
     if (CCbigguy_cmp (cutoff, CCbigguy_ZERO) < 0) {
-        printf ("Cutoff is less than ZERO, do not eliminate\n");
-        fflush (stdout);
+        CC_PRINTF("Cutoff is less than ZERO, do not eliminate\n");
+        CC_FFLUSH(stdout);
         return 1;
     }
 
@@ -443,13 +443,13 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
                    node_domino, BIG_PRICE_GEN, &incount, inlist, &n1, &n2,
                    &finished, cutoff, 0);
         if (rval) {
-            fprintf (stderr, "big_generate_edges failed\n");
+            CC_FPRINTF(stderr, "big_generate_edges failed\n");
             CC_FREE (adj, CCtsp_genadj);
             goto CLEANUP;
         }
         rval = big_price_list (lp, incount, inlist, node_pi, clique_pi, cut_pi);
         if (rval) {
-            fprintf (stderr, "big_price_list failed\n");
+            CC_FPRINTF(stderr, "big_price_list failed\n");
             CC_FREE (adj, CCtsp_genadj);
             goto CLEANUP;
         }
@@ -468,9 +468,9 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
                                      lp->graph.edges[ek].branch == 0)) {
 */
                         /*
-                        printf ("[%d, %d] ", inlist[i].ends[0],
+                        CC_PRINTF("[%d, %d] ", inlist[i].ends[0],
                                              inlist[i].ends[1]);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                         */
                         nfixed++;
                     }
@@ -508,7 +508,7 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
         adjspace = CC_SAFE_MALLOC (nremain + lp->nfixededges + nbranch,
                                 CCtsp_genadjobj);
         if (!adjspace) {
-            fprintf (stderr, "out of memory in CCtsp_edge_elimination\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_edge_elimination\n");
             CC_FREE (adj, CCtsp_genadj);
             rval = 1;
             goto CLEANUP;
@@ -518,7 +518,7 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
         rval = CCutil_reallocrus_count ((void **) &(lp->fixededges),
                   2 * (lp->nfixededges + nfixed), sizeof (int));
         if (rval) {
-            fprintf (stderr, "out of memory in CCtsp_edge_elimination\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_edge_elimination\n");
             CC_FREE (adj, CCtsp_genadj);
             CC_IFFREE (adjspace, CCtsp_genadjobj);
             goto CLEANUP;
@@ -541,14 +541,14 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
                    node_domino, BIG_PRICE_GEN, &incount, inlist, &n1, &n2,
                    &finished, cutoff, 0);
         if (rval) {
-            fprintf (stderr, "big_generate_edges failed\n");
+            CC_FPRINTF(stderr, "big_generate_edges failed\n");
             CC_FREE (adj, CCtsp_genadj);
             CC_IFFREE (adjspace, CCtsp_genadjobj);
             goto CLEANUP;
         }
         rval = big_price_list (lp, incount, inlist, node_pi, clique_pi, cut_pi);
         if (rval) {
-            fprintf (stderr, "big_price_list failed\n");
+            CC_FPRINTF(stderr, "big_price_list failed\n");
             CC_FREE (adj, CCtsp_genadj);
             CC_IFFREE (adjspace, CCtsp_genadjobj);
             goto CLEANUP;
@@ -587,7 +587,7 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
             end1 = lp->branchhistory[i].ends[1];
             rval = add_to_adj (lp, adj, end0, end1, &nremain);
             if (rval) {
-                fprintf (stderr, "add_to_adj failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "add_to_adj failed\n"); goto CLEANUP;
             }
         }
     }
@@ -596,7 +596,7 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
         end1 = lp->fixededges[2*i+1];
         rval = add_to_adj (lp, adj, end0, end1, &nremain);
         if (rval) {
-            fprintf (stderr, "add_to_adj failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "add_to_adj failed\n"); goto CLEANUP;
         }
     }
     rval = 0;
@@ -609,10 +609,10 @@ int CCtsp_edge_elimination (CCtsp_lp *lp, int eliminate_sparse, int silent)
     lp->full_edges_valid = 1;
 
     if (!silent) {
-        printf ("Remaining Edges: %d (with %d new fixed)\n", nremain, nfixed);
-        printf ("Edge Elimination Time: %.2f seconds\n",
+        CC_PRINTF("Remaining Edges: %d (with %d new fixed)\n", nremain, nfixed);
+        CC_PRINTF("Edge Elimination Time: %.2f seconds\n",
                 CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -649,7 +649,7 @@ static int add_to_adj (CCtsp_lp *lp, CCtsp_genadj *adj, int end0, int end1,
                 }
             }
             if (j == lp->fulladj[end0].deg) {
-                fprintf (stderr, "ERROR: fixed/branch edge not in fulladj\n");
+                CC_FPRINTF(stderr, "ERROR: fixed/branch edge not in fulladj\n");
                 rval = 1; goto CLEANUP;
             }
         } else {
@@ -678,7 +678,7 @@ static int big_pricing_duals (CCtsp_lp *lp, CCbigguy *node_pi,
     *rhs_sum = CCbigguy_ZERO;
 
     if (!lp->exact_dual || lp->exact_dual->cutcount != lp->cuts.cutcount) {
-        fprintf (stderr, "no exact_dual in big_pricing_duals\n");
+        CC_FPRINTF(stderr, "no exact_dual in big_pricing_duals\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -746,7 +746,7 @@ static int big_pricing_duals (CCtsp_lp *lp, CCbigguy *node_pi,
                 x = cut_pi[i];
                 if (CCbigguy_cmp (x, CCbigguy_ZERO) > 0) {
                     if (c->cliquecount != 1) {
-                        fprintf (stderr, "YIPES: No handle for domino\n");
+                        CC_FPRINTF(stderr, "YIPES: No handle for domino\n");
                         rval = 1;  goto CLEANUP;
                     }
                     CC_FOREACH_NODE_IN_CLIQUE (j,
@@ -762,7 +762,7 @@ static int big_pricing_duals (CCtsp_lp *lp, CCbigguy *node_pi,
                         }
                     }
                 } else if (CCbigguy_cmp (x, CCbigguy_ZERO) < 0) {
-                    fprintf (stderr, "YIPES: negative domino\n");
+                    CC_FPRINTF(stderr, "YIPES: negative domino\n");
                     rval = 1;  goto CLEANUP;
                 }
             }
@@ -867,7 +867,7 @@ static int big_price_list (CCtsp_lp *lp, int ecount, bigpredge *elist,
                 x = cut_pi[i];
                 if (CCbigguy_cmp (x, CCbigguy_ZERO) > 0) {
                     if (cut->cliquecount != 1) {
-                        fprintf (stderr, "YIPES: No handle for domino\n");
+                        CC_FPRINTF(stderr, "YIPES: No handle for domino\n");
                         rval = 1;  goto CLEANUP;
                     }
                     nzlist = CCtsp_lpcut_nzlist (&g, cut, lp->cuts.cliques,
@@ -883,7 +883,7 @@ static int big_price_list (CCtsp_lp *lp, int ecount, bigpredge *elist,
                         nzlist = nznext;
                     }
                 } else if (CCbigguy_cmp (x, CCbigguy_ZERO) < 0) {
-                    fprintf (stderr, "YIPES: negative domino\n");
+                    CC_FPRINTF(stderr, "YIPES: negative domino\n");
                     rval = 1;  goto CLEANUP;
                 }
             }
@@ -917,7 +917,7 @@ static int big_generate_edges (CCtsp_lp *lp, int use_full_edges,
     *finished = 0;
 
     if (!lp->dat && !use_full_edges) {
-        fprintf (stderr, "no source of edges in big_generate_edges\n");
+        CC_FPRINTF(stderr, "no source of edges in big_generate_edges\n");
         return 1;
     }
 
@@ -1107,14 +1107,14 @@ int CCtsp_exact_dual (CCtsp_lp *lp)
                     (int *) NULL, (int **) NULL, (double **) NULL,
                     (double **) NULL, &d_node_pi, &d_cut_pi);
     if (rval) {
-        fprintf (stderr, "get_lp_result failed\n");
-        fflush (stdout);
+        CC_FPRINTF(stderr, "get_lp_result failed\n");
+        CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
     d = CC_SAFE_MALLOC (1, CCtsp_bigdual);
     if (!(d)) {
-        fprintf (stderr, "out of memory in CCtsp_exact_dual C\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_exact_dual C\n");
         rval = 1; goto CLEANUP;
     }
     d->cutcount = cutcount;
@@ -1123,7 +1123,7 @@ int CCtsp_exact_dual (CCtsp_lp *lp)
 
     d->node_pi = CC_SAFE_MALLOC (ncount, CCbigguy);
     if (!d->node_pi) {
-        fprintf (stderr, "out of memory in CCtsp_exact_dual B\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_exact_dual B\n");
         CC_FREE (d, CCtsp_bigdual);
         rval = 1; goto CLEANUP;
     }
@@ -1135,7 +1135,7 @@ int CCtsp_exact_dual (CCtsp_lp *lp)
     if (cutcount) {
         d->cut_pi = CC_SAFE_MALLOC (cutcount, CCbigguy);
         if (!d->cut_pi) {
-            fprintf (stderr, "out of memory in CCtsp_exact_dual A\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_exact_dual A\n");
             CC_FREE (d->node_pi, CCbigguy);
             CC_FREE (d, CCtsp_bigdual);
             rval = 1; goto CLEANUP;
@@ -1179,22 +1179,22 @@ int CCtsp_verify_infeasible_lp (CCtsp_lp *lp, int *yesno, int silent)
     *yesno = 0;
     rval = CCtsp_exact_price (lp, &exactbound, 0, 1, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_exact_price_failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_exact_price_failed\n"); goto CLEANUP;
     }
 
     if (!silent) {
-        printf ("Exactbound: %f\n", CCbigguy_bigguytod (exactbound));
-        fflush (stdout);
+        CC_PRINTF("Exactbound: %f\n", CCbigguy_bigguytod (exactbound));
+        CC_FFLUSH(stdout);
     }
 
     if (CCbigguy_cmp (exactbound, CCbigguy_ZERO) > 0) {
-        printf ("Problem is shown to be infeasible\n"); fflush (stdout);
+        CC_PRINTF("Problem is shown to be infeasible\n"); CC_FFLUSH(stdout);
         *yesno = 1;
         lp->infeasible = 1;
         lp->lowerbound = CCtsp_LP_MAXDOUBLE;
         lp->exact_lowerbound = CCbigguy_MAXBIGGUY;
     } else {
-        printf ("Did not verify an infeasible LP\n"); fflush (stdout);
+        CC_PRINTF("Did not verify an infeasible LP\n"); CC_FFLUSH(stdout);
         *yesno = 0;
     }
 
@@ -1211,12 +1211,12 @@ int CCtsp_verify_lp_prune (CCtsp_lp *lp, int *yesno, int silent)
     *yesno = 0;
     rval = CCtsp_exact_price (lp, &exactbound, 0, 0, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_exact_price_failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_exact_price_failed\n"); goto CLEANUP;
     }
   
     if (!silent) {
-        printf ("Exact LP bound: %f\n", CCbigguy_bigguytod (exactbound));
-        fflush (stdout);
+        CC_PRINTF("Exact LP bound: %f\n", CCbigguy_bigguytod (exactbound));
+        CC_FFLUSH(stdout);
     }
 
     bnd = CCbigguy_dtobigguy (lp->upperbound);
@@ -1224,13 +1224,13 @@ int CCtsp_verify_lp_prune (CCtsp_lp *lp, int *yesno, int silent)
 
     if (CCbigguy_cmp (exactbound, bnd) > 0) {
         if (!silent) {
-            printf ("Can prune lp.\n"); fflush (stdout);
+            CC_PRINTF("Can prune lp.\n"); CC_FFLUSH(stdout);
         }
         *yesno = 1;
         lp->exact_lowerbound = exactbound;
     } else {
         if (!silent) {
-            printf ("Cannot prune lp.\n"); fflush (stdout);
+            CC_PRINTF("Cannot prune lp.\n"); CC_FFLUSH(stdout);
         }
         *yesno = 0;
     }

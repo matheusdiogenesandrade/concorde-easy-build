@@ -159,28 +159,28 @@ int CCchunk_separate (CCchunk_graph *chunk, CCchunk_separate_timer *timer,
     graph_init (&g);
 
 #ifdef DUMPCHUNKS
-    printf ("CCchunk_separate\n");
-    printf ("%d %d\n", chunk->ncount, chunk->ecount);
+    CC_PRINTF("CCchunk_separate\n");
+    CC_PRINTF("%d %d\n", chunk->ncount, chunk->ecount);
     for (i=0; i<chunk->ecount; i++) {
-        printf ("%d %d %.16f %d\n",chunk->end0[i], chunk->end1[i], chunk->weight[i],
+        CC_PRINTF("%d %d %.16f %d\n",chunk->end0[i], chunk->end1[i], chunk->weight[i],
                 chunk->fixed[i]);
     }
     for (i=0; i<chunk->ncount; i++) {
-        if (i>0) printf (" ");
-        printf ("%d",chunk->equality[i]);
+        if (i>0) CC_PRINTF(" ");
+        CC_PRINTF("%d",chunk->equality[i]);
     }
-    printf ("\n");
+    CC_PRINTF("\n");
 #endif /* DUMPCHUNKS */
 
     rval = graph_build (&g, chunk);
     if (rval) {
-        fprintf (stderr, "graph_build failed\n");
+        CC_FPRINTF(stderr, "graph_build failed\n");
         goto  CLEANUP;
     }
 
     rval = separate (&g, chunk, timer, callback);
     if (rval) {
-        fprintf (stderr, "separate failed\n");
+        CC_FPRINTF(stderr, "separate failed\n");
         goto CLEANUP;
     }
 
@@ -230,7 +230,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
 
     if (bcount == 0) {
         /*
-        fprintf (stderr, "Representation has 0 edges\n");
+        CC_FPRINTF(stderr, "Representation has 0 edges\n");
         */
         rval = 0; goto CLEANUP;
     }
@@ -258,7 +258,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
         x_int          == (int *) NULL ||
         fault.a.coef   == (int *) NULL ||
         sig_list       == (int *) NULL) {
-        fprintf (stderr, "Out of memory in separate\n");
+        CC_FPRINTF(stderr, "Out of memory in separate\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -278,7 +278,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
     rval = CCchunk_lpinit (&g->lp, "firstlp", bcount, x);
     CCutil_stop_timer (&timer->lpsolver, 0);
     if (rval) {
-        fprintf (stderr, "CCchunk_lpinit failed\n");
+        CC_FPRINTF(stderr, "CCchunk_lpinit failed\n");
         goto CLEANUP;
     }
 #ifdef STUDY14
@@ -293,7 +293,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
         rval = CCchunk_lpsolve (g->lp, &lpstat, c, &c[bcount]);
         CCutil_stop_timer (&timer->lpsolver, 0);
         if (rval) {
-            fprintf (stderr, "CCchunk_lpsolve failed\n");
+            CC_FPRINTF(stderr, "CCchunk_lpsolve failed\n");
             goto CLEANUP;
         }
 #ifdef STUDY14
@@ -304,13 +304,13 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
             /* not faulty */
             rval = 0;
 #ifdef STUDY14
-            printf ("faultless in %d iterations time %.2f lpsolver %.2f oracle %.2f misc\n",
+            CC_PRINTF("faultless in %d iterations time %.2f lpsolver %.2f oracle %.2f misc\n",
                     iter, lpsolver_zeit, oracle_zeit,
                     CCutil_zeit() - szeit - lpsolver_zeit - oracle_zeit);
 #endif
             goto CLEANUP;
         } else if (lpstat != CC_CHUNK_LPINFEASIBLE) {
-            fprintf (stderr, "CCchunk_lpsolve lpstat %d\n", lpstat);
+            CC_FPRINTF(stderr, "CCchunk_lpsolve lpstat %d\n", lpstat);
             rval = -1;
             goto CLEANUP;
         }
@@ -333,7 +333,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
         rval = get_signature (g, c2_int, c2_int[ecount], x_int, &found,
                               &timer->oracle);
         if (rval) {
-            fprintf (stderr, "get_signature failed\n");
+            CC_FPRINTF(stderr, "get_signature failed\n");
             goto CLEANUP;
         }
         if (found) {
@@ -347,11 +347,11 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
             }
             rval = CCchunk_lpaddcol (g->lp, x);
             if (rval) {
-                fprintf (stderr, "CCchunk_lpaddcol failed\n");
+                CC_FPRINTF(stderr, "CCchunk_lpaddcol failed\n");
                 goto CLEANUP;
             }
             if (nsigs >= maxsignatures) {
-                fprintf (stderr, "TOO MANY SIGNATURES\n");
+                CC_FPRINTF(stderr, "TOO MANY SIGNATURES\n");
             } else {
                 for (i=0; i<ecount; i++) sig_list[nsigs*ecount+i] = x_int[i];
                 nsigs++;
@@ -360,7 +360,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
 #ifdef STUDY14
             oracle_zeit += CCutil_zeit() - szeit2;
             s = get_cutslack (ecount, c2_int, c2_int[ecount], g->target);
-            printf ("   faulty (%.2f) in %d iterations time %.2f lpsolver %.2f oracle %.2f misc\n",
+            CC_PRINTF("   faulty (%.2f) in %d iterations time %.2f lpsolver %.2f oracle %.2f misc\n",
                     s, iter, lpsolver_zeit, oracle_zeit,
                     CCutil_zeit() - szeit - lpsolver_zeit - oracle_zeit);
 #endif
@@ -368,7 +368,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
             rval = collect_solutions (g, sig_list, nsigs, &fault.nsols,
                                       &fault.sols);
             if (rval) {
-                fprintf (stderr, "collect_solutions failed\n");
+                CC_FPRINTF(stderr, "collect_solutions failed\n");
                 goto CLEANUP;
             }
 
@@ -377,7 +377,7 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
                                       callback->u_data);
             CCutil_resume_timer (&timer->all);
             if (rval) {
-                fprintf (stderr, "fault callback failed\n");
+                CC_FPRINTF(stderr, "fault callback failed\n");
                 goto CLEANUP;
             }
 
@@ -400,19 +400,19 @@ static int separate (graph *g, CCchunk_graph *chunk, CCchunk_separate_timer *tim
             }
 
 #if 0
-            printf ("relaxing row %d\n", i);
-            fflush (stdout);
+            CC_PRINTF("relaxing row %d\n", i);
+            CC_FFLUSH(stdout);
 #endif
 
             rval = CCchunk_lprelaxrow (g->lp, i);
             if (rval) {
-                fprintf (stderr, "CCchunk_lprelaxrow failed\n");
+                CC_FPRINTF(stderr, "CCchunk_lprelaxrow failed\n");
                 goto CLEANUP;
             }
         }
     }
 
-    printf ("ITERATION LIMIT %d exceeded in separate\n",
+    CC_PRINTF("ITERATION LIMIT %d exceeded in separate\n",
             MAXITERATIONS);
 
   CLEANUP:
@@ -454,13 +454,13 @@ static int collect_solutions (graph *g, int *sig_list, int nsigs,
 
     bas = CC_SAFE_MALLOC (nsigs, int);
     if (bas == (int *) NULL) {
-        fprintf (stderr, "Out of memory in collect_solutions\n");
+        CC_FPRINTF(stderr, "Out of memory in collect_solutions\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCchunk_lpbasis (g->lp, nsigs, bas);
     if (rval) {
-        fprintf (stderr, "CCchunk_lpbasis failed\n");
+        CC_FPRINTF(stderr, "CCchunk_lpbasis failed\n");
         goto CLEANUP;
     }
 
@@ -479,7 +479,7 @@ static int collect_solutions (graph *g, int *sig_list, int nsigs,
 
     sols = CC_SAFE_MALLOC (ecount * nsols, int);
     if (sols == (int *) NULL) {
-        fprintf (stderr, "Out of memory in collect_solutions\n");
+        CC_FPRINTF(stderr, "Out of memory in collect_solutions\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -542,7 +542,7 @@ static int graph_build (graph *g, CCchunk_graph *chunk)
         g->edgelist == (edge *) NULL ||
         g->adjspace == (adjinfo *) NULL ||
         g->target   == (double *) NULL) {
-        fprintf (stderr, "Out of memory in graph_build\n");
+        CC_FPRINTF(stderr, "Out of memory in graph_build\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -742,14 +742,14 @@ static void integerize_check (int count, double *dvec, int *ivec)
         error += CC_OURABS(dvec[i]/scale - ivec[i]);
     }
     if (error > 0.001) {
-        printf ("bad integerize error %f\n", error);
-        printf ("from:");
-        for (i=0; i<count; i++) printf (" %f", dvec[i]);
-        printf ("\n");
-        printf ("to:");
-        for (i=0; i<count; i++) printf (" %d", ivec[i]);
-        printf ("\n");
-        fflush (stdout);
+        CC_PRINTF("bad integerize error %f\n", error);
+        CC_PRINTF("from:");
+        for (i=0; i<count; i++) CC_PRINTF(" %f", dvec[i]);
+        CC_PRINTF("\n");
+        CC_PRINTF("to:");
+        for (i=0; i<count; i++) CC_PRINTF(" %d", ivec[i]);
+        CC_PRINTF("\n");
+        CC_FFLUSH(stdout);
     }
 }
 
@@ -811,9 +811,9 @@ static void integerize_vector (int count, double *dvec, int *ivec)
     double dmax;
 
 #ifdef STUDY12
-    printf ("integerize:");
-    for (i=0; i<count; i++) printf (" %f", dvec[i]);
-    printf ("\n");
+    CC_PRINTF("integerize:");
+    for (i=0; i<count; i++) CC_PRINTF(" %f", dvec[i]);
+    CC_PRINTF("\n");
 #endif
 
     dmax = 0.0;
@@ -838,9 +838,9 @@ static void integerize_vector (int count, double *dvec, int *ivec)
     }
 
 #ifdef STUDY12
-    printf ("integerized");
-    for (i=0; i<count; i++) printf (" %d", ivec[i]);
-    printf ("\n");
+    CC_PRINTF("integerized");
+    for (i=0; i<count; i++) CC_PRINTF(" %d", ivec[i]);
+    CC_PRINTF("\n");
 #endif
 
 #ifdef STUDY13
@@ -850,7 +850,7 @@ static void integerize_vector (int count, double *dvec, int *ivec)
     return;
 
   FAILURE:
-    printf ("Overflow in integerize_vector.  Calling integerize_vector2\n");
+    CC_PRINTF("Overflow in integerize_vector.  Calling integerize_vector2\n");
     integerize_vector2 (count, dvec, ivec);
 }
 
@@ -861,9 +861,9 @@ static void integerize_vector2 (int count, double *dvec, int *ivec)
     int divv;
 
 #ifdef STUDY12
-    printf ("integerize(2):");
-    for (i=0; i<count; i++) printf (" %f", dvec[i]);
-    printf ("\n");
+    CC_PRINTF("integerize(2):");
+    for (i=0; i<count; i++) CC_PRINTF(" %f", dvec[i]);
+    CC_PRINTF("\n");
 #endif
 
     scale = CC_OURABS(dvec[0]);
@@ -896,9 +896,9 @@ static void integerize_vector2 (int count, double *dvec, int *ivec)
     }
 
 #ifdef STUDY12
-    printf ("integerized");
-    for (i=0; i<count; i++) printf (" %d", ivec[i]);
-    printf ("\n");
+    CC_PRINTF("integerized");
+    for (i=0; i<count; i++) CC_PRINTF(" %d", ivec[i]);
+    CC_PRINTF("\n");
 #endif
 
 #ifdef STUDY13
@@ -924,7 +924,7 @@ static int get_signature (graph *g, int *obj, int rhs, int *x, int *found,
 
     a.coef = CC_SAFE_MALLOC (ecount, int);
     if (a.coef == (int *) NULL) {
-        fprintf (stderr, "Out of memory in get_signature\n");
+        CC_FPRINTF(stderr, "Out of memory in get_signature\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -935,10 +935,10 @@ static int get_signature (graph *g, int *obj, int rhs, int *x, int *found,
         *found = 0;
         rval = 0; goto CLEANUP;
     } else if (rval == CC_CHUNK_ORACLE_SEARCHLIMITEXCEEDED) {
-        fprintf (stderr, "CCchunk_oracle node limit exceeded\n");
+        CC_FPRINTF(stderr, "CCchunk_oracle node limit exceeded\n");
         goto CLEANUP;
     } else if (rval) {
-        fprintf (stderr, "CCchunk_oracle failed\n");
+        CC_FPRINTF(stderr, "CCchunk_oracle failed\n");
         goto CLEANUP;
     }
 
@@ -958,11 +958,11 @@ static void report_objective (int ecount, int *obj, int rhs)
 {
     int i;
 
-    printf ("objective ");
+    CC_PRINTF("objective ");
     for (i=0; i < ecount; i++) {
-        printf (" %d", obj[i]);
+        CC_PRINTF(" %d", obj[i]);
     }
-    printf ("> %d\n", rhs);
+    CC_PRINTF("> %d\n", rhs);
 }
 */
 
@@ -971,11 +971,11 @@ static void report_new_signature (int ecount, int *x, int objslack)
 {
     int i;
 
-    printf ("got new signature (by %d)", objslack);
+    CC_PRINTF("got new signature (by %d)", objslack);
     for (i=0; i < ecount; i++) {
-        printf (" %d", x[i]);
+        CC_PRINTF(" %d", x[i]);
     }
-    printf ("\n");
+    CC_PRINTF("\n");
 }
 */
 
@@ -987,7 +987,7 @@ CCchunk_graph *CCchunk_graph_alloc (int ncount, int ecount)
 
     c = CC_SAFE_MALLOC (1, CCchunk_graph);
     if (!c) {
-        printf ("out of memory in CCchunk_graph_alloc\n");
+        CC_PRINTF("out of memory in CCchunk_graph_alloc\n");
         return (CCchunk_graph *) NULL;
     }
 
@@ -1000,7 +1000,7 @@ CCchunk_graph *CCchunk_graph_alloc (int ncount, int ecount)
 
     if (!c->end0 || !c->end1 || !c->fixed || !c->weight ||
         !c->equality || !c->members) {
-        printf ("out of memory in CCchunk_graph_alloc\n");
+        CC_PRINTF("out of memory in CCchunk_graph_alloc\n");
         return (CCchunk_graph *) NULL;
     }
 

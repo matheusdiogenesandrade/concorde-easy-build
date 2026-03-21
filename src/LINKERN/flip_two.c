@@ -110,7 +110,7 @@ int CClinkern_flipper_init (CClk_flipper *F, int ncount, int *cyc)
     init_flipper (F);
     rval = build_flipper (F, ncount); 
     if (rval) {
-        fprintf (stderr, "build_flipper failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_flipper failed\n"); goto CLEANUP;
     }
 
     remain = ncount;
@@ -130,7 +130,7 @@ int CClinkern_flipper_init (CClk_flipper *F, int ncount, int *cyc)
     i++;
 
     if (i != F->nsegments) {
-        fprintf (stderr, "seg count is wrong\n");
+        CC_FPRINTF(stderr, "seg count is wrong\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -631,7 +631,7 @@ static int build_flipper (CClk_flipper *Fl, int ncount)
                  /* The +1 will stop a purify burp later */
     if (Fl->parents  == (CClk_parentnode *) NULL ||
         Fl->children == (CClk_childnode *) NULL) {
-        fprintf (stderr, "out of memory in build_flipper\n");
+        CC_FPRINTF(stderr, "out of memory in build_flipper\n");
         rval = 1; goto CLEANUP;
     }
 

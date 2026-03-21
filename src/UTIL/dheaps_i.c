@@ -148,7 +148,7 @@ int CCutil_dheap_findmin (CCdheap *h)
 int CCutil_dheap_insert (CCdheap *h, int i)
 {
     if (h->size >= h->total_space) {
-        fprintf (stderr, "Error - heap already full\n");
+        CC_FPRINTF(stderr, "Error - heap already full\n");
         return 1;
     }
     h->size++;

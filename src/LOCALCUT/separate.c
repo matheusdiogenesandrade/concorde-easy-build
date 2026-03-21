@@ -273,7 +273,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
 
     *lp_p = CC_SAFE_MALLOC (1, CCchunklp);
     if ( *lp_p == (CCchunklp *) NULL ) {
-        rval = 1; fprintf (stderr, "lp_p allocation failed\n");
+        rval = 1; CC_FPRINTF(stderr, "lp_p allocation failed\n");
         return rval;
     }
 
@@ -287,25 +287,25 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
 
     rval = CClp_init (&((*lp_p)->lp));
     if ( rval ) {
-        fprintf (stderr, "CClp_init failed\n");
+        CC_FPRINTF(stderr, "CClp_init failed\n");
         goto CLEANUP;
     }
 
     rval = CClp_create ((*lp_p)->lp, lp_name);
     if ( rval ) {
-        fprintf (stderr, "CClp_create failed\n");
+        CC_FPRINTF(stderr, "CClp_create failed\n");
         goto CLEANUP;
     }
 
     rval = CClp_tune_small ((*lp_p)->lp);
     if (rval) {
-        fprintf (stderr, "CClp_tune_small failed\n");
+        CC_FPRINTF(stderr, "CClp_tune_small failed\n");
         goto CLEANUP;
     }
 
     rval = CClp_disable_presolve ((*lp_p)->lp);
     if (rval) {
-        fprintf (stderr, "CClp_disable_presolve failed\n");
+        CC_FPRINTF(stderr, "CClp_disable_presolve failed\n");
         goto CLEANUP;
     }
 
@@ -315,7 +315,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
        edges, even if some are no longer active */
 
     if ( lp_nrows <= 0 ) {
-       rval = 1;  fprintf (stderr, "lp_nrows <= 0\n");
+       rval = 1;  CC_FPRINTF(stderr, "lp_nrows <= 0\n");
        goto CLEANUP;
     }
 
@@ -329,7 +329,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
          (*lp_p)->cmatind == (int *)    NULL ||
          (*lp_p)->cmatval == (double *) NULL ||
          (*lp_p)->pi      == (double *) NULL   ) {
-        rval = 1; fprintf (stderr, "Not enough memory\n");
+        rval = 1; CC_FPRINTF(stderr, "Not enough memory\n");
         goto CLEANUP;
     }
 
@@ -341,7 +341,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
 
     rval = CClp_new_row ((*lp_p)->lp, sense, rhs);
     if ( rval ) {
-        fprintf (stderr, "CClp_new_row failed\n");
+        CC_FPRINTF(stderr, "CClp_new_row failed\n");
         goto CLEANUP;
     }
 
@@ -354,7 +354,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
 #endif
         rval = CClp_new_row ((*lp_p)->lp, sense, rhs);
         if ( rval ) {
-            fprintf (stderr, "CClp_new_row failed\n");
+            CC_FPRINTF(stderr, "CClp_new_row failed\n");
             goto CLEANUP;
         }
     }
@@ -364,7 +364,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
     cmatbeg[0] = 0;
     lb[0] = 0.0;
     if (SEPARATE_EPSILON == 0.0) {
-        fprintf (stderr, "SEPARATE_NORML1 does not work with SEPARATE_EPSILON == 0.0\n");
+        CC_FPRINTF(stderr, "SEPARATE_NORML1 does not work with SEPARATE_EPSILON == 0.0\n");
         rval = 1; goto CLEANUP;
     }
     ub[0] = 2.0/SEPARATE_EPSILON;
@@ -377,7 +377,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
     rval = CClp_addcols ((*lp_p)->lp, 1, lp_nrows+1, obj, cmatbeg, (*lp_p)->cmatind,
                          (*lp_p)->cmatval, lb, ub);
     if (rval) {
-        fprintf (stderr, "CClp_addcols failed\n");
+        CC_FPRINTF(stderr, "CClp_addcols failed\n");
         goto CLEANUP;
     }
     (*lp_p)->extracols++;
@@ -401,7 +401,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
         rval = CClp_addcols ((*lp_p)->lp, 1, 1, obj, cmatbeg, cmatind,
                              cmatval, lb, ub);
         if (rval) {
-            fprintf (stderr, "CClp_addcols failed\n");
+            CC_FPRINTF(stderr, "CClp_addcols failed\n");
             goto CLEANUP;
         }
         (*lp_p)->extracols++;
@@ -417,7 +417,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
         rval = CClp_addcols ((*lp_p)->lp, 1, 1, obj, cmatbeg, cmatind,
                              cmatval, lb, ub);
         if (rval) {
-            fprintf (stderr, "CClp_addcols failed\n");
+            CC_FPRINTF(stderr, "CClp_addcols failed\n");
             goto CLEANUP;
         }
         (*lp_p)->extracols++;
@@ -431,7 +431,7 @@ int CCchunk_lpinit (CCchunklp **lp_p, const char *lp_name, int lp_nrows,
         rval = CClp_addcols ((*lp_p)->lp, 1, 1, obj, cmatbeg, cmatind,
                              cmatval, lb, ub);
         if (rval) {
-            fprintf (stderr, "CClp_addcols failed\n");
+            CC_FPRINTF(stderr, "CClp_addcols failed\n");
             goto CLEANUP;
         }
         (*lp_p)->extracols++;
@@ -493,7 +493,7 @@ int CCchunk_lpaddcol (CCchunklp *lp, double *x)
                        nzs /* no. nzs */, &obj, &cmatbeg, lp->cmatind,
                        lp->cmatval, &lb, &ub);
     if ( rval ) {
-        fprintf (stderr, "CClp_addcols failed\n");
+        CC_FPRINTF(stderr, "CClp_addcols failed\n");
         goto CLEANUP;
     }
 
@@ -512,17 +512,17 @@ int CCchunk_lprelaxrow (CCchunklp *lp, int del_row)
 
 #ifdef SEPARATE_STRICTAFFINE
     if (CClp_ncols (lp->lp) == lp->extracols) {
-/*        fprintf (stderr, "Asking for trouble, relaxing row from initial problem\n");*/
+/*        CC_FPRINTF(stderr, "Asking for trouble, relaxing row from initial problem\n");*/
     }
 #endif
         
     if ( del_row >= lp->nrows  ||  del_row < 0 ) {
-        rval = 1; fprintf (stderr, "Illegal row index %d\n", del_row);
+        rval = 1; CC_FPRINTF(stderr, "Illegal row index %d\n", del_row);
         return rval;
     }
 
     if ( lp->active[del_row] == 0 ) {
-        fprintf (stderr, "Row %d already inactive\n", del_row);
+        CC_FPRINTF(stderr, "Row %d already inactive\n", del_row);
         return rval;
     }
 
@@ -532,7 +532,7 @@ int CCchunk_lprelaxrow (CCchunklp *lp, int del_row)
 
     rval = CClp_delete_row (lp->lp, k);
     if ( rval ) {
-        fprintf (stderr, "CClp_delete_row failed\n");
+        CC_FPRINTF(stderr, "CClp_delete_row failed\n");
     } else {
         lp->active[del_row] = 0;
     }
@@ -576,12 +576,12 @@ int CCchunk_lpsolve (CCchunklp *lp, int *lpstatus_p, double *c,
 #endif
 #ifdef SEPARATE_OPTIMIZE
     if ( rval ) {
-        fprintf (stderr, "CClp_opt failed, rval %d\n", rval);
+        CC_FPRINTF(stderr, "CClp_opt failed, rval %d\n", rval);
         return 1;
     }
     rval = CClp_objval (lp->lp, &obj);
     if (rval) {
-        fprintf (stderr, "CClp_objval failed, rval %d\n", rval);
+        CC_FPRINTF(stderr, "CClp_objval failed, rval %d\n", rval);
         return 1;
     }
 #ifdef SEPARATE_NORML1
@@ -594,7 +594,7 @@ int CCchunk_lpsolve (CCchunklp *lp, int *lpstatus_p, double *c,
     }
 #else /* SEPARATE_OPTIMIZE */
     if (rval != 0 && rval != 2) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
         return rval;
     }
     if (rval == 0) {
@@ -604,7 +604,7 @@ int CCchunk_lpsolve (CCchunklp *lp, int *lpstatus_p, double *c,
 #endif /* SEPARATE_OPTIMIZE */
     rval = CClp_pi (lp->lp, lp->pi);
     if (rval) {
-        fprintf (stderr, "CClp_pi failed\n");
+        CC_FPRINTF(stderr, "CClp_pi failed\n");
         return rval;
     }
     k = 0;
@@ -635,7 +635,7 @@ int CCchunk_lpbasis (CCchunklp *lp, int ncols, int *basis)
 
     rval = CClp_get_info (lp->lp, &info);
     if (rval) {
-        fprintf (stderr, "CClp_get_info failed\n");
+        CC_FPRINTF(stderr, "CClp_get_info failed\n");
         goto CLEANUP;
     }
 
@@ -706,7 +706,7 @@ int CCchunk_lprhs (CCchunklp *lp, double *xstar)
             rval = CPXchgcoef (lp->lp->cplex_env, lp->lp->cplex_lp, j, col,
                                mul * xstar[i]);
             if (rval) {
-                fprintf (stderr, "CPXchgcoef failed\n");
+                CC_FPRINTF(stderr, "CPXchgcoef failed\n");
                 return rval;
             }
             j++;

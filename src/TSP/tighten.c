@@ -347,7 +347,7 @@ static int initialize_lpcut_in (tighten_graph *tg, CCtsp_lpcut_in *c)
     }
 
     if (c->skel.atomcount == 0) {
-        fprintf (stderr, "error, cut in tighten has empty skeleton\n");
+        CC_FPRINTF(stderr, "error, cut in tighten has empty skeleton\n");
         return 1;
     }
     
@@ -597,7 +597,7 @@ static void cleanup_graph (tighten_graph *tg)
     {
         int total, onlist, leak;
         if ((leak = atomfind_leaks(&tg->atomfind_world, &total, &onlist))) {
-            fprintf (stderr, "TIGHTEN leaked %d atomfind's (total %d onlist %d)\n",
+            CC_FPRINTF(stderr, "TIGHTEN leaked %d atomfind's (total %d onlist %d)\n",
                      leak, total, onlist);
         }
     }
@@ -673,7 +673,7 @@ static int collect_skeleton (tighten_graph *tg, CCtsp_skeleton *skel)
     
     skel->atoms = CC_SAFE_MALLOC (tg->atomcount, int);
     if (skel->atoms == (int *) NULL) {
-        fprintf (stderr, "Out of memory in collect_skeleton\n");
+        CC_FPRINTF(stderr, "Out of memory in collect_skeleton\n");
         rval = 1; goto CLEANUP;
     }
     skel->atomcount = tg->atomcount;
@@ -686,7 +686,7 @@ static int collect_skeleton (tighten_graph *tg, CCtsp_skeleton *skel)
 
     for (i=0; i<skel->atomcount; i++) {
         if (skel->atoms[i] == -1) {
-            fprintf (stderr, "collect_atomfinder didn't find atom %d\n", i);
+            CC_FPRINTF(stderr, "collect_atomfinder didn't find atom %d\n", i);
             rval = 1; goto CLEANUP;
         }
     }
@@ -737,16 +737,16 @@ int CCtsp_tighten_lpcut_in (CCtsp_lpgraph *g, CCtsp_lpcut_in *c, double *x,
     double szeit = CCutil_zeit();
 
     if (c->branch != 0) {
-        fprintf (stderr, "try to tighten a branch cut\n"); return 1;
+        CC_FPRINTF(stderr, "try to tighten a branch cut\n"); return 1;
     }
     if (c->sense != 'G') {
-        fprintf (stderr, "try to tighten a <= cut\n"); return 1;
+        CC_FPRINTF(stderr, "try to tighten a <= cut\n"); return 1;
     }
     if (c->cliquecount > MAX_ALLOWABLE_CLIQUE_COUNT) {
         if (pimprove) *pimprove = 0.0;
         rval = CCtsp_copy_lpcut_in (c, cout);
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpcut_in failed\n"); return rval;
+            CC_FPRINTF(stderr, "CCtsp_copy_lpcut_in failed\n"); return rval;
         }
         return 0;
     }
@@ -755,13 +755,13 @@ int CCtsp_tighten_lpcut_in (CCtsp_lpgraph *g, CCtsp_lpcut_in *c, double *x,
     {
         int i;
         
-        printf ("lpcut_in in  skeleton:");
+        CC_PRINTF("lpcut_in in  skeleton:");
         for (i=0; i<c->skel.atomcount; i++) {
-            printf (" %d", c->skel.atoms[i]);
+            CC_PRINTF(" %d", c->skel.atoms[i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
         CCtsp_print_lpcut_in (c);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 #endif
     
@@ -789,13 +789,13 @@ int CCtsp_tighten_lpcut_in (CCtsp_lpgraph *g, CCtsp_lpcut_in *c, double *x,
     {
         int i;
         
-        printf ("lpcut_in out skeleton:");
+        CC_PRINTF("lpcut_in out skeleton:");
         for (i=0; i<cout->skel.atomcount; i++) {
-            printf (" %d", cout->skel.atoms[i]);
+            CC_PRINTF(" %d", cout->skel.atoms[i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
         CCtsp_print_lpcut_in (cout);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 #endif
     
@@ -819,10 +819,10 @@ int CCtsp_tighten_lpcut (CCtsp_lpgraph *g, CCtsp_lpclique *cliques,
     double szeit = CCutil_zeit();
 
     if (c->branch != 0) {
-        fprintf (stderr, "try to tighten a branch cut\n"); return 1;
+        CC_FPRINTF(stderr, "try to tighten a branch cut\n"); return 1;
     }
     if (c->sense != 'G') {
-        fprintf (stderr, "try to tighten a <= cut\n"); return 1;
+        CC_FPRINTF(stderr, "try to tighten a <= cut\n"); return 1;
     }
 
     if (c->cliquecount > MAX_ALLOWABLE_CLIQUE_COUNT) {
@@ -832,7 +832,7 @@ int CCtsp_tighten_lpcut (CCtsp_lpgraph *g, CCtsp_lpclique *cliques,
         if (pimprove) *pimprove = 0.0;
         rval = CCtsp_lpcut_to_lpcut_in (&dummy, c, cout);
         if (rval) {
-            fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n"); return rval;
+            CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n"); return rval;
         }
         return 0;
     }
@@ -876,12 +876,12 @@ void CCtsp_init_tighten_info (CCtsp_tighten_info *stats)
 
 void CCtsp_print_tighten_info (CCtsp_tighten_info *stats)
 {
-    printf ("TIGHTEN STATS: %d calls (%d failed), %.2f improvement, %.2f seconds\n",
+    CC_PRINTF("TIGHTEN STATS: %d calls (%d failed), %.2f improvement, %.2f seconds\n",
             stats->ncall, stats->nfail, stats->add_delta + stats->del_delta,
             stats->time);
-    printf ("               %d adds, %d tied, %.2f improvement\n",
+    CC_PRINTF("               %d adds, %d tied, %.2f improvement\n",
             stats->nadd, stats->nadd_tied, stats->add_delta);
-    printf ("               %d dels, %d tied, %.2f improvement\n",
+    CC_PRINTF("               %d dels, %d tied, %.2f improvement\n",
             stats->ndel, stats->ndel_tied, stats->del_delta);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 }

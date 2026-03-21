@@ -128,24 +128,24 @@ int CCcombs_find_blocks (int ncount, int ecount, int *elist, double *x,
     init_graph (&G);
 
     if (cutnodes && !ncutnodes) {
-        fprintf (stderr, "must use ncutnodes if using cutnodes\n");
+        CC_FPRINTF(stderr, "must use ncutnodes if using cutnodes\n");
         rval = 1; goto CLEANUP;
     }
     if (blocks && (!nblocks || !blockcnts)) {
-        fprintf (stderr, "must use nblocks and blockcnts if using blocks\n");
+        CC_FPRINTF(stderr, "must use nblocks and blockcnts if using blocks\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = build_graph (&G, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "build_graph failed\n");
+        CC_FPRINTF(stderr, "build_graph failed\n");
         goto CLEANUP;
     }
 
     if (G.ecount > 0) {
         edgestack = CC_SAFE_MALLOC (G.ecount, shortedge);
         if (!edgestack) {
-            fprintf (stderr, "out of memory in CCcombs_find_blocks\n");
+            CC_FPRINTF(stderr, "out of memory in CCcombs_find_blocks\n");
             rval = 1; goto CLEANUP;
         }
     } else {
@@ -172,7 +172,7 @@ int CCcombs_find_blocks (int ncount, int ecount, int *elist, double *x,
             rval = findblocks (&G, i, -1, &lastnumber, &top, clistptr,
                                blistptr);
             if (rval) {
-                fprintf (stderr, "findblocks failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "findblocks failed\n"); goto CLEANUP;
             }
         }
     }
@@ -188,7 +188,7 @@ int CCcombs_find_blocks (int ncount, int ecount, int *elist, double *x,
             if (k) {
                 *cutnodes = CC_SAFE_MALLOC (k, int);
                 if (*cutnodes == (int *) NULL) {
-                    fprintf (stderr, "out of memory in CCcombs_find_blocks\n");
+                    CC_FPRINTF(stderr, "out of memory in CCcombs_find_blocks\n");
                     rval = 1; goto CLEANUP;
                 }
                 k = 0;
@@ -214,7 +214,7 @@ int CCcombs_find_blocks (int ncount, int ecount, int *elist, double *x,
             *blocks = CC_SAFE_MALLOC (bnt, int *);
             *blockcnts = CC_SAFE_MALLOC (bnt, int);
             if (*blocks == (int **) NULL) {
-                fprintf (stderr, "out of memory in CCcombs_find_blocks\n");
+                CC_FPRINTF(stderr, "out of memory in CCcombs_find_blocks\n");
                 if (cutnodes) {
                     CC_IFFREE (*cutnodes, int);
                     *ncutnodes = 0;
@@ -229,7 +229,7 @@ int CCcombs_find_blocks (int ncount, int ecount, int *elist, double *x,
                 }
                 b = CC_SAFE_MALLOC (k, int);
                 if (b == (int *) NULL) {
-                    fprintf (stderr, "out of memory in CCcombs_find_blocks\n");
+                    CC_FPRINTF(stderr, "out of memory in CCcombs_find_blocks\n");
                     for (k = 0; k < bnt; k++) {
                         CC_IFFREE ((*blocks)[k], int);
                     }
@@ -358,7 +358,7 @@ static int build_graph (graph *G, int ncount, int ecount, int *elist,
     if (G->ncount > 0) {
         G->nodelist = CC_SAFE_MALLOC (G->ncount, node);
         if (!G->nodelist) {
-            fprintf (stderr, "out of memory in build_graph\n");
+            CC_FPRINTF(stderr, "out of memory in build_graph\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -366,7 +366,7 @@ static int build_graph (graph *G, int ncount, int ecount, int *elist,
     if (G->ecount > 0) {
         G->adjspace = CC_SAFE_MALLOC (2*G->ecount, int);
         if (!G->adjspace) {
-            fprintf (stderr, "out of memory in build_graph\n");
+            CC_FPRINTF(stderr, "out of memory in build_graph\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -468,13 +468,13 @@ static void block_free_world (CCptrworld *intptr_world,
     int total, onlist;
 
     if (intptr_check_leaks (intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (intptr_world);
 
     if (intptrptr_check_leaks (intptrptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (intptrptr_world);

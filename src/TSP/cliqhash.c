@@ -131,7 +131,7 @@ int CCtsp_register_clique (CCtsp_lpcuts *cuts, CCtsp_lpclique *c)
 
     new = CC_SAFE_MALLOC (c->segcount, CCtsp_segment);
     if (!new) {
-        fprintf (stderr, "out of memory in CCtsp_register_clique\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_register_clique\n");
         return -1;
     }
 
@@ -179,7 +179,7 @@ void CCtsp_unregister_clique (CCtsp_lpcuts *cuts, int c)
             y = cuts->cliques[y].hashnext;
         }
         if (y == -1) {
-            fprintf (stderr, "Couldn't find clique to delete from hash\n");
+            CC_FPRINTF(stderr, "Couldn't find clique to delete from hash\n");
             return;
         }
         cuts->cliques[yprev].hashnext = cuts->cliques[c].hashnext;
@@ -264,7 +264,7 @@ int CCtsp_register_domino (CCtsp_lpcuts *cuts, CCtsp_lpdomino *c)
     for (k = 0; k < 2; k++) {
         new[k] = CC_SAFE_MALLOC (c->sets[k].segcount, CCtsp_segment);
         if (!new[k]) {
-            fprintf (stderr, "out of memory in CCtsp_register_domino\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_register_domino\n");
             if (k == 1) { CC_FREE (new[0], CCtsp_segment); }
             return -1;
         }
@@ -320,7 +320,7 @@ void CCtsp_unregister_domino (CCtsp_lpcuts *cuts, int c)
             y = cuts->dominos[y].hashnext;
         }
         if (y == -1) {
-            fprintf (stderr, "Couldn't find domino to delete from hash\n");
+            CC_FPRINTF(stderr, "Couldn't find domino to delete from hash\n");
             return;
         }
         cuts->dominos[yprev].hashnext = cuts->dominos[c].hashnext;

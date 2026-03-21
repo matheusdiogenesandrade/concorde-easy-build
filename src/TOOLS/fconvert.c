@@ -68,7 +68,7 @@ int main (int ac, char **av)
     }
 
     szeit = CCutil_zeit ();
-    printf ("Reading files ... "); fflush (stdout);
+    CC_PRINTF("Reading files ... "); CC_FFLUSH(stdout);
     if (getgraph (edgefilename, datfilename, &ncount, &ecount, &elist, &elen,
                   &xcoord, &ycoord))
         goto CLEANUP;
@@ -78,9 +78,9 @@ int main (int ac, char **av)
                              &dlen, binary_in))
             goto CLEANUP;
     }
-    printf ("DONE\n"); fflush (stdout);
+    CC_PRINTF("DONE\n"); CC_FFLUSH(stdout);
 
-    printf ("Writing files ... "); fflush (stdout);
+    CC_PRINTF("Writing files ... "); CC_FFLUSH(stdout);
     if (edgefilename) {
         if (!double_len) {
             if (dumpedges (ncount, ecount, elist, elen))
@@ -102,10 +102,10 @@ int main (int ac, char **av)
         if (dumpdat (ncount, xcoord, ycoord))
             goto CLEANUP;
     }
-    printf ("DONE\n"); fflush (stdout);
+    CC_PRINTF("DONE\n"); CC_FFLUSH(stdout);
 
-    printf ("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_PRINTF("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
     if (xcoord) {
@@ -171,14 +171,14 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [-abir] [-e edgefile] [-n: datfile]\n", f);
-    fprintf (stderr, "     a: produce ascii output files\n");
-    fprintf (stderr, "     b: input files are in binary format\n");
-    fprintf (stderr, "     i: input datfile has integer data\n");
-    fprintf (stderr, "     e file: edgefile input\n");
-    fprintf (stderr, "     d: the edgelengths are doubles\n");
-    fprintf (stderr, "     n file: datafile input\n");
-    fprintf (stderr, "     r: input files in our old (reversed) format\n");
+    CC_FPRINTF(stderr, "Usage: %s [-abir] [-e edgefile] [-n: datfile]\n", f);
+    CC_FPRINTF(stderr, "     a: produce ascii output files\n");
+    CC_FPRINTF(stderr, "     b: input files are in binary format\n");
+    CC_FPRINTF(stderr, "     i: input datfile has integer data\n");
+    CC_FPRINTF(stderr, "     e file: edgefile input\n");
+    CC_FPRINTF(stderr, "     d: the edgelengths are doubles\n");
+    CC_FPRINTF(stderr, "     n file: datafile input\n");
+    CC_FPRINTF(stderr, "     r: input files in our old (reversed) format\n");
 }
 
 static int getgraph (char *edgefile, char *datfile, int *ncount, int *ecount,
@@ -240,7 +240,7 @@ static int getgraph (char *edgefile, char *datfile, int *ncount, int *ecount,
             int i, k;
             if (in == (FILE *) NULL) {
                 perror (edgefile);
-                fprintf (stderr, "Unable to open %s for input\n", edgefile);
+                CC_FPRINTF(stderr, "Unable to open %s for input\n", edgefile);
                 return 1;
             }
             *ncount = CCutil_readint (in);
@@ -286,9 +286,9 @@ static int getgraph (char *edgefile, char *datfile, int *ncount, int *ecount,
                 }
             }
             if (edgefile && i != *ncount) {
-                fprintf (stderr, "dat file does not match edge file\n");
+                CC_FPRINTF(stderr, "dat file does not match edge file\n");
                 if (CCutil_sclose (f))
-                    fprintf (stderr, "could not close file\n");
+                    CC_FPRINTF(stderr, "could not close file\n");
                 if (edgefile != (char *) NULL) {
                     CC_FREE (*elist, int);
                     CC_FREE (*elen, int);
@@ -297,11 +297,11 @@ static int getgraph (char *edgefile, char *datfile, int *ncount, int *ecount,
             } else {
                 *ncount = i;
             }
-            printf ("%d nodes ... ", *ncount); fflush (stdout);
+            CC_PRINTF("%d nodes ... ", *ncount); CC_FFLUSH(stdout);
             *xcoord = CC_SAFE_MALLOC (*ncount, double);
             if (!(*xcoord)) {
                 if (CCutil_sclose (f))
-                    fprintf (stderr, "could not close file\n");
+                    CC_FPRINTF(stderr, "could not close file\n");
                 if (edgefile != (char *) NULL) {
                     CC_FREE (*elist, int);
                     CC_FREE (*elen, int);
@@ -311,7 +311,7 @@ static int getgraph (char *edgefile, char *datfile, int *ncount, int *ecount,
             *ycoord = CC_SAFE_MALLOC (*ncount, double);
             if (!(*ycoord)) {
                 if (CCutil_sclose (f))
-                    fprintf (stderr, "could not close file\n");
+                    CC_FPRINTF(stderr, "could not close file\n");
                 CC_FREE(*xcoord, double);
                 if (edgefile != (char *) NULL) {
                     CC_FREE (*elist, int);
@@ -353,12 +353,12 @@ static int getgraph (char *edgefile, char *datfile, int *ncount, int *ecount,
             int i;
             if (indat == (FILE *) NULL) {
                 perror (datfile);
-                fprintf (stderr, "Unable to open %s\n", datfile);
+                CC_FPRINTF(stderr, "Unable to open %s\n", datfile);
                 return 1;
             }
             fscanf (indat, " %d", &i);
             if (edgefile && i != *ncount) {
-                fprintf (stderr, "dat file does not match edge file\n");
+                CC_FPRINTF(stderr, "dat file does not match edge file\n");
                 fclose (indat);
                 if (edgefile != (char *) NULL) {
                     CC_FREE (*elist, int);
@@ -393,8 +393,8 @@ static int getgraph (char *edgefile, char *datfile, int *ncount, int *ecount,
                     (*ycoord)[i] = (double) CCutil_readint (indat);
                 }
             } else {
-                printf ("WARNING: Doubles will be converted to ints\n");
-                fflush (stdout);
+                CC_PRINTF("WARNING: Doubles will be converted to ints\n");
+                CC_FFLUSH(stdout);
                 for (i = 0; i < *ncount; i++)
                     fscanf (indat, "%lf %lf", &((*xcoord)[i]),
                             &((*ycoord)[i]));
@@ -443,7 +443,7 @@ static int dumpedges (int ncount, int ecount, int *elist, int *elen)
         FILE *out = fopen ("edge.out", "w");
         if (out == (FILE *) NULL) {
             perror ("edge.out");
-            fprintf (stderr, "Unable to open edge.out for output\n");
+            CC_FPRINTF(stderr, "Unable to open edge.out for output\n");
             return 1;
         }
         fprintf (out, "%d %d\n", ncount, ecount);
@@ -486,7 +486,7 @@ static int dumpdat (int ncount, double *xcoord, double *ycoord)
         FILE *out = fopen ("dat.out", "w");
         if (out == (FILE *) NULL) {
             perror ("dat.out");
-            fprintf (stderr, "Unable to open dat.out for output\n");
+            CC_FPRINTF(stderr, "Unable to open dat.out for output\n");
             return 1;
         }
         fprintf (out, "%d\n", ncount);

@@ -181,7 +181,7 @@ char *CCutil_strdup (const char *s)
     char *p = CC_SAFE_MALLOC (strlen(s)+1, char);
 
     if (p == (char *) NULL) {
-        fprintf (stderr, "Out of memory in CCutil_strdup\n");
+        CC_FPRINTF(stderr, "Out of memory in CCutil_strdup\n");
         return (char *) NULL;
     }
     strcpy (p, s);
@@ -203,7 +203,7 @@ char *CCutil_strdup2 (const char *s)
     p = CC_SAFE_MALLOC (len+1, char);
 
     if (p == (char *) NULL) {
-        fprintf (stderr, "Out of memory in CCutil_strdup2\n");
+        CC_FPRINTF(stderr, "Out of memory in CCutil_strdup2\n");
         return (char *) NULL;
     }
     strncpy (p, s, len);
@@ -232,11 +232,11 @@ void CCutil_printlabel (void)
     char buf[1024];
 
     gethostname (buf, 1024);
-    printf ("Host: %s  Current process id: %d\n", buf, (int) getpid());
-    fflush (stdout);
+    CC_PRINTF("Host: %s  Current process id: %d\n", buf, (int) getpid());
+    CC_FFLUSH(stdout);
 #else
-    printf ("No label - need function to non-NETREADY machines\n");
-    fflush (stdout);
+    CC_PRINTF("No label - need function to non-NETREADY machines\n");
+    CC_FFLUSH(stdout);
 #endif
 }
 
@@ -260,7 +260,7 @@ int CCutil_print_command (int ac, char **av)
         cmdlen++;
     }
     cmdout[cmdlen-1] = '\0';
-    printf ("%s\n", cmdout); fflush (stdout);
+    CC_PRINTF("%s\n", cmdout); CC_FFLUSH(stdout);
 
 CLEANUP:
 

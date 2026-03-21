@@ -150,14 +150,14 @@ int CCchunk_finder (int vcount, int ecount, int *elist, double *elen,
     CCutil_start_timer (&timer->all);
     
     if (buildgraph (&G, vcount, ecount, elist, elen)) {
-        printf ("buildgraph failed\n");
+        CC_PRINTF("buildgraph failed\n");
         CCutil_stop_timer (&timer->all, 0);
         return 1;
     }
 
     if (flags.dummy) {
         if (dummy_chunkfinder (&G, eps, flags, &timer->locate, callback)) {
-            fprintf (stderr, "dummy_chunkfinder failed\n");
+            CC_FPRINTF(stderr, "dummy_chunkfinder failed\n");
             freegraph (&G);
             CCutil_stop_timer (&timer->all, 0);
             return 1;
@@ -165,28 +165,28 @@ int CCchunk_finder (int vcount, int ecount, int *elist, double *elen,
     } else if (flags.permute) {
         if (permute_chunkfinder (&G, eps, flags, &timer->locate, callback,
                                  rstate)) {
-            fprintf (stderr, "permute_chunkfinder failed\n");
+            CC_FPRINTF(stderr, "permute_chunkfinder failed\n");
             freegraph (&G);
             CCutil_stop_timer (&timer->all, 0);
             return 1;
         }
     } else if (flags.weighted) {
         if (weighted_chunkfinder (&G, eps, flags, &timer->locate, callback)) {
-            fprintf (stderr, "weighted_chunkfinder failed\n");
+            CC_FPRINTF(stderr, "weighted_chunkfinder failed\n");
             freegraph (&G);
             CCutil_stop_timer (&timer->all, 0);
             return 1;
         }
     } else if (flags.spheres) {
         if (sphere_chunkfinder (&G, eps, flags, &timer->locate, callback)) {
-            fprintf (stderr, "sphere_chunkfinder failed\n");
+            CC_FPRINTF(stderr, "sphere_chunkfinder failed\n");
             freegraph (&G);
             CCutil_stop_timer (&timer->all, 0);
             return 1;
         }
     } else {
         if (equiv_chunkfinder (&G, flags, &timer->locate, callback)) {
-            fprintf (stderr, "equiv_chunkfinder failed\n");
+            CC_FPRINTF(stderr, "equiv_chunkfinder failed\n");
             freegraph (&G);
             CCutil_stop_timer (&timer->all, 0);
             return 1;
@@ -205,7 +205,7 @@ static graph_chunk_old *graph_chunk_old_alloc (int ncount, int ecount)
 
     c = CC_SAFE_MALLOC (1, graph_chunk_old);
     if (!c) {
-        printf ("out of memory in graph_chunk_old_alloc\n");
+        CC_PRINTF("out of memory in graph_chunk_old_alloc\n");
         return (graph_chunk_old *) NULL;
     }
 
@@ -218,7 +218,7 @@ static graph_chunk_old *graph_chunk_old_alloc (int ncount, int ecount)
 
     if (!c->end0 || !c->end1 || !c->upper || !c->lower
                  || !c->weight || !c->members) {
-        printf ("out of memory in graph_chunk_old_alloc\n");
+        CC_PRINTF("out of memory in graph_chunk_old_alloc\n");
         return (graph_chunk_old *) NULL;
     }
 
@@ -266,7 +266,7 @@ static int buildgraph (graph *G, int vcount, int ecount, int *elist,
     G->elist = CC_SAFE_MALLOC (ecount, edge);
     G->supply = CC_SAFE_MALLOC (2*ecount, item);
     if (!G->vlist || !G->elist || !G->supply) {
-        printf ("out of memory in getedges\n");
+        CC_PRINTF("out of memory in getedges\n");
         G->vlist = (vertex *) NULL;
         G->elist = (edge *) NULL;
         G->supply = (item *) NULL;
@@ -360,7 +360,7 @@ static int equiv_chunkfinder (graph *G, CCchunk_flag flags,
     convert_lists (G);
 
     if (grab_all_chunks (G, flags, timer, callback)) {
-        printf ("grab_all_chunks failed\n");
+        CC_PRINTF("grab_all_chunks failed\n");
         CCutil_stop_timer (timer, 0);
         return 1;
     }
@@ -487,7 +487,7 @@ static int grab_all_chunks (graph *G, CCchunk_flag flags,
 
     chunkvertex = CC_SAFE_MALLOC (flags.maxchunksize, vertex *);
     if (!chunkvertex) {
-        fprintf (stderr, "Out of memory in grab_all_chunks\n");
+        CC_FPRINTF(stderr, "Out of memory in grab_all_chunks\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -521,7 +521,7 @@ static int grab_all_chunks (graph *G, CCchunk_flag flags,
                 }
                 c = grab_chunk (G, chunkvertex, count);
                 if (!c) {
-                    fprintf (stderr, "grab_chunk failed\n");
+                    CC_FPRINTF(stderr, "grab_chunk failed\n");
                     rval = -1;
                     goto CLEANUP;
                 }
@@ -529,7 +529,7 @@ static int grab_all_chunks (graph *G, CCchunk_flag flags,
                 if (c->ncount <= G->vcount) { /* there is an outside */
                     rval = checkout_chunk (c, timer, callback);
                     if (rval) {
-                        fprintf (stderr, "checkout_chunk failed\n");
+                        CC_FPRINTF(stderr, "checkout_chunk failed\n");
 /* FAILURE could just be determinant
                         graph_chunk_old_free (c);
                         goto CLEANUP;
@@ -560,7 +560,7 @@ static int dummy_grab_chunk (graph *G, int count, int *list,
 
     chunkvertex = CC_SAFE_MALLOC (count + 1, vertex *);
     if (!chunkvertex) {
-        fprintf (stderr, "out of memory in dummy_grab_chunk\n");
+        CC_FPRINTF(stderr, "out of memory in dummy_grab_chunk\n");
         rval = 1; goto CLEANUP;
     }
    
@@ -598,7 +598,7 @@ static graph_chunk_old *grab_chunk (graph *G, vertex **chunkvertex, int count)
     cecount = chunk_ecount (chunkvertex, count);
     c = graph_chunk_old_alloc (count, cecount);
     if (!c) {
-        printf ("graph_chunk_old_alloc failed\n");
+        CC_PRINTF("graph_chunk_old_alloc failed\n");
         return (graph_chunk_old *) NULL;
     }
     for (i = 1; i < count; i++) {
@@ -650,7 +650,7 @@ static graph_chunk_old *grab_chunk (graph *G, vertex **chunkvertex, int count)
     for (i = 0; i < count; i++) {
         c->members[i] = CC_SAFE_MALLOC (2, int);
         if (!c->members[i]) {
-            printf ("out of memory in grab_chunks\n");
+            CC_PRINTF("out of memory in grab_chunks\n");
             graph_chunk_old_free (c);
             return (graph_chunk_old *) NULL;
         }
@@ -697,7 +697,7 @@ static CCchunk_graph *strip_outside (graph_chunk_old *c)
 
     cnew = CCchunk_graph_alloc (c->ncount-1, ecount);
     if (!cnew) {
-        fprintf (stderr, "CCchunk_graph_alloc failed\n");
+        CC_FPRINTF(stderr, "CCchunk_graph_alloc failed\n");
         goto CLEANUP;
     }
 
@@ -705,7 +705,7 @@ static CCchunk_graph *strip_outside (graph_chunk_old *c)
         cnew->equality[i] = 1;
         cnew->members[i] = member_dup (c->members[i+1]);
         if (!cnew->members[i]) {
-            fprintf (stderr, "member_dup failed\n");
+            CC_FPRINTF(stderr, "member_dup failed\n");
             goto CLEANUP;
         }
     }
@@ -714,14 +714,14 @@ static CCchunk_graph *strip_outside (graph_chunk_old *c)
     for (i=0; i<c->ecount; i++) {
         if (c->end0[i] == 0) {
             if (c->lower[i] != 0 || c->upper[i] != 2) {
-                fprintf (stderr, "strip_outside, outside edge bounds %d %d\n",
+                CC_FPRINTF(stderr, "strip_outside, outside edge bounds %d %d\n",
                          c->lower[i], c->upper[i]);
                 goto CLEANUP;
             }
             cnew->equality[c->end1[i]-1] = 0;
         } else if (c->end1[i] == 0) {
             if (c->lower[i] != 0 || c->upper[i] != 2) {
-                fprintf (stderr, "strip_outside, outside edge bounds %d %d\n",
+                CC_FPRINTF(stderr, "strip_outside, outside edge bounds %d %d\n",
                          c->lower[i], c->upper[i]);
                 goto CLEANUP;
             }
@@ -737,7 +737,7 @@ static CCchunk_graph *strip_outside (graph_chunk_old *c)
             } else if (c->lower[i] == 1 && c->upper[i] == 1) {
                 cnew->fixed[ecount] = 1;
             } else {
-                fprintf (stderr, "strip_outside, non-outside edge bounds %d %d\n",
+                CC_FPRINTF(stderr, "strip_outside, non-outside edge bounds %d %d\n",
                          c->lower[i], c->upper[i]);
                 goto CLEANUP;
             }
@@ -763,7 +763,7 @@ static int *member_dup (int *omem)
 
     nmem = CC_SAFE_MALLOC (cnt, int);
     if (!nmem) {
-        fprintf (stderr, "Out of memory in member_dup\n");
+        CC_FPRINTF(stderr, "Out of memory in member_dup\n");
         return (int *) NULL;
     }
 
@@ -781,7 +781,7 @@ static int checkout_chunk (graph_chunk_old *c, CCutil_timer *timer,
     CCchunk_graph *cnew = (CCchunk_graph *) NULL;
 
 /*
-    printf ("Q"); fflush (stdout);
+    CC_PRINTF("Q"); CC_FFLUSH(stdout);
 */
 
     civilize_chunk (c);
@@ -800,13 +800,13 @@ static int checkout_chunk (graph_chunk_old *c, CCutil_timer *timer,
 #ifdef DUMPBADCHUNKS
     if (rval) {
         int i;
-        printf ("failed chunk:\n");
-        printf ("%d %d\n", c->ncount, c->ecount);
+        CC_PRINTF("failed chunk:\n");
+        CC_PRINTF("%d %d\n", c->ncount, c->ecount);
         for (i=0; i<c->ecount; i++) {
-            printf ("%d %d %.16f %d %d\n",c->end0[i], c->end1[i], c->weight[i],
+            CC_PRINTF("%d %d %.16f %d %d\n",c->end0[i], c->end1[i], c->weight[i],
                     c->lower[i], c->upper[i]);
         }
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 #endif
  CLEANUP:
@@ -904,7 +904,7 @@ static int sphere_chunkfinder (graph *G, double eps, CCchunk_flag flags,
             if (c->ncount <= G->vcount) { /* there is an outside */
                 rval = checkout_chunk (c, timer, callback);
                 if (rval) {
-                    fprintf (stderr, "checkout_chunk failed\n");
+                    CC_FPRINTF(stderr, "checkout_chunk failed\n");
 /* failure could just be determinant
                     graph_chunk_old_free (c);
                     CCutil_stop_timer (timer, 0);
@@ -950,7 +950,7 @@ static int dummy_chunkfinder (graph *G, double eps, CCchunk_flag flags,
             if (c->ncount <= G->vcount) { /* there is an outside */
                 rval = checkout_chunk (c, timer, callback);
                 if (rval) {
-                    fprintf (stderr, "checkout_chunk failed\n");
+                    CC_FPRINTF(stderr, "checkout_chunk failed\n");
                 }
             }
             graph_chunk_old_free (c);
@@ -987,7 +987,7 @@ static int permute_chunkfinder (graph *G, double eps, CCchunk_flag flags,
             if (c->ncount <= G->vcount) { /* there is an outside */
                 rval = checkout_chunk (c, timer, callback);
                 if (rval) {
-                    fprintf (stderr, "checkout_chunk failed\n");
+                    CC_FPRINTF(stderr, "checkout_chunk failed\n");
                 }
             }
             graph_chunk_old_free (c);
@@ -1021,7 +1021,7 @@ static int weighted_chunkfinder (graph *G, double eps, CCchunk_flag flags,
             if (c->ncount <= G->vcount) { /* there is an outside */
                 rval = checkout_chunk (c, timer, callback);
                 if (rval) {
-                    fprintf (stderr, "checkout_chunk failed\n");
+                    CC_FPRINTF(stderr, "checkout_chunk failed\n");
                 }
             }
             graph_chunk_old_free (c);
@@ -1044,7 +1044,7 @@ static graph_chunk_old *get_sphere (graph *G, vertex *v, double eps,
 
     chunkvertex = CC_SAFE_MALLOC (flags.maxchunksize, vertex *);
     if (!chunkvertex) {
-        fprintf (stderr, "Out of memory in get_sphere\n");
+        CC_FPRINTF(stderr, "Out of memory in get_sphere\n");
         goto CLEANUP;
     }
 
@@ -1077,7 +1077,7 @@ static graph_chunk_old *get_sphere (graph *G, vertex *v, double eps,
     if (count > MINCHUNKSIZE) {
         c = grab_chunk (G, chunkvertex, count);
         if (!c) {
-            fprintf (stderr, "grab_chunk failed\n");
+            CC_FPRINTF(stderr, "grab_chunk failed\n");
             goto CLEANUP;
         }
 
@@ -1104,7 +1104,7 @@ static graph_chunk_old *get_weighted_sphere (graph *G, vertex *v,
 
     chunkvertex = CC_SAFE_MALLOC (flags.maxchunksize, vertex *);
     if (!chunkvertex) {
-        fprintf (stderr, "Out of memory in get_sphere\n");
+        CC_FPRINTF(stderr, "Out of memory in get_sphere\n");
         goto CLEANUP;
     }
 
@@ -1150,7 +1150,7 @@ static graph_chunk_old *get_weighted_sphere (graph *G, vertex *v,
     if (count > MINCHUNKSIZE) {
         c = grab_chunk (G, chunkvertex, count);
         if (!c) {
-            fprintf (stderr, "grab_chunk failed\n");
+            CC_FPRINTF(stderr, "grab_chunk failed\n");
             goto CLEANUP;
         }
     }
@@ -1185,7 +1185,7 @@ static graph_chunk_old *get_card_sphere (graph *G, vertex *v, double eps,
 
     chunkvertex = CC_SAFE_MALLOC (flags.maxchunksize, vertex *);
     if (!chunkvertex) {
-        fprintf (stderr, "Out of memory in get_sphere\n");
+        CC_FPRINTF(stderr, "Out of memory in get_sphere\n");
         goto CLEANUP;
     }
 
@@ -1232,7 +1232,7 @@ static graph_chunk_old *get_card_sphere (graph *G, vertex *v, double eps,
     if (count > MINCHUNKSIZE) {
         c = grab_chunk (G, chunkvertex, count);
         if (!c) {
-            fprintf (stderr, "grab_chunk failed\n");
+            CC_FPRINTF(stderr, "grab_chunk failed\n");
             goto CLEANUP;
         }
     }

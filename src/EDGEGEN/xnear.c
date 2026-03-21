@@ -230,19 +230,19 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
         (norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         usex = 1;
         if (!silent) {
-            printf ("Using x-norm nearest code\n"); fflush (stdout);
+            CC_PRINTF("Using x-norm nearest code\n"); CC_FFLUSH(stdout);
         }
     } else {
         usex = 0;
         if (!silent) {
-            printf ("Using junk-norm nearest code\n"); fflush (stdout);
+            CC_PRINTF("Using junk-norm nearest code\n"); CC_FFLUSH(stdout);
         }
     }
 
     if (wcoord != (double *) NULL) {
         for (i = 0; i < ncount; i++) {
             if (wcoord[i] < -0.00000001) {
-                fprintf (stderr, "Cannot use CCxnear with negative weights\n");
+                CC_FPRINTF(stderr, "Cannot use CCxnear with negative weights\n");
                 return 1;
             }
         }
@@ -257,7 +257,7 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
 
     if (usex) {
         if (CCedgegen_xnear_build (ncount, dat, wcoord, &xn)) {
-            fprintf (stderr, "build_nodes failed\n");
+            CC_FPRINTF(stderr, "build_nodes failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -277,9 +277,9 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
     }
 
     if (!usex && doquad) {
-        printf ("NOTE: Cannot run quadrant nearest with a JUNK norm.\n");
-        printf ("      Running nearest instead.\n");
-        fflush (stdout);
+        CC_PRINTF("NOTE: Cannot run quadrant nearest with a JUNK norm.\n");
+        CC_PRINTF("      Running nearest instead.\n");
+        CC_FFLUSH(stdout);
     }
 
     for (n = 0; n < ncount; n++) {
@@ -287,13 +287,13 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
             if (doquad) {
                 if (CCedgegen_x_node_quadrant_k_nearest (&xn, n, num, ncount,
                                                          list)) {
-                    fprintf (stderr, "CCedgegen_x_node_quadrant_k_nearest failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_node_quadrant_k_nearest failed\n");
                     rval = 1;
                     goto CLEANUP;
                 }
             } else {
                 if (CCedgegen_x_node_k_nearest (&xn, n, num, ncount, list)) {
-                    fprintf (stderr, "CCedgegen_x_node_k_nearest failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_node_k_nearest failed\n");
                     rval = 1;
                     goto CLEANUP;
                 }
@@ -301,7 +301,7 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
         } else {
             if (CCedgegen_junk_node_k_nearest (dat, wcoord, n, num, ncount,
                                                list)) {
-                fprintf (stderr, "junk_node_k_nearest_failed\n");
+                CC_FPRINTF(stderr, "junk_node_k_nearest_failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -309,7 +309,7 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
         for (i = 0; i < goal; i++) {
             if (list[i] != -1) {
                 if (put_in_table (&td, n, list[i], &added))  {
-                    fprintf (stderr, "put_in_table failed\n");
+                    CC_FPRINTF(stderr, "put_in_table failed\n");
                     rval = 1;
                     goto CLEANUP;
                 } else {
@@ -319,14 +319,14 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
         }
         if (!silent) {
             if (n % 1000 == 999) {
-                printf (".");
-                fflush (stdout);
+                CC_PRINTF(".");
+                CC_FFLUSH(stdout);
             }
         }
     }
   
     if (!silent) {
-        printf (" %d edges\n", ntotal); fflush (stdout);
+        CC_PRINTF(" %d edges\n", ntotal); CC_FFLUSH(stdout);
     }
 
     if (wantlist) {
@@ -354,7 +354,7 @@ static int run_x_k_nearest (int ncount, int num, CCdatagroup *dat,
     }
 
     if (intptr_check_leaks (&td.intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs in kdnear\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs in kdnear\n",
                  total - onlist);
     }
 
@@ -547,7 +547,7 @@ int CCedgegen_x_node_k_nearest (CCxnear *xn, int ni, int nearnum, int ncount,
             list[ntotal++] = xn->nodenames[nearlist[i].end];
     }
     if (ntotal < nearnum) {
-        fprintf (stderr, "WARNING: There do not exist %d neighbors\n",
+        CC_FPRINTF(stderr, "WARNING: There do not exist %d neighbors\n",
                  nearnum);
         for (i = ntotal; i < nearnum; i++)
             list[i] = -1;
@@ -646,7 +646,7 @@ int CCedgegen_junk_node_k_nearest (CCdatagroup *dat, double *wcoord, int n,
             list[ntotal++] = nearlist[i].end;
     }
     if (ntotal < nearnum) {
-        fprintf (stderr, "WARNING: There do not exist %d neighbors\n",
+        CC_FPRINTF(stderr, "WARNING: There do not exist %d neighbors\n",
                  nearnum);
         for (i = ntotal; i < nearnum; i++)
             list[i] = -1;
@@ -719,23 +719,23 @@ int CCedgegen_x_nearest_neighbor_tour (int ncount, int start, CCdatagroup *dat,
     int norm;
 
     /*
-        printf ("Grow nearest neighbor tour from node %d\n", start);
-        fflush (stdout);
+        CC_PRINTF("Grow nearest neighbor tour from node %d\n", start);
+        CC_FFLUSH(stdout);
     */
 
     if (ncount < 3) {
-        fprintf (stderr, "Cannot find tour in an %d node graph\n", ncount);
+        CC_FPRINTF(stderr, "Cannot find tour in an %d node graph\n", ncount);
         return 1;
     }
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_BITS) != CC_X_NORM_TYPE &&
         (norm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-        fprintf (stderr, "Cannot run x_nearest with norm %d\n", norm);
+        CC_FPRINTF(stderr, "Cannot run x_nearest with norm %d\n", norm);
         return 1;
     }
 
     if (CCedgegen_xnear_build (ncount, dat, (double *) NULL, &xn)) {
-        fprintf (stderr, "Unable to build CCxnear\n");
+        CC_FPRINTF(stderr, "Unable to build CCxnear\n");
         return 1;
     }
 
@@ -789,19 +789,19 @@ int CCedgegen_x_greedy_tour (int ncount, CCdatagroup *dat, int *outcycle,
     double len;
 
     if (!silent) {
-        printf ("Grow a greedy tour \n");
-        fflush (stdout);
+        CC_PRINTF("Grow a greedy tour \n");
+        CC_FFLUSH(stdout);
     }
 
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_BITS) != CC_X_NORM_TYPE &&
         (norm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-        fprintf (stderr, "Cannot run x_nearest with norm %d\n", norm);
+        CC_FPRINTF(stderr, "Cannot run x_nearest with norm %d\n", norm);
         return 1;
     }
 
     if (CCedgegen_xnear_build (ncount, dat, (double *) NULL, &xn)) {
-        fprintf (stderr, "Unable to build CCxnear\n");
+        CC_FPRINTF(stderr, "Unable to build CCxnear\n");
         return 1;
     }
 
@@ -809,7 +809,7 @@ int CCedgegen_x_greedy_tour (int ncount, CCdatagroup *dat, int *outcycle,
     elen = CC_SAFE_MALLOC (ecount, int);
     if (perm == (int *) NULL ||
         elen == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCedgegen_x_greedy_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in CCedgegen_x_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<ecount; i++) {
@@ -926,18 +926,18 @@ int CCedgegen_x_greedy_tour (int ncount, CCdatagroup *dat, int *outcycle,
     len += (double) CCutil_dat_edgelen (x, y, dat);
     *val = len;
     if (!silent) {
-        printf ("Length of Greedy Tour: %.2f\n", len);
-        fflush (stdout);
+        CC_PRINTF("Length of Greedy Tour: %.2f\n", len);
+        CC_FFLUSH(stdout);
     }
 
     if (tcyc) {
         int istour;
         rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, outcycle);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: greedy tour is not a tour\n");
+            CC_FPRINTF(stderr, "ERROR: greedy tour is not a tour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -980,19 +980,19 @@ int CCedgegen_x_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
     int found;
 
     if (!silent) {
-        printf ("Grow a Quick-Boruvka tour \n");
-        fflush (stdout);
+        CC_PRINTF("Grow a Quick-Boruvka tour \n");
+        CC_FFLUSH(stdout);
     }
 
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_BITS) != CC_X_NORM_TYPE &&
         (norm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-        fprintf (stderr, "Cannot run x_nearest with norm %d\n", norm);
+        CC_FPRINTF(stderr, "Cannot run x_nearest with norm %d\n", norm);
         return 1;
     }
 
     if (CCedgegen_xnear_build (ncount, dat, (double *) NULL, &xn)) {
-        fprintf (stderr, "Unable to build CCxnear\n");
+        CC_FPRINTF(stderr, "Unable to build CCxnear\n");
         return 1;
     }
 
@@ -1000,7 +1000,7 @@ int CCedgegen_x_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
     elen = CC_SAFE_MALLOC (ecount, int);
     if (perm == (int *) NULL ||
         elen == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCedgegen_x_greedy_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in CCedgegen_x_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<ecount; i++) {
@@ -1017,7 +1017,7 @@ int CCedgegen_x_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
     if (deg  == (int *) NULL ||
         adj  == (int **) NULL ||
         adjspace == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCedgegen_x_greedy_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in CCedgegen_x_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<ncount; i++) {
@@ -1123,8 +1123,8 @@ int CCedgegen_x_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
                     tail[tail[y]] = tail[x];
                 }
                 if (count % 10000 == 9999) {
-                    printf (".");
-                    fflush (stdout);
+                    CC_PRINTF(".");
+                    CC_FFLUSH(stdout);
                 }
                 count++;
             }
@@ -1139,17 +1139,17 @@ int CCedgegen_x_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
     len += (double) CCutil_dat_edgelen (x, y, dat);
     *val = len;
     if (ncount >= 10000)
-        printf ("\n");
-    printf ("Length of Quick-Boruvka Tour: %.2f\n", len);
+        CC_PRINTF("\n");
+    CC_PRINTF("Length of Quick-Boruvka Tour: %.2f\n", len);
 
     if (tcyc) {
         int istour;
         rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, outcycle);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: greedy tour is not a tour\n");
+            CC_FPRINTF(stderr, "ERROR: greedy tour is not a tour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -1177,15 +1177,15 @@ int CCedgegen_junk_nearest_neighbor_tour (int ncount, int start,
     char *marks;
 
 /*
-    printf ("Grow nearest neighbor tour from node %d\n", start);
+    CC_PRINTF("Grow nearest neighbor tour from node %d\n", start);
 */
     if (!silent) {
-        printf ("This is a JUNK norm, so expect a quadratic running time\n");
-        fflush (stdout);
+        CC_PRINTF("This is a JUNK norm, so expect a quadratic running time\n");
+        CC_FFLUSH(stdout);
     }
 
     if (ncount < 3) {
-        fprintf (stderr, "Cannot find tour in an %d node graph\n", ncount);
+        CC_FPRINTF(stderr, "Cannot find tour in an %d node graph\n", ncount);
         return 1;
     }
 
@@ -1235,15 +1235,15 @@ int CCedgegen_junk_greedy_tour (int ncount, CCdatagroup *dat, int *outcycle,
     double len;
 
     if (!silent) {
-        printf ("Grow a greedy tour \n");
-        fflush (stdout);
+        CC_PRINTF("Grow a greedy tour \n");
+        CC_FFLUSH(stdout);
     }
 
     perm = CC_SAFE_MALLOC (ecount, int);
     elen = CC_SAFE_MALLOC (ecount, int);
     if (perm == (int *) NULL ||
         elen == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCedgegen_junk_greedy_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in CCedgegen_junk_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<ecount; i++) {
@@ -1361,18 +1361,18 @@ int CCedgegen_junk_greedy_tour (int ncount, CCdatagroup *dat, int *outcycle,
     len += (double) CCutil_dat_edgelen (x, y, dat);
     *val = len;
     if (!silent) {
-        printf ("Length of Greedy Tour: %.2f\n", len);
-        fflush (stdout);
+        CC_PRINTF("Length of Greedy Tour: %.2f\n", len);
+        CC_FFLUSH(stdout);
     }
 
     if (tcyc) {
         int istour;
         rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, outcycle);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: greedy tour is not a tour\n");
+            CC_FPRINTF(stderr, "ERROR: greedy tour is not a tour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -1412,15 +1412,15 @@ int CCedgegen_junk_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
     int found;
 
     if (!silent) {
-        printf ("Grow a Quick-Boruvka tour \n");
-        fflush (stdout);
+        CC_PRINTF("Grow a Quick-Boruvka tour \n");
+        CC_FFLUSH(stdout);
     }
 
     perm = CC_SAFE_MALLOC (ecount, int);
     elen = CC_SAFE_MALLOC (ecount, int);
     if (perm == (int *) NULL ||
         elen == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCedgegen_junk_greedy_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in CCedgegen_junk_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<ecount; i++) {
@@ -1437,7 +1437,7 @@ int CCedgegen_junk_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
     if (deg  == (int *) NULL ||
         adj  == (int **) NULL ||
         adjspace == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCedgegen_junk_greedy_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in CCedgegen_junk_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<ncount; i++) {
@@ -1545,8 +1545,8 @@ int CCedgegen_junk_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
                     tail[tail[y]] = tail[x];
                 }
                 if (count % 10000 == 9999) {
-                    printf (".");
-                    fflush (stdout);
+                    CC_PRINTF(".");
+                    CC_FFLUSH(stdout);
                 }
                 count++;
             }
@@ -1561,17 +1561,17 @@ int CCedgegen_junk_qboruvka_tour (int ncount, CCdatagroup *dat, int *outcycle,
     len += (double) CCutil_dat_edgelen (x, y, dat);
     *val = len;
     if (ncount >= 10000)
-        printf ("\n");
-    printf ("Length of Quick-Boruvka Tour: %.2f\n", len);
+        CC_PRINTF("\n");
+    CC_PRINTF("Length of Quick-Boruvka Tour: %.2f\n", len);
 
     if (tcyc) {
         int istour;
         rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, outcycle);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: greedy tour is not a tour\n");
+            CC_FPRINTF(stderr, "ERROR: greedy tour is not a tour\n");
             rval = 1; goto CLEANUP;
         }
     }

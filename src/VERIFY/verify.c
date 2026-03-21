@@ -165,27 +165,27 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
 
 #ifdef DEBUG
     double sz = CCutil_zeit();
-    printf ("Verifying cut, %d cliques %d atoms",cut->cliquecount,
+    CC_PRINTF("Verifying cut, %d cliques %d atoms",cut->cliquecount,
             cut->skel.atomcount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 #endif /* DEBUG */
 
     if (type != (int *) NULL) *type = -1;
     
     if (cut->skel.atomcount == 0 || cut->skel.atoms == (int *) NULL) {
-        fprintf (stderr, "Cut to verify has no skeleton\n");
+        CC_FPRINTF(stderr, "Cut to verify has no skeleton\n");
         rval = 1; goto CLEANUP;
     }
     
     rval = build_atom_info (cut, &atoms);
     if (rval) {
-        fprintf (stderr, "build_atom_info failed\n");
+        CC_FPRINTF(stderr, "build_atom_info failed\n");
         goto CLEANUP;
     }
 
     rval = verify_atom_info (cut, &atoms);
     if (rval) {
-        fprintf (stderr, "atom_info failed verification\n");
+        CC_FPRINTF(stderr, "atom_info failed verification\n");
         goto CLEANUP;
     }
 
@@ -194,8 +194,8 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
         if (rval == 0) {
             /* It's a valid subtour - we're done */
 #ifdef DEBUG
-            printf (" (subtour)");
-            fflush (stdout);
+            CC_PRINTF(" (subtour)");
+            CC_FFLUSH(stdout);
 #endif
             if (type != (int *) NULL) *type = CC_TYPE_SUBTOUR;
             goto CLEANUP;
@@ -207,8 +207,8 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
         if (rval == 0) {
             /* It's a valid comb - we're done */
 #ifdef DEBUG
-            printf (" (comb 1,%d)", atoms.cliquecount-1);
-            fflush (stdout);
+            CC_PRINTF(" (comb 1,%d)", atoms.cliquecount-1);
+            CC_FFLUSH(stdout);
 #endif
             if (type != (int *) NULL) *type = CC_TYPE_COMB;
             goto CLEANUP;
@@ -225,8 +225,8 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
 #ifdef DEBUG
                     int hcnt = family_count (&atoms.family[0],
                                              (int *) NULL) - 1;
-                    printf (" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
-                    fflush (stdout);
+                    CC_PRINTF(" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
+                    CC_FFLUSH(stdout);
 #endif
                     if (type != (int *) NULL) *type = CC_TYPE_STAR;
                     goto CLEANUP;
@@ -238,8 +238,8 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
 #ifdef DEBUG
                     int hcnt = family_count (&atoms.family[1],
                                              (int *) NULL) - 1;
-                    printf (" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
-                    fflush (stdout);
+                    CC_PRINTF(" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
+                    CC_FFLUSH(stdout);
 #endif
                     if (type != (int *) NULL) *type = CC_TYPE_STAR;
                     goto CLEANUP;
@@ -252,9 +252,9 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
 #ifdef DEBUG
                     int hcnt = family_count (&atoms.family[0],
                                              (int *) NULL) - 1;
-                    printf (" (bipartition %d,%d)", hcnt,
+                    CC_PRINTF(" (bipartition %d,%d)", hcnt,
                             atoms.cliquecount - hcnt);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
 #endif
                     if (type != (int *) NULL) *type = CC_TYPE_BIPARTITION;
                     goto CLEANUP;
@@ -266,9 +266,9 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
 #ifdef DEBUG
                     int hcnt = family_count (&atoms.family[1],
                                              (int *) NULL) - 1;
-                    printf (" (bipartition %d,%d)", hcnt,
+                    CC_PRINTF(" (bipartition %d,%d)", hcnt,
                             atoms.cliquecount - hcnt);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
 #endif
                     if (type != (int *) NULL) *type = CC_TYPE_BIPARTITION;
                     goto CLEANUP;
@@ -277,9 +277,9 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
             
 #if 0
 #ifdef DEBUG
-            printf ("\nCurious, binested, but not star or bipartition:\n");
+            CC_PRINTF("\nCurious, binested, but not star or bipartition:\n");
             CCtsp_print_lpcut_in (cut);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
 #endif
 #endif
         }
@@ -289,13 +289,13 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
         rval = verify_other (&atoms);
         if (rval == 0) {
 #ifdef DEBUG
-            printf (" (other)");
-            fflush (stdout);
+            CC_PRINTF(" (other)");
+            CC_FFLUSH(stdout);
 #endif
             if (type != (int *) NULL) *type = CC_TYPE_OTHER;
             goto CLEANUP;
         }
-        fprintf (stderr, "Unable to verify cut\n");
+        CC_FPRINTF(stderr, "Unable to verify cut\n");
     }
 
     rval = -1;
@@ -303,13 +303,13 @@ int CCverify_cut (CCtsp_lpcut_in *cut, int check_types, int *type)
   CLEANUP:
 #ifdef DEBUG
     if (rval == 0) {
-        printf (" in %.2f seconds\n", CCutil_zeit() - sz);
-        fflush (stdout);
+        CC_PRINTF(" in %.2f seconds\n", CCutil_zeit() - sz);
+        CC_FFLUSH(stdout);
     } else {
-        printf (" FAILED in %.2f seconds\n", CCutil_zeit() - sz);
-        printf ("FAILED CUT:\n");
+        CC_PRINTF(" FAILED in %.2f seconds\n", CCutil_zeit() - sz);
+        CC_PRINTF("FAILED CUT:\n");
         CCtsp_print_lpcut_in (cut);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 #endif
     free_atom_info (&atoms);
@@ -337,7 +337,7 @@ static int build_atom_info (CCtsp_lpcut_in *cut, atom_info *atoms)
 
     atoms->nodelist = CC_SAFE_MALLOC (atoms->nodespace, node);
     if (atoms->nodelist == (node *) NULL) {
-        fprintf (stderr, "Out of memory in build_atom_info\n");
+        CC_FPRINTF(stderr, "Out of memory in build_atom_info\n");
         goto FAILURE;
     }
 
@@ -345,7 +345,7 @@ static int build_atom_info (CCtsp_lpcut_in *cut, atom_info *atoms)
 
     rval = build_atoms (cut, atoms);
     if (rval) {
-        fprintf (stderr, "build_atoms failed\n");
+        CC_FPRINTF(stderr, "build_atoms failed\n");
         goto FAILURE;
     }
     
@@ -355,7 +355,7 @@ static int build_atom_info (CCtsp_lpcut_in *cut, atom_info *atoms)
 
     atoms->cliquelist = CC_SAFE_MALLOC (cliquecount, vclique);
     if (atoms->cliquelist == (vclique *) NULL) {
-        fprintf (stderr, "Out of memory in build_atom_info\n");
+        CC_FPRINTF(stderr, "Out of memory in build_atom_info\n");
         rval = -1;
         goto FAILURE;
     }
@@ -369,14 +369,14 @@ static int build_atom_info (CCtsp_lpcut_in *cut, atom_info *atoms)
     for (i=0; i<cliquecount; i++) {
         rval = build_clique_atoms (&cut->cliques[i], atoms, i);
         if (rval) {
-            fprintf (stderr, "build_clique_atoms failed\n");
+            CC_FPRINTF(stderr, "build_clique_atoms failed\n");
             goto FAILURE;
         }
     }
 
     rval = build_atom_cliques (atoms);
     if (rval) {
-        fprintf (stderr, "build_atom_cliques failed\n");
+        CC_FPRINTF(stderr, "build_atom_cliques failed\n");
         goto FAILURE;
     }
 
@@ -443,7 +443,7 @@ static int build_clique_atoms (CCtsp_lpclique *clique, atom_info *atoms,
     newclique->atomcount = cnt;
     newclique->atomlist = CC_SAFE_MALLOC (cnt, int);
     if (newclique->atomlist == (int *) NULL) {
-        fprintf (stderr, "Out of memory in build_clique_atoms\n");
+        CC_FPRINTF(stderr, "Out of memory in build_clique_atoms\n");
         return -1;
     }
     for (i=0, cnt=0; i<atoms->atomcount; i++) {
@@ -452,7 +452,7 @@ static int build_clique_atoms (CCtsp_lpclique *clique, atom_info *atoms,
         }
     }
     if (cnt != newclique->atomcount) {
-        fprintf (stderr, "SURPRISE - lost some atoms\n");
+        CC_FPRINTF(stderr, "SURPRISE - lost some atoms\n");
         CC_IFFREE (newclique->atomlist, int);
         return -1;
     }
@@ -485,7 +485,7 @@ static int build_atom_cliques (atom_info *atoms)
             atomlist[i].cliquelist = CC_SAFE_MALLOC (atomlist[i].cliquecount,
                                                      int);
             if (atomlist[i].cliquelist == (int *) NULL) {
-                fprintf (stderr, "Out of memory in build_atom_cliques\n");
+                CC_FPRINTF(stderr, "Out of memory in build_atom_cliques\n");
                 goto FAILURE;
             }
         } else {
@@ -587,19 +587,19 @@ static int verify_atom_info (CCtsp_lpcut_in *cut, atom_info *atoms)
 /* (7) The rhs, sense, and cliquecount are the same in the cut and the atom
  */
     if (cut->rhs != atoms->rhs) {
-        fprintf (stderr, "cut rhs %d != atom rhs %d\n", cut->rhs,
+        CC_FPRINTF(stderr, "cut rhs %d != atom rhs %d\n", cut->rhs,
                  atoms->rhs);
         rval = -1;
         goto CLEANUP;
     }
     if (cut->sense != atoms->sense) {
-        fprintf (stderr, "cut sense %c != atom sense %c\n", cut->sense,
+        CC_FPRINTF(stderr, "cut sense %c != atom sense %c\n", cut->sense,
                  atoms->sense);
         rval = -1;
         goto CLEANUP;
     }
     if (cut->cliquecount != atoms->cliquecount) {
-        fprintf (stderr, "cut cliquecount %d != atom cliquecount %d\n",
+        CC_FPRINTF(stderr, "cut cliquecount %d != atom cliquecount %d\n",
                  cut->cliquecount, atoms->cliquecount);
         rval = -1;
         goto CLEANUP;
@@ -630,18 +630,18 @@ static int verify_nodes (CCtsp_lpcut_in *cut, atom_info *atoms)
     for (i=0; i<cliquecount; i++) {
         CC_FOREACH_NODE_IN_CLIQUE (j, cliques[i], k) {
             if (j < 0 || j >= nodespace) {
-                fprintf (stderr, "clique %d contains bogus node %d\n",
+                CC_FPRINTF(stderr, "clique %d contains bogus node %d\n",
                          i, j);
                 return -1;
             }
             if (nodelist[j].atom < -1 || nodelist[j].atom >= atomcount) {
-                fprintf (stderr, "node %d is in bogus atom %d\n", j,
+                CC_FPRINTF(stderr, "node %d is in bogus atom %d\n", j,
                          nodelist[j].atom);
                 return -1;
             }
             if (nodelist[j].atom >= 0 &&
                 atomlist[nodelist[j].atom].representative != j) {
-                fprintf (stderr, "node %d is not the representative of its atom %d\n",
+                CC_FPRINTF(stderr, "node %d is not the representative of its atom %d\n",
                          j, nodelist[j].atom);
             }
         }
@@ -672,7 +672,7 @@ static int verify_atom_clique (CCtsp_lpclique *clique, atom_info *atoms,
         a = nodelist[i].atom;
         if (a >= 0) {
             if (atomlist[a].mark) {
-                fprintf (stderr, "Duplicate atom %d in clique\n", a);
+                CC_FPRINTF(stderr, "Duplicate atom %d in clique\n", a);
                 rval = -1;
                 goto CLEANUP;
             }
@@ -683,7 +683,7 @@ static int verify_atom_clique (CCtsp_lpclique *clique, atom_info *atoms,
     for (i=0; i<cliqueinfo->atomcount; i++) {
         j = cliqueinfo->atomlist[i];
         if (atomlist[j].mark != 1) {
-            fprintf (stderr, "Atom %d not in clique %d\n", j, cnum);
+            CC_FPRINTF(stderr, "Atom %d not in clique %d\n", j, cnum);
             rval = -1;
             goto CLEANUP;
         }
@@ -692,7 +692,7 @@ static int verify_atom_clique (CCtsp_lpclique *clique, atom_info *atoms,
 
     for (i=0; i<atomcount; i++) {
         if (atomlist[i].mark != 0) {
-            fprintf (stderr, "Atom %d not in cliquelist %d\n", j, cnum);
+            CC_FPRINTF(stderr, "Atom %d not in cliquelist %d\n", j, cnum);
             rval = -1;
             goto CLEANUP;
         }
@@ -722,7 +722,7 @@ static int verify_atom_lists (atom_info *atoms)
         for (j=0; j<atomlist[i].cliquecount; j++) {
             rval = find_clique_atom (atoms, atomlist[i].cliquelist[j], i);
             if (rval) {
-                fprintf (stderr, "clique %d missing atom %d\n",
+                CC_FPRINTF(stderr, "clique %d missing atom %d\n",
                          atomlist[i].cliquelist[j], i);
                 return rval;
             }
@@ -733,7 +733,7 @@ static int verify_atom_lists (atom_info *atoms)
         for (j=0; j<cliquelist[i].atomcount; j++) {
             rval = find_atom_clique (atoms, cliquelist[i].atomlist[j], i);
             if (rval) {
-                fprintf (stderr, "atom %d missing clique %d\n",
+                CC_FPRINTF(stderr, "atom %d missing clique %d\n",
                          cliquelist[i].atomlist[j], i);
                 return rval;
             }
@@ -772,7 +772,7 @@ static int verify_subtour (atom_info *atoms, CCverify_cutclass *class)
         if (class != (CCverify_cutclass *) NULL) {
             rval = build_cutclass (class, 1, 1);
             if (rval) {
-                fprintf (stderr, "build_cutclass failed\n");
+                CC_FPRINTF(stderr, "build_cutclass failed\n");
                 return rval;
             }
             class->type = CC_TYPE_SUBTOUR;
@@ -924,7 +924,7 @@ static int verify_chvatal_comb (atom_info *atoms, CCverify_cutclass *class)
     if (class != (CCverify_cutclass *) NULL) {
         rval = build_cutclass (class, cliquecount, cliquecount);
         if (rval) {
-            fprintf (stderr, "build_cutclass failed\n");
+            CC_FPRINTF(stderr, "build_cutclass failed\n");
             return 1;
         }
         class->type = CC_TYPE_COMB;
@@ -1032,12 +1032,12 @@ static int build_binesting (atom_info *atoms)
     
     rval = nest_atom_color (atoms, 0);
     if (rval) {
-        fprintf (stderr, "nest_atom_color failed\n");
+        CC_FPRINTF(stderr, "nest_atom_color failed\n");
         return rval;
     }
     rval = nest_atom_color (atoms, 1);
     if (rval) {
-        fprintf (stderr, "nest_atom_color failed\n");
+        CC_FPRINTF(stderr, "nest_atom_color failed\n");
         return rval;
     }
     return 0;
@@ -1061,7 +1061,7 @@ static int build_cross_cliques (atom_info *atoms, int cliq)
 
     crosslist = CC_SAFE_MALLOC (atoms->cliquecount, int);
     if (crosslist == (int *) NULL) {
-        fprintf (stderr, "Out of memory in build_cross_cliques\n");
+        CC_FPRINTF(stderr, "Out of memory in build_cross_cliques\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -1091,12 +1091,12 @@ static int build_cross_cliques (atom_info *atoms, int cliq)
     }
 
     if (crosscount == 0) {
-        printf ("Warning: clique %d crosses no other cliques\n", cliq);
+        CC_PRINTF("Warning: clique %d crosses no other cliques\n", cliq);
         c->crosslist = (int *) NULL;
     } else {
         c->crosslist = CC_SAFE_MALLOC (crosscount, int);
         if (c->crosslist == (int *) NULL) {
-            fprintf (stderr, "Out of memory in build_cross_cliques\n");
+            CC_FPRINTF(stderr, "Out of memory in build_cross_cliques\n");
             rval = 1; goto CLEANUP;
         }
         for (i=0; i<crosscount; i++) {
@@ -1148,7 +1148,7 @@ static int nest_atom_color (atom_info *atoms, int color)
     keys = CC_SAFE_MALLOC (cliquecount, int);
     if (perm == (int *) NULL ||
         keys == (int *) NULL) {
-        fprintf (stderr, "Out of memory in nest_atom_color\n");
+        CC_FPRINTF(stderr, "Out of memory in nest_atom_color\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1206,7 +1206,7 @@ static int nest_clique (atom_info *atoms, int cliqnum, vclique *family)
     if (cliq->flipped) {
         rval = clique_complement (atoms, cliq, &catomcount, &catomlist);
         if (rval) {
-            fprintf (stderr, "clique_complement failed\n");
+            CC_FPRINTF(stderr, "clique_complement failed\n");
             goto CLEANUP;
         }
     } else {
@@ -1255,7 +1255,7 @@ static int clique_complement (atom_info *atoms, vclique *cliq, int *catomcount,
 
     if (*catomlist == (int *) NULL ||
         cmark == (int *) NULL) {
-        fprintf (stderr, "Out of memory in clique_complement\n");
+        CC_FPRINTF(stderr, "Out of memory in clique_complement\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<atomcount; i++) cmark[i] = 0;
@@ -1267,7 +1267,7 @@ static int clique_complement (atom_info *atoms, vclique *cliq, int *catomcount,
         }
     }
     if (cnt != *catomcount) {
-        fprintf (stderr, "Lost some atoms\n");
+        CC_FPRINTF(stderr, "Lost some atoms\n");
         rval = 1; goto CLEANUP;
     }
     rval = 0;
@@ -1398,7 +1398,7 @@ static int verify_star (atom_info *atoms, int handnum,
 
     alist = CC_SAFE_MALLOC (atoms->atomcount, int);
     if (alist == (int *) NULL) {
-        fprintf (stderr, "Out of memory in verify_star\n");
+        CC_FPRINTF(stderr, "Out of memory in verify_star\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -1424,7 +1424,7 @@ static int verify_star (atom_info *atoms, int handnum,
     if (class != (CCverify_cutclass *) NULL) {
         rval = build_cutclass (class, cliquecount, tcnt+1);
         if (rval) {
-            fprintf (stderr, "build_cutclass failed\n");
+            CC_FPRINTF(stderr, "build_cutclass failed\n");
             goto CLEANUP;
         }
 #if 0
@@ -1693,7 +1693,7 @@ static int collect_atom_mark_counts (atom_info *atoms, vclique *cliq,
     if (cliq->flipped) {
         rval = clique_complement (atoms, cliq, &catomcount, &catomlist);
         if (rval) {
-            fprintf (stderr, "clique_complement failed\n");
+            CC_FPRINTF(stderr, "clique_complement failed\n");
             goto CLEANUP;
         }
     } else {
@@ -1744,7 +1744,7 @@ static int tooth_has_cavity (atom_info *atoms, vclique *cliq, int nflipped)
     if (cliq->flipped) {
         rval = clique_complement (atoms, cliq, &catomcount, &catomlist);
         if (rval) {
-            fprintf (stderr, "clique_complement failed\n");
+            CC_FPRINTF(stderr, "clique_complement failed\n");
             goto CLEANUP;
         }
     } else {
@@ -1786,7 +1786,7 @@ static int verify_other (atom_info *atoms)
 
     rval = build_complete_graph (atoms->atomcount, &g);
     if (rval) {
-        fprintf (stderr, "build_complete_graph failed\n");
+        CC_FPRINTF(stderr, "build_complete_graph failed\n");
         goto CLEANUP;
     }
 
@@ -1814,7 +1814,7 @@ static int build_complete_graph (int nodecount, graph **p_g)
 
     g = CC_SAFE_MALLOC (1, graph);
     if (!g) {
-        fprintf (stderr, "Out of memory in build_graph\n");
+        CC_FPRINTF(stderr, "Out of memory in build_graph\n");
         goto FAILURE;
     }
     g->nodecount = nodecount;
@@ -1824,13 +1824,13 @@ static int build_complete_graph (int nodecount, graph **p_g)
 
     g->elist = (int *) CC_SAFE_MALLOC (edgecount*2, int);
     if (!g->elist) {
-        fprintf (stderr, "Out of memory in build_graph\n");
+        CC_FPRINTF(stderr, "Out of memory in build_graph\n");
         goto FAILURE;
     }
 
     g->elen = (int *) CC_SAFE_MALLOC (edgecount, int);
     if (!g->elen) {
-        fprintf (stderr, "Out of memory in build_graph\n");
+        CC_FPRINTF(stderr, "Out of memory in build_graph\n");
         goto FAILURE;
     }
 
@@ -1846,7 +1846,7 @@ static int build_complete_graph (int nodecount, graph **p_g)
         }
     }
     if (edgecount2 != edgecount) {
-        fprintf (stderr, "ERROR - found %d edges, expected %d\n",
+        CC_FPRINTF(stderr, "ERROR - found %d edges, expected %d\n",
                  edgecount2, edgecount);
         goto FAILURE;
     }
@@ -1907,31 +1907,31 @@ static void compute_lhs (atom_info *atoms, graph *g)
 #ifdef DUMPSMALL
     if (atomcount < DUMPSMALL) {
         int k;
-        printf ("\n%d\n", atomcount);
+        CC_PRINTF("\n%d\n", atomcount);
         for (i=0; i<atomcount; i++) {
             for (j=0; j<i; j++) {
                 k = atomcount * (atomcount-1) / 2 -
                     (atomcount - j) * (atomcount - j - 1) / 2 + i - j - 1;
                 if (elist[2*k] != j || elist[2*k+1] != i) {
-                    fprintf (stderr, "Indexing problem, i %d j %d k %d elist[2k] %d elist[2k+1] %d\n",
+                    CC_FPRINTF(stderr, "Indexing problem, i %d j %d k %d elist[2k] %d elist[2k+1] %d\n",
                              i, j, k, elist[2*k], elist[2*k+1]);
                 }
-                printf ("%d ", elen[k]);
+                CC_PRINTF("%d ", elen[k]);
             }
-            printf ("0");
+            CC_PRINTF("0");
             for (j=i+1; j<atomcount; j++) {
                 k = atomcount * (atomcount-1) / 2 -
                     (atomcount - i) * (atomcount - i - 1) / 2 + j - i - 1;
                 if (elist[2*k] != i || elist[2*k+1] != j) {
-                    fprintf (stderr, "Indexing problem, i %d j %d k %d elist[2k] %d elist[2k+1] %d\n",
+                    CC_FPRINTF(stderr, "Indexing problem, i %d j %d k %d elist[2k] %d elist[2k+1] %d\n",
                              i, j, k, elist[2*k], elist[2*k+1]);
                 }
-                printf (" %d", elen[k]);
+                CC_PRINTF(" %d", elen[k]);
             }
-            printf ("\n");
+            CC_PRINTF("\n");
         }
-        printf ("\n");
-        fflush (stdout);
+        CC_PRINTF("\n");
+        CC_FFLUSH(stdout);
     }
 #endif /* DUMPSMALL */
 }
@@ -1944,7 +1944,7 @@ static int verify_rhs (atom_info *atoms, graph *g)
     int foundtour;
 
     if (atoms->sense != 'G') {
-        fprintf (stderr, "Constraint is not a >=\n");
+        CC_FPRINTF(stderr, "Constraint is not a >=\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -1961,26 +1961,26 @@ static int verify_rhs (atom_info *atoms, graph *g)
                                    1, (int *) NULL, HELDKARP_LIMIT, 2);
 #endif
     if (rval == HELDKARP_SEARCHLIMITEXCEEDED) {
-        fprintf (stderr, "CCheldkarp_small_elist search limit exceeded\n");
+        CC_FPRINTF(stderr, "CCheldkarp_small_elist search limit exceeded\n");
 #ifdef DUMPFAIL
         {
             int i;
-            printf ("Failed tsp\n");
-            printf ("%d %d\n", g->nodecount, g->edgecount);
+            CC_PRINTF("Failed tsp\n");
+            CC_PRINTF("%d %d\n", g->nodecount, g->edgecount);
             for (i=0; i<g->edgecount; i++) {
-                printf ("%d %d %d\n", g->elist[2*i], g->elist[2*i+1],
+                CC_PRINTF("%d %d %d\n", g->elist[2*i], g->elist[2*i+1],
                         g->elen[i]);
             }
-            printf ("%d\n", atoms->rhs);
-            printf ("\n");
+            CC_PRINTF("%d\n", atoms->rhs);
+            CC_PRINTF("\n");
         }
 #endif /* DUMPFAIL */
         rval = 1;
     } else if (rval) {
-        fprintf (stderr, "CCheldkarp_small_elist failed\n");
+        CC_FPRINTF(stderr, "CCheldkarp_small_elist failed\n");
         rval = 1;
     } else if (foundtour) {
-        fprintf (stderr, "CCheldkarp_small_elist found better tour\n");
+        CC_FPRINTF(stderr, "CCheldkarp_small_elist found better tour\n");
         rval = 1;
     } else {
         rval = 0;
@@ -1991,16 +1991,16 @@ static int verify_rhs (atom_info *atoms, graph *g)
     if (rval == CC_TINYTSP_INFEASIBLE) {
         rval = 0; goto CLEANUP;
     } else if (rval == CC_TINYTSP_ERROR) {
-        fprintf (stderr, "Tinytsp failed\n");
+        CC_FPRINTF(stderr, "Tinytsp failed\n");
         rval = 1; goto CLEANUP;
     } else if (rval == CC_TINYTSP_SEARCHLIMITEXCEEDED) {
-        fprintf (stderr, "Tinytsp search limit exceeded\n");
+        CC_FPRINTF(stderr, "Tinytsp search limit exceeded\n");
         rval = 1; goto CLEANUP;
     } else if (rval) {
-        fprintf (stderr, "Tinytsp invalid return code %d\n", rval);
+        CC_FPRINTF(stderr, "Tinytsp invalid return code %d\n", rval);
         rval = 1; goto CLEANUP;
     } else {
-        fprintf (stderr, "Tinytsp found better tour\n");
+        CC_FPRINTF(stderr, "Tinytsp found better tour\n");
         rval = 1; goto CLEANUP;
     }
 #endif
@@ -2074,27 +2074,27 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
 
 #ifdef DEBUG
     double sz = CCutil_zeit();
-    printf ("Classifying cut, %d cliques %d atoms",cut->cliquecount,
+    CC_PRINTF("Classifying cut, %d cliques %d atoms",cut->cliquecount,
             cut->skel.atomcount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 #endif /* DEBUG */
 
     class->type = -1;
     
     if (cut->skel.atomcount == 0 || cut->skel.atoms == (int *) NULL) {
-        fprintf (stderr, "Cut to classify has no skeleton\n");
+        CC_FPRINTF(stderr, "Cut to classify has no skeleton\n");
         rval = 1; goto CLEANUP;
     }
     
     rval = build_atom_info (cut, &atoms);
     if (rval) {
-        fprintf (stderr, "build_atom_info failed\n");
+        CC_FPRINTF(stderr, "build_atom_info failed\n");
         goto CLEANUP;
     }
 
     rval = verify_atom_info (cut, &atoms);
     if (rval) {
-        fprintf (stderr, "atom_info failed verification\n");
+        CC_FPRINTF(stderr, "atom_info failed verification\n");
         goto CLEANUP;
     }
 
@@ -2102,8 +2102,8 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
     if (rval == 0) {
         /* It's a valid subtour - we're done */
 #ifdef DEBUG
-        printf (" (subtour)");
-        fflush (stdout);
+        CC_PRINTF(" (subtour)");
+        CC_FFLUSH(stdout);
 #endif
         goto CLEANUP;
     }
@@ -2112,8 +2112,8 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
     if (rval == 0) {
         /* It's a valid comb - we're done */
 #ifdef DEBUG
-        printf (" (comb 1,%d)", atoms.cliquecount-1);
-        fflush (stdout);
+        CC_PRINTF(" (comb 1,%d)", atoms.cliquecount-1);
+        CC_FFLUSH(stdout);
 #endif
         goto CLEANUP;
     }
@@ -2125,8 +2125,8 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
             /* It's a valid star, with handles marked 0 - we're done */
 #ifdef DEBUG
             int hcnt = family_count (&atoms.family[0], (int *) NULL) - 1;
-            printf (" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
-            fflush (stdout);
+            CC_PRINTF(" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
+            CC_FFLUSH(stdout);
 #endif
             if (type != (int *) NULL) *type = CC_TYPE_STAR;
             goto CLEANUP;
@@ -2137,8 +2137,8 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
             /* It's a valid star, with handles marked 1 - we're done */
 #ifdef DEBUG
             int hcnt = family_count (&atoms.family[1], (int *) NULL) - 1;
-            printf (" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
-            fflush (stdout);
+            CC_PRINTF(" (star %d,%d)", hcnt, atoms.cliquecount - hcnt);
+            CC_FFLUSH(stdout);
 #endif
             if (type != (int *) NULL) *type = CC_TYPE_STAR;
             goto CLEANUP;
@@ -2149,8 +2149,8 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
             /* It's a valid bipartition, with handles marked 0 - we're done */
 #ifdef DEBUG
             int hcnt = family_count (&atoms.family[0], (int *) NULL) - 1;
-            printf (" (bipartition %d,%d)", hcnt, atoms.cliquecount - hcnt);
-            fflush (stdout);
+            CC_PRINTF(" (bipartition %d,%d)", hcnt, atoms.cliquecount - hcnt);
+            CC_FFLUSH(stdout);
 #endif
             if (type != (int *) NULL) *type = CC_TYPE_BIPARTITION;
             goto CLEANUP;
@@ -2161,8 +2161,8 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
             /* It's a valid bipartition, with handles marked 1 - we're done */
 #ifdef DEBUG
             int hcnt = family_count (&atoms.family[1], (int *) NULL) - 1;
-            printf (" (bipartition %d,%d)", hcnt, atoms.cliquecount - hcnt);
-            fflush (stdout);
+            CC_PRINTF(" (bipartition %d,%d)", hcnt, atoms.cliquecount - hcnt);
+            CC_FFLUSH(stdout);
 #endif
             if (type != (int *) NULL) *type = CC_TYPE_BIPARTITION;
             goto CLEANUP;
@@ -2170,9 +2170,9 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
 
 #if 0
 #ifdef DEBUG
-        printf ("\nCurious, binested, but not star or bipartition:\n");
+        CC_PRINTF("\nCurious, binested, but not star or bipartition:\n");
         CCtsp_print_lpcut_in (cut);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
 #endif
 #endif
     }
@@ -2182,26 +2182,26 @@ int CCverify_classify (CCtsp_lpcut_in *cut, CCverify_cutclass *class)
     rval = verify_other (&atoms);
     if (rval == 0) {
 #ifdef DEBUG
-        printf (" (other)");
-        fflush (stdout);
+        CC_PRINTF(" (other)");
+        CC_FFLUSH(stdout);
 #endif
         if (type != (int *) NULL) *type = CC_TYPE_OTHER;
         goto CLEANUP;
     }
 
-    fprintf (stderr, "Unable to verify cut\n");
+    CC_FPRINTF(stderr, "Unable to verify cut\n");
     rval = -1;
 
   CLEANUP:
 #ifdef DEBUG
     if (rval == 0) {
-        printf (" in %.2f seconds\n", CCutil_zeit() - sz);
-        fflush (stdout);
+        CC_PRINTF(" in %.2f seconds\n", CCutil_zeit() - sz);
+        CC_FFLUSH(stdout);
     } else {
-        printf (" FAILED in %.2f seconds\n", CCutil_zeit() - sz);
-        printf ("FAILED CUT:\n");
+        CC_PRINTF(" FAILED in %.2f seconds\n", CCutil_zeit() - sz);
+        CC_PRINTF("FAILED CUT:\n");
         CCtsp_print_lpcut_in (cut);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 #endif
     free_atom_info (&atoms);
@@ -2220,7 +2220,7 @@ static int build_cutclass (CCverify_cutclass *class, int ncliques,
     if (class->cliques == (int *) NULL ||
         class->inverted == (int *) NULL ||
         class->family_start == (int *) NULL) {
-        fprintf (stderr, "Out of memory in build_cutclass\n");
+        CC_FPRINTF(stderr, "Out of memory in build_cutclass\n");
         CC_IFFREE (class->cliques, int);
         CC_IFFREE (class->inverted, int);
         CC_IFFREE (class->family_start, int);

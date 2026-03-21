@@ -259,30 +259,30 @@ int CCtsp_prob_file_delete (char *f, int n)
         char hostbuf[1024];
         if (split_name (f, hostbuf, sizeof (hostbuf),
                         nambuf, sizeof (nambuf))) {
-            fprintf (stderr, "Cannot split remote name\n");
+            CC_FPRINTF(stderr, "Cannot split remote name\n");
             return -1;
         }
         return CCtsp_prob_delete_remote (hostbuf, nambuf, n);
 #else /* CC_NETREADY */
-        fprintf (stderr, "Remote problem deleting not enabled\n");
+        CC_FPRINTF(stderr, "Remote problem deleting not enabled\n");
         return -1;
 #endif
     }
     
     if (prob_name (nambuf, sizeof (nambuf), f, n)) return 1;
     /*
-    printf ("Delete File %s at time %.0f\n", nambuf, CCutil_real_zeit());
-    fflush (stdout);
+    CC_PRINTF("Delete File %s at time %.0f\n", nambuf, CCutil_real_zeit());
+    CC_FFLUSH(stdout);
     */
     sval = CCutil_sdelete_file (nambuf);
     if (sval) {
-        fprintf (stderr, "Prob file %s could not be deleted\n", nambuf);
+        CC_FPRINTF(stderr, "Prob file %s could not be deleted\n", nambuf);
     }
     sval = CCutil_sdelete_file_backup (nambuf);
     /*
     if (!sval) {
-        printf ("Deleted backup to file: %s\n", nambuf);
-        fflush (stdout);
+        CC_PRINTF("Deleted backup to file: %s\n", nambuf);
+        CC_FFLUSH(stdout);
     }
     */
 
@@ -298,12 +298,12 @@ CCtsp_PROB_FILE *CCtsp_prob_read (char *f, int n)
         char hostbuf[1024];
         if (split_name (f, hostbuf, sizeof (hostbuf),
                         nambuf, sizeof (nambuf))) {
-            fprintf (stderr, "Cannot split remote name\n");
+            CC_FPRINTF(stderr, "Cannot split remote name\n");
             return (CCtsp_PROB_FILE *) NULL;
         }
         return CCtsp_prob_read_remote (hostbuf, nambuf, n);
 #else /* CC_NETREADY */
-        fprintf (stderr, "Remote problem reading not enabled\n");
+        CC_FPRINTF(stderr, "Remote problem reading not enabled\n");
         return (CCtsp_PROB_FILE *) NULL;
 #endif
     }
@@ -321,14 +321,14 @@ CCtsp_PROB_FILE *CCtsp_prob_read_name (char *f)
 
 #if 0
     if (remote_name (f)) {
-        fprintf (stderr, "Cannot read remote problems by name\n");
+        CC_FPRINTF(stderr, "Cannot read remote problems by name\n");
         return (CCtsp_PROB_FILE *) NULL;
     }
 #endif
     
     /*
-    printf ("Read File %s at time %.0f\n", f, CCutil_real_zeit());
-    fflush (stdout);
+    CC_PRINTF("Read File %s at time %.0f\n", f, CCutil_real_zeit());
+    CC_FFLUSH(stdout);
     */
 
     p = CC_SAFE_MALLOC (1, CCtsp_PROB_FILE);
@@ -342,7 +342,7 @@ CCtsp_PROB_FILE *CCtsp_prob_read_name (char *f)
 
     rval = prob_getheader (p, p);
     if (rval) {
-        fprintf (stderr, "prob_getheader failed\n");
+        CC_FPRINTF(stderr, "prob_getheader failed\n");
         goto FAILURE;
     }
 
@@ -375,8 +375,8 @@ CCtsp_PROB_FILE *CCtsp_prob_read_remote (char *hname, char *pname, int n)
 */
 
     /*
-    printf ("Read Remote Host %s name %s id %d\n", hname, pname, n);
-    fflush (stdout);
+    CC_PRINTF("Read Remote Host %s name %s id %d\n", hname, pname, n);
+    CC_FFLUSH(stdout);
     */
 
     p = CC_SAFE_MALLOC (1, CCtsp_PROB_FILE);
@@ -385,27 +385,27 @@ CCtsp_PROB_FILE *CCtsp_prob_read_remote (char *hname, char *pname, int n)
 
     p->f = CCutil_snet_open (hname, CCtsp_PROB_PORT);
     if (p->f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "Unable to contact server\n");
+        CC_FPRINTF(stderr, "Unable to contact server\n");
         goto FAILURE;
     }
     p->type = PROB_REMOTE;
 
     rval = CCutil_swrite_char (p->f, CCtsp_Pread);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_char failed\n"); goto FAILURE;
+        CC_FPRINTF(stderr, "CCutil_swrite_char failed\n"); goto FAILURE;
     }
     rval = CCutil_swrite_string (p->f, pname);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_string failed\n"); goto FAILURE;
+        CC_FPRINTF(stderr, "CCutil_swrite_string failed\n"); goto FAILURE;
     }
     rval = CCutil_swrite_int (p->f, n);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_int failed\n"); goto FAILURE;
+        CC_FPRINTF(stderr, "CCutil_swrite_int failed\n"); goto FAILURE;
     }
 
     rval = prob_getheader (p, p);
     if (rval) {
-        fprintf (stderr, "prob_getheader failed\n");
+        CC_FPRINTF(stderr, "prob_getheader failed\n");
         goto FAILURE;
     }
 
@@ -464,7 +464,7 @@ static int prob_getheader (CCtsp_PROB_FILE *p, CCtsp_PROB_FILE *h)
         }
         break;
     default:
-        fprintf (stderr, "Unknown problem version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown problem version %ud\n", (unsigned) version);
         return 1;
     }
     return 0;
@@ -479,12 +479,12 @@ CCtsp_PROB_FILE *CCtsp_prob_write (char *f, int n)
         char hostbuf[1024];
         if (split_name (f, hostbuf, sizeof (hostbuf),
                         nambuf, sizeof (nambuf))) {
-            fprintf (stderr, "Cannot split remote name\n");
+            CC_FPRINTF(stderr, "Cannot split remote name\n");
             return (CCtsp_PROB_FILE *) NULL;
         }
         return CCtsp_prob_write_remote (hostbuf, nambuf, n);
 #else /* CC_NETREADY */
-        fprintf (stderr, "Remote problem writing not enabled\n");
+        CC_FPRINTF(stderr, "Remote problem writing not enabled\n");
         return (CCtsp_PROB_FILE *) NULL;
 #endif
     }
@@ -501,14 +501,14 @@ CCtsp_PROB_FILE *CCtsp_prob_write_name (char *fname)
 
 #if 0
     if (remote_name (fname)) {
-        fprintf (stderr, "Cannot write remote problems by name\n");
+        CC_FPRINTF(stderr, "Cannot write remote problems by name\n");
         return (CCtsp_PROB_FILE *) NULL;
     }
 #endif
 
     /*
-    printf ("Write File %s at time %.0f\n", fname, CCutil_real_zeit());
-    fflush (stdout);
+    CC_PRINTF("Write File %s at time %.0f\n", fname, CCutil_real_zeit());
+    CC_FFLUSH(stdout);
     */
 
     p = CC_SAFE_MALLOC (1, CCtsp_PROB_FILE);
@@ -521,7 +521,7 @@ CCtsp_PROB_FILE *CCtsp_prob_write_name (char *fname)
     p->type = PROB_LOCAL;
     
     if (prob_putheader (p, p)) {
-        fprintf (stderr, "prob_putheader failed\n");
+        CC_FPRINTF(stderr, "prob_putheader failed\n");
         goto FAILURE;
     }
 
@@ -555,8 +555,8 @@ CCtsp_PROB_FILE *CCtsp_prob_write_remote (char *hname, char *pname, int n)
 */
 
     /*
-    printf ("Write Remote Host %s name %s id %d\n", hname, pname, n);
-    fflush (stdout);
+    CC_PRINTF("Write Remote Host %s name %s id %d\n", hname, pname, n);
+    CC_FFLUSH(stdout);
     */
 
     p = CC_SAFE_MALLOC (1, CCtsp_PROB_FILE);
@@ -569,22 +569,22 @@ CCtsp_PROB_FILE *CCtsp_prob_write_remote (char *hname, char *pname, int n)
 
     p->f = CCutil_snet_open (hname, CCtsp_PROB_PORT);
     if (p->f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "Unable to contact server\n");
+        CC_FPRINTF(stderr, "Unable to contact server\n");
         goto FAILURE;
     }
     p->type = PROB_REMOTE;
 
     rval = CCutil_swrite_char (p->f, CCtsp_Pwrite);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_char failed\n"); goto FAILURE;
+        CC_FPRINTF(stderr, "CCutil_swrite_char failed\n"); goto FAILURE;
     }
     rval = CCutil_swrite_string (p->f, pname);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_string failed\n"); goto FAILURE;
+        CC_FPRINTF(stderr, "CCutil_swrite_string failed\n"); goto FAILURE;
     }
     rval = CCutil_swrite_int (p->f, n);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_int failed\n"); goto FAILURE;
+        CC_FPRINTF(stderr, "CCutil_swrite_int failed\n"); goto FAILURE;
     }
     
     return p;
@@ -604,31 +604,31 @@ int CCtsp_prob_delete_remote (char *hname, char *pname, int n)
     CC_SFILE *f = (CC_SFILE *) NULL;
     int rval;
 
-    printf ("Delete Remote Host %s name %s id %d\n", hname, pname, n);
-    fflush (stdout);
+    CC_PRINTF("Delete Remote Host %s name %s id %d\n", hname, pname, n);
+    CC_FFLUSH(stdout);
 
     f = CCutil_snet_open (hname, CCtsp_PROB_PORT);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "Unable to contact server\n");
+        CC_FPRINTF(stderr, "Unable to contact server\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCutil_swrite_char (f, CCtsp_Pdelete);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_char failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_swrite_char failed\n"); goto CLEANUP;
     }
     rval = CCutil_swrite_string (f, pname);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_string failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_swrite_string failed\n"); goto CLEANUP;
     }
     rval = CCutil_swrite_int (f, n);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_int failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_swrite_int failed\n"); goto CLEANUP;
     }
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
     }
     f = (CC_SFILE *) NULL;
 
@@ -708,7 +708,7 @@ static int prob_name (char *buf, size_t buflen, char *f, int n)
     int d;
 
     if (l + 5 > (int) buflen || n < 0) {
-        fprintf (stderr, "Cannot generate filename for %s node %d\n",
+        CC_FPRINTF(stderr, "Cannot generate filename for %s node %d\n",
                  f, n);
         return -1;
     }
@@ -771,7 +771,7 @@ static int prob_name (char *buf, size_t buflen, char *f, int n)
         buf[l++] = (d < 10) ? '0' + ((unsigned int) d)
                             : 'a' + ((unsigned int) (d-10));
     } else {
-        fprintf (stderr, "Node number %d too large\n", n);
+        CC_FPRINTF(stderr, "Node number %d too large\n", n);
         return -1;
     }
         
@@ -880,7 +880,7 @@ int CCtsp_prob_getid (CCtsp_PROB_FILE *p, int *id)
 
     *id = p->id;
     if (*id == -1) {
-        printf ("Setting -1 ID to 0\n"); fflush (stdout);
+        CC_PRINTF("Setting -1 ID to 0\n"); CC_FFLUSH(stdout);
         *id = 0;
     }
     return 0;
@@ -1045,15 +1045,15 @@ static int prob_copyheader (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t)
     int rval;
 
     if (f->type == PROB_SERVER && t->type == PROB_SERVER) {
-        fprintf (stderr, "Cannot copy header from server to server\n");
+        CC_FPRINTF(stderr, "Cannot copy header from server to server\n");
         return -1;
     } else if (f->type == PROB_SERVER) {
         rval = prob_getheader (f, t);
-        if (rval) fprintf (stderr, "prob_getheader failed\n");
+        if (rval) CC_FPRINTF(stderr, "prob_getheader failed\n");
         return rval;
     } else if (t->type == PROB_SERVER) {
         rval = prob_putheader (t, f);
-        if (rval) fprintf (stderr, "prob_putheader failed\n");
+        if (rval) CC_FPRINTF(stderr, "prob_putheader failed\n");
         return rval;
     } else {
         strcpy (t->name, f->name);
@@ -1088,14 +1088,14 @@ static int begin_get (CCtsp_PROB_FILE *p, int offset, char section, int silent)
     if (p->type == PROB_LOCAL) {
         if (offset == -1) {
             if (!silent) {
-                printf ("No section %c in file.\n", section);
-                fflush (stdout);
+                CC_PRINTF("No section %c in file.\n", section);
+                CC_FFLUSH(stdout);
             }
             return 1;
         }
         if (CCutil_sseek (p->f, offset)) {
-            fprintf (stderr, "CCutil_sseek failed in begin_get\n");
-            fflush (stdout);
+            CC_FPRINTF(stderr, "CCutil_sseek failed in begin_get\n");
+            CC_FFLUSH(stdout);
             return -1;
         }
     } else if (p->type == PROB_REMOTE) {
@@ -1105,8 +1105,8 @@ static int begin_get (CCtsp_PROB_FILE *p, int offset, char section, int silent)
         if (CCutil_sread_char (p->f, &exists)) return -1;
         if (exists == 0) {
             if (!silent) {
-                printf ("No section %c in remote file\n", section);
-                fflush (stdout);
+                CC_PRINTF("No section %c in remote file\n", section);
+                CC_FFLUSH(stdout);
             }
             return 1;
         }
@@ -1122,13 +1122,13 @@ static int begin_copy (CCtsp_PROB_FILE *f, int foffset, CCtsp_PROB_FILE *t,
     if (f->type == PROB_LOCAL) {
         if (foffset == -1) {
             if (!silent) {
-                printf ("No section %c in file.\n", section);
-                fflush (stdout);
+                CC_PRINTF("No section %c in file.\n", section);
+                CC_FFLUSH(stdout);
             }
             exists = 0;
         } else {
             if (CCutil_sseek (f->f, foffset)) {
-                fprintf (stderr, "CCutil_sseek failed in begin_copy\n");
+                CC_FPRINTF(stderr, "CCutil_sseek failed in begin_copy\n");
                 return -1;
             }
             exists = 1;
@@ -1138,8 +1138,8 @@ static int begin_copy (CCtsp_PROB_FILE *f, int foffset, CCtsp_PROB_FILE *t,
         if (CCutil_sread_char (f->f, &exists)) return -1;
         if (exists == 0) {
             if (!silent) {
-                printf ("No section %c in remote file\n", section);
-                fflush (stdout);
+                CC_PRINTF("No section %c in remote file\n", section);
+                CC_FFLUSH(stdout);
             }
         }
     } else if (f->type == PROB_SERVER) {
@@ -1204,13 +1204,13 @@ int CCtsp_prob_gettour (CCtsp_PROB_FILE *p, int ncount, int **tour, int silent)
     case 1:
         if (CCutil_sread_int (p->f, &ncount2)) goto FAILURE;
         if (ncount != ncount2) {
-            fprintf (stderr, "Wrong ncount in tour\n");
+            CC_FPRINTF(stderr, "Wrong ncount in tour\n");
             goto FAILURE;
         }
         nbits = CCutil_sbits (ncount2);
         *tour = CC_SAFE_MALLOC (ncount2, int);
         if (!(*tour)) {
-            fprintf (stderr, "out of memory in CCtsp_prob_gettour\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_prob_gettour\n");
             goto FAILURE;
         }
 
@@ -1221,7 +1221,7 @@ int CCtsp_prob_gettour (CCtsp_PROB_FILE *p, int ncount, int **tour, int silent)
         }
         break;
     default:
-        fprintf (stderr, "Unknown tour version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown tour version %ud\n", (unsigned) version);
         goto FAILURE;
     }
     return 0;
@@ -1255,7 +1255,7 @@ static int prob_copytour (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t, int silent)
         if (rval) return rval;
         break;
     default:
-        fprintf (stderr, "Unknown tour version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown tour version %ud\n", (unsigned) version);
         return 1;
     }
     return 0;
@@ -1310,7 +1310,7 @@ int CCtsp_prob_getedges (CCtsp_PROB_FILE *p, int ncount, int *ecount,
     case 1:
         if (CCutil_sread_int (p->f, &ncount2)) goto FAILURE;
         if (ncount2 != ncount) {
-            fprintf (stderr, "Wrong ncount in edges\n");
+            CC_FPRINTF(stderr, "Wrong ncount in edges\n");
             goto FAILURE;
         }
         if (CCutil_sread_int (p->f, ecount)) goto FAILURE;
@@ -1318,7 +1318,7 @@ int CCtsp_prob_getedges (CCtsp_PROB_FILE *p, int ncount, int *ecount,
         *elist = CC_SAFE_MALLOC (2 * (*ecount), int);
         *elen = CC_SAFE_MALLOC (*ecount, int);
         if (!(*elist) || !(*elen)) {
-            fprintf (stderr, "out of memory in CCtsp_prob_getedges\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_prob_getedges\n");
             goto FAILURE;
         }
 
@@ -1335,7 +1335,7 @@ int CCtsp_prob_getedges (CCtsp_PROB_FILE *p, int ncount, int *ecount,
         }
         break;
     default:
-        fprintf (stderr, "Unknown edges version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown edges version %ud\n", (unsigned) version);
         goto FAILURE;
     }
     return 0;
@@ -1378,7 +1378,7 @@ static int prob_copyedges (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t, int silent)
         }
         break;
     default:
-        fprintf (stderr, "Unknown edges version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown edges version %ud\n", (unsigned) version);
         return 1;
     }
     return 0;
@@ -1440,7 +1440,7 @@ int CCtsp_prob_putwarmstart (CCtsp_PROB_FILE *p, CClp_warmstart *w)
     if (rval) return rval;
 
     if (CClp_swrite_warmstart (p->f, w)) {
-        fprintf (stderr, "CClp_swrite_warmstart failed\n");
+        CC_FPRINTF(stderr, "CClp_swrite_warmstart failed\n");
         return 1;
     }
 
@@ -1458,7 +1458,7 @@ int CCtsp_prob_getwarmstart (CCtsp_PROB_FILE *p, CClp_warmstart **w, int silent)
 
 
     if (CClp_sread_warmstart (p->f, w)) {
-        fprintf (stderr, "CClp_sread_warmstart failed\n");;
+        CC_FPRINTF(stderr, "CClp_sread_warmstart failed\n");;
         return -1;
     }
     return 0;
@@ -1537,14 +1537,14 @@ int CCtsp_prob_getfulladj (CCtsp_PROB_FILE *p, int ncount, int *fullcount,
     case 1:
         if (CCutil_sread_int (p->f, &ncount2)) goto FAILURE;
         if (ncount != ncount2) {
-            fprintf (stderr, "ncount incorrect in fulladj\n"); goto FAILURE;
+            CC_FPRINTF(stderr, "ncount incorrect in fulladj\n"); goto FAILURE;
         }
         nbits = CCutil_sbits (ncount2);
         if (CCutil_sread_int (p->f, fullcount)) goto FAILURE;
         *adjspace = CC_SAFE_MALLOC (*fullcount, CCtsp_genadjobj);
         *adj = CC_SAFE_MALLOC (ncount, CCtsp_genadj);
         if (!adjspace || !adj) {
-            fprintf (stderr, "out of memory in CCtsp_prob_getfulladj\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_prob_getfulladj\n");
             goto FAILURE;
         }
 
@@ -1563,7 +1563,7 @@ int CCtsp_prob_getfulladj (CCtsp_PROB_FILE *p, int ncount, int *fullcount,
         }
         break;
     default:
-        fprintf (stderr, "Unknown fulladj version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown fulladj version %ud\n", (unsigned) version);
         goto FAILURE;
     }
     return 0;
@@ -1611,7 +1611,7 @@ static int prob_copyfulladj (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t, int silent)
         }
         break;
     default:
-        fprintf (stderr, "Unknown fulladj version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown fulladj version %ud\n", (unsigned) version);
         return -1;
     }
     return 0;
@@ -1664,7 +1664,7 @@ int CCtsp_prob_getfixed (CCtsp_PROB_FILE *p, int ncount, int *ecount,
     case 1:
         if (CCutil_sread_int (p->f, &ncount2)) goto FAILURE;
         if (ncount != ncount2) {
-            fprintf (stderr, "wrong ncount in fixed edges\n");
+            CC_FPRINTF(stderr, "wrong ncount in fixed edges\n");
             goto FAILURE;
         }
         if (CCutil_sread_int (p->f, ecount)) goto FAILURE;
@@ -1672,7 +1672,7 @@ int CCtsp_prob_getfixed (CCtsp_PROB_FILE *p, int ncount, int *ecount,
         if (*ecount) {
             *elist = CC_SAFE_MALLOC (2*(*ecount), int);
             if (!(*elist)) {
-                fprintf (stderr, "out of memory in CCtsp_prob_getfixed\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_prob_getfixed\n");
                 goto FAILURE;
             }
             nbits = CCutil_sbits (ncount);
@@ -1683,7 +1683,7 @@ int CCtsp_prob_getfixed (CCtsp_PROB_FILE *p, int ncount, int *ecount,
         }
         break;
     default:
-        fprintf (stderr, "Unknown fixed version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown fixed version %ud\n", (unsigned) version);
         goto FAILURE;
     }
     return 0;
@@ -1720,7 +1720,7 @@ static int prob_copyfixed (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t, int silent)
         if (rval) return rval;
         break;
     default:
-        fprintf (stderr, "Unknown fixed version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown fixed version %ud\n", (unsigned) version);
         return -1;
     }
     return 0;
@@ -1772,12 +1772,12 @@ int CCtsp_prob_getexactdual (CCtsp_PROB_FILE *p, int ncount, CCtsp_bigdual **d,
     case 1:
         if (CCutil_sread_int (p->f, &ncount2)) goto FAILURE;
         if (ncount != ncount2) {
-            fprintf (stderr, "wrong ncount in exact dual\n"); goto FAILURE;
+            CC_FPRINTF(stderr, "wrong ncount in exact dual\n"); goto FAILURE;
         }
     
         *d = CC_SAFE_MALLOC (1, CCtsp_bigdual);
         if (!(*d)) {
-            fprintf (stderr, "out of memory in CCtsp_prob_getexactdual\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_prob_getexactdual\n");
             goto FAILURE;
         }
         rd = *d;
@@ -1789,7 +1789,7 @@ int CCtsp_prob_getexactdual (CCtsp_PROB_FILE *p, int ncount, CCtsp_bigdual **d,
         
         rd->node_pi = CC_SAFE_MALLOC (ncount, CCbigguy);
         if (!rd->node_pi) {
-            fprintf (stderr, "out of memory in CCtsp_prob_getexactdual\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_prob_getexactdual\n");
             goto FAILURE;
         }
         for (i = 0; i < ncount; i++) {
@@ -1798,7 +1798,7 @@ int CCtsp_prob_getexactdual (CCtsp_PROB_FILE *p, int ncount, CCtsp_bigdual **d,
         if (rd->cutcount) {
             rd->cut_pi = CC_SAFE_MALLOC (rd->cutcount, CCbigguy);
             if (!rd->cut_pi) {
-                fprintf (stderr, "out of memory in CCtsp_prob_getexactdual\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_prob_getexactdual\n");
                 goto FAILURE;
             }
             for (i = 0; i < rd->cutcount; i++) {
@@ -1807,7 +1807,7 @@ int CCtsp_prob_getexactdual (CCtsp_PROB_FILE *p, int ncount, CCtsp_bigdual **d,
         }
         break;
     default:
-        fprintf (stderr, "Unknown exact dual version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown exact dual version %ud\n", (unsigned) version);
         goto FAILURE;
     }
     return 0;
@@ -1848,7 +1848,7 @@ static int prob_copyexactdual (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t,
         if (rval) return rval;
         return 0;
     default:
-        fprintf (stderr, "Unknown exact dual version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown exact dual version %ud\n", (unsigned) version);
         return -1;
     }
 }
@@ -1913,7 +1913,7 @@ int CCtsp_prob_gethistory (CCtsp_PROB_FILE *p, int *depth,
         if (*depth) {
             *history = CC_SAFE_MALLOC (*depth, CCtsp_branchobj);
             if (!(*history)) {
-                fprintf (stderr, "out of memory in CCtsp_prob_gethistory\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_prob_gethistory\n");
                 goto FAILURE;
             }
             for (i = 0; i < (*depth); i++) {
@@ -1940,7 +1940,7 @@ int CCtsp_prob_gethistory (CCtsp_PROB_FILE *p, int *depth,
                     if (!c) goto FAILURE;
                     rval = CCtsp_seglist_to_lpclique (nseg, slist, c);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_seglist_to_lpclique failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_seglist_to_lpclique failed\n");
                         CC_FREE (c, CCtsp_lpclique);
                         goto FAILURE;
                     }
@@ -1954,7 +1954,7 @@ int CCtsp_prob_gethistory (CCtsp_PROB_FILE *p, int *depth,
         }
         break;
     default:
-        fprintf (stderr, "Unknown history version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown history version %ud\n", (unsigned) version);
         goto FAILURE;
     }
     return 0;
@@ -2000,7 +2000,7 @@ static int prob_copyhistory (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t, int silent)
         }
         break;
     default:
-        fprintf (stderr, "Unknown history version %ud\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown history version %ud\n", (unsigned) version);
         return -1;
     }
     return 0;
@@ -2029,7 +2029,7 @@ int CCtsp_prob_copy_section (CCtsp_PROB_FILE *f, CCtsp_PROB_FILE *t,
       case CCtsp_Phistory:
         return prob_copyhistory (f, t, silent);
       default:
-        fprintf (stderr, "Invalid section %c in CCtsp_prob_copy_section\n",
+        CC_FPRINTF(stderr, "Invalid section %c in CCtsp_prob_copy_section\n",
                  section);
         return 1;
     }
@@ -2048,13 +2048,13 @@ static int split_name (const char *f, char *hostname, size_t hlen,
 
     p = CCutil_strchr_c (f, ':');
     if (p == (const char *) NULL) {
-        fprintf (stderr, "non-net name in split_name\n");
+        CC_FPRINTF(stderr, "non-net name in split_name\n");
         return 1;
     }
 
     len = p - f;
     if (len+1 > hlen) {
-        fprintf (stderr, "hostname too long in split_name\n");
+        CC_FPRINTF(stderr, "hostname too long in split_name\n");
         return 1;
     }
 
@@ -2063,7 +2063,7 @@ static int split_name (const char *f, char *hostname, size_t hlen,
 
     len = strlen (p+1);
     if (len+1 > plen) {
-        fprintf (stderr, "filename too long in split_name\n");
+        CC_FPRINTF(stderr, "filename too long in split_name\n");
         return 1;
     }
 

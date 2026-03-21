@@ -51,28 +51,28 @@ int main (int ac, char **av)
     if (textin) {
         rval = verify_text_pool (cutname, in_ncount);
         if (rval) {
-            fprintf (stderr, "verify_text_pool failed\n");
+            CC_FPRINTF(stderr, "verify_text_pool failed\n");
             goto CLEANUP;
         }
     } else if (probin) {
         rval = verify_problem (cutname, run_silently);
         if (rval) {
-            fprintf (stderr, "verify_problem failed\n");
+            CC_FPRINTF(stderr, "verify_problem failed\n");
             goto CLEANUP;
         }
     } else if (poolin) {
         rval = verify_binary_pool (cutname);
         if (rval) {
-            fprintf (stderr, "verify_binary_pool failed\n");
+            CC_FPRINTF(stderr, "verify_binary_pool failed\n");
             goto CLEANUP;
         }
     }
 
   CLEANUP:
-    printf ("Verification completed (%s) in %.2f seconds\n",
+    CC_PRINTF("Verification completed (%s) in %.2f seconds\n",
             rval ? "unsuccessful" : "successful",
             CCutil_stop_timer (&z, 0));
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     return rval;
 }
 
@@ -89,14 +89,14 @@ static int verify_text_pool (char *poolname, int nodecount)
 
     tour = CC_SAFE_MALLOC (nodecount, int);
     if (tour == (int *) NULL) {
-        fprintf (stderr, "Out of memory in verify_text_pool\n");
+        CC_FPRINTF(stderr, "Out of memory in verify_text_pool\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<nodecount; i++) tour[i] = i;
     
     rval = CCtsp_file_cuts (poolname, &cuts, &cutcount, nodecount, tour);
     if (rval) {
-        fprintf (stderr, "CCtsp_file_cuts failed\n");
+        CC_FPRINTF(stderr, "CCtsp_file_cuts failed\n");
         goto CLEANUP;
     }
 
@@ -104,7 +104,7 @@ static int verify_text_pool (char *poolname, int nodecount)
         cnext = cuts->next;
         rval = CCverify_cut (cuts, CC_TYPE_ALL, (int *) NULL);
         if (rval) {
-            fprintf (stderr, "CCverify_cut failed\n");
+            CC_FPRINTF(stderr, "CCverify_cut failed\n");
             nfail++;
         } else {
             nsuccess++;
@@ -114,7 +114,7 @@ static int verify_text_pool (char *poolname, int nodecount)
         cuts = cnext;
     }
 
-    printf ("%d of %d cuts failed verification\n", nfail, nfail + nsuccess);
+    CC_PRINTF("%d of %d cuts failed verification\n", nfail, nfail + nsuccess);
 
     if (nfail == 0) rval = 0;
     else rval = -1;
@@ -142,19 +142,19 @@ static int verify_binary_pool (char *poolname)
 
     rval = CCtsp_init_cutpool (&ncount, poolname, &pool);
     if (rval) {
-        fprintf (stderr, "CCtsp_init_cutpool failed\n");
+        CC_FPRINTF(stderr, "CCtsp_init_cutpool failed\n");
         goto CLEANUP;
     }
 
     for (i=0; i<pool->cutcount; i++) {
         rval = CCtsp_lpcut_to_lpcut_in (pool, &(pool->cuts[i]), &cut);
         if (rval) {
-            fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
+            CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
             goto CLEANUP;
         }
         rval = CCverify_cut (&cut, CC_TYPE_ALL, (int *) NULL);
         if (rval) {
-            fprintf (stderr, "CCverify_cut failed\n");
+            CC_FPRINTF(stderr, "CCverify_cut failed\n");
             nfail++;
         } else {
             nsuccess++;
@@ -162,7 +162,7 @@ static int verify_binary_pool (char *poolname)
         CCtsp_free_lpcut_in (&cut);
     }
 
-    printf ("%d of %d cuts failed verification\n", nfail, nfail + nsuccess);
+    CC_PRINTF("%d of %d cuts failed verification\n", nfail, nfail + nsuccess);
 
     if (nfail == 0) rval = 0;
     else rval = -1;
@@ -187,25 +187,25 @@ static int verify_problem (char *probname, int silent)
 
     lp = CC_SAFE_MALLOC (1, CCtsp_lp);
     if (lp == (CCtsp_lp *) NULL) {
-        fprintf (stderr, "Out of memory in verify_problem\n");
+        CC_FPRINTF(stderr, "Out of memory in verify_problem\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_init_tsp_lp_struct (lp);
     rval = CCtsp_read_probfile (lp, probname, (char *) NULL, &ncount, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_read_probfile failed\n");
+        CC_FPRINTF(stderr, "CCtsp_read_probfile failed\n");
         goto CLEANUP;
     }
 
     rval = CCtsp_build_lpadj (&lp->graph, 0, lp->graph.ecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n");
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n");
         goto CLEANUP;
     }
     
     rval = CCtsp_add_branchhistory_to_lp (lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_branchhistory_to_lp failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_branchhistory_to_lp failed\n");
         goto CLEANUP;
     }
 
@@ -214,12 +214,12 @@ static int verify_problem (char *probname, int silent)
         if (cuts->cuts[i].branch == 0) {
             rval = CCtsp_lpcut_to_lpcut_in (cuts, &(cuts->cuts[i]), &cut);
             if (rval) {
-                fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
+                CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
                 goto CLEANUP;
             }
             rval = CCverify_cut (&cut, CC_TYPE_ALL, (int *) NULL);
             if (rval) {
-                fprintf (stderr, "CCverify_cut failed\n");
+                CC_FPRINTF(stderr, "CCverify_cut failed\n");
                 nfail++;
             } else {
                 nsuccess++;
@@ -228,7 +228,7 @@ static int verify_problem (char *probname, int silent)
         }
     }
 
-    printf ("%d cuts failed verification, %d passed\n", nfail, nsuccess);
+    CC_PRINTF("%d cuts failed verification, %d passed\n", nfail, nsuccess);
 
     if (nfail == 0) rval = 0;
     else rval = -1;
@@ -270,9 +270,9 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [NPt:] cutfile\n", fname);
-    fprintf (stderr, "   -N        cutfile is problem file\n");
-    fprintf (stderr, "   -P        cutfile is a cut pool\n");
-    fprintf (stderr, "   -t n      cutfile is text file, n is the nodecount\n");
-    fprintf (stderr, "   One of -N, -P, or -t must be specified\n");
+    CC_FPRINTF(stderr, "Usage: %s [NPt:] cutfile\n", fname);
+    CC_FPRINTF(stderr, "   -N        cutfile is problem file\n");
+    CC_FPRINTF(stderr, "   -P        cutfile is a cut pool\n");
+    CC_FPRINTF(stderr, "   -t n      cutfile is text file, n is the nodecount\n");
+    CC_FPRINTF(stderr, "   One of -N, -P, or -t must be specified\n");
 }

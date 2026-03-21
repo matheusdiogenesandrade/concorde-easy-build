@@ -117,7 +117,7 @@ int CClp_init (CClp **lp)
 
     (*lp) = CC_SAFE_MALLOC (1, CClp);
     if ((*lp) == (CClp *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_init\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_init\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -128,7 +128,7 @@ int CClp_init (CClp **lp)
     if (CClp_cplex_env == (CPXENVptr) NULL) {
         CClp_cplex_env = CPXopenCPLEX (&rval);
         if (rval) {
-            fprintf (stderr, "CPXopenCPLEX failed, return code %d\n", rval);
+            CC_FPRINTF(stderr, "CPXopenCPLEX failed, return code %d\n", rval);
             goto CLEANUP;
         }
         CClp_env_count = 0;
@@ -138,7 +138,7 @@ int CClp_init (CClp **lp)
 #else /* CC_ONE_ENV */
     (*lp)->cplex_env = CPXopenCPLEX (&rval);
     if (rval) {
-        fprintf (stderr, "CPXopenCPLEX failed, return code %d\n", rval);
+        CC_FPRINTF(stderr, "CPXopenCPLEX failed, return code %d\n", rval);
         goto CLEANUP;
     }
 #endif /* CC_ONE_ENV */
@@ -169,38 +169,38 @@ int CClp_init (CClp **lp)
     /* the documentation doesn't say what the return value means */
     rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_SCRIND, 1);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_SCRIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_SCRIND failed\n");
         goto CLEANUP;
     }
 
     rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_SIMDISPLAY, 1);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_SIMDISPLAY failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_SIMDISPLAY failed\n");
         goto CLEANUP;
     }
 #endif
 
     rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_FASTMIP, 1);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_FASTMIP failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_FASTMIP failed\n");
         goto CLEANUP;
     }
 
     rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_ADVIND, 1);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_ADVIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_ADVIND failed\n");
         goto CLEANUP;
     }
     rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_DPRIIND,
                            CPX_DPRIIND_STEEP);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_DPRIIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_DPRIIND failed\n");
         goto CLEANUP;
     }
     rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_PPRIIND,
                            CPX_PPRIIND_STEEP);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_PPRIIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PPRIIND failed\n");
         goto CLEANUP;
     }
 
@@ -209,17 +209,17 @@ int CClp_init (CClp **lp)
 
     rval = CPXsetdblparam ((*lp)->cplex_env, CPX_PARAM_EPPER, 1.0E-6);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam CPX_PARAM_EPPER failed\n");
+        CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_EPPER failed\n");
         goto CLEANUP;
     }
     rval = CPXsetdblparam ((*lp)->cplex_env, CPX_PARAM_EPOPT, 1.0E-9);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam CPX_PARAM_EPOPT failed\n");
+        CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_EPOPT failed\n");
         goto CLEANUP;
     }
     rval = CPXsetdblparam ((*lp)->cplex_env, CPX_PARAM_EPRHS, 1.0E-9);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam CPX_PARAM_EPRHS failed\n");
+        CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_EPRHS failed\n");
         goto CLEANUP;
     }
 
@@ -243,7 +243,7 @@ int CClp_force_perturb (CClp *lp)
 #else /* CC_ONE_ENV */
     rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_PERIND, 1);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
     }
 #endif /* CC_ONE_ENV */
     return rval;
@@ -260,13 +260,13 @@ int CClp_tune_small (CClp *lp)
     rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_DPRIIND,
                            CPX_DPRIIND_FULL);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_DPRIIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_DPRIIND failed\n");
         return rval;
     }
     rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_PPRIIND,
                            CPX_PPRIIND_AUTO);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_PPRIIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PPRIIND failed\n");
         return rval;
     }
 #endif /* CC_ONE_ENV */
@@ -280,11 +280,11 @@ int CClp_disable_presolve (CClp *lp)
     lp->cplex_params.aggind = 0;
 #else /* CC_ONE_ENV */
     if (CPXsetintparam (lp->cplex_env, CPX_PARAM_PREIND, CPX_OFF)) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
         return 1;
     }
     if (CPXsetintparam (lp->cplex_env, CPX_PARAM_AGGIND, 0)) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
         return 1;
     }
 #endif /* CC_ONE_ENV */
@@ -335,7 +335,7 @@ int CClp_loadlp (CClp *lp, const char *name, int ncols, int nrows,
 
     lp->cplex_lp = CPXcreateprob (lp->cplex_env, &rval, nambuf);
     if (!lp->cplex_lp || rval) {
-       fprintf (stderr, "CPXcreateprob failed, return code %d\n", rval);
+       CC_FPRINTF(stderr, "CPXcreateprob failed, return code %d\n", rval);
        return 1;
     }
 
@@ -343,7 +343,7 @@ int CClp_loadlp (CClp *lp, const char *name, int ncols, int nrows,
                       objsense, obj, rhs, sense, matbeg, matcnt,
                       matind, matval, lb, ub, (double *) NULL);
     if (rval) {
-       fprintf (stderr, "CPXcopylp failed, return code %d\n", rval);
+       CC_FPRINTF(stderr, "CPXcopylp failed, return code %d\n", rval);
        return 1;
     }
 
@@ -361,7 +361,7 @@ int CClp_create (CClp *lp, const char *name)
 
     lp->cplex_lp = CPXcreateprob (lp->cplex_env, &rval, nambuf);
     if (!lp->cplex_lp || rval) {
-       fprintf (stderr, "CPXcreateprob failed, return code %d\n", rval);
+       CC_FPRINTF(stderr, "CPXcreateprob failed, return code %d\n", rval);
        return 1;
     }
     return 0;
@@ -379,7 +379,7 @@ int CClp_new_row (CClp *lp, char sense, double rhs)
     rval = CPXnewrows (lp->cplex_env, lp->cplex_lp, 1, arhs, asense,
                        (double *) NULL, (char **) NULL);
     if (rval) {
-        fprintf (stderr, "CPXnewrows failed\n");
+        CC_FPRINTF(stderr, "CPXnewrows failed\n");
         return rval;
     }
     return 0;
@@ -395,7 +395,7 @@ int CClp_change_sense (CClp *lp, int row, char sense)
     asense[0] = sense;
     rval = CPXchgsense (lp->cplex_env, lp->cplex_lp, 1, xindex, asense);
     if (rval) {
-        fprintf (stderr, "CPXchgsense failed\n");
+        CC_FPRINTF(stderr, "CPXchgsense failed\n");
         return rval;
     }
     return 0;
@@ -407,7 +407,7 @@ int CClp_opt (CClp *lp, int method)
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
@@ -423,7 +423,7 @@ int CClp_opt (CClp *lp, int method)
             break;
         default:
             rval = 1;
-            fprintf (stderr, "Nonexistent method in CClp_opt\n");
+            CC_FPRINTF(stderr, "Nonexistent method in CClp_opt\n");
             break;
     }
     return rval;
@@ -439,7 +439,7 @@ static int primalopt (CClp *lp)
 
     sprintf (probname, "prim%d.sav", probcnt);
     probcnt++;
-    printf ("Writing %s\n", probname);
+    CC_PRINTF("Writing %s\n", probname);
     CPXsavwrite (lp->cplex_env, lp->cplex_lp, probname);
 #endif
 
@@ -447,39 +447,39 @@ static int primalopt (CClp *lp)
     if (rval) {
         if (rval == CPX_STAT_INForUNBD) {
             int old, oldagg;
-            printf ("Cplex presolve failed, switch to simplex\n");
-            fflush (stdout);
+            CC_PRINTF("Cplex presolve failed, switch to simplex\n");
+            CC_FFLUSH(stdout);
             if (CPXgetintparam (lp->cplex_env, CPX_PARAM_PREIND, &old)) {
-                fprintf (stderr, "CPXgetintparam CPX_PARAM_PREIND failed\n");
+                CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_PREIND failed\n");
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_PREIND, CPX_OFF)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
                 return 1;
             }
             if (CPXgetintparam (lp->cplex_env, CPX_PARAM_AGGIND, &oldagg)) {
-                fprintf (stderr, "CPXgetintparam CPX_PARAM_AGGIND failed\n");
+                CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_AGGIND failed\n");
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_AGGIND, 0)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
                 return 1;
             }
             rval = CPXprimopt (lp->cplex_env, lp->cplex_lp);
             if (rval) {
-                fprintf (stderr, "CPXprimopt failed, return code %d\n", rval);
+                CC_FPRINTF(stderr, "CPXprimopt failed, return code %d\n", rval);
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_PREIND, old)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_AGGIND, oldagg)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
                 return 1;
             }
         } else {
-            fprintf (stderr, "CPXprimopt failed, return code %d\n", rval);
+            CC_FPRINTF(stderr, "CPXprimopt failed, return code %d\n", rval);
             return 1;
         }
     }
@@ -488,7 +488,7 @@ static int primalopt (CClp *lp)
         return 2;
     } else if (solstat != CPX_STAT_OPTIMAL       &&
                solstat != CPX_STAT_OPTIMAL_INFEAS  ) {
-        fprintf (stderr, "Cplex optimization status %d\n", solstat);
+        CC_FPRINTF(stderr, "Cplex optimization status %d\n", solstat);
         return 1;
     }
     return 0;
@@ -504,7 +504,7 @@ static int dualopt (CClp *lp)
 
     sprintf (probname, "dual%d.sav", probcnt);
     probcnt++;
-    printf ("Writing %s\n", probname);
+    CC_PRINTF("Writing %s\n", probname);
     CPXsavwrite (lp->cplex_env, lp->cplex_lp, probname);
 #endif
 
@@ -512,39 +512,39 @@ static int dualopt (CClp *lp)
     if (rval) {
         if (rval == CPX_STAT_INForUNBD) {
             int old, oldagg;
-            printf ("Cplex presolve failed, switch to simplex\n");
-            fflush (stdout);
+            CC_PRINTF("Cplex presolve failed, switch to simplex\n");
+            CC_FFLUSH(stdout);
             if (CPXgetintparam (lp->cplex_env, CPX_PARAM_PREIND, &old)) {
-                fprintf (stderr, "CPXgetintparam CPX_PARAM_PREIND failed\n");
+                CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_PREIND failed\n");
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_PREIND, CPX_OFF)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
                 return 1;
             }
             if (CPXgetintparam (lp->cplex_env, CPX_PARAM_AGGIND, &oldagg)) {
-                fprintf (stderr, "CPXgetintparam CPX_PARAM_AGGIND failed\n");
+                CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_AGGIND failed\n");
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_AGGIND, 0)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
                 return 1;
             }
             rval = CPXdualopt (lp->cplex_env, lp->cplex_lp);
             if (rval) {
-                fprintf (stderr, "CPXdualopt failed, return code %d\n", rval);
+                CC_FPRINTF(stderr, "CPXdualopt failed, return code %d\n", rval);
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_PREIND, old)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
                 return 1;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_AGGIND, oldagg)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
                 return 1;
             }
         } else {
-            fprintf (stderr, "CPXdualopt failed, return code %d\n", rval);
+            CC_FPRINTF(stderr, "CPXdualopt failed, return code %d\n", rval);
             return 1;
         }
     }
@@ -553,13 +553,13 @@ static int dualopt (CClp *lp)
         return 2;
     } else if (solstat != CPX_STAT_OPTIMAL       &&
                solstat != CPX_STAT_OPTIMAL_INFEAS  ) {
-        fprintf (stderr, "Cplex optimization status %d\n", solstat);
+        CC_FPRINTF(stderr, "Cplex optimization status %d\n", solstat);
         if (solstat == CPX_STAT_ABORT_IT_LIM) {
             int itlim;
             rval = CPXgetintparam (lp->cplex_env, CPX_PARAM_ITLIM, &itlim);
             if (!rval) {
-                printf ("cplex iteration limit: %d\n", itlim);
-                fflush (stdout);
+                CC_PRINTF("cplex iteration limit: %d\n", itlim);
+                CC_FFLUSH(stdout);
             }
         }
         return 1;
@@ -577,19 +577,19 @@ static int baropt (CClp *lp)
 
     sprintf (probname, "barrier%d.sav", probcnt);
     probcnt++;
-    printf ("Writing %s\n", probname);
+    CC_PRINTF("Writing %s\n", probname);
     CPXsavwrite (lp->cplex_env, lp->cplex_lp, probname);
 #endif
 
     rval = CPXbaropt (lp->cplex_env, lp->cplex_lp);
     if (rval) {
-        printf ("CPXbaropt failed, return code %d, calling CPXdualopt\n",
+        CC_PRINTF("CPXbaropt failed, return code %d, calling CPXdualopt\n",
                 rval);
         return dualopt (lp);
     }
     solstat = CPXgetstat (lp->cplex_env, lp->cplex_lp);
     if (solstat != CPX_STAT_OPTIMAL) {
-        printf ("CPXbaropt returned non-optimal solution, calling CPXdualopt\n");
+        CC_PRINTF("CPXbaropt returned non-optimal solution, calling CPXdualopt\n");
         return dualopt (lp);
     }
     return 0;
@@ -621,7 +621,7 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
@@ -630,62 +630,62 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
 
     rval = CPXgetintparam (lp->cplex_env, CPX_PARAM_PERIND, &old_perind);
     if (rval) {
-         fprintf (stderr, "CPXgetintparam CPX_PARAM_PERIND failed\n");
+         CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_PERIND failed\n");
          goto CLEANUP;
     }
     got_perind = 1;
 
     rval = CPXgetintparam (lp->cplex_env, CPX_PARAM_ITLIM, &old_iterationlim);
     if (rval) {
-        fprintf (stderr, "CPXgetintparam CPX_PARAM_ITLIM failed\n");
+        CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_ITLIM failed\n");
         goto CLEANUP;
     }
     got_iterationlim = 1;
 
     rval = CPXgetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM, &old_objupperlim);
     if (rval) {
-        fprintf (stderr, "CPXgetdblparam CPX_PARAM_OBJULIM failed\n");
+        CC_FPRINTF(stderr, "CPXgetdblparam CPX_PARAM_OBJULIM failed\n");
         goto CLEANUP;
     }
     got_objupperlim = 1;
 
     rval = CPXgetintparam (lp->cplex_env, CPX_PARAM_PREIND, &old_presolveind);
     if (rval) {
-        fprintf (stderr, "CPXgetintparam CPX_PARAM_PREIND failed\n");
+        CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_PREIND failed\n");
         goto CLEANUP;
     }
     got_presolveind = 1;
 
     rval = CPXgetintparam (lp->cplex_env, CPX_PARAM_AGGIND, &old_aggregateind);
     if (rval) {
-        fprintf (stderr, "CPXgetintparam CPX_PARAM_AGGIND failed\n");
+        CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_AGGIND failed\n");
         goto CLEANUP;
     }
     got_aggregateind = 1;
 
     rval = CPXgetintparam (lp->cplex_env, CPX_PARAM_REINV, &old_refactorfreq);
     if (rval) {
-        fprintf (stderr, "CPXgetintparam CPX_PARAM_REINV failed\n");
+        CC_FPRINTF(stderr, "CPXgetintparam CPX_PARAM_REINV failed\n");
         goto CLEANUP;
     }
     got_refactorfreq = 1;
 
     rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_PERIND, 0);
     if (rval) {
-         fprintf (stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
+         CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
          goto CLEANUP;
     }
 
     rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_ITLIM, iterationlim);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_ITLIM failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_ITLIM failed\n");
         goto CLEANUP;
     }
 
     if ( iterationlim < CC_MAX_REFACTORFREQ ) {
         rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_REINV, iterationlim+1);
         if (rval) {
-            fprintf (stderr, "CPXsetintparam CPX_PARAM_REINV failed\n");
+            CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_REINV failed\n");
             goto CLEANUP;
         }
     }
@@ -693,7 +693,7 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
     if (objupperlim) {
         rval = CPXsetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM, *objupperlim);
         if (rval) {
-            fprintf (stderr, "CPXsetdblparam CPX_PARAM_OBJULIM failed\n");
+            CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_OBJULIM failed\n");
             goto CLEANUP;
         }
     }
@@ -701,24 +701,24 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
     rval = CPXdualopt (lp->cplex_env, lp->cplex_lp);
     if (rval) {
         if (rval == CPX_STAT_INForUNBD) {
-            printf ("Cplex presolve failed, force simplex\n");
-            fflush (stdout);
+            CC_PRINTF("Cplex presolve failed, force simplex\n");
+            CC_FFLUSH(stdout);
 
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_PREIND, CPX_OFF)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
                 goto CLEANUP;
             }
             if (CPXsetintparam (lp->cplex_env, CPX_PARAM_AGGIND, 0)) {
-                fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+                CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
                 goto CLEANUP;
             }
             rval = CPXdualopt (lp->cplex_env, lp->cplex_lp);
             if (rval) {
-                fprintf (stderr, "CPXdualopt failed, return code %d\n", rval);
+                CC_FPRINTF(stderr, "CPXdualopt failed, return code %d\n", rval);
                 goto CLEANUP;
             }
         } else {
-            fprintf (stderr, "CPXdualopt failed, return code %d\n", rval);
+            CC_FPRINTF(stderr, "CPXdualopt failed, return code %d\n", rval);
             goto CLEANUP;
         }
     }
@@ -726,14 +726,14 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
     rval = CPXsolninfo (lp->cplex_env, lp->cplex_lp, NULL, NULL, NULL,
 		        &dfeasind);
     if ( rval ) {
-        fprintf (stderr, "CPXsolninfo dfeasind failed\n");
+        CC_FPRINTF(stderr, "CPXsolninfo dfeasind failed\n");
 	goto CLEANUP;
     }
     if ( solstat==CPX_STAT_ABORT_IT_LIM &&
          !dfeasind                        ) {
         rval = CPXsetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM, -1.0E75);
         if (rval) {
-            fprintf (stderr, "CPXsetdblparam CPX_PARAM_OBJULIM failed\n");
+            CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_OBJULIM failed\n");
             goto CLEANUP;
         }
         /* We could be even more aggressive here and make the iteration
@@ -742,32 +742,32 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
            CPX_IT_LIM_INFEAS below -- REB, 1 July 97 */
         rval = CPXdualopt (lp->cplex_env, lp->cplex_lp);
         if (rval) {
-            fprintf (stderr, "CPXdualopt failed, return code %d\n", rval);
+            CC_FPRINTF(stderr, "CPXdualopt failed, return code %d\n", rval);
             goto CLEANUP;
         }
         solstat = CPXgetstat (lp->cplex_env, lp->cplex_lp);
         rval = CPXsolninfo (lp->cplex_env, lp->cplex_lp, NULL, NULL, NULL,
 		            &dfeasind);
         if ( rval ) {
-            fprintf (stderr, "CPXsolninfo dfeasind failed\n");
+            CC_FPRINTF(stderr, "CPXsolninfo dfeasind failed\n");
     	    goto CLEANUP;
         }
     }
 
     if (solstat == CPX_STAT_INFEASIBLE) {
-        printf ("Infeasible in CPXdualopt\n"); fflush (stdout);
+        CC_PRINTF("Infeasible in CPXdualopt\n"); CC_FFLUSH(stdout);
         if (status) *status = CClp_INFEASIBLE;
     } else if (solstat == CPX_STAT_ABORT_IT_LIM &&
                !dfeasind                          ) {
-        printf ("LP infeasible after the limited number of iterations\n");
-        fflush (stdout);
+        CC_PRINTF("LP infeasible after the limited number of iterations\n");
+        CC_FFLUSH(stdout);
         if (status) *status = CClp_UNKNOWN;
     } else if (solstat != CPX_STAT_OPTIMAL          &&
                solstat != CPX_STAT_OPTIMAL_INFEAS   &&
                solstat != CPX_STAT_ABORT_OBJ_LIM    &&
                (solstat != CPX_STAT_ABORT_IT_LIM ||
 	        !dfeasind                          )  ) {
-        fprintf (stderr, "Cplex optimization status %d\n", solstat);
+        CC_FPRINTF(stderr, "Cplex optimization status %d\n", solstat);
         if (status) *status = CClp_FAILURE;
     } else {
         if (status) *status = CClp_SUCCESS;
@@ -779,7 +779,7 @@ CLEANUP:
         sval = CPXsetintparam (lp->cplex_env, CPX_PARAM_ITLIM,
                                old_iterationlim);
         if (sval) {
-            fprintf (stderr, "CPXsetintparam CPX_PARAM_ITLIM failed\n");
+            CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_ITLIM failed\n");
             rval = 1;
         }
     }
@@ -788,7 +788,7 @@ CLEANUP:
         sval = CPXsetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM,
                                old_objupperlim);
         if (sval) {
-            fprintf (stderr, "CPXsetdblparam CPX_PARAM_OBJULIM failed\n");
+            CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_OBJULIM failed\n");
             rval = 1;
         }
     }
@@ -797,7 +797,7 @@ CLEANUP:
         sval = CPXsetintparam (lp->cplex_env, CPX_PARAM_PREIND,
                                old_presolveind);
         if (sval) {
-            fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+            CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
             rval = 1;
         }
     }
@@ -806,7 +806,7 @@ CLEANUP:
         sval = CPXsetintparam (lp->cplex_env, CPX_PARAM_AGGIND,
                                old_aggregateind);
         if (sval) {
-            fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+            CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
             rval = 1;
         }
     }
@@ -815,7 +815,7 @@ CLEANUP:
         sval = CPXsetintparam (lp->cplex_env, CPX_PARAM_REINV,
                                old_refactorfreq);
         if (sval) {
-            fprintf (stderr, "CPXsetintparam CPX_PARAM_REINV failed\n");
+            CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_REINV failed\n");
             rval = 1;
         }
     }
@@ -823,7 +823,7 @@ CLEANUP:
     if (got_perind == 1) {
         sval = CPXsetintparam (lp->cplex_env, CPX_PARAM_PERIND, old_perind);
         if (sval) {
-            fprintf (stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
+            CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
             rval = 1;;
         }
     }
@@ -843,7 +843,7 @@ int CClp_addrows (CClp *lp, int newrows, int newnz, double *rhs, char *sense,
     rval = CPXaddrows (lp->cplex_env, lp->cplex_lp, 0, newrows, newnz,
                        rhs, sense, rmatbeg, rmatind, rmatval,
                        (char **) NULL, (char **) NULL);
-    if (rval) fprintf (stderr, "CPXaddrows failed\n");
+    if (rval) CC_FPRINTF(stderr, "CPXaddrows failed\n");
     return rval;
 }
 
@@ -855,7 +855,7 @@ int CClp_addcols (CClp *lp, int newcols, int newnz, double *obj,
 
     rval = CPXaddcols (lp->cplex_env, lp->cplex_lp, newcols, newnz, obj,
                    cmatbeg, cmatind, cmatval, lb, ub, (char **) NULL);
-    if (rval) fprintf (stderr, "CPXaddcols failed\n");
+    if (rval) CC_FPRINTF(stderr, "CPXaddcols failed\n");
     return rval;
 }
 
@@ -866,16 +866,16 @@ int CClp_delete_row (CClp *lp, int i)
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
     locali[0] = i;
     if (CPXpivotin (lp->cplex_env, lp->cplex_lp, locali, 1)) {
-        fprintf (stderr, "CPXpivotin failed, continuing anyway\n");
+        CC_FPRINTF(stderr, "CPXpivotin failed, continuing anyway\n");
     }
     rval = CPXdelrows (lp->cplex_env, lp->cplex_lp, i, i);
-    if (rval) fprintf (stderr, "CPXdelrows failed\n");
+    if (rval) CC_FPRINTF(stderr, "CPXdelrows failed\n");
     return rval;
 }
 
@@ -890,7 +890,7 @@ int CClp_delete_set_of_rows (CClp *lp, int *delstat)
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
@@ -898,12 +898,12 @@ int CClp_delete_set_of_rows (CClp *lp, int *delstat)
         if (delstat[i]) delcnt++;
     }
     if (delcnt == 0) {
-        fprintf (stderr, "delete_set_of_rows with no deleted rows\n");
+        CC_FPRINTF(stderr, "delete_set_of_rows with no deleted rows\n");
         return 0;
     }
     dellist = CC_SAFE_MALLOC (delcnt, int);
     if (dellist == (int *) NULL) {
-        fprintf (stderr, "Out of memory in delete_set_of_rows\n");
+        CC_FPRINTF(stderr, "Out of memory in delete_set_of_rows\n");
         return 1;
     }
     for (i=0, j=0; i<rcnt; i++) {
@@ -912,18 +912,18 @@ int CClp_delete_set_of_rows (CClp *lp, int *delstat)
         }
     }
     if (j != delcnt) {
-        fprintf (stderr, "Lost some deleted rows\n");
+        CC_FPRINTF(stderr, "Lost some deleted rows\n");
         CC_FREE (dellist, int);
         return 1;
     }
 
     if (CPXpivotin (lp->cplex_env, lp->cplex_lp, dellist, delcnt)) {
-        fprintf (stderr, "CPXpivotin failed, continuing anyway\n");
+        CC_FPRINTF(stderr, "CPXpivotin failed, continuing anyway\n");
     }
     CC_FREE (dellist, int);
     
     rval = CPXdelsetrows (lp->cplex_env, lp->cplex_lp, delstat);
-    if (rval) fprintf (stderr, "CPXdelsetrows failed\n");
+    if (rval) CC_FPRINTF(stderr, "CPXdelsetrows failed\n");
     return rval;
 }
 
@@ -936,7 +936,7 @@ int CClp_delete_column (CClp *lp, int i)
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
@@ -945,19 +945,19 @@ int CClp_delete_column (CClp *lp, int i)
     bd[0] = 0.0;
 
     if (CPXchgbds (lp->cplex_env, lp->cplex_lp, 1, locali, lu, bd)) {
-        fprintf (stderr, "CPXchgbds failed, continuing anyway\n");
+        CC_FPRINTF(stderr, "CPXchgbds failed, continuing anyway\n");
     }
 
     if (CPXdualopt (lp->cplex_env, lp->cplex_lp)) {
-        fprintf (stderr, "CPXdualopt failed, continuing anyway\n");
+        CC_FPRINTF(stderr, "CPXdualopt failed, continuing anyway\n");
     }
 
     if (CPXpivotout (lp->cplex_env, lp->cplex_lp, locali, 1)) {
-        fprintf (stderr, "CPXpivotout failed, continuing anyway\n");
+        CC_FPRINTF(stderr, "CPXpivotout failed, continuing anyway\n");
     }
 
     rval = CPXdelcols (lp->cplex_env, lp->cplex_lp, i, i);
-    if (rval) fprintf (stderr, "CPXdelcols failed\n");
+    if (rval) CC_FPRINTF(stderr, "CPXdelcols failed\n");
     return rval;
 }
 
@@ -974,7 +974,7 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
@@ -982,7 +982,7 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
         if (delstat[i]) delcnt++;
     }
     if (delcnt == 0) {
-        fprintf (stderr, "delete_set_of_columns with no deleted columns\n");
+        CC_FPRINTF(stderr, "delete_set_of_columns with no deleted columns\n");
         return 0;
     }
     dellist = CC_SAFE_MALLOC (delcnt, int);
@@ -991,7 +991,7 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
     if (dellist == (int *) NULL ||
         lu == (char *) NULL ||
         bd == (double *) NULL) {
-        fprintf (stderr, "Out of memory in delete_set_of_columns\n");
+        CC_FPRINTF(stderr, "Out of memory in delete_set_of_columns\n");
         CC_IFFREE (dellist, int);
         CC_IFFREE (lu, char);
         CC_IFFREE (bd, double);
@@ -1005,7 +1005,7 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
         }
     }
     if (j != delcnt) {
-        fprintf (stderr, "Lost some deleted columns\n");
+        CC_FPRINTF(stderr, "Lost some deleted columns\n");
         CC_FREE (dellist, int);
         CC_FREE (lu, char);
         CC_FREE (bd, double);
@@ -1013,15 +1013,15 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
     }
 
     if (CPXchgbds (lp->cplex_env, lp->cplex_lp, delcnt, dellist, lu, bd)) {
-        fprintf (stderr, "CPXchgbds failed, stumbling on anyway\n");
+        CC_FPRINTF(stderr, "CPXchgbds failed, stumbling on anyway\n");
     }
     
     if (CPXdualopt (lp->cplex_env, lp->cplex_lp)) {
-        fprintf (stderr, "CPXdualopt failed, continuing anyway\n");
+        CC_FPRINTF(stderr, "CPXdualopt failed, continuing anyway\n");
     }
 
     if (CPXpivotout (lp->cplex_env, lp->cplex_lp, dellist, delcnt)) {
-        fprintf (stderr, "CPXpivotout failed, continuing anyway\n");
+        CC_FPRINTF(stderr, "CPXpivotout failed, continuing anyway\n");
     }
 
     CC_FREE (dellist, int);
@@ -1029,7 +1029,7 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
     CC_FREE (bd, double);
     
     rval = CPXdelsetcols (lp->cplex_env, lp->cplex_lp, delstat);
-    if (rval) fprintf (stderr, "CPXdelsetcols failed\n");
+    if (rval) CC_FPRINTF(stderr, "CPXdelsetcols failed\n");
     return rval;
 }
 
@@ -1046,7 +1046,7 @@ int CClp_setbnd (CClp *lp, int col, char lower_or_upper, double bnd)
 
     rval = CPXchgbds (lp->cplex_env, lp->cplex_lp, 1, cindex, lu, bd);
     if (rval) {
-        fprintf (stderr, "Couldn't set bnd on variable %d in cplex\n", col);
+        CC_FPRINTF(stderr, "Couldn't set bnd on variable %d in cplex\n", col);
         return rval;
     }
     return 0;
@@ -1060,7 +1060,7 @@ int CClp_get_warmstart (CClp *lp, CClp_warmstart **w)
 
     (*w) = CC_SAFE_MALLOC (1, CClp_warmstart);
     if ((*w) == (CClp_warmstart *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1072,7 +1072,7 @@ int CClp_get_warmstart (CClp *lp, CClp_warmstart **w)
 
     (*w)->ccount = CPXgetnumcols (lp->cplex_env, lp->cplex_lp);
     if ((*w)->ccount == 0) {
-        fprintf (stderr, "No columns in LP\n");
+        CC_FPRINTF(stderr, "No columns in LP\n");
         rval = 1; goto CLEANUP;
     }
     (*w)->rcount = CPXgetnumrows (lp->cplex_env, lp->cplex_lp);
@@ -1085,19 +1085,19 @@ int CClp_get_warmstart (CClp *lp, CClp_warmstart **w)
     (*w)->rstat = CC_SAFE_MALLOC ((*w)->rcount, int);
     (*w)->dnorm = CC_SAFE_MALLOC ((*w)->rcount, double);
     if (!(*w)->cstat || !(*w)->rstat || !(*w)->dnorm) {
-        fprintf (stderr, "out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CPXgetbasednorms (lp->cplex_env, lp->cplex_lp, (*w)->cstat,
                              (*w)->rstat, (*w)->dnorm);
     if (rval) {
-        fprintf (stderr, "CPXgetbasednorms failed, trying to get basis\n");
+        CC_FPRINTF(stderr, "CPXgetbasednorms failed, trying to get basis\n");
         CC_IFFREE ((*w)->dnorm, double);
         rval = CPXgetbase (lp->cplex_env, lp->cplex_lp, (*w)->cstat,
                            (*w)->rstat);
         if (rval) {
-            fprintf (stderr, "CPXgetbase failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CPXgetbase failed\n"); goto CLEANUP;
         }
     }
 
@@ -1117,16 +1117,16 @@ int CClp_load_warmstart (CClp *lp, CClp_warmstart *w)
         rval = CPXcopybasednorms (lp->cplex_env, lp->cplex_lp, w->cstat,
                                   w->rstat, w->dnorm);
         if (rval) {
-            fprintf (stderr, "CPXcopybasednorms failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CPXcopybasednorms failed\n"); goto CLEANUP;
         }
     } else if (w->cstat && w->rstat) {
         rval = CPXcopybase (lp->cplex_env, lp->cplex_lp, w->cstat, w->rstat);
         if (rval) {
-            fprintf (stderr, "CPXcopybase failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CPXcopybase failed\n"); goto CLEANUP;
         }
     } else {
-        printf ("WARNING: No basis in call to load_warmstart\n");
-        fflush (stdout);
+        CC_PRINTF("WARNING: No basis in call to load_warmstart\n");
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -1143,7 +1143,7 @@ int CClp_build_warmstart (CClp_warmstart **w, CClp_info *i)
 
     (*w) = CC_SAFE_MALLOC (1, CClp_warmstart);
     if ((*w) == (CClp_warmstart *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1155,19 +1155,19 @@ int CClp_build_warmstart (CClp_warmstart **w, CClp_info *i)
 
     (*w)->ccount = i->ccount;
     if ((*w)->ccount == 0) {
-        fprintf (stderr, "No columns in CClp_info\n");
+        CC_FPRINTF(stderr, "No columns in CClp_info\n");
         rval = 1; goto CLEANUP;
     }
     (*w)->rcount = i->rcount;
     if ((*w)->rcount == 0) {
-        fprintf (stderr, "No rows in CClp_info\n");
+        CC_FPRINTF(stderr, "No rows in CClp_info\n");
         rval = 1; goto CLEANUP;
     }
 
     (*w)->cstat = CC_SAFE_MALLOC ((*w)->ccount, int);
     (*w)->rstat = CC_SAFE_MALLOC ((*w)->rcount, int);
     if (!(*w)->cstat || !(*w)->rstat) {
-        fprintf (stderr, "out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1211,7 +1211,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
     name[4] = '\0';
 
     if (strncmp (name, SOLVER_WARMSTART_NAME, 4)) {
-        fprintf (stderr, "warmstart for another solver (%s) ignored\n", name);
+        CC_FPRINTF(stderr, "warmstart for another solver (%s) ignored\n", name);
         return 0;
     }
 
@@ -1220,7 +1220,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
 
     (*w) = CC_SAFE_MALLOC (1, CClp_warmstart);
     if ((*w) == (CClp_warmstart *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_sread_warmstart\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_sread_warmstart\n");
         goto CLEANUP;
     }
 
@@ -1234,7 +1234,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
     (*w)->rstat = CC_SAFE_MALLOC (rcount, int);
     if ((*w)->cstat == (int *) NULL ||
         (*w)->rstat == (int *) NULL) {
-        fprintf (stderr, "out of memory in CClp_sread_warmstart\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_sread_warmstart\n");
         goto CLEANUP;
     }
     for (i = 0; i < ccount; i++) {
@@ -1251,7 +1251,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
     if (has_dnorms) {
         (*w)->dnorm = CC_SAFE_MALLOC (rcount, double);
         if ((*w)->dnorm == (double *) NULL) {
-            fprintf (stderr, "out of memory in CClp_sread_warmstart\n");
+            CC_FPRINTF(stderr, "out of memory in CClp_sread_warmstart\n");
             goto CLEANUP;
         }
         for (i = 0; i < rcount; i++) {
@@ -1310,7 +1310,7 @@ int CClp_get_info (CClp *lp, CClp_info **i)
 
     (*i) = CC_SAFE_MALLOC (1, CClp_info);
     if ((*i) == (CClp_info *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_get_info\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_get_info\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1321,7 +1321,7 @@ int CClp_get_info (CClp *lp, CClp_info **i)
 
     (*i)->ccount = CPXgetnumcols (lp->cplex_env, lp->cplex_lp);
     if ((*i)->ccount == 0) {
-        fprintf (stderr, "No columns in CClp_get_info\n");
+        CC_FPRINTF(stderr, "No columns in CClp_get_info\n");
         rval = 1; goto CLEANUP;
     }
     (*i)->rcount = CPXgetnumrows (lp->cplex_env, lp->cplex_lp);
@@ -1333,13 +1333,13 @@ int CClp_get_info (CClp *lp, CClp_info **i)
     (*i)->cstat = CC_SAFE_MALLOC ((*i)->ccount, int);
     (*i)->rstat = CC_SAFE_MALLOC ((*i)->rcount, int);
     if (!(*i)->cstat || !(*i)->rstat) {
-        fprintf (stderr, "out of memory in CClp_get_info\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_get_info\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CPXgetbase (lp->cplex_env, lp->cplex_lp, (*i)->cstat, (*i)->rstat);
     if (rval) {
-        fprintf (stderr, "CPXgetbase failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CPXgetbase failed\n"); goto CLEANUP;
     }
 
     return 0;
@@ -1359,7 +1359,7 @@ int CClp_create_info (CClp_info **i, int rcount, int ccount)
 
     (*i) = CC_SAFE_MALLOC (1, CClp_info);
     if ((*i) == (CClp_info *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_create_info\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1370,19 +1370,19 @@ int CClp_create_info (CClp_info **i, int rcount, int ccount)
 
     (*i)->ccount = ccount;
     if (ccount == 0) {
-        fprintf (stderr, "No columns in CClp_create_info\n");
+        CC_FPRINTF(stderr, "No columns in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
     (*i)->rcount = rcount;
     if (rcount == 0) {
-        fprintf (stderr, "No rows in CClp_create_info\n");
+        CC_FPRINTF(stderr, "No rows in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
 
     (*i)->cstat = CC_SAFE_MALLOC ((*i)->ccount, int);
     (*i)->rstat = CC_SAFE_MALLOC ((*i)->rcount, int);
     if (!(*i)->cstat || !(*i)->rstat) {
-        fprintf (stderr, "out of memory in CClp_create_info\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1453,12 +1453,12 @@ int CClp_x (CClp *lp, double *x)
 
     ncols = CPXgetnumcols (lp->cplex_env, lp->cplex_lp);
     if (ncols == 0) {
-        fprintf (stderr, "No columns in LP\n");
+        CC_FPRINTF(stderr, "No columns in LP\n");
         return 1;
     }
     rval = CPXgetx (lp->cplex_env, lp->cplex_lp, x, 0, ncols - 1);
     if (rval) {
-        fprintf (stderr, "CPXgetx failed\n");
+        CC_FPRINTF(stderr, "CPXgetx failed\n");
         return rval;
     }
     return 0;
@@ -1471,11 +1471,11 @@ int CClp_rc (CClp *lp, double *rc)
 
     ncols = CPXgetnumcols (lp->cplex_env, lp->cplex_lp);
     if (ncols == 0) {
-        fprintf (stderr, "No columns in LP\n"); return 1;
+        CC_FPRINTF(stderr, "No columns in LP\n"); return 1;
     }
     rval = CPXgetdj (lp->cplex_env, lp->cplex_lp, rc, 0, ncols - 1);
     if (rval) {
-        fprintf (stderr, "CPXgetdj failed\n"); return rval;
+        CC_FPRINTF(stderr, "CPXgetdj failed\n"); return rval;
     }
     return 0;
 }
@@ -1489,18 +1489,18 @@ int CClp_pi (CClp *lp, double *pi)
          CPXgetstat (lp->cplex_env, lp->cplex_lp )  == CPX_STAT_INFEASIBLE  ) {
         rval = getfarkasmultipliers (lp, pi);
         if (rval) {
-            fprintf (stderr, "getfarkasmultipliers failed\n"); return rval;
+            CC_FPRINTF(stderr, "getfarkasmultipliers failed\n"); return rval;
         }
         return 0;
     }
 
     nrows = CPXgetnumrows (lp->cplex_env, lp->cplex_lp);
     if (nrows == 0) {
-        fprintf (stderr, "No rows in LP\n"); return 1;
+        CC_FPRINTF(stderr, "No rows in LP\n"); return 1;
     }
     rval = CPXgetpi (lp->cplex_env, lp->cplex_lp, pi, 0, nrows - 1);
     if (rval) {
-        fprintf (stderr, "CPXgetpi failed\n"); return rval;
+        CC_FPRINTF(stderr, "CPXgetpi failed\n"); return rval;
     }
     return 0;
 }
@@ -1511,7 +1511,7 @@ int CClp_objval (CClp *lp, double *obj)
 
     rval = CPXgetobjval (lp->cplex_env, lp->cplex_lp, obj);
     if (rval) {
-        fprintf (stderr, "CPXgetobjval failed\n");
+        CC_FPRINTF(stderr, "CPXgetobjval failed\n");
         return rval;
     }
     return 0;
@@ -1538,7 +1538,7 @@ int CClp_status (CClp *lp, int *status)
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
@@ -1552,13 +1552,13 @@ int CClp_status (CClp *lp, int *status)
             *status = 1;
             return 0;
         } else {
-            fprintf (stderr, "lp in an unknown state: %d %d\n",
+            CC_FPRINTF(stderr, "lp in an unknown state: %d %d\n",
                            solmethod, solstat);
             *status = -1;
             return 1;
         }
     } else {
-        fprintf (stderr, "lp not solved by usual methods: %d\n", solmethod);
+        CC_FPRINTF(stderr, "lp not solved by usual methods: %d\n", solmethod);
         *status = -2;
         return 1;
     }
@@ -1571,14 +1571,14 @@ int CClp_getweight (CClp *lp, int nrows, int *rmatbeg, int *rmatind,
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
     rval = CPXgetweight (lp->cplex_env, lp->cplex_lp, nrows,
                          rmatbeg, rmatind, rmatval, weight, CPX_DPRIIND_STEEP);
     if (rval) {
-        fprintf (stderr, "CPXgetweight failed\n");
+        CC_FPRINTF(stderr, "CPXgetweight failed\n");
     }
     return rval;
 }
@@ -1594,7 +1594,7 @@ int CClp_dump_lp (CClp *lp, const char *fname)
 
     rval = CPXwriteprob (lp->cplex_env, lp->cplex_lp, nambuf, NULL);
     if (rval) {
-        fprintf (stderr, "CPXsavwrite failed\n");
+        CC_FPRINTF(stderr, "CPXsavwrite failed\n");
     }
     return rval;
 }
@@ -1614,42 +1614,42 @@ int CClp_getgoodlist (CClp *lp, int *goodlist, int *goodlen_p,
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
     rval = CPXdualopt (lp->cplex_env, lp->cplex_lp);
     if (rval) {
-        fprintf (stderr, "CPXdualopt failed, return code %d\n", rval);
+        CC_FPRINTF(stderr, "CPXdualopt failed, return code %d\n", rval);
         rval = 1; goto CLEANUP;
     }
 
     ncols = CPXgetnumcols (lp->cplex_env, lp->cplex_lp);
     if ( ncols == 0 ) {
-        fprintf (stderr, "No columns in LP\n");
+        CC_FPRINTF(stderr, "No columns in LP\n");
         rval = 1; goto CLEANUP;
     }
 
     x = CC_SAFE_MALLOC (ncols, double);
     if (x == (double *) NULL) {
-        fprintf (stderr, "out of memory in branch_getgoodlist\n");
+        CC_FPRINTF(stderr, "out of memory in branch_getgoodlist\n");
         rval = 1; goto CLEANUP;
     }
     if (CPXgetx (lp->cplex_env, lp->cplex_lp, x, 0, ncols-1)) {
-        fprintf (stderr, "CPXgetx failed\n");
+        CC_FPRINTF(stderr, "CPXgetx failed\n");
         rval = 1; goto CLEANUP;
     }
 
     cstat = CC_SAFE_MALLOC (ncols, int);
     if ( cstat == (int *) NULL ) {
-        fprintf (stderr, "Out of memory\n");
+        CC_FPRINTF(stderr, "Out of memory\n");
         rval = 1; goto CLEANUP;
     }
 
     /* Get basis */
 
     if ( CPXgetbase (lp->cplex_env, lp->cplex_lp, cstat, (int *) NULL) ) {
-        fprintf (stderr, "CPXgetbase failed\n");
+        CC_FPRINTF(stderr, "CPXgetbase failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1666,7 +1666,7 @@ int CClp_getgoodlist (CClp *lp, int *goodlist, int *goodlen_p,
 
     if ( CPXmdleave (lp->cplex_env, lp->cplex_lp, goodlist, *goodlen_p,
                      downpen, uppen)) {
-       fprintf (stderr, "CPXmdleave failed\n");
+       CC_FPRINTF(stderr, "CPXmdleave failed\n");
        rval = 1; goto CLEANUP;
     }
 
@@ -1720,19 +1720,19 @@ int CClp_strongbranch (CClp *lp, int *candidatelist, int ncand,
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
     rval = CPXgetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM,
                            &oldupperbound);
     if (rval) {
-        fprintf (stderr, "CPXgetdblparam failed\n"); return rval;
+        CC_FPRINTF(stderr, "CPXgetdblparam failed\n"); return rval;
     }
     rval = CPXsetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM,
                            upperbound);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam failed\n"); return rval;
+        CC_FPRINTF(stderr, "CPXsetdblparam failed\n"); return rval;
     }
 
     /* REB, 14 October 1997:  If perturbation has been turned on elsewhere,
@@ -1740,23 +1740,23 @@ int CClp_strongbranch (CClp *lp, int *candidatelist, int ncand,
 
     rval = CPXgetintparam (lp->cplex_env, CPX_PARAM_PERIND, &old_perind);
     if (rval) {
-         fprintf (stderr, "CPXgetintparam failed\n"); return rval;
+         CC_FPRINTF(stderr, "CPXgetintparam failed\n"); return rval;
     }
 
     rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_PERIND, 0);
     if (rval) {
-         fprintf (stderr, "CPXsetintparam failed\n"); return rval;
+         CC_FPRINTF(stderr, "CPXsetintparam failed\n"); return rval;
     }
 
     rval = CPXstrongbranch (lp->cplex_env, lp->cplex_lp, candidatelist,
                             ncand, downpen, uppen, iterations);
 
     if (rval) {
-        fprintf (stderr, "CPXstrongbranch failed, return code %d\n", rval);
+        CC_FPRINTF(stderr, "CPXstrongbranch failed, return code %d\n", rval);
         sval = CPXsetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM,
                                oldupperbound);
         if (sval) {
-            fprintf (stderr,
+            CC_FPRINTF(stderr,
                      "CPXsetdblparam failed with return code %d\n",
                      sval);
         }
@@ -1765,13 +1765,13 @@ int CClp_strongbranch (CClp *lp, int *candidatelist, int ncand,
 
     rval = CPXsetintparam (lp->cplex_env, CPX_PARAM_PERIND, old_perind);
     if (rval) {
-         fprintf (stderr, "CPXsetintparam failed\n"); return rval;
+         CC_FPRINTF(stderr, "CPXsetintparam failed\n"); return rval;
     }
 
     rval = CPXsetdblparam (lp->cplex_env, CPX_PARAM_OBJULIM,
                            oldupperbound);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam failed\n"); return rval;
+        CC_FPRINTF(stderr, "CPXsetdblparam failed\n"); return rval;
     }
     
     for (i=0; i<ncand; i++) {
@@ -1793,36 +1793,36 @@ static int getfarkasmultipliers (CClp *lp, double *y)
 
 #ifdef CC_ONE_ENV
     if (set_parameters (lp->cplex_env, &lp->cplex_params)) {
-        fprintf (stderr, "Unable to set optimization parameters\n");
+        CC_FPRINTF(stderr, "Unable to set optimization parameters\n");
     }
 #endif
 
     if ( lp->cplex_env == (struct cpxenv *) NULL ||
          lp->cplex_lp  == (struct cpxlp *)  NULL) {
-        rval = 1;  fprintf (stderr, "env object or lp object is NULL\n");
+        rval = 1;  CC_FPRINTF(stderr, "env object or lp object is NULL\n");
         goto CLEANUP;
     }
 
     if ( CPXgetmethod (lp->cplex_env, lp->cplex_lp) != CPX_ALG_DUAL  ||
          CPXgetstat (lp->cplex_env, lp->cplex_lp )  != CPX_STAT_INFEASIBLE  ) {
-        rval = 1;  fprintf (stderr, "Incorrect solution type\n");
+        rval = 1;  CC_FPRINTF(stderr, "Incorrect solution type\n");
         goto CLEANUP;
     }
 
     if ( CPXgetijdiv (lp->cplex_env, lp->cplex_lp, &idiv, &jdiv) ) {
-        rval = 1;  fprintf (stderr, "CPXgetijdiv failed\n");
+        rval = 1;  CC_FPRINTF(stderr, "CPXgetijdiv failed\n");
         goto CLEANUP;
     }
 
     if ( (jdiv == -1  &&  idiv == -1) ||
          (jdiv != -1  &&  idiv != -1)   ) {
-        rval = 1;  fprintf (stderr, "CPLEX returned illegal indices\n");
+        rval = 1;  CC_FPRINTF(stderr, "CPLEX returned illegal indices\n");
         goto CLEANUP;
     }
 
     nrows = CPXgetnumrows (lp->cplex_env, lp->cplex_lp);
     if ( nrows == 0 ) {
-        rval = 1;  fprintf (stderr, "lp->cplex_lp has no rows\n");
+        rval = 1;  CC_FPRINTF(stderr, "lp->cplex_lp has no rows\n");
         goto CLEANUP;
     }
 
@@ -1830,17 +1830,17 @@ static int getfarkasmultipliers (CClp *lp, double *y)
     sense = CC_SAFE_MALLOC (nrows, char);
     if ( bhead == (int *) NULL ||
          sense == (char *) NULL   ) {
-        rval = -1;  fprintf (stderr, "Out of memory\n");
+        rval = -1;  CC_FPRINTF(stderr, "Out of memory\n");
         goto CLEANUP;
     }
 
     if ( CPXgetbhead (lp->cplex_env, lp->cplex_lp, bhead, NULL) ) {
-        rval = 1;  fprintf (stderr, "CPXgetbhead failed\n");
+        rval = 1;  CC_FPRINTF(stderr, "CPXgetbhead failed\n");
         goto CLEANUP;
     }
 
     if ( CPXgetsense (lp->cplex_env, lp->cplex_lp, sense, 0, nrows-1) ) {
-        rval = 1;  fprintf (stderr, "CPXgetsense failed\n");
+        rval = 1;  CC_FPRINTF(stderr, "CPXgetsense failed\n");
         goto CLEANUP;
     }
 
@@ -1849,19 +1849,19 @@ static int getfarkasmultipliers (CClp *lp, double *y)
             if ( bhead[i] == jdiv )  break;
         }
         if ( i == nrows ) {
-            rval = 1;  fprintf (stderr, "Basis index not found\n");
+            rval = 1;  CC_FPRINTF(stderr, "Basis index not found\n");
             goto CLEANUP;
         }
         if ( CPXgetx (lp->cplex_env, lp->cplex_lp, &val, jdiv, jdiv) ) {
-            rval = 1;  fprintf (stderr, "CPXgetx failed\n");
+            rval = 1;  CC_FPRINTF(stderr, "CPXgetx failed\n");
             goto CLEANUP;
         }
         if ( CPXgetlb (lp->cplex_env, lp->cplex_lp, &lb, jdiv, jdiv) ) {
-            rval = 1;  fprintf (stderr, "CPXgetlb failed\n");
+            rval = 1;  CC_FPRINTF(stderr, "CPXgetlb failed\n");
             goto CLEANUP;
         }
         if ( CPXgetub (lp->cplex_env, lp->cplex_lp, &ub, jdiv, jdiv) ) {
-            rval = 1;  fprintf (stderr, "CPXgetub failed\n");
+            rval = 1;  CC_FPRINTF(stderr, "CPXgetub failed\n");
             goto CLEANUP;
         }
     } else {
@@ -1869,11 +1869,11 @@ static int getfarkasmultipliers (CClp *lp, double *y)
             if ( bhead[i] ==  -idiv-1 )  break;
         }
         if ( i == nrows ) {
-            rval = 1;  fprintf (stderr, "Basis index not found\n");
+            rval = 1;  CC_FPRINTF(stderr, "Basis index not found\n");
             goto CLEANUP;
         }
         if ( CPXgetslack (lp->cplex_env, lp->cplex_lp, &val, idiv, idiv) ) {
-            rval = 1;  fprintf (stderr, "CPXgetslack failed\n");
+            rval = 1;  CC_FPRINTF(stderr, "CPXgetslack failed\n");
             goto CLEANUP;
         }
         lb = 0.0;
@@ -1883,7 +1883,7 @@ static int getfarkasmultipliers (CClp *lp, double *y)
     }
 
     if ( CPXbinvrow (lp->cplex_env, lp->cplex_lp, i, y) ) {
-        rval = 1;  fprintf (stderr, "CPXbinvrow failed\n");
+        rval = 1;  CC_FPRINTF(stderr, "CPXbinvrow failed\n");
         goto CLEANUP;
     }
 
@@ -1913,69 +1913,69 @@ static int set_parameters (CPXENVptr cplex_env, CClp_parameters *params)
     /* the documentation doesn't say what the return value means */
     rval = CPXsetintparam (cplex_env, CPX_PARAM_SCRIND, params->scrind);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_SCRIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_SCRIND failed\n");
         goto CLEANUP;
     }
 
     rval = CPXsetintparam (cplex_env, CPX_PARAM_SIMDISPLAY,
                            params->simdisplay);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_SIMDISPLAY failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_SIMDISPLAY failed\n");
         goto CLEANUP;
     }
 
     rval = CPXsetintparam (cplex_env, CPX_PARAM_FASTMIP, params->fastmip);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_FASTMIP failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_FASTMIP failed\n");
         goto CLEANUP;
     }
     rval = CPXsetintparam (cplex_env, CPX_PARAM_ADVIND, params->advind);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_ADVIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_ADVIND failed\n");
         goto CLEANUP;
     }
     rval = CPXsetintparam (cplex_env, CPX_PARAM_DPRIIND, params->dpriind);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_DPRIIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_DPRIIND failed\n");
         goto CLEANUP;
     }
     rval = CPXsetintparam (cplex_env, CPX_PARAM_PPRIIND, params->ppriind);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_PPRIIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PPRIIND failed\n");
         goto CLEANUP;
     }
 
     rval = CPXsetdblparam (cplex_env, CPX_PARAM_EPPER, params->epper);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam CPX_PARAM_EPPER failed\n");
+        CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_EPPER failed\n");
         goto CLEANUP;
     }
     rval = CPXsetdblparam (cplex_env, CPX_PARAM_EPOPT, params->epopt);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam CPX_PARAM_EPOPT failed\n");
+        CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_EPOPT failed\n");
         goto CLEANUP;
     }
     rval = CPXsetdblparam (cplex_env, CPX_PARAM_EPRHS, params->eprhs);
     if (rval) {
-        fprintf (stderr, "CPXsetdblparam CPX_PARAM_EPRHS failed\n");
+        CC_FPRINTF(stderr, "CPXsetdblparam CPX_PARAM_EPRHS failed\n");
         goto CLEANUP;
     }
     
     rval = CPXsetintparam (cplex_env, CPX_PARAM_PERIND, params->perind);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PERIND failed\n");
         goto CLEANUP;
     }
 
     rval = CPXsetintparam (cplex_env, CPX_PARAM_PREIND, params->preind);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_PREIND failed\n");
         goto CLEANUP;
     }
 
     rval = CPXsetintparam (cplex_env, CPX_PARAM_AGGIND, params->aggind);
     if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
+        CC_FPRINTF(stderr, "CPXsetintparam CPX_PARAM_AGGIND failed\n");
         goto CLEANUP;
     }
 

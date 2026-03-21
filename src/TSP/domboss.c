@@ -44,16 +44,16 @@ int main (int ac, char **av)
     init_domlist (&D);
 
     if (ac != 1) {
-        fprintf (stderr, "Usage: %s (no arguments)\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s (no arguments)\n", av[0]);
         rval = 1; goto CLEANUP;
     }
 
-    printf ("BEGINNING DOMINO NET PROCESSING\n\n");
-    fflush (stdout);
+    CC_PRINTF("BEGINNING DOMINO NET PROCESSING\n\n");
+    CC_FFLUSH(stdout);
 
     lport = CCutil_snet_listen (CCtsp_DOMINO_PORT);
     if (lport == (CC_SPORT *) NULL) {                                           
-        fprintf (stderr, "CCutil_snet_listen failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_listen failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -62,12 +62,12 @@ int main (int ac, char **av)
         do {
             s = CCutil_snet_receive (lport);
             if (!s) {
-                fprintf (stderr, "CCutil_snet_receive failed, ignoring\n");
+                CC_FPRINTF(stderr, "CCutil_snet_receive failed, ignoring\n");
                 continue;
             }
 
             if (CCutil_sread_char (s, &request)) {
-                fprintf (stderr, "CCutil_sread_char failed, abort con\n");
+                CC_FPRINTF(stderr, "CCutil_sread_char failed, abort con\n");
                 CCutil_sclose (s);
                 continue;
             }
@@ -79,17 +79,17 @@ int main (int ac, char **av)
                 CCutil_sclose (s);
                 break;
             case CCtsp_DOMINO_EXIT:
-                printf ("Shutting down the domino boss\n"); fflush (stdout);
+                CC_PRINTF("Shutting down the domino boss\n"); CC_FFLUSH(stdout);
                 CCutil_sclose (s);
                 rval = 1;  goto CLEANUP;
             case CCtsp_DOMINO_GRAPH:
                 break;
             case CCtsp_DOMINO_SEND:
-                fprintf (stderr, "No graph, cannot send dominos\n");
+                CC_FPRINTF(stderr, "No graph, cannot send dominos\n");
                 CCutil_sclose (s);
                 rval = 1;  goto CLEANUP;
             default:
-                fprintf (stderr, "Invalid request %c\n", request);
+                CC_FPRINTF(stderr, "Invalid request %c\n", request);
             }
         } while (request != CCtsp_DOMINO_GRAPH);
 
@@ -109,12 +109,12 @@ int main (int ac, char **av)
             do {
                 s = CCutil_snet_receive (lport);
                 if (!s) {
-                    fprintf (stderr, "CCutil_snet_receive failed, ignoring\n");
+                    CC_FPRINTF(stderr, "CCutil_snet_receive failed, ignoring\n");
                     continue;
                 }
 
                 if (CCutil_sread_char (s, &request)) {
-                    fprintf (stderr, "CCutil_sread_char failed, abort con\n");
+                    CC_FPRINTF(stderr, "CCutil_sread_char failed, abort con\n");
                     CCutil_sclose (s);
                     continue;
                 }
@@ -125,44 +125,44 @@ int main (int ac, char **av)
                     CCcheck_rval (rval, "CCutil_swrite_char failed (YES)");
                     break;
                 case CCtsp_DOMINO_EXIT:
-                    printf ("Shutting down the domino boss\n"); fflush (stdout);
+                    CC_PRINTF("Shutting down the domino boss\n"); CC_FFLUSH(stdout);
                     CCutil_sclose (s);
                     rval = 1;  goto CLEANUP;
                 case CCtsp_DOMINO_GRAPH:
-                    fprintf (stderr, "Cannot receive new graph\n");
+                    CC_FPRINTF(stderr, "Cannot receive new graph\n");
                     CCutil_sclose (s);
                     rval = 1;  goto CLEANUP;
                 case CCtsp_DOMINO_SEND:
                     CCutil_sclose (s);
                     break;
                 default:
-                    fprintf (stderr, "Invalid request %c\n", request);
+                    CC_FPRINTF(stderr, "Invalid request %c\n", request);
                 }
             } while (request != CCtsp_DOMINO_RECEIVE);
 
             rval = CCutil_sread_int (s, &gid);
             if (rval) {
-                fprintf (stderr, "CCutil_sread_int failed, abort con\n");
+                CC_FPRINTF(stderr, "CCutil_sread_int failed, abort con\n");
                 rval = 0;
                 goto CLOSE_CONN;
             }
             rval = CCutil_sread_int (s, &id);
             if (rval) {
-                fprintf (stderr, "CCutil_sread_int failed, abort con\n");
+                CC_FPRINTF(stderr, "CCutil_sread_int failed, abort con\n");
                 rval = 0;
                 goto CLOSE_CONN;
             }
             if (id != -1) { 
                 rval = CCutil_sread_double (s, &rtime);
                 if (rval) {
-                    fprintf (stderr, "CCutil_sread_double failed, abort con\n");
+                    CC_FPRINTF(stderr, "CCutil_sread_double failed, abort con\n");
                     rval = 0;
                     goto CLOSE_CONN;
                 }
 
                 if (gid != G.gid) {
-                    printf ("Finished node with graph %d, ignoring\n", gid);
-                    fflush (stdout);
+                    CC_PRINTF("Finished node with graph %d, ignoring\n", gid);
+                    CC_FFLUSH(stdout);
 
                     rval = CCutil_swrite_char (s, CCtsp_DOMINO_NO);
                     CCcheck_rval (rval, "CCutil_swrite_char failed (NO)");
@@ -170,8 +170,8 @@ int main (int ac, char **av)
                     rval = CCutil_swrite_char (s, CCtsp_DOMINO_NO);
                     CCcheck_rval (rval, "CCutil_swrite_char failed (NO)");
 
-                    printf ("Finished completed node %d, ignoring\n", id);
-                    fflush (stdout);
+                    CC_PRINTF("Finished completed node %d, ignoring\n", id);
+                    CC_FFLUSH(stdout);
                 } else {
                     rval = CCutil_swrite_char (s, CCtsp_DOMINO_YES);
                     CCcheck_rval (rval, "CCutil_swrite_char failed (YES)");
@@ -183,9 +183,9 @@ int main (int ac, char **av)
                     cumtime += rtime;
                     nremain--;
 
-                    printf ("DONE %3d:  %4.0f sec, %7.0f total, %d remaining ",
+                    CC_PRINTF("DONE %3d:  %4.0f sec, %7.0f total, %d remaining ",
                             id, rtime, cumtime, nremain);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
             }
             
@@ -212,11 +212,11 @@ int main (int ac, char **av)
 
                 status[curloc % G.ncount] = DOM_STAT_WORK;
 
-                printf ("  New = %d\n", curloc % G.ncount); fflush (stdout);
+                CC_PRINTF("  New = %d\n", curloc % G.ncount); CC_FFLUSH(stdout);
 
                 curloc++;
             } else {
-                printf ("\n"); fflush (stdout);
+                CC_PRINTF("\n"); CC_FFLUSH(stdout);
                 rval = CCutil_swrite_char (s, CCtsp_DOMINO_WAIT);
                 CCcheck_rval (rval, "CCutil_swrite_char failed (WAIT)");
             }
@@ -226,19 +226,19 @@ int main (int ac, char **av)
             CCutil_sclose (s);
         }
 
-        printf ("\nFINISHED Graph %d: %.2f seconds\n", G.gid, cumtime);
-        fflush (stdout);
+        CC_PRINTF("\nFINISHED Graph %d: %.2f seconds\n", G.gid, cumtime);
+        CC_FFLUSH(stdout);
 
         request = 0;
         do {
             s = CCutil_snet_receive (lport);
             if (!s) {
-                fprintf (stderr, "CCutil_snet_receive failed, ignoring\n");
+                CC_FPRINTF(stderr, "CCutil_snet_receive failed, ignoring\n");
                 continue;
             }
 
             if (CCutil_sread_char (s, &request)) {
-                fprintf (stderr, "CCutil_sread_char failed, abort con\n");
+                CC_FPRINTF(stderr, "CCutil_sread_char failed, abort con\n");
                 CCutil_sclose (s);
                 continue;
             }
@@ -250,21 +250,21 @@ int main (int ac, char **av)
                 CCutil_sclose (s);
                 break;
             case CCtsp_DOMINO_EXIT:
-                printf ("Shutting down the domino boss\n"); fflush (stdout);
+                CC_PRINTF("Shutting down the domino boss\n"); CC_FFLUSH(stdout);
                 CCutil_sclose (s);
                 rval = 1;  goto CLEANUP;
             case CCtsp_DOMINO_GRAPH:
-                fprintf (stderr, "Cannot receive new graph\n");
+                CC_FPRINTF(stderr, "Cannot receive new graph\n");
                 CCutil_sclose (s);
                 rval = 1;  goto CLEANUP;
             case CCtsp_DOMINO_SEND:
                 break;
             default:
-                fprintf (stderr, "Invalid request %c\n", request);
+                CC_FPRINTF(stderr, "Invalid request %c\n", request);
             }
         } while (request != CCtsp_DOMINO_SEND);
 
-        printf ("Send the dominos\n"); fflush (stdout);
+        CC_PRINTF("Send the dominos\n"); CC_FFLUSH(stdout);
 
         rval = send_dominos (s, &D);
         CCcheck_rval (rval, "send_dominos failed");
@@ -288,7 +288,7 @@ static int receive_graph (CC_SFILE *s, bossgraph *G)
     int rval = 0;
 
     if (!G) {
-        fprintf (stderr, "no graph structure\n");
+        CC_FPRINTF(stderr, "no graph structure\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -301,9 +301,9 @@ static int receive_graph (CC_SFILE *s, bossgraph *G)
     rval = CCutil_sread_int (s, &G->ecount);
     CCcheck_rval (rval, "CCutil_sread_int failed (ecount)");
 
-    printf ("New graph %d (%d nodes, %d edges)\n", G->gid, G->ncount,
+    CC_PRINTF("New graph %d (%d nodes, %d edges)\n", G->gid, G->ncount,
                                                    G->ecount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -315,7 +315,7 @@ static int send_graph (CC_SFILE *s, bossgraph *G)
     int rval = 0;
 
     if (!G) {
-        fprintf (stderr, "no graph to send\n");
+        CC_FPRINTF(stderr, "no graph to send\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -346,11 +346,11 @@ static int send_dominos (CC_SFILE *s, domlist *D)
         CCcheck_rval (rval, "CCutil_swrite_int failed (list)");
     }
 
-    printf ("Dom List: %d\n", D->count);
+    CC_PRINTF("Dom List: %d\n", D->count);
     for (i = 0; i < D->count; i++) {
-        printf ("%d ", D->list[i]);
+        CC_PRINTF("%d ", D->list[i]);
     }
-    printf ("\n"); fflush (stdout);
+    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 
 CLEANUP:
 

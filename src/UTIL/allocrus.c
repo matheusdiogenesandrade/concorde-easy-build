@@ -94,12 +94,12 @@ void *CCutil_allocrus (size_t size)
     void *mem = (void *) NULL;
 
     if (size == 0) {
-        fprintf (stderr, "Warning: 0 bytes allocated\n");
+        CC_FPRINTF(stderr, "Warning: 0 bytes allocated\n");
     }
 
     mem = (void *) malloc (size);
     if (mem == (void *) NULL) {
-        fprintf (stderr, "Out of memory. Asked for %d bytes\n", (int) size);
+        CC_FPRINTF(stderr, "Out of memory. Asked for %d bytes\n", (int) size);
     }
     return mem;
 }
@@ -107,7 +107,7 @@ void *CCutil_allocrus (size_t size)
 void CCutil_freerus (void *p)
 {
     if (!p) {
-        fprintf (stderr, "Warning: null pointer freed\n");
+        CC_FPRINTF(stderr, "Warning: null pointer freed\n");
         return;
     }
 
@@ -123,7 +123,7 @@ void *CCutil_reallocrus (void *ptr, size_t size)
     } else {
         newptr = (void *) realloc (ptr, size);
         if (!newptr) {
-            fprintf (stderr, "Out of memory.  Tried to grow to %d bytes\n",
+            CC_FPRINTF(stderr, "Out of memory.  Tried to grow to %d bytes\n",
                      (int) size);
         }
         return newptr;
@@ -166,7 +166,7 @@ CCbigchunkptr *CCutil_bigchunkalloc (void)
     CCbigchunk *p = CC_SAFE_MALLOC (1, CCbigchunk);
 
     if (p == (CCbigchunk *) NULL) {
-        fprintf (stderr, "Out of memory in CCutil_bigchunkalloc\n");
+        CC_FPRINTF(stderr, "Out of memory in CCutil_bigchunkalloc\n");
         return (CCbigchunkptr *) NULL;
     }
     p->ptr.this_chunk = p;

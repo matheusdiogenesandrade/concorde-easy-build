@@ -102,7 +102,7 @@ int main (int ac, char **av)
     if (tsplib_in && datfilename != (char *) NULL) {
         rval = CCutil_gettsplib (datfilename, &ncount, &dat);
         if (rval) {
-            fprintf (stderr, "could not read the TSPLIB file\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "could not read the TSPLIB file\n"); goto CLEANUP;
         }
         CCutil_dat_getnorm (&dat, &norm);
         mydat = &dat;
@@ -120,7 +120,7 @@ int main (int ac, char **av)
         rval = CCutil_getdata (datfilename, binary_in, norm, &ncount, &dat,
                                use_gridsize, allow_dups, &rstate);
         if (rval) {
-            fprintf (stderr, "Could not create data set\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "Could not create data set\n"); goto CLEANUP;
         }
         mydat = &dat;
     } else {
@@ -130,31 +130,31 @@ int main (int ac, char **av)
     rval = getgraph (edgefilename, &dat, &ncount, &ecount, &elist, &elen,
                      run_silently, &rstate);
     if (rval) {
-        fprintf (stderr, "getgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "getgraph failed\n"); goto CLEANUP;
     }
-    printf ("Initial edgeset: %d edges (%d nodes)\n", ecount, ncount);
-    printf ("Time to generate graph: %.2f (seconds)\n",
+    CC_PRINTF("Initial edgeset: %d edges (%d nodes)\n", ecount, ncount);
+    CC_PRINTF("Time to generate graph: %.2f (seconds)\n",
             CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
     if (dumpmatch) {
         thematching = CC_SAFE_MALLOC((6 * ncount) + 1, int);
         if (!thematching) {
-            fprintf (stderr, "out of memory in main\n");
+            CC_FPRINTF(stderr, "out of memory in main\n");
             rval = 1; goto CLEANUP;
         }
     }
     if (dumpdual) {
         thedual = CC_SAFE_MALLOC(ncount, int);
         if (!thedual) {
-            fprintf (stderr, "out of memory in main\n");
+            CC_FPRINTF(stderr, "out of memory in main\n");
             rval = 1; goto CLEANUP;
         }
     }
     if (dumpbasis) {
         thebasis = CC_SAFE_MALLOC(2 * ncount, int);
         if (!thebasis) {
-            fprintf (stderr, "out of memory in main\n");
+            CC_FPRINTF(stderr, "out of memory in main\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -165,13 +165,13 @@ int main (int ac, char **av)
                    &v, thematching, thedual, thebasis, wantbasic, 
                    run_silently, &rstate);
     if (rval) {
-        fprintf (stderr, "Fractional matching routine failed\n");
+        CC_FPRINTF(stderr, "Fractional matching routine failed\n");
         goto CLEANUP;
     }
 
-    printf ("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-    printf ("Final matching weight: %.1f\n", v);
-    fflush (stdout);
+    CC_PRINTF("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+    CC_PRINTF("Final matching weight: %.1f\n", v);
+    CC_FFLUSH(stdout);
 
     if (dumpmatch)
         dump_match (thematching);
@@ -289,25 +289,25 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [-see below-]\n", f);
-    fprintf (stderr, "   -B    find basic optimal solution\n");
-    fprintf (stderr, "   -b    datfile in integer binary format\n");
-    fprintf (stderr, "   -D f  edgegen file for initial edge set\n");
-    fprintf (stderr, "   -e f  edge file - initial edge set\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -m    NN 2-matching as initial edge set\n");
-    fprintf (stderr, "   -n f  dat file - for fmatch on complete graph\n");
-    fprintf (stderr, "   -q #  quad-nearest # as initial edge set (default 2)\n");
-    fprintf (stderr, "   -Q    run quietly (don't generate so much output)\n");
-    fprintf (stderr, "   -r #  use #x# grid for random points, no dups if #<0\n");
-    fprintf (stderr, "   -s #  random seed\n");
-    fprintf (stderr, "   -x    dump matching to match.out\n");
-    fprintf (stderr, "   -y    dump dual solution to dual.out\n");
-    fprintf (stderr, "   -z    dump basic edges to basis.out\n");
-    fprintf (stderr, "   -N #  norm for pricing (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
-    fprintf (stderr, "         8=DSJRAND, 9=CRYSTAL, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
-    fprintf (stderr, "         17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "Usage: %s [-see below-]\n", f);
+    CC_FPRINTF(stderr, "   -B    find basic optimal solution\n");
+    CC_FPRINTF(stderr, "   -b    datfile in integer binary format\n");
+    CC_FPRINTF(stderr, "   -D f  edgegen file for initial edge set\n");
+    CC_FPRINTF(stderr, "   -e f  edge file - initial edge set\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -m    NN 2-matching as initial edge set\n");
+    CC_FPRINTF(stderr, "   -n f  dat file - for fmatch on complete graph\n");
+    CC_FPRINTF(stderr, "   -q #  quad-nearest # as initial edge set (default 2)\n");
+    CC_FPRINTF(stderr, "   -Q    run quietly (don't generate so much output)\n");
+    CC_FPRINTF(stderr, "   -r #  use #x# grid for random points, no dups if #<0\n");
+    CC_FPRINTF(stderr, "   -s #  random seed\n");
+    CC_FPRINTF(stderr, "   -x    dump matching to match.out\n");
+    CC_FPRINTF(stderr, "   -y    dump dual solution to dual.out\n");
+    CC_FPRINTF(stderr, "   -z    dump basic edges to basis.out\n");
+    CC_FPRINTF(stderr, "   -N #  norm for pricing (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
+    CC_FPRINTF(stderr, "         8=DSJRAND, 9=CRYSTAL, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
+    CC_FPRINTF(stderr, "         17=GEOM, 18=JOHNSON\n");
 }
 
 #define QUAD_TRY 2
@@ -326,13 +326,13 @@ static int getgraph (char *edgefile, CCdatagroup *dat, int *ncount,
     if (edgefile != (char *) NULL) {
         if ((in = fopen (edgefile, "r")) == (FILE *) NULL) {
             perror (edgefile);
-            fprintf (stderr, "Unable to open %s for input\n", edgefile);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", edgefile);
             return 1;
         }
 
         k = CCutil_readint (in);
         if (*ncount != 0 && k != *ncount) {
-            fprintf (stderr, "Edge file does not match dat file\n");
+            CC_FPRINTF(stderr, "Edge file does not match dat file\n");
             fclose (in);
             return 1;
         }
@@ -360,12 +360,12 @@ static int getgraph (char *edgefile, CCdatagroup *dat, int *ncount,
     } else if (edgegenfname) {
         CCedgegengroup plan;
         if (CCedgegen_read (edgegenfname, &plan)) {
-            fprintf (stderr, "CCedgegen_read failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_read failed\n");
             return 1;
         }
         if (CCedgegen_edges (&plan, *ncount, dat, (double *) NULL, ecount,
                              elist, silent, rstate)) {
-            fprintf (stderr, "CCedgegen_edges failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_edges failed\n");
             return 1;
         }
         *elen = CC_SAFE_MALLOC(*ecount, int);
@@ -385,20 +385,20 @@ static int getgraph (char *edgefile, CCdatagroup *dat, int *ncount,
             if (!(*elist))
                 return 1;
             if ((datnorm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
-                printf ("Using nearest neighbor 2-matching graph\n");
-                fflush (stdout);
+                CC_PRINTF("Using nearest neighbor 2-matching graph\n");
+                CC_FFLUSH(stdout);
                 if (CCkdtree_nearest_neighbor_2match ((CCkdtree *) NULL,
                         *ncount, CCutil_lprand (rstate) % (*ncount), dat,
                         *elist, &val, rstate)) {
-                   fprintf (stderr, "nearest 2-matching code failed\n");
+                   CC_FPRINTF(stderr, "nearest 2-matching code failed\n");
                    CC_FREE (*elist, int);
                    return 1;
                 }
             } else {
                 int *cyc = (int *) NULL;
-                printf ("Not setup for nearest 2-match with x or junk norms\n");
-                printf ("Using nearest neighbour tour graph\n");
-                fflush (stdout);
+                CC_PRINTF("Not setup for nearest 2-match with x or junk norms\n");
+                CC_PRINTF("Using nearest neighbour tour graph\n");
+                CC_FFLUSH(stdout);
                 cyc = CC_SAFE_MALLOC (*ncount, int);
                 if (!cyc) {
                     CC_FREE (*elist, int);
@@ -430,31 +430,31 @@ static int getgraph (char *edgefile, CCdatagroup *dat, int *ncount,
             }
         } else {
             if ((datnorm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
-                printf ("Using quadrant nearest %d graph\n", quadtry);
-                fflush (stdout);
+                CC_PRINTF("Using quadrant nearest %d graph\n", quadtry);
+                CC_FFLUSH(stdout);
                 if (CCkdtree_quadrant_k_nearest ((CCkdtree *) NULL, *ncount,
                                       quadtry, dat, (double *) NULL, 1, 
                                       ecount, elist, silent, rstate)) {
-                    fprintf (stderr, "CCkdtree-quad nearest code failed\n");
+                    CC_FPRINTF(stderr, "CCkdtree-quad nearest code failed\n");
                     CC_FREE (*elist, int);
                     return 1;
                 }
             } else if ((datnorm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
-                printf ("Using quadrant nearest %d graph\n", quadtry);
-                fflush (stdout);
+                CC_PRINTF("Using quadrant nearest %d graph\n", quadtry);
+                CC_FFLUSH(stdout);
                 if (CCedgegen_x_quadrant_k_nearest (*ncount, quadtry, dat,
                        (double *) NULL, 1, ecount, elist, run_silently)) {
-                    fprintf (stderr, "CCedgegen_x_quadrant_k_nearest code failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_quadrant_k_nearest code failed\n");
                     CC_FREE (*elist, int);
                     return 1;
                 }
             } else {
-                printf ("No junk quad nearest, using %d nearest graph\n",
+                CC_PRINTF("No junk quad nearest, using %d nearest graph\n",
                          4 * quadtry);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
                 if (CCedgegen_junk_k_nearest (*ncount, 4 * quadtry, dat,
                        (double *) NULL, 1, ecount, elist, run_silently)) {
-                    fprintf (stderr, "CCedgegen_junk_k_nearest code failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_junk_k_nearest code failed\n");
                     CC_FREE (*elist, int);
                     return 1;
                 }
@@ -482,7 +482,7 @@ static void dump_match (int *thematching)
 
     if (out == (FILE *) NULL) {
         perror ("match.out");
-        fprintf (stderr, "Unable to open match.out for output\n");
+        CC_FPRINTF(stderr, "Unable to open match.out for output\n");
         return;
     }
 
@@ -500,7 +500,7 @@ static void dump_dual (int *thedual, int ncount)
 
     if (out == (FILE *) NULL) {
         perror ("dual.out");
-        fprintf (stderr, "Unable to open dual.out for output\n");
+        CC_FPRINTF(stderr, "Unable to open dual.out for output\n");
         return;
     }
 
@@ -516,7 +516,7 @@ static void dump_basis (int *thebasis, int ncount)
 
     if (out == (FILE *) NULL) {
         perror ("basis.out");
-        fprintf (stderr, "Unable to open basis.out for output\n");
+        CC_FPRINTF(stderr, "Unable to open basis.out for output\n");
         return;
     }
 

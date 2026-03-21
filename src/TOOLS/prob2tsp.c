@@ -70,30 +70,30 @@ int main (int ac, char **av)
     }
 
     CCutil_sprand (seed, &rstate);
-    printf ("Using random seed %d\n", seed); fflush (stdout);
+    CC_PRINTF("Using random seed %d\n", seed); CC_FFLUSH(stdout);
 
     if (isdat || !fname) {
         ncount = nnodes_want;
         rval = CCutil_getdata (fname, binary_in, norm, &ncount, &dat, 0, 1, &rstate);
         if (rval) {
-            fprintf (stderr, "CCutil_getdata failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_getdata failed\n"); goto CLEANUP;
         }
     } else {
         rval = CCutil_getedgelist_n (&ncount, fname, &ecount, &elist,
                                      &elen, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
         }
         rval = CCutil_graph2dat_matrix (ncount, ecount, elist, elen, 1000000,
                                         &dat);
         if (rval) {
-            fprintf (stderr, "CCutil_graph2dat_matrix failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_graph2dat_matrix failed\n"); goto CLEANUP;
         }
     }
 
     rval = CCutil_writetsplib ("out.tsp", ncount, &dat);
     if (rval) {
-        fprintf (stderr, "CCutil_writetsplib failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_writetsplib failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -148,7 +148,7 @@ static int parseargs (int ac, char **av)
             case 17: norm = CC_GEOM; break;
             case 18: norm = CC_EUCLIDEAN_CEIL; break;
             default:
-                printf ("unknown norm %d\n", inorm); fflush (stdout);
+                CC_PRINTF("unknown norm %d\n", inorm); CC_FFLUSH(stdout);
                 usage (av[0]);
                 return 1;
             }
@@ -174,13 +174,13 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [-flags below] [filename]\n", f);
-    fprintf (stderr, "   -b    dat file is in binary\n");
-    fprintf (stderr, "   -d    dat file (default is edge file)\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -s #  random seed\n");
-    fprintf (stderr, "   -N #  norm (default is L2)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
-    fprintf (stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
-    fprintf (stderr, "         17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below] [filename]\n", f);
+    CC_FPRINTF(stderr, "   -b    dat file is in binary\n");
+    CC_FPRINTF(stderr, "   -d    dat file (default is edge file)\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -s #  random seed\n");
+    CC_FPRINTF(stderr, "   -N #  norm (default is L2)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
+    CC_FPRINTF(stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
+    CC_FPRINTF(stderr, "         17=GEOM, 18=JOHNSON\n");
 }

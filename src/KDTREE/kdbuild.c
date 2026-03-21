@@ -103,7 +103,7 @@ int CCkdtree_build (CCkdtree *intree, int ncount, CCdatagroup *dat,
     if (wcoord != (double *) NULL) {
         for (i = 0; i < ncount; i++) {
             if (wcoord[i] < -0.00000001) {
-                fprintf (stderr, "Cannot build with negative node weights\n");
+                CC_FPRINTF(stderr, "Cannot build with negative node weights\n");
                 return 1;
             }
         }
@@ -131,7 +131,7 @@ int CCkdtree_build (CCkdtree *intree, int ncount, CCdatagroup *dat,
     thetree->root = build (0, ncount - 1, &depth, current_bnds_x,
                      current_bnds_y, thetree, dat->x, dat->y, wcoord, rstate);
     if (!(thetree->root)) {
-        fprintf (stderr, "Unable to build CCkdtree\n");
+        CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
         CC_FREE (thetree->perm, int);
         CC_FREE (thetree->bucketptr, CCkdnode *);
         return 1;
@@ -159,11 +159,11 @@ static void kdtree_free_world (CCptrworld *kdnode_world,
     int total, onlist;
 
     if (kdnode_check_leaks (kdnode_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding kdnodes\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding kdnodes\n",
                  total - onlist);
     }
     if (kdbnds_check_leaks (kdbnds_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding kdbnds\n", total - onlist);
+        CC_FPRINTF(stderr, "WARNING: %d outstanding kdbnds\n", total - onlist);
     }
     CCptrworld_delete (kdnode_world);
     CCptrworld_delete (kdbnds_world);

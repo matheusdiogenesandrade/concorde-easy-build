@@ -22,7 +22,7 @@ int main (int ac, char **av)
     FILE *out = (FILE *) NULL;
 
     if (ac < 2) {
-        printf ("usage %s: boss\n", *av);
+        CC_PRINTF("usage %s: boss\n", *av);
         rval = 1;  goto CLEANUP;
     }
 
@@ -33,7 +33,7 @@ int main (int ac, char **av)
     while (1) {
         s = CCutil_snet_open (bosshost, CC_SUBDIV_PORT);
         if (!s) {
-            fprintf (stderr, "CCutil_snet_open failed\n");
+            CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
             rval = 1;  goto CLEANUP;
         }
        
@@ -64,7 +64,7 @@ int main (int ac, char **av)
         sprintf (buf, "%s_par.%d", probname, id);
         out = fopen (buf, "w");
         if (!out) {
-            fprintf (stderr, "could not open %s for output\n", buf);
+            CC_FPRINTF(stderr, "could not open %s for output\n", buf);
             rval = 1; goto CLEANUP;
         }
 
@@ -81,14 +81,14 @@ int main (int ac, char **av)
         p = popen (buf, "r");
         if (!p) {
             perror (buf);
-            fprintf (stderr, "popen failed\n");
+            CC_FPRINTF(stderr, "popen failed\n");
             rval = 1; goto CLEANUP;
         }
 
         while ((fgets (buf2, sizeof (buf2), p)) != NULL) {
             buf2[sizeof (buf2) - 1] = '\0';
             fputs (buf2, stdout);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
     
             if (sscanf (buf2, "%s", key) != EOF) {
                 if (!strcmp (key, "Z")) {
@@ -96,7 +96,7 @@ int main (int ac, char **av)
                     tb += strlen (key);
                     while (*tb == ' ') tb++;
                     if (sscanf (tb, "%lf", &newcost) == EOF) {
-                        fprintf (stderr, "Could not read tourlen\n");
+                        CC_FPRINTF(stderr, "Could not read tourlen\n");
                         rval = 1;  goto CLEANUP;
                     }
                 }
@@ -106,17 +106,17 @@ int main (int ac, char **av)
         pclose (p);
 
         if (newcost == -1.0) {
-            fprintf (stderr, "failed to produce a tourlen\n");
+            CC_FPRINTF(stderr, "failed to produce a tourlen\n");
             rval = 1; goto CLEANUP;
         }
  
         rtime = child_zeit () - szeit;
-        printf ("New Tour Cost: %0.0f\n", newcost); fflush (stdout);
+        CC_PRINTF("New Tour Cost: %0.0f\n", newcost); CC_FFLUSH(stdout);
     }
 
 DONE:
 
-    printf ("No work available.  Shutting down.\n"); fflush (stdout);
+    CC_PRINTF("No work available.  Shutting down.\n"); CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -153,7 +153,7 @@ static int receive_tspfile (CC_SFILE *s, char *name, int id)
     sprintf (buf, "%s_lkh_tsp.%d", name, id);
     out = fopen (buf, "w");
     if (!out) {
-        fprintf (stderr, "unable to open %s for output\n", buf);
+        CC_FPRINTF(stderr, "unable to open %s for output\n", buf);
         rval = 1; goto CLEANUP;
     }
 
@@ -177,10 +177,10 @@ static int receive_tspfile (CC_SFILE *s, char *name, int id)
         fprintf (out, "EUC_2D\n");
         break;
     case CC_GEOM:
-        fprintf (stderr, "GEOM\n");
+        CC_FPRINTF(stderr, "GEOM\n");
         break;
     default:
-        fprintf (stderr, "illegal NORM\n");
+        CC_FPRINTF(stderr, "illegal NORM\n");
         rval = 1; goto CLEANUP;
     }
 

@@ -52,32 +52,32 @@ int CCchunk_oracle (CCchunk_graph *ch, CCchunk_ineq *c, int *xsol, int *objval,
     double drhs, dobjval;
 
 /*
-    printf ("+"); fflush (stdout);
+    CC_PRINTF("+"); CC_FFLUSH(stdout);
 */
 
     CCutil_start_timer (&timer->all);
 
 #ifdef DEBUG
-    printf ("CCchunk_oracle:");
+    CC_PRINTF("CCchunk_oracle:");
     for (i=0; i<ch->ecount; i++) {
-        printf (" %d", c->coef[i]);
+        CC_PRINTF(" %d", c->coef[i]);
     }
-    printf (" <= %d\n", c->rhs);
-    fflush (stdout);
+    CC_PRINTF(" <= %d\n", c->rhs);
+    CC_FFLUSH(stdout);
 #endif
     elist = CC_SAFE_MALLOC (ecount*2, int);
     weight = CC_SAFE_MALLOC (ecount, int);
     lbound = CC_SAFE_MALLOC (ecount, int);
     ubound = CC_SAFE_MALLOC (ecount, int);
     if (!elist || !weight || !lbound || !ubound) {
-        fprintf (stderr, "Out of memory in CCchunk_oracle\n");
+        CC_FPRINTF(stderr, "Out of memory in CCchunk_oracle\n");
         rval = CC_CHUNK_ORACLE_ERROR;
         goto CLEANUP;
     }
     if (xsol) {
         tmpxsol = CC_SAFE_MALLOC (ecount, int);
         if (!tmpxsol) {
-            fprintf (stderr, "Out of memory in CCchunk_oracle\n");
+            CC_FPRINTF(stderr, "Out of memory in CCchunk_oracle\n");
             rval = CC_CHUNK_ORACLE_ERROR;
             goto CLEANUP;
         }
@@ -124,7 +124,7 @@ int CCchunk_oracle (CCchunk_graph *ch, CCchunk_ineq *c, int *xsol, int *objval,
         rval = CC_CHUNK_ORACLE_INFEASIBLE;
         goto CLEANUP;
     } else if (rval == 0 && rhsvalid && dobjval <= drhs) {
-        fprintf (stderr, "bnbtsp obj %.0f c->rhs %.0f, should have reported infeas\n",
+        CC_FPRINTF(stderr, "bnbtsp obj %.0f c->rhs %.0f, should have reported infeas\n",
                  dobjval, drhs);
         rval = CC_CHUNK_ORACLE_INFEASIBLE;
         goto CLEANUP;
@@ -137,17 +137,17 @@ int CCchunk_oracle (CCchunk_graph *ch, CCchunk_ineq *c, int *xsol, int *objval,
         }
         goto CLEANUP;
     } else if (rval != CC_TINYTSP_SEARCHLIMITEXCEEDED) {
-        fprintf (stderr, "CCtiny_bnb_msp rval %d\n", rval);
+        CC_FPRINTF(stderr, "CCtiny_bnb_msp rval %d\n", rval);
         rval = CC_CHUNK_ORACLE_ERROR;
 #ifdef DUMP_FAILEDMSPS
-        printf ("%d %d\n",ncount, ecount);
+        CC_PRINTF("%d %d\n",ncount, ecount);
         for (i=0; i<ecount; i++) {
-            printf ("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
+            CC_PRINTF("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
                     ubound[i],weight[i]);
         }
-        if (rhsvalid) printf ("%d\n", c->rhs);
-        printf ("\n");
-        fflush (stdout);
+        if (rhsvalid) CC_PRINTF("%d\n", c->rhs);
+        CC_PRINTF("\n");
+        CC_FFLUSH(stdout);
 #endif
         goto CLEANUP;
     }
@@ -163,7 +163,7 @@ int CCchunk_oracle (CCchunk_graph *ch, CCchunk_ineq *c, int *xsol, int *objval,
         rval = CC_CHUNK_ORACLE_INFEASIBLE;
         goto CLEANUP;
     } else if (rval == 0 && rhsvalid && dobjval <= drhs) {
-        fprintf (stderr, "CCtiny_bnc_msp obj %.0f c->rhs %.0f, should have reported infeas\n",
+        CC_FPRINTF(stderr, "CCtiny_bnc_msp obj %.0f c->rhs %.0f, should have reported infeas\n",
                  dobjval, drhs);
         rval = CC_CHUNK_ORACLE_INFEASIBLE;
         goto CLEANUP;
@@ -176,37 +176,37 @@ int CCchunk_oracle (CCchunk_graph *ch, CCchunk_ineq *c, int *xsol, int *objval,
         }
         goto CLEANUP;
     } else if (rval != CC_TINYTSP_SEARCHLIMITEXCEEDED) {
-        fprintf (stderr, "CCtiny_bnc_msp rval %d\n", rval);
+        CC_FPRINTF(stderr, "CCtiny_bnc_msp rval %d\n", rval);
         rval = CC_CHUNK_ORACLE_ERROR;
 #ifdef DUMP_FAILEDMSPS
-        printf ("%d %d\n",ncount, ecount);
+        CC_PRINTF("%d %d\n",ncount, ecount);
         for (i=0; i<ecount; i++) {
-            printf ("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
+            CC_PRINTF("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
                     ubound[i],weight[i]);
         }
-        if (rhsvalid) printf ("%d\n", c->rhs);
-        printf ("\n");
-        fflush (stdout);
+        if (rhsvalid) CC_PRINTF("%d\n", c->rhs);
+        CC_PRINTF("\n");
+        CC_FFLUSH(stdout);
 #endif
         goto CLEANUP;
     }
 
     rval = CC_CHUNK_ORACLE_SEARCHLIMITEXCEEDED;
 #ifdef DUMP_HARDMSPS
-    printf ("TSPORACLE Search Limit Exceeded");
-    if (rhsvalid) printf ("TSP objlimit %d", c->rhs);
-    printf (":\n");
-    printf ("%d %d\n",ncount, ecount);
+    CC_PRINTF("TSPORACLE Search Limit Exceeded");
+    if (rhsvalid) CC_PRINTF("TSP objlimit %d", c->rhs);
+    CC_PRINTF(":\n");
+    CC_PRINTF("%d %d\n",ncount, ecount);
     for (i=0; i<ecount; i++) {
-        printf ("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
+        CC_PRINTF("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
                 ubound[i],weight[i]);
     }
-    if (rhsvalid) printf ("%d\n", c->rhs);
-    printf ("\n");
-    fflush (stdout);
+    if (rhsvalid) CC_PRINTF("%d\n", c->rhs);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 #endif
 
-    printf ("-"); fflush (stdout);
+    CC_PRINTF("-"); CC_FFLUSH(stdout);
 
   CLEANUP:
     CC_IFFREE (elist, int);
@@ -231,19 +231,19 @@ int CCchunk_verify (CCchunk_graph *ch, CCchunk_ineq *c)
     double drhs, dobjval;
 
 #ifdef DEBUG
-    printf ("CCchunk_verify:");
+    CC_PRINTF("CCchunk_verify:");
     for (i=0; i<ch->ecount; i++) {
-        printf (" %d", c->coef[i]);
+        CC_PRINTF(" %d", c->coef[i]);
     }
-    printf (" <= %d\n", c->rhs);
-    fflush (stdout);
+    CC_PRINTF(" <= %d\n", c->rhs);
+    CC_FFLUSH(stdout);
 #endif
     elist = CC_SAFE_MALLOC (ecount*2, int);
     weight = CC_SAFE_MALLOC (ecount, int);
     lbound = CC_SAFE_MALLOC (ecount, int);
     ubound = CC_SAFE_MALLOC (ecount, int);
     if (!elist || !weight || !lbound || !ubound) {
-        fprintf (stderr, "Out of memory in CCchunk_oracle\n");
+        CC_FPRINTF(stderr, "Out of memory in CCchunk_oracle\n");
         rval = CC_CHUNK_ORACLE_ERROR;
         goto CLEANUP;
     }
@@ -273,7 +273,7 @@ int CCchunk_verify (CCchunk_graph *ch, CCchunk_ineq *c)
     if (rval == CC_TINYTSP_INFEASIBLE) {
         rval = 0;
     } else if (rval == 0 && dobjval <= drhs) {
-        fprintf (stderr, "CCtiny_bnc_msp obj %.0f c->rhs %.0f, should have reported infeas\n",
+        CC_FPRINTF(stderr, "CCtiny_bnc_msp obj %.0f c->rhs %.0f, should have reported infeas\n",
                  dobjval, drhs);
         rval = 0;
     } else if (rval == 0) {
@@ -281,13 +281,13 @@ int CCchunk_verify (CCchunk_graph *ch, CCchunk_ineq *c)
     }
 
     if (rval) {
-        printf ("TSPVERIFY Failed rval %d objlimit %d:\n", rval, c->rhs);
-        printf ("%d %d\n",ncount, ecount);
+        CC_PRINTF("TSPVERIFY Failed rval %d objlimit %d:\n", rval, c->rhs);
+        CC_PRINTF("%d %d\n",ncount, ecount);
         for (i=0; i<ecount; i++) {
-            printf ("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
+            CC_PRINTF("%d %d %d %d %d\n",elist[2*i],elist[2*i+1],lbound[i],
                     ubound[i],weight[i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 
   CLEANUP:

@@ -85,19 +85,19 @@ int CCcut_connect_components (int ncount, int ecount, int *elist, double *x,
     *ncomp = 0;
     *comps = CC_SAFE_MALLOC (ncount, int);
     if (!(*comps)) {
-        fprintf (stderr, "out of memory in CCcut_connect_components\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_connect_components\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = build_graph (&G, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "build_graph failed\n");
+        CC_FPRINTF(stderr, "build_graph failed\n");
         goto CLEANUP;
     }
 
     dstack = CC_SAFE_MALLOC (ncount, int);
     if (!dstack) {
-        fprintf (stderr, "out of memory in CCcut_connect_components\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_connect_components\n");
         CC_FREE (*comps, int);
         rval = 1; goto CLEANUP;
     }
@@ -111,7 +111,7 @@ int CCcut_connect_components (int ncount, int ecount, int *elist, double *x,
     *compscount = CC_SAFE_MALLOC (*ncomp, int);
     nmarks = CC_SAFE_MALLOC (*ncomp, int);
     if (!(*compscount) || !nmarks) {
-        fprintf (stderr, "out of memory in CCcut_connect_components\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_connect_components\n");
         CC_FREE (*comps, int);
         CC_IFFREE (*compscount, int);
         CC_IFFREE (nmarks, int);
@@ -163,7 +163,7 @@ static int build_graph (graph *G, int ncount, int ecount, int *elist,
 
     G->nodelist = CC_SAFE_MALLOC (G->ncount, node);
     if (!G->nodelist) {
-        fprintf (stderr, "out of memory in build_graph\n");
+        CC_FPRINTF(stderr, "out of memory in build_graph\n");
         rval = 1; goto CLEANUP;
     }
     nodelist = G->nodelist;
@@ -171,7 +171,7 @@ static int build_graph (graph *G, int ncount, int ecount, int *elist,
     if (G->ecount) {
         G->adjspace = CC_SAFE_MALLOC (2*G->ecount, int);
         if (!G->adjspace) {
-            fprintf (stderr, "out of memory in build_graph\n");
+            CC_FPRINTF(stderr, "out of memory in build_graph\n");
             rval = 1; goto CLEANUP;
         }
     }

@@ -267,20 +267,20 @@ int CCcut_mincut_st (int ncount, int ecount, int *elist, double *ecap,
         if (cutcount) {
             *cutcount = 0;
         } else {
-            fprintf (stderr, "cut is specified but not cutcount\n");
+            CC_FPRINTF(stderr, "cut is specified but not cutcount\n");
             rval = 1; goto CLEANUP;
         }
     }
 
     rval = buildgraph (&G, ncount, ecount, elist, ecap);
     if (rval) {
-        fprintf (stderr, "Buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "Buildgraph failed\n"); goto CLEANUP;
     }
     *value = flow (&G, G.nodelist + s, G.nodelist + t);
     if (cut) {
         rval = grab_the_cut (&G, G.nodelist + t, cut, cutcount);
         if (rval) {
-            fprintf (stderr, "grab_the_cut failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "grab_the_cut failed\n"); goto CLEANUP;
         }
     }
 
@@ -312,8 +312,8 @@ static double flow (graph *G, node *s, node *t)
 #endif
 
 /*
-    printf ("Find cut separating %d and %d ...\n", s - nodelist, t - nodelist);
-    fflush (stdout);
+    CC_PRINTF("Find cut separating %d and %d ...\n", s - nodelist, t - nodelist);
+    CC_FFLUSH(stdout);
 */
 
     for (i = 0; i < ncount; i++) {
@@ -499,7 +499,7 @@ static void setlabels (graph *G, node *s, node *t)
     t->flowlabel = 0;
     backwards_bfs (t, num, G);
     if (s->magiclabel == num) {
-        printf ("Help - s should not get a label\n");
+        CC_PRINTF("Help - s should not get a label\n");
         s->flowlabel = ncount;
     }
 
@@ -632,7 +632,7 @@ static int grab_the_cut (graph *G, node *n, int **cut, int *cutcount)
 
     tcut = CC_SAFE_MALLOC (G->nnodes, int);
     if (!tcut) {
-        fprintf (stderr, "out of memory in grab_the_cut\n");
+        CC_FPRINTF(stderr, "out of memory in grab_the_cut\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -670,7 +670,7 @@ static int grab_the_cut (graph *G, node *n, int **cut, int *cutcount)
 
     *cut = CC_SAFE_MALLOC (count, int);
     if (!(*cut)) {
-        fprintf (stderr, "out of memory in grab_the_cut\n");
+        CC_FPRINTF(stderr, "out of memory in grab_the_cut\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < count; i++) {
@@ -709,7 +709,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
     G->nodelist = CC_SAFE_MALLOC (ncount, node);
     G->edgelist = CC_SAFE_MALLOC (ecount, edge);
     if (!G->nodelist || !G->edgelist) {
-        fprintf (stderr, "Out of memory in buildgraph\n");
+        CC_FPRINTF(stderr, "Out of memory in buildgraph\n");
         CC_IFFREE (G->nodelist, node);
         CC_IFFREE (G->edgelist, edge);
         return 1;
@@ -717,7 +717,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
 #ifdef USE_GAP
     G->level = CC_SAFE_MALLOC (ncount + 1, node *);
     if (!G->level) {
-        fprintf (stderr, "Out of memory in buildgraph\n");
+        CC_FPRINTF(stderr, "Out of memory in buildgraph\n");
         CC_IFFREE (G->nodelist, node);
         CC_IFFREE (G->edgelist, edge);
         return 1;
@@ -730,7 +730,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
 #ifdef HIGHEST_LABEL_PRF
     G->high = CC_SAFE_MALLOC (ncount, node *);
     if (!G->high) {
-        fprintf (stderr, "Out of memory in buildgraph\n");
+        CC_FPRINTF(stderr, "Out of memory in buildgraph\n");
         CC_IFFREE (G->nodelist, node);
         CC_IFFREE (G->edgelist, edge);
         return 1;
@@ -751,7 +751,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist,
         int head = elist[(2 * i) + 1];
         if (tail < 0 || tail >= ncount ||
             head < 0 || head >= ncount) {
-            fprintf (stderr, "Edge list in wrong format: Edge %d = [%d, %d]\n",
+            CC_FPRINTF(stderr, "Edge list in wrong format: Edge %d = [%d, %d]\n",
                          i, tail, head);
             return 1;
         }

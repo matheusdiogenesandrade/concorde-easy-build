@@ -69,7 +69,7 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
         nodelist == (stripnode *) NULL ||
         adjspace == (int *) NULL ||
         coefspace == (int *) NULL) {
-        fprintf (stderr, "Out of memory\n");
+        CC_FPRINTF(stderr, "Out of memory\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -88,12 +88,12 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
     rhs = -rhs;
 
     for (i=0; i<nodecount; i++) {
-        printf ("With %d outside:\n", i);
+        CC_PRINTF("With %d outside:\n", i);
         strip_outside (nodecount, edgecount, nodelist, elist, coef, rhs, i);
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 
-    printf ("With tight triangular:\n");
+    CC_PRINTF("With tight triangular:\n");
     strip_triangular (nodecount, edgecount, nodelist, elist, coef, rhs);
 
     rval = 0;
@@ -155,17 +155,17 @@ static int strip_outside (int nodecount, int edgecount, stripnode *nodelist,
     for (i=0; i<nodecount; i++) {
         for (j=i+1; j<nodecount; j++) {
             if (nodelist[i].coef[j]) {
-                printf ("%d %d %d\n", i, j, nodelist[i].coef[j]);
+                CC_PRINTF("%d %d %d\n", i, j, nodelist[i].coef[j]);
             }
             if (nodelist[i].coef[j] != nodelist[j].coef[i]) {
-                printf ("ERROR: n[%d].c[%d]=%d n[%d].c[%d]=%d\n",
+                CC_PRINTF("ERROR: n[%d].c[%d]=%d n[%d].c[%d]=%d\n",
                         i,j,nodelist[i].coef[j],
                         j,i,nodelist[j].coef[i]);
             }
         }
     }
 
-    printf ("minc %d\n", minc);
+    CC_PRINTF("minc %d\n", minc);
 #endif /* 0 */
 
     for (i=0; i<nodecount; i++) {
@@ -187,10 +187,10 @@ static int strip_outside (int nodecount, int edgecount, stripnode *nodelist,
     for (i=0; i<nodecount; i++) {
         for (j=i+1; j<nodecount; j++) {
             if (nodelist[i].coef[j]) {
-                printf ("%d %d %d\n", i, j, nodelist[i].coef[j]);
+                CC_PRINTF("%d %d %d\n", i, j, nodelist[i].coef[j]);
             }
             if (nodelist[i].coef[j] != nodelist[j].coef[i]) {
-                printf ("ERROR: n[%d].c[%d]=%d n[%d].c[%d]=%d\n",
+                CC_PRINTF("ERROR: n[%d].c[%d]=%d n[%d].c[%d]=%d\n",
                         i,j,nodelist[i].coef[j],
                         j,i,nodelist[j].coef[i]);
             }
@@ -248,13 +248,13 @@ static int strip_graph (int nnodes, stripnode *nodes, int rhs)
         if (deg <= 1) {
             CC_FREE (work1, int);
             CC_FREE (maxclique, int);
-            printf (" >= %d\n", nrhs);
+            CC_PRINTF(" >= %d\n", nrhs);
             return 0;
         }
         for (i=0; i<deg; i++) {
-            printf ("%d ", maxclique[i]);
+            CC_PRINTF("%d ", maxclique[i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
         nrhs += 2*deg;
     }
 
@@ -313,7 +313,7 @@ static int strip_maxclique (int nnodes, stripnode *nodes, int *maxclique,
                     }
                 }
                 if (size != k) {
-                    fprintf (stderr, "Size mismatch 1\n");
+                    CC_FPRINTF(stderr, "Size mismatch 1\n");
                     simpsize = k;
                 }
             } else if (mindeg > size-1 && size > nonsize) {
@@ -326,7 +326,7 @@ static int strip_maxclique (int nnodes, stripnode *nodes, int *maxclique,
                     }
                 }
                 if (size != k) {
-                    fprintf (stderr, "Size mismatch 2\n");
+                    CC_FPRINTF(stderr, "Size mismatch 2\n");
                     nonsize = k;
                 }
                 for (ia=0; ia<nodes[i].nadj; ia++) {
@@ -422,7 +422,7 @@ static int strip_triangular (int nodecount, int edgecount, stripnode *nodelist,
             }
         }
         if (minc % 2 != 0) {
-            fprintf (stderr, "Whoa, parity problem in strip_triangular\n");
+            CC_FPRINTF(stderr, "Whoa, parity problem in strip_triangular\n");
             return -1;
         }
         minc /= 2;
@@ -437,16 +437,16 @@ static int strip_triangular (int nodecount, int edgecount, stripnode *nodelist,
     for (i=0; i<nodecount; i++) {
         for (j=i+1; j<nodecount; j++) {
             if (nodelist[i].coef[j]) {
-                printf ("%d %d %d\n", i, j, nodelist[i].coef[j]);
+                CC_PRINTF("%d %d %d\n", i, j, nodelist[i].coef[j]);
             }
             if (nodelist[i].coef[j] != nodelist[j].coef[i]) {
-                printf ("ERROR: n[%d].c[%d]=%d n[%d].c[%d]=%d\n",
+                CC_PRINTF("ERROR: n[%d].c[%d]=%d n[%d].c[%d]=%d\n",
                         i,j,nodelist[i].coef[j],
                         j,i,nodelist[j].coef[i]);
             }
         }
     }
-    printf (">= %d\n", rhs);
+    CC_PRINTF(">= %d\n", rhs);
 #endif /* 0 */
 
     for (i=0; i<nodecount; i++) {
@@ -486,18 +486,18 @@ static int strip_graph_triangular (int nnodes, stripnode *nodes, int rhs)
     while (1) {
         deg = strip_clique_triangular (nnodes, nodes, maxclique);
         if (deg == 0) {
-            printf (" >= %d\n", rhs);
+            CC_PRINTF(" >= %d\n", rhs);
             rval = 0;
             goto CLEANUP;
         } else if (deg < 0) {
-            fprintf (stderr, "strip_clique_triangular failed\n");
+            CC_FPRINTF(stderr, "strip_clique_triangular failed\n");
             rval = deg;
             goto CLEANUP;
         }
         for (i=0; i<deg; i++) {
-            printf ("%d ", maxclique[i]);
+            CC_PRINTF("%d ", maxclique[i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 
   CLEANUP:
@@ -541,7 +541,7 @@ static int strip_clique_triangular (int nnodes, stripnode *nodes,
     }
 
     if (xdiv > 1) {
-        printf ("Scaling down by %d\n", xdiv);
+        CC_PRINTF("Scaling down by %d\n", xdiv);
         for (i=0; i<nnodes; i++) {
             for (j=0; j<nnodes; j++) {
                 nodes[i].coef[j] /= xdiv;
@@ -551,7 +551,7 @@ static int strip_clique_triangular (int nnodes, stripnode *nodes,
     }
 
     if (min_coef > 1) {
-        printf ("lost, minimum coefficient %d\n", min_coef);
+        CC_PRINTF("lost, minimum coefficient %d\n", min_coef);
         return -1;
     }
 
@@ -562,7 +562,7 @@ static int strip_clique_triangular (int nnodes, stripnode *nodes,
         if (a == b+1) {
             maxclique[size++] = i;
         } else if (a != b-1) {
-            printf ("lost, triangle %d, %d, 1\n", a, b);
+            CC_PRINTF("lost, triangle %d, %d, 1\n", a, b);
             return -2;
         }
     }

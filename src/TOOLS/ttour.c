@@ -122,26 +122,26 @@ int main (int ac, char **av)
     if (rval) return 1;
 
     if (!dump_partition_tsp && !tspfname) {
-        fprintf (stderr, "No TSPLIB or DAT file specified\n");
+        CC_FPRINTF(stderr, "No TSPLIB or DAT file specified\n");
         usage (av[0]);
         goto CLEANUP;
     }
 
     if ((!dump_partition_tsp && !cat_tour && !border_optimization) &&
          !tourfname) {
-        fprintf (stderr, "No path file specfied\n");
+        CC_FPRINTF(stderr, "No path file specfied\n");
         usage (av[0]);
         goto CLEANUP;
     }
 
     if ((border_crossings || border_optimization) && !fulltourfname) {
-        fprintf (stderr, "No full tour specfied\n");
+        CC_FPRINTF(stderr, "No full tour specfied\n");
         usage (av[0]);
         goto CLEANUP;
     }
 
     if (!indexfname) {
-        fprintf (stderr, "No index file specfied\n");
+        CC_FPRINTF(stderr, "No index file specfied\n");
         usage (av[0]);
         goto CLEANUP;
     }
@@ -158,9 +158,9 @@ int main (int ac, char **av)
         CCcheck_rval (rval, "CCutil_read_subdivision_index failed");
     }
     CCcheck_rval (rval, "CCutil_read_subdivision_index failed");
-    printf ("Name: %s\n", name);
-    printf ("ncount = %d, partitions = %d\n", ncount, pcount);
-    fflush (stdout);
+    CC_PRINTF("Name: %s\n", name);
+    CC_PRINTF("ncount = %d, partitions = %d\n", ncount, pcount);
+    CC_FFLUSH(stdout);
 
     if (dump_partition_tsp) {
         rval = find_part_tour (name, pcount, trac);
@@ -179,7 +179,7 @@ int main (int ac, char **av)
     }
 
     if ((innorm & CC_NORM_SIZE_BITS) != CC_D2_NORM_SIZE) {
-        fprintf (stderr, "Only set up for 2D norms\n");
+        CC_FPRINTF(stderr, "Only set up for 2D norms\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -239,9 +239,9 @@ static int border_opt (int ncount, CCdatagroup *dat, char *name, int pcount,
     int i, j, norm, len, pole, cnt = 0;
     char buf[1024];
 
-    printf ("Border optimization ...\n"); fflush (stdout);
+    CC_PRINTF("Border optimization ...\n"); CC_FFLUSH(stdout);
     CCutil_cycle_len (ncount, dat, tour, &val);
-    printf ("Starting tour length:       %16.0f\n", val);  fflush (stdout);
+    CC_PRINTF("Starting tour length:       %16.0f\n", val);  CC_FFLUSH(stdout);
 
     CCutil_dat_getnorm (dat, &norm);
 
@@ -284,12 +284,12 @@ static int border_opt (int ncount, CCdatagroup *dat, char *name, int pcount,
         }
     }
 
-    printf ("Re-optimized %d borders\n", cnt); fflush (stdout);
+    CC_PRINTF("Re-optimized %d borders\n", cnt); CC_FFLUSH(stdout);
 
     CCutil_cycle_len (ncount, dat, tour, &newval);
-    printf ("Starting tour length:       %16.0f\n", val); 
-    printf ("Adjusted tour length:       %16.0f\n", newval);
-    fflush (stdout);
+    CC_PRINTF("Starting tour length:       %16.0f\n", val); 
+    CC_PRINTF("Adjusted tour length:       %16.0f\n", newval);
+    CC_FFLUSH(stdout);
 
     sprintf (buf, "%s_window.tour", name);
     rval = CCutil_writecycle (ncount, buf, tour, 0);
@@ -310,9 +310,9 @@ static int insert_crossings (int ncount, CCdatagroup *dat, char *name,
     double yhi, ylo, xhi, xlo, val, newval, tdelta, delta = 0.0;
     char buf[1024];
  
-    printf ("Insert border crossings in tour\n");  fflush (stdout);
+    CC_PRINTF("Insert border crossings in tour\n");  CC_FFLUSH(stdout);
     CCutil_cycle_len (ncount, dat, ftour, &val);
-    printf ("Starting tour length:       %16.0f\n", val);  fflush (stdout);
+    CC_PRINTF("Starting tour length:       %16.0f\n", val);  CC_FFLUSH(stdout);
 
     CCutil_dat_getnorm (dat, &norm);
 
@@ -370,16 +370,16 @@ static int insert_crossings (int ncount, CCdatagroup *dat, char *name,
             }
         }
     }
-    printf ("\n");
+    CC_PRINTF("\n");
 
-    printf ("%d total inserts, with delta = %.0f\n", cnt, delta);
-    fflush (stdout);
+    CC_PRINTF("%d total inserts, with delta = %.0f\n", cnt, delta);
+    CC_FFLUSH(stdout);
 
     CCutil_cycle_len (ncount, dat, ftour, &newval);
-    printf ("Starting tour length:       %16.0f\n", val);  fflush (stdout);
-    printf ("Adjusted tour length:       %16.0f\n", newval);  fflush (stdout);
+    CC_PRINTF("Starting tour length:       %16.0f\n", val);  CC_FFLUSH(stdout);
+    CC_PRINTF("Adjusted tour length:       %16.0f\n", newval);  CC_FFLUSH(stdout);
     if (newval - val != delta) {
-         printf ("Note: not the same as delta\n"); fflush (stdout);
+         CC_PRINTF("Note: not the same as delta\n"); CC_FFLUSH(stdout);
     }
 
     sprintf (buf, "%s_insert.tour", name);
@@ -405,7 +405,7 @@ static int cat_full_tour (int ncount, CCdatagroup *dat, char *name, int pcount,
     char tnam[128], buf[1024];
     double newval;
 
-    printf ("Cat full tour from paths\n"); fflush (stdout);
+    CC_PRINTF("Cat full tour from paths\n"); CC_FFLUSH(stdout);
 
     sprintf (tnam, "lkpath");
 
@@ -417,7 +417,7 @@ static int cat_full_tour (int ncount, CCdatagroup *dat, char *name, int pcount,
         CCcheck_rval (rval, "get_part_data failed");
 
         if (scount != lkhtrac[i].cnt) {
-            fprintf (stderr, "subpath count does not match index\n");
+            CC_FPRINTF(stderr, "subpath count does not match index\n");
             rval = 1;  goto CLEANUP;
         } 
 
@@ -430,7 +430,7 @@ static int cat_full_tour (int ncount, CCdatagroup *dat, char *name, int pcount,
     }
 
     if (k != ncount) {
-        fprintf (stderr, "the subpaths do not make a full tour\n");
+        CC_FPRINTF(stderr, "the subpaths do not make a full tour\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -440,7 +440,7 @@ static int cat_full_tour (int ncount, CCdatagroup *dat, char *name, int pcount,
 
     for (i = 0; i < ncount; i++) {
         if (hits[tour[i]]) {
-            fprintf (stderr, "duplicate node in tour\n");
+            CC_FPRINTF(stderr, "duplicate node in tour\n");
             rval = 1;  goto CLEANUP;
         } else {
             hits[tour[i]] = 1;
@@ -448,8 +448,8 @@ static int cat_full_tour (int ncount, CCdatagroup *dat, char *name, int pcount,
     }
 
     CCutil_cycle_len (ncount, dat, tour, &newval);
-    printf ("Starting tour length:       %16.0f\n", origval);  fflush (stdout);
-    printf ("Adjusted tour length:       %16.0f\n", newval);  fflush (stdout);
+    CC_PRINTF("Starting tour length:       %16.0f\n", origval);  CC_FFLUSH(stdout);
+    CC_PRINTF("Adjusted tour length:       %16.0f\n", newval);  CC_FFLUSH(stdout);
     
     sprintf (buf, "%s_lksegment.tour", name);
     rval = CCutil_writecycle (ncount, buf, tour, 0);
@@ -480,18 +480,18 @@ static int find_full_tour (int ncount, CCdatagroup *dat, char *name,
 
     sprintf (tnam, "lkcyc");
 
-    printf ("Build full tour from components\n"); fflush (stdout);
+    CC_PRINTF("Build full tour from components\n"); CC_FFLUSH(stdout);
 
-    printf ("Partition Path\n");
+    CC_PRINTF("Partition Path\n");
     for (i = 0; i < pcount; i++) {
-        printf ("%d ", ptour[i]);
-        if (i % 10 == 9) printf ("\n");
+        CC_PRINTF("%d ", ptour[i]);
+        if (i % 10 == 9) CC_PRINTF("\n");
     }
-    printf ("\n"); fflush (stdout);
+    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 
     rval = get_partial_tour_sum (name, pcount, &sumval, dat);
     CCcheck_rval (rval, "get_partial_tour_sum failed");
-    printf ("Sum of partial tours:  %.0f\n", sumval); fflush (stdout);
+    CC_PRINTF("Sum of partial tours:  %.0f\n", sumval); CC_FFLUSH(stdout);
 
     rval = get_part_data (name, ptour[0], &bcount, &bnamelist, &btour, tnam, 0);
     CCcheck_rval (rval, "get_part_data failed");
@@ -504,12 +504,12 @@ static int find_full_tour (int ncount, CCdatagroup *dat, char *name,
         rval = find_closest_pair (name, ptour[i-1], ptour[i], &n0, &n1,
                                   &m0, &m1, dat, trac, &bcount, &btour); 
         CCcheck_rval (rval, "find_closest_pair failed");
-        printf ("%d %d %d\n", n0, m0, CCutil_dat_edgelen (n0, m0, dat));
-        printf ("%d %d %d\n", n1, m1, CCutil_dat_edgelen (n1, m1, dat));
+        CC_PRINTF("%d %d %d\n", n0, m0, CCutil_dat_edgelen (n0, m0, dat));
+        CC_PRINTF("%d %d %d\n", n1, m1, CCutil_dat_edgelen (n1, m1, dat));
     }
 
     if (bcount != ncount) {
-        fprintf (stderr, "full tour is missing nodes\n");
+        CC_FPRINTF(stderr, "full tour is missing nodes\n");
         rval = 1;  goto CLEANUP;
     }
  
@@ -518,7 +518,7 @@ static int find_full_tour (int ncount, CCdatagroup *dat, char *name,
     for (i = 0; i < bcount; i++) hits[i] = 0;
     for (i = 0; i < bcount; i++) {
         if (hits[btour[i]] != 0) {
-            fprintf (stderr, "repeated node in full tour\n");
+            CC_FPRINTF(stderr, "repeated node in full tour\n");
             rval = 1; goto CLEANUP;
         }
         hits[btour[i]] = 1;
@@ -529,8 +529,8 @@ static int find_full_tour (int ncount, CCdatagroup *dat, char *name,
     CCcheck_rval (rval, "CCutil_writecycle failed");
 
     CCutil_cycle_len (bcount, dat, btour, &bval);
-    printf ("Length of full tour:       %16.0f\n", bval);  fflush (stdout);
-    printf ("Delta from partial  tours: %16.0f\n", bval - sumval);
+    CC_PRINTF("Length of full tour:       %16.0f\n", bval);  CC_FFLUSH(stdout);
+    CC_PRINTF("Delta from partial  tours: %16.0f\n", bval - sumval);
 
 CLEANUP:
 
@@ -554,11 +554,11 @@ static int improve_border (char *name, int ncount, int ip, int iq,
     int *qbord = (int *) NULL;
     int *ulist = (int *) NULL;
 
-    printf ("Improve border %d-%d", ip, iq);
-    if (dateline)  printf (" dateline\n");
-    else if (pole) printf (" polar\n");
-    else           printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("Improve border %d-%d", ip, iq);
+    if (dateline)  CC_PRINTF(" dateline\n");
+    else if (pole) CC_PRINTF(" polar\n");
+    else           CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 
     if (pole) {
         border = 0;
@@ -570,13 +570,13 @@ static int improve_border (char *name, int ncount, int ip, int iq,
         } else if (p->yrange[1] == yhi && q->yrange[0] == ylo) {
             flip = 1;
         } else {
-            fprintf (stderr, "the adjacent pair does not share dateline\n");
+            CC_FPRINTF(stderr, "the adjacent pair does not share dateline\n");
             rval = 1;  goto CLEANUP;
         }
     } else {
         find_common_border (p, q, &border, &flip);
         if (border == -1) {
-            fprintf (stderr, "the adjacent pair does not share a border\n");
+            CC_FPRINTF(stderr, "the adjacent pair does not share a border\n");
             rval = 1;  goto CLEANUP;
         }
     }
@@ -663,11 +663,11 @@ static int insert_closest_pair (char *name, int ncount, int ip, int iq,
 
     sprintf (tnam, "lkcyc");
 
-    printf ("Insert border %d-%d", ip, iq);
-    if (dateline)  printf (" dateline\n");
-    else if (pole) printf (" polar\n");
-    else           printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("Insert border %d-%d", ip, iq);
+    if (dateline)  CC_PRINTF(" dateline\n");
+    else if (pole) CC_PRINTF(" polar\n");
+    else           CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 
     if (pole) {
         border = 0;
@@ -679,13 +679,13 @@ static int insert_closest_pair (char *name, int ncount, int ip, int iq,
         } else if (p->yrange[1] == yhi && q->yrange[0] == ylo) {
             flip = 1;
         } else {
-            fprintf (stderr, "the adjacent pair does not share dateline\n");
+            CC_FPRINTF(stderr, "the adjacent pair does not share dateline\n");
             rval = 1;  goto CLEANUP;
         }
     } else {
         find_common_border (p, q, &border, &flip);
         if (border == -1) {
-            fprintf (stderr, "the adjacent pair does not share a border\n");
+            CC_FPRINTF(stderr, "the adjacent pair does not share a border\n");
             rval = 1;  goto CLEANUP;
         }
     }
@@ -768,8 +768,8 @@ static int insert_closest_pair (char *name, int ncount, int ip, int iq,
     }
 
     if (p0 == q1 || p1 == q0) {
-        fprintf (stderr, "paired edges not disjoint: p0 = %d, p1 = %d, q0 = %d, q1 = %d\n", p0, p1, q0, q1);
-        fprintf (stderr, "skipping this pair\n");
+        CC_FPRINTF(stderr, "paired edges not disjoint: p0 = %d, p1 = %d, q0 = %d, q1 = %d\n", p0, p1, q0, q1);
+        CC_FPRINTF(stderr, "skipping this pair\n");
         *hit = 0;
         goto CLEANUP;
     }
@@ -778,11 +778,11 @@ static int insert_closest_pair (char *name, int ncount, int ip, int iq,
                         CCutil_dat_edgelen (q1, p1, dat) -
                         CCutil_dat_edgelen (p0, p1, dat) -
                         CCutil_dat_edgelen (q0, q1, dat)); 
-    printf ("Swap (%d,%d), (%d,%d), delta = %.0f\n", p0, p1, q0, q1, *tdelta);
-    fflush (stdout);
+    CC_PRINTF("Swap (%d,%d), (%d,%d), delta = %.0f\n", p0, p1, q0, q1, *tdelta);
+    CC_FFLUSH(stdout);
 /*
-    printf ("EDGE %d %d 1\n", q0, p0);
-    printf ("EDGE %d %d 1\n", q1, p1);
+    CC_PRINTF("EDGE %d %d 1\n", q0, p0);
+    CC_PRINTF("EDGE %d %d 1\n", q1, p1);
 */
 
     newtour = CC_SAFE_MALLOC (ncount, int);
@@ -806,7 +806,7 @@ static int insert_closest_pair (char *name, int ncount, int ip, int iq,
     }
 
     if (k != ncount) {
-        fprintf (stderr, "error in 2-swap\n");  
+        CC_FPRINTF(stderr, "error in 2-swap\n");  
         rval = 1;  goto CLEANUP;
     }
 
@@ -854,7 +854,7 @@ static int find_closest_pair (char *name, int ip, int iq, int *p_p0, int *p_p1,
 
     find_common_border (p, q, &border, &flip);
     if (border == -1) {
-        fprintf (stderr, "the adjacent pair does not share a border\n");
+        CC_FPRINTF(stderr, "the adjacent pair does not share a border\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -900,7 +900,7 @@ static int find_closest_pair (char *name, int ip, int iq, int *p_p0, int *p_p1,
     }
 
     if (p0 == -1) {
-        fprintf (stderr, "could not find close pair\n");
+        CC_FPRINTF(stderr, "could not find close pair\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -922,7 +922,7 @@ static int find_closest_pair (char *name, int ip, int iq, int *p_p0, int *p_p1,
         if (btour[i] == p0) p0index = i; 
     }
     if (p0index == -1) {
-        fprintf (stderr, "error in btour\n");
+        CC_FPRINTF(stderr, "error in btour\n");
         rval = 1;  goto CLEANUP;
     }
     if (p0index < bcount-1) p1index = p0index+1;
@@ -936,7 +936,7 @@ static int find_closest_pair (char *name, int ip, int iq, int *p_p0, int *p_p1,
         if (qtour[i] == q0) q0index = i; 
     }
     if (q0index == -1) {
-        fprintf (stderr, "error in partial tour B\n");
+        CC_FPRINTF(stderr, "error in partial tour B\n");
         rval = 1;  goto CLEANUP;
     }
     if (q0index < qcount-1) q1index = q0index+1;
@@ -966,7 +966,7 @@ static int find_closest_pair (char *name, int ip, int iq, int *p_p0, int *p_p1,
         for (i = p1index; i >= 0; i--) newtour[k++] = btour[i];
         for (i = bcount-1; i > p1index; i--)  newtour[k++] = btour[i];
     } else {
-        printf ("p-pair not adjacent, use alternative\n");
+        CC_PRINTF("p-pair not adjacent, use alternative\n");
         for (i = p1index; i < bcount; i++) newtour[k++] = btour[i];
         for (i = 0; i < p1index; i++) newtour[k++] = btour[i];
         p0 = btour[k-1]; 
@@ -986,7 +986,7 @@ static int find_closest_pair (char *name, int ip, int iq, int *p_p0, int *p_p1,
         for (i = q0index; i >= 0; i--) newtour[k++] = qtour[i];
         for (i = qcount-1; i > q0index; i--)  newtour[k++] = qtour[i];
     } else {
-        fprintf (stderr, "error in partial tour C\n");
+        CC_FPRINTF(stderr, "error in partial tour C\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -1066,11 +1066,11 @@ static int grab_border_points (int btype, int scount, int *slist,
     }
 
 /*
-    printf ("xcount = %d, btype = %d\n", xcount, btype); fflush (stdout);
+    CC_PRINTF("xcount = %d, btype = %d\n", xcount, btype); CC_FFLUSH(stdout);
 */
 
     if (xcount == 0) {
-        fprintf (stderr, "no points to grab\n");
+        CC_FPRINTF(stderr, "no points to grab\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -1158,7 +1158,7 @@ static int get_part_data (char *name, int ind, int *p_count, int **p_namelist,
 
     in = fopen (nambuf, "r");
     if (!in) {
-        fprintf (stderr, "could not open %s for reading\n", nambuf);
+        CC_FPRINTF(stderr, "could not open %s for reading\n", nambuf);
         rval = 1; goto CLEANUP;
     }
     fscanf (in, "%d", &count);
@@ -1179,11 +1179,11 @@ static int get_part_data (char *name, int ind, int *p_count, int **p_namelist,
         rval = CCutil_getcycle (count, tourbuf, tour, 0);
         if (rval) {
             if (use_default) {
-                printf ("Using default permutation tour\n"); fflush (stdout);
+                CC_PRINTF("Using default permutation tour\n"); CC_FFLUSH(stdout);
                 for (i = 0; i < count; i++) tour[i] = i;
                 rval = 0;
             } else {
-                fprintf (stderr, "CCutil_getcycle failed\n");
+                CC_FPRINTF(stderr, "CCutil_getcycle failed\n");
                 goto CLEANUP;
             }
         }
@@ -1192,9 +1192,9 @@ static int get_part_data (char *name, int ind, int *p_count, int **p_namelist,
 /*
     if (hackarray[ind] == 0) {
         for (i = 1; i < count; i++) {
-            printf ("%d %d 1\n", namelist[tour[i-1]], namelist[tour[i]]);
+            CC_PRINTF("%d %d 1\n", namelist[tour[i-1]], namelist[tour[i]]);
         }
-        printf ("%d %d 1\n", namelist[tour[count-1]], namelist[tour[0]]);
+        CC_PRINTF("%d %d 1\n", namelist[tour[count-1]], namelist[tour[0]]);
         hackarray[ind] = 1;
     }
 */
@@ -1237,7 +1237,7 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
 
     CCutil_init_datagroup (&sdat);
 
-    printf ("Improve subproblem with %d points\n", scount);  fflush (stdout);
+    CC_PRINTF("Improve subproblem with %d points\n", scount);  CC_FFLUSH(stdout);
 
     CCedgegen_init_edgegengroup (&plan);
     plan.quadnearest = 2;
@@ -1293,8 +1293,8 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
     }
 
     if (scount < 10) {
-        printf ("Skipping subproblem with %d points\n", scount);
-        fflush (stdout);
+        CC_PRINTF("Skipping subproblem with %d points\n", scount);
+        CC_FFLUSH(stdout);
         goto CLEANUP;
     }
   
@@ -1322,8 +1322,8 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
         }
     }
 
-    printf ("Tour had %d fixed edges\n", fixed_count); fflush (stdout);
-    printf ("scount = %d\n", scount);
+    CC_PRINTF("Tour had %d fixed edges\n", fixed_count); CC_FFLUSH(stdout);
+    CC_PRINTF("scount = %d\n", scount);
 
     sdat.x = x;
     sdat.y = y;
@@ -1345,7 +1345,7 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
         for (i = 0; i < scount; i++) hit[i] = 0;
         for (i = 0; i < scount; i++) {
             if (hit[newstour[i]]) {
-                fprintf (stderr, "BAD NEWS LK %d\n", i);
+                CC_FPRINTF(stderr, "BAD NEWS LK %d\n", i);
                 rval = 1;  goto CLEANUP;
             } else {
                 hit[newstour[i]] = 1;
@@ -1366,20 +1366,20 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
         int next_snode = newstour[(i+1)%scount];
 
         if (j >= ncount)  {
-            fprintf (stderr, "Counting too many nodes in tour patch\n");
+            CC_FPRINTF(stderr, "Counting too many nodes in tour patch\n");
             rval = 1;  goto CLEANUP;
         }
 
         if (sfixed[snode]==0 || sfixed[snode]!=sfixed[next_snode]) {	
             /* Take single edge from newstour */
-            /* printf ("1: %d-%d\n", j, big_tournr[next_snode]); */
+            /* CC_PRINTF("1: %d-%d\n", j, big_tournr[next_snode]); */
             new_tour[j++] = big_tournr[next_snode];
         } else {
             int i2;
             /* Take set of edges from the big tour */
             int big_tour_snode = big_nr[snode];
             if (small_nr[tour[big_tour_snode]] != snode)  {
-                printf("Something is wrong !!\n");
+                CC_PRINTF("Something is wrong !!\n");
                 rval = 1;  goto CLEANUP;
             }
 
@@ -1392,11 +1392,11 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
 	        i2 = big_tour_snode;
 	        do { /** loop until we are at a node inside subset again */
 	            i2 = (i2+1)%ncount;
-                    /* printf ("2: %d-%d\n", j, tour[i2]); */
+                    /* CC_PRINTF("2: %d-%d\n", j, tour[i2]); */
 	            new_tour[j++] = tour[i2];
 	        } while (in_out[tour[i2]]==0);
 	        if (small_nr[tour[i2]] != next_snode) {
-	            printf("Something is wrong II !!\n");	  
+	            CC_PRINTF("Something is wrong II !!\n");	  
                     rval = 1;  goto CLEANUP;
                 }
             } else {
@@ -1404,11 +1404,11 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
 	        i2 = big_tour_snode;
                 do { /** loop until we are at a node inside subset again */
 	            i2 = (i2-1+ncount)%ncount;
-                    /* printf ("3: %d-%d\n", j, tour[i2]); */
+                    /* CC_PRINTF("3: %d-%d\n", j, tour[i2]); */
 	            new_tour[j++] = tour[i2];
 	        } while (in_out[tour[i2]]==0);
 	        if (small_nr[tour[i2]] != next_snode) {
-	            printf("Something is wrong III !!\n");	  
+	            CC_PRINTF("Something is wrong III !!\n");	  
                     rval = 1;  goto CLEANUP;
                 }
             }
@@ -1424,7 +1424,7 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
         for (i = 0; i < ncount; i++) hit[i] = 0;
         for (i = 0; i < ncount; i++) {
             if (hit[tour[i]]) {
-                fprintf (stderr, "BAD NEWS %d - %d\n", i, tour[i]);
+                CC_FPRINTF(stderr, "BAD NEWS %d - %d\n", i, tour[i]);
                 exit (1);
             } else {
                 hit[tour[i]] = 1;
@@ -1433,7 +1433,7 @@ static int run_lk_subproblem (int scount, int *slist, int ncount, int *tour,
         free (hit);
     }
 
-    printf ("End of function\n"); fflush (stdout);
+    CC_PRINTF("End of function\n"); CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -1462,7 +1462,7 @@ static int find_part_tour (char *name, int scount, CCsubdiv *trac)
 
     out = fopen (buf, "w");
     if (!out) {
-        fprintf (stderr, "could not open %s for output\n", buf);
+        CC_FPRINTF(stderr, "could not open %s for output\n", buf);
         rval = 1;  goto CLEANUP;
     }
 
@@ -1591,7 +1591,7 @@ static int parseargs (int ac, char **av)
     }
 
     if (boptind < ac) {
-        fprintf (stderr, "extra items\n");
+        CC_FPRINTF(stderr, "extra items\n");
         usage (av[0]);
         return 1;
     }
@@ -1601,19 +1601,19 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below]\n", fname);
-    fprintf (stderr, "   -b    datfile in double binary format\n");
-    fprintf (stderr, "   -B    datfile in integer binary format\n");
-    fprintf (stderr, "   -c    cat a tour (need -I -D)\n");
-    fprintf (stderr, "   -D f  specify a tsp_or_dat file\n");
-    fprintf (stderr, "   -I f  specify an index file\n");
-    fprintf (stderr, "   -P f  specify a path file (for partitions)\n");
-    fprintf (stderr, "   -r    use border reoptimization (need -I -T -D)\n");
-    fprintf (stderr, "   -T f  specify a tour file (for full set)\n");
-    fprintf (stderr, "   -w    insert border crossings (need -I -P -T -D)\n");
-    fprintf (stderr, "   -q    dump partition tsp as edg file (need -I)\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below]\n", fname);
+    CC_FPRINTF(stderr, "   -b    datfile in double binary format\n");
+    CC_FPRINTF(stderr, "   -B    datfile in integer binary format\n");
+    CC_FPRINTF(stderr, "   -c    cat a tour (need -I -D)\n");
+    CC_FPRINTF(stderr, "   -D f  specify a tsp_or_dat file\n");
+    CC_FPRINTF(stderr, "   -I f  specify an index file\n");
+    CC_FPRINTF(stderr, "   -P f  specify a path file (for partitions)\n");
+    CC_FPRINTF(stderr, "   -r    use border reoptimization (need -I -T -D)\n");
+    CC_FPRINTF(stderr, "   -T f  specify a tour file (for full set)\n");
+    CC_FPRINTF(stderr, "   -w    insert border crossings (need -I -P -T -D)\n");
+    CC_FPRINTF(stderr, "   -q    dump partition tsp as edg file (need -I)\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 17=GEOM, 18=JOHNSON\n");
 }
 
 static char *get_problabel (const char *probloc)

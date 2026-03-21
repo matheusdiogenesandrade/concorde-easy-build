@@ -60,7 +60,7 @@ int CCutil_bix_getopt (int ac, char **av, const char *def, int *p_optind,
         *p_optind = ac;
         bwarn[0] = *sp;                          /* Bico: February 8, 1995 */
         bwarn[1] = '\0';
-        printf ("Illegal option: -%s\n", bwarn);
+        CC_PRINTF("Illegal option: -%s\n", bwarn);
         return CC_BIX_GETOPT_UNKNOWN;
     }
     if ((int) *(def + 1) != (int) ':') {

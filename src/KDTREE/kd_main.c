@@ -97,7 +97,7 @@ int main (int ac, char **av)
 
     if (tsplib_in) {
         if (CCutil_gettsplib (nodefile, &ncount, &dat)) {
-            fprintf (stderr, "could not read the TSPLIB file\n");
+            CC_FPRINTF(stderr, "could not read the TSPLIB file\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -121,7 +121,7 @@ int main (int ac, char **av)
         }
     }
     if ((norm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-        fprintf (stderr, "Cannot run CCkdtree with norm %d\n", norm);
+        CC_FPRINTF(stderr, "Cannot run CCkdtree with norm %d\n", norm);
         rval = 1;
         goto CLEANUP;
     }
@@ -129,7 +129,7 @@ int main (int ac, char **av)
     if (usenodeweights) {
         if (CCutil_getnodeweights (weightfile, ncount, random_weight_limit,
                                    &wcoord, &rstate)) {
-            fprintf (stderr, "could not read the nodeweight file\n");
+            CC_FPRINTF(stderr, "could not read the nodeweight file\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -154,7 +154,7 @@ int main (int ac, char **av)
 
     if (cycle_for_twoopt) {
         if (CCutil_getcycle (ncount, cycle_for_twoopt, ttour, 0)) {
-            fprintf (stderr, "Getcycle failed\n");
+            CC_FPRINTF(stderr, "Getcycle failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -162,22 +162,22 @@ int main (int ac, char **av)
         szeit = CCutil_zeit ();
         if (CCkdtree_nearest_neighbor_tour ((CCkdtree *) NULL, ncount,
                CCutil_lprand (&rstate) % ncount, &dat, ttour, &val, &rstate)) {
-            fprintf (stderr, "Nearest neighbor failed\n");
+            CC_FPRINTF(stderr, "Nearest neighbor failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("NN tour: %.2f (%.2f seconds)\n", val, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("NN tour: %.2f (%.2f seconds)\n", val, CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
     } else if (find_fa_tour) {
         szeit = CCutil_zeit ();
         if (CCkdtree_far_add_tour ((CCkdtree *) NULL, ncount,
                CCutil_lprand (&rstate) % ncount, &dat, ttour, &val, &rstate)) {
-            fprintf (stderr, "Farthest Addition Tour failed\n");
+            CC_FPRINTF(stderr, "Farthest Addition Tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("FA tour: %.2f (%.2f seconds)\n", val, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("FA tour: %.2f (%.2f seconds)\n", val, CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
         {
             char *marks;
             int i;
@@ -191,13 +191,13 @@ int main (int ac, char **av)
                 marks[i] = 0;
             for (i = 0; i < ncount; i++) {
                 if (ttour[i] < 0 || ttour[i] >= ncount) {
-                    fprintf (stderr, "MADE NODE IN FA TOUR: %d\n", ttour[i]);
+                    CC_FPRINTF(stderr, "MADE NODE IN FA TOUR: %d\n", ttour[i]);
                     rval = 1;
                     goto CLEANUP;
                 }
                 if (marks[ttour[i]]) {
-                    fprintf (stderr, "REPEAT NODE IN FA-TOUR: %d\n", ttour[i]);
-                    fprintf (stderr, "BAD INDEX: %d\n", i);
+                    CC_FPRINTF(stderr, "REPEAT NODE IN FA-TOUR: %d\n", ttour[i]);
+                    CC_FPRINTF(stderr, "BAD INDEX: %d\n", i);
                     rval = 1;
                     goto CLEANUP;
                 } else {
@@ -210,59 +210,59 @@ int main (int ac, char **av)
         szeit = CCutil_zeit ();
         if (CCkdtree_boruvka_tour ((CCkdtree *) NULL, ncount, &dat, ttour,
                                    &val, &rstate)) {
-            fprintf (stderr, "Boruvka tour failed\n");
+            CC_FPRINTF(stderr, "Boruvka tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Boruvka tour: %.2f (%.2f seconds)\n",
+        CC_PRINTF("Boruvka tour: %.2f (%.2f seconds)\n",
                 val, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (find_qboruvka_tour) {
         szeit = CCutil_zeit ();
         if (CCkdtree_qboruvka_tour ((CCkdtree *) NULL, ncount, &dat, ttour,
                                     &val, &rstate)) {
-            fprintf (stderr, "Quick-Boruvka tour failed\n");
+            CC_FPRINTF(stderr, "Quick-Boruvka tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Quick-Boruvka tour: %.2f (%.2f seconds)\n",
+        CC_PRINTF("Quick-Boruvka tour: %.2f (%.2f seconds)\n",
                          val, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (find_greedy_tour) {
         szeit = CCutil_zeit ();
         if (CCkdtree_greedy_tour ((CCkdtree *) NULL, ncount, &dat, ttour,
                                   &val, run_silently, &rstate)) {
-            fprintf (stderr, "Greedy tour failed\n");
+            CC_FPRINTF(stderr, "Greedy tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Greedy tour: %.2f (%.2f seconds)\n",
+        CC_PRINTF("Greedy tour: %.2f (%.2f seconds)\n",
                 val, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     if (find_twoopt_tour) {
         szeit = CCutil_zeit ();
         if (CCkdtree_twoopt_tour ((CCkdtree *) NULL, ncount, &dat, ttour,
                        tour2, &val, run_two_and_a_half_opt, 0, &rstate)) {
-            fprintf (stderr, "Two-opt failed\n");
+            CC_FPRINTF(stderr, "Two-opt failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("2-opt tour: %.2f (%.2f seconds))\n",
+        CC_PRINTF("2-opt tour: %.2f (%.2f seconds))\n",
                 val, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (find_3opt_tour) {
         szeit = CCutil_zeit ();
         if (CCkdtree_3opt_tour ((CCkdtree *) NULL, ncount, &dat, ttour, tour2,
                                 &val, 0, &rstate)) {
-            fprintf (stderr, "3-opt failed\n");
+            CC_FPRINTF(stderr, "3-opt failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("3-opt tour: %.2f (%.2f seconds))\n",
+        CC_PRINTF("3-opt tour: %.2f (%.2f seconds))\n",
                 val, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         {
             char *marks;
             int i;
@@ -276,12 +276,12 @@ int main (int ac, char **av)
                 marks[i] = 0;
             for (i = 0; i < ncount; i++) {
                 if (tour2[i] < 0 || tour2[i] >= ncount) {
-                    fprintf (stderr, "MADE NODE IN TOUR2: %d\n", tour2[i]);
+                    CC_FPRINTF(stderr, "MADE NODE IN TOUR2: %d\n", tour2[i]);
                     rval = 1;
                     goto CLEANUP;
                 }
                 if (marks[tour2[i]]) {
-                    fprintf (stderr, "REPEATED NODE IN TOUR2: %d\n",
+                    CC_FPRINTF(stderr, "REPEATED NODE IN TOUR2: %d\n",
                              tour2[i]);
                     rval = 1;
                     goto CLEANUP;
@@ -305,38 +305,38 @@ int main (int ac, char **av)
         szeit = CCutil_zeit ();
         if (CCkdtree_prim_spanningtree ((CCkdtree *) NULL, ncount, &dat,
                 wcoord, elist, &val, &rstate)) {
-            fprintf (stderr, "Prim_spanningtree failed\n");
+            CC_FPRINTF(stderr, "Prim_spanningtree failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Min spanning tree: %.2f (%.2f seconds)\n", val,
+        CC_PRINTF("Min spanning tree: %.2f (%.2f seconds)\n", val,
                  CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (nearnum) {
         int wantlist = (outfile ? 1 : 0);
         szeit = CCutil_zeit ();
         if (CCkdtree_k_nearest ((CCkdtree *) NULL, ncount, nearnum, &dat,
               wcoord, wantlist, &ecount, &elist, run_silently, &rstate)) {
-            fprintf (stderr, "k-nearest failed\n");
+            CC_FPRINTF(stderr, "k-nearest failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Nearest %d: %.2f (seconds)\n",
+        CC_PRINTF("Nearest %d: %.2f (seconds)\n",
                 nearnum, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (quadnearnum) {
         int wantlist = (outfile ? 1 : 0);
         szeit = CCutil_zeit ();
         if (CCkdtree_quadrant_k_nearest ((CCkdtree *) NULL, ncount,
               quadnearnum, &dat, wcoord, wantlist, &ecount, &elist,
               run_silently, &rstate)) {
-            fprintf (stderr, "k-nearest failed\n");
+            CC_FPRINTF(stderr, "k-nearest failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Quadrant-Nearest %d: %.2f (seconds)\n", quadnearnum,
+        CC_PRINTF("Quadrant-Nearest %d: %.2f (seconds)\n", quadnearnum,
                  CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (find_nearest_2match) {
         if (outfile) {
             ecount = ncount;
@@ -349,45 +349,45 @@ int main (int ac, char **av)
         szeit = CCutil_zeit ();
         if (CCkdtree_nearest_neighbor_2match ((CCkdtree *) NULL, ncount,
                CCutil_lprand (&rstate) % ncount, &dat, elist, &val, &rstate)) {
-            fprintf (stderr, "Nearest neighbor 2-matching failed\n");
+            CC_FPRINTF(stderr, "Nearest neighbor 2-matching failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Nearest 2-matching: %.2f (%.2f seconds)\n", val,
+        CC_PRINTF("Nearest 2-matching: %.2f (%.2f seconds)\n", val,
                  CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (!find_nearest_tour && !find_greedy_tour && !find_twoopt_tour &&
                !find_qboruvka_tour && !find_boruvka_tour && !find_fa_tour &&
                !find_3opt_tour) {
         szeit = CCutil_zeit ();
         if (CCkdtree_build (&kt, ncount, &dat, wcoord, &rstate)) {
-            fprintf (stderr, "CCkdtree_build failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_build failed\n");
             rval = 1;
             goto CLEANUP;
         }
-        printf ("Built CCkdtree: %.2f (seconds)\n", CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("Built CCkdtree: %.2f (seconds)\n", CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
         CCkdtree_free (&kt);
     }
 
     if (outfile) {
         if (find_twoopt_tour || find_3opt_tour) {
             if (CCutil_writecycle (ncount, outfile, tour2, 0)) {
-                fprintf (stderr, "Could not write tour\n");
+                CC_FPRINTF(stderr, "Could not write tour\n");
                 rval = 1;
                 goto CLEANUP;
             }
         } else if (find_nearest_tour || find_greedy_tour || find_fa_tour ||
                    find_qboruvka_tour || find_boruvka_tour) {
             if (CCutil_writecycle (ncount, outfile, ttour, 0)) {
-                fprintf (stderr, "Could not write tour\n");
+                CC_FPRINTF(stderr, "Could not write tour\n");
                 rval = 1;
                 goto CLEANUP;
             }
         } else if (find_spanning_tree ||  find_nearest_2match || nearnum ||
                                                              quadnearnum) {
             if (CCutil_writeedges (ncount, outfile, ecount, elist, &dat, 0)) {
-                fprintf (stderr, "Could not write the edge set\n");
+                CC_FPRINTF(stderr, "Could not write the edge set\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -516,30 +516,30 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [- see below -] [tsplib_file or dat_file]\n", f);
-    fprintf (stderr, "   -b:   dat file in binary-ints\n");
-    fprintf (stderr, "   -w f  use node weights from file\n");
-    fprintf (stderr, "   -W #  use random node weights (0, #)\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -G #  use #x# grid for random points, no dups if #<0\n"
+    CC_FPRINTF(stderr, "Usage: %s [- see below -] [tsplib_file or dat_file]\n", f);
+    CC_FPRINTF(stderr, "   -b:   dat file in binary-ints\n");
+    CC_FPRINTF(stderr, "   -w f  use node weights from file\n");
+    CC_FPRINTF(stderr, "   -W #  use random node weights (0, #)\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -G #  use #x# grid for random points, no dups if #<0\n"
 );
 
-    fprintf (stderr, "   -s #  random seed\n");
-    fprintf (stderr, "   -n #  find # nearest graph\n");
-    fprintf (stderr, "   -q #  find quadrant # nearest graph\n");
-    fprintf (stderr, "   -t    nearest neighbor tour\n");
-    fprintf (stderr, "   -g    greedy tour\n");
-    fprintf (stderr, "   -j    quick-boruvka tour\n");
-    fprintf (stderr, "   -v    boruvka tour\n");
-    fprintf (stderr, "   -f    farthest addition tour\n");
-    fprintf (stderr, "   -z f  two_opt the given cycle\n");
-    fprintf (stderr, "   -Z    run two_opt (default: on greedy)\n");
-    fprintf (stderr, "   -x f  3_opt the given cycle\n");
-    fprintf (stderr, "   -X    run 3_opt (default: on greedy)\n");
-    fprintf (stderr, "   -h    use limited 3-swaps in two_opt\n");
-    fprintf (stderr, "   -m    nearest neighbor 2-matcing\n");
-    fprintf (stderr, "   -p    min spanning tree (prim)\n");
-    fprintf (stderr, "   -o f  write the cycle or edge set to f\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "   -s #  random seed\n");
+    CC_FPRINTF(stderr, "   -n #  find # nearest graph\n");
+    CC_FPRINTF(stderr, "   -q #  find quadrant # nearest graph\n");
+    CC_FPRINTF(stderr, "   -t    nearest neighbor tour\n");
+    CC_FPRINTF(stderr, "   -g    greedy tour\n");
+    CC_FPRINTF(stderr, "   -j    quick-boruvka tour\n");
+    CC_FPRINTF(stderr, "   -v    boruvka tour\n");
+    CC_FPRINTF(stderr, "   -f    farthest addition tour\n");
+    CC_FPRINTF(stderr, "   -z f  two_opt the given cycle\n");
+    CC_FPRINTF(stderr, "   -Z    run two_opt (default: on greedy)\n");
+    CC_FPRINTF(stderr, "   -x f  3_opt the given cycle\n");
+    CC_FPRINTF(stderr, "   -X    run 3_opt (default: on greedy)\n");
+    CC_FPRINTF(stderr, "   -h    use limited 3-swaps in two_opt\n");
+    CC_FPRINTF(stderr, "   -m    nearest neighbor 2-matcing\n");
+    CC_FPRINTF(stderr, "   -p    min spanning tree (prim)\n");
+    CC_FPRINTF(stderr, "   -o f  write the cycle or edge set to f\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 18=JOHNSON\n");
 }

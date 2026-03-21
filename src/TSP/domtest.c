@@ -28,16 +28,16 @@ int main (int ac, char **av)
 
     s = CCutil_snet_open (hostname, CCtsp_DOMINO_PORT);
     if (!s) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1;  goto CLEANUP;
     }
 
     if (stopboss) {
-        printf ("stop the boss\n");  fflush (stdout);
+        CC_PRINTF("stop the boss\n");  CC_FFLUSH(stdout);
         rval = CCutil_swrite_char (s, CCtsp_DOMINO_EXIT);
         CCcheck_rval (rval, "CCutil_swrite_char failed (EXIT)");
     } else if (sendgraph) {
-        printf ("Send graph id = %d\n", graphid);  fflush (stdout);
+        CC_PRINTF("Send graph id = %d\n", graphid);  CC_FFLUSH(stdout);
         rval = CCutil_swrite_char (s, CCtsp_DOMINO_GRAPH);
         CCcheck_rval (rval, "CCutil_swrite_char failed (GRAPH)");
         rval = CCutil_swrite_int (s, graphid);
@@ -47,13 +47,13 @@ int main (int ac, char **av)
         rval = CCutil_swrite_int (s, 3*graphid);
         CCcheck_rval (rval, "CCutil_swrite_int failed");
     } else if (getdominos) {
-        printf ("get the domino list\n");  fflush (stdout);
+        CC_PRINTF("get the domino list\n");  CC_FFLUSH(stdout);
         rval = CCutil_swrite_char (s, CCtsp_DOMINO_SEND);
         CCcheck_rval (rval, "CCutil_swrite_char failed (SEND)");
         rval = receive_dominos (s);
         CCcheck_rval (rval, "receive_dominos failed");
     } else {
-        printf ("Nothing to do.\n"); fflush (stdout);
+        CC_PRINTF("Nothing to do.\n"); CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -116,11 +116,11 @@ static int receive_dominos (CC_SFILE *s)
         CCcheck_rval (rval, "CCutil_sread_int failed (list)");
     }
 
-    printf ("Dom List: %d\n", count);
+    CC_PRINTF("Dom List: %d\n", count);
     for (i = 0; i < count; i++) {
-        printf ("%d ", list[i]);
+        CC_PRINTF("%d ", list[i]);
     }
-    printf ("\n"); fflush (stdout);
+    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -130,8 +130,8 @@ CLEANUP:
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [-see below-] hostname\n", f);
-    fprintf (stderr, "   -d   tells the boss to send dominos\n");
-    fprintf (stderr, "   -g # sends graph is id #\n");
-    fprintf (stderr, "   -x   tells the boss to exit\n");
+    CC_FPRINTF(stderr, "Usage: %s [-see below-] hostname\n", f);
+    CC_FPRINTF(stderr, "   -d   tells the boss to send dominos\n");
+    CC_FPRINTF(stderr, "   -g # sends graph is id #\n");
+    CC_FPRINTF(stderr, "   -x   tells the boss to exit\n");
 }

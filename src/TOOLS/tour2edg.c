@@ -71,7 +71,7 @@ int main (int ac, char **av)
     if (rval) return 1;
 
     if (!tspfname) {
-        fprintf (stderr, "No TSPLIB file specified for edge lengths\n");
+        CC_FPRINTF(stderr, "No TSPLIB file specified for edge lengths\n");
         usage (av[0]);
         return 1;
     }
@@ -80,37 +80,37 @@ int main (int ac, char **av)
 
     rval = CCutil_gettsplib (tspfname, &ncount, &dat);
     if (rval) {
-        fprintf (stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
     }
 
     tour = CC_SAFE_MALLOC (ncount, int);
     if (!tour) {
-        fprintf (stderr, "out of memory in main\n");
+        CC_FPRINTF(stderr, "out of memory in main\n");
         rval = 1; goto CLEANUP;
     }
 
     if (simpletour) {
         rval = CCutil_getcycle (ncount, cycfname, tour, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getcycle_tsplib failed\n");
+            CC_FPRINTF(stderr, "CCutil_getcycle_tsplib failed\n");
             goto CLEANUP;
         }
     } else {
         rval = CCutil_getcycle_tsplib (ncount, cycfname, tour);
         if (rval) {
-            fprintf (stderr, "CCutil_getcycle_tsplib failed\n");
+            CC_FPRINTF(stderr, "CCutil_getcycle_tsplib failed\n");
             goto CLEANUP;
         }
     }
 
     CCutil_cycle_len (ncount, &dat, tour, &val);
-    printf ("Tour Length: %.0f\n", val); fflush (stdout);
+    CC_PRINTF("Tour Length: %.0f\n", val); CC_FFLUSH(stdout);
 
     if (outfname) {
         int i;
         out = fopen (outfname, "w");
         if (!out) {
-            fprintf (stderr, "could not open %s for writing\n", outfname);
+            CC_FPRINTF(stderr, "could not open %s for writing\n", outfname);
             rval = 1; goto CLEANUP;
         }
         
@@ -205,8 +205,8 @@ static char *get_problabel (const char *probloc)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below] -T TSPLIB_file tour_file\n", fname);
-    fprintf (stderr, "   -t    tour file in concorde format (default TSPLIB)\n");
-    fprintf (stderr, "   -o f  output file (for the edge list)\n");
-    fprintf (stderr, "   -S    write a TSPLIB tour file with tour length\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below] -T TSPLIB_file tour_file\n", fname);
+    CC_FPRINTF(stderr, "   -t    tour file in concorde format (default TSPLIB)\n");
+    CC_FPRINTF(stderr, "   -o f  output file (for the edge list)\n");
+    CC_FPRINTF(stderr, "   -S    write a TSPLIB tour file with tour length\n");
 }

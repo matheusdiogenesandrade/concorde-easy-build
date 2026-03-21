@@ -144,7 +144,7 @@ int CCtsp_pr_cliquetree (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     double *newx = (double *) NULL;
     CCptrworld intptr_world;
 
-    printf ("CCtsp_pr_cliquetree ...\n"); fflush (stdout);
+    CC_PRINTF("CCtsp_pr_cliquetree ...\n"); CC_FFLUSH(stdout);
 
     /* a version of the Padberg-Rinaldi clique tree heuristic described */
     /* in Mathematical Programming 47 (1990) 219-257 (section 7.1)      */
@@ -161,24 +161,24 @@ int CCtsp_pr_cliquetree (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     rval = grab_nonzero_x (ecount, elist, x, &newecount, &newelist, &newx,
                            X_FLUFF);
     if (rval) {
-        fprintf (stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
     }
 
     CCtsp_init_lpgraph_struct (&L);
     rval = CCtsp_build_lpgraph (&L, ncount, newecount, newelist,
                                 (int *) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
     }
     rval = CCtsp_build_lpadj (&L, 0, newecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
     }
 
     rval = shrink_ones (ncount, newecount, newelist, newx, &oncount,
                         &oecount, &oelist, &ox, &expand);
     if (rval) {
-        fprintf (stderr, "shrink_ones failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "shrink_ones failed\n"); goto CLEANUP;
     }
     CC_FREE (newelist, int);
 
@@ -186,12 +186,12 @@ int CCtsp_pr_cliquetree (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
     rval = buildgraph (&G, oncount, oecount, oelist, ox);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
     rval = find_components (oncount, oecount, oelist, ox, &ncomp,
                             &compcnt, &comps);
     if (rval) {
-        fprintf (stderr, "find_components failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "find_components failed\n"); goto CLEANUP;
     }
 
     for (i = 0, k = 0; i < ncomp; i++) {
@@ -201,7 +201,7 @@ int CCtsp_pr_cliquetree (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
                          &newcut, &viol, &G, compcnt[i], comps + k,
                          &intptr_world);
             if (rval) {
-                fprintf (stderr, "search_component failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "search_component failed\n"); goto CLEANUP;
             }
             if (newcut) {
                 if (viol > CCtsp_MIN_VIOL) {
@@ -220,9 +220,9 @@ int CCtsp_pr_cliquetree (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
     if (cutcount) *cutcount = kcut;
 
-    printf ("PR Cliquetrees : %d cuts  %.4f max violation  %.2f seconds\n",
+    CC_PRINTF("PR Cliquetrees : %d cuts  %.4f max violation  %.2f seconds\n",
                   kcut, maxviol, CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -262,7 +262,7 @@ static int search_component (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
 
     marks = CC_SAFE_MALLOC (G->ncount, int);
     if (marks == (int *) NULL) {
-        fprintf (stderr, "out of memory in search_component\n");
+        CC_FPRINTF(stderr, "out of memory in search_component\n");
         rval = 1; goto CLEANUP;
     }
     mark_set_and_neighbors (G, ccount, comp, marks, 0);
@@ -279,7 +279,7 @@ static int search_component (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
                         rval = intptr_listadd (&extralist,
                                 G->nodelist[n].adj[j].to, intptr_world);
                         if (rval) {
-                            fprintf (stderr, "intptr_listadd failed\n");
+                            CC_FPRINTF(stderr, "intptr_listadd failed\n");
                             goto CLEANUP;
                         }
                     }
@@ -293,15 +293,15 @@ static int search_component (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
             if (G->nodelist[n].adj[j].x >= 1.0 - X_FLUFF) {
                 if (marks[G->nodelist[n].adj[j].to] < 2) {
                     marks[n]++;
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                     rval = intptr_listadd (&onelist, n, intptr_world);
                     if (rval) {
-                        fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                        CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
                     }
                     rval = intptr_listadd (&onelist, G->nodelist[n].adj[j].to,
                                         intptr_world);
                     if (rval) {
-                        fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                        CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
                     }
                 }
             }
@@ -321,7 +321,7 @@ static int search_component (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
     if (extracount) {
         extraset = CC_SAFE_MALLOC (ccount + extracount, int);
         if (extraset == (int *) NULL) {
-            fprintf (stderr, "out of memory in search_component\n");
+            CC_FPRINTF(stderr, "out of memory in search_component\n");
             rval = 1; goto CLEANUP;
         }
         for (k = 0; k < ccount; k++) {
@@ -331,7 +331,7 @@ static int search_component (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
             extraset[k++] = ip->this;
         }
         if (k != ccount + extracount) {
-            fprintf (stderr, "error in search_component\n");
+            CC_FPRINTF(stderr, "error in search_component\n");
             rval = 1; goto CLEANUP;
         }
         set = extraset;
@@ -346,13 +346,13 @@ static int search_component (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
         rval = build_blossom (set, setcount, onelist, expand, fullncount,
                               newcut, viol);
         if (rval) {
-            fprintf (stderr, "build_blossom failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "build_blossom failed\n"); goto CLEANUP;
         }
     } else if (oddcount >= 4) {
         rval = check_comp (L, stats, x, set, setcount, onelist, G, newcut,
                            viol, expand, fullncount, intptr_world);
         if (rval) {
-            fprintf (stderr, "check_comp failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "check_comp failed\n"); goto CLEANUP;
         }
     } 
 
@@ -397,7 +397,7 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
     invset = CC_SAFE_MALLOC (G->ncount, int);
     marks = CC_SAFE_MALLOC (G->ncount, int);
     if (marks == (int *) NULL || invset == (int *) NULL) {
-        fprintf (stderr, "out of memory in check_comp\n");
+        CC_FPRINTF(stderr, "out of memory in check_comp\n");
         rval = 1;  goto CLEANUP;
     }
     mark_set_and_neighbors (G, setcount, set, marks, 0);
@@ -420,7 +420,7 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
     hlist = CC_SAFE_MALLOC (2 * hcount, int);
     hx    = CC_SAFE_MALLOC (hcount, double);
     if (hlist == (int *) NULL || hx == (double *) NULL) {
-        fprintf (stderr, "out of memory in check_comp\n");
+        CC_FPRINTF(stderr, "out of memory in check_comp\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -439,7 +439,7 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
 
     rval = buildgraph (&H, setcount, hcount, hlist, hx);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
 
     for (ip = onelist; ip; ip = ip->next) {
@@ -453,7 +453,7 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
     scanned = CC_SAFE_MALLOC (hcount, char);
     hmarks = CC_SAFE_MALLOC (setcount, int);
     if (scanned == (char *) NULL || hmarks == (int *) NULL) {
-        fprintf (stderr, "out of memory in check_comp\n");
+        CC_FPRINTF(stderr, "out of memory in check_comp\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < setcount; i++) {
@@ -470,32 +470,32 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
             if (e != -1) {
                 rval = intptr_listadd (&T, hlist[2*e], intptr_world);
                 if (rval) {
-                    fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
                 }
                 rval = intptr_listadd (&T, hlist[2*e+1], intptr_world);
                 if (rval) {
-                    fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
                 }
                 if (round == 0) {
                     rval = growT (&T, &H, intptr_world);
                     if (rval) {
-                        fprintf (stderr, "growT failed\n"); goto CLEANUP;
+                        CC_FPRINTF(stderr, "growT failed\n"); goto CLEANUP;
                     }
                 } else {
                     rval = growTprime (&T, &H, intptr_world);
                     if (rval) {
-                        fprintf (stderr, "growTprime failed\n"); goto CLEANUP;
+                        CC_FPRINTF(stderr, "growTprime failed\n"); goto CLEANUP;
                     }
                 }
                 rval = divide_comp (T, &H, &u1, &u2, intptr_world);
                 if (rval) {
-                    fprintf (stderr, "divide_comp failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "divide_comp failed\n"); goto CLEANUP;
                 }
                 if (u1 != (intptr *) NULL && u2 != (intptr *) NULL) {
                     rval = grab_cliquetree (T, u1, u2, setcount, set, onelist,
                                   G, &cut, expand, fullncount, intptr_world);
                     if (rval) {
-                        fprintf (stderr, "grab_cliquetree failed\n");
+                        CC_FPRINTF(stderr, "grab_cliquetree failed\n");
                         goto CLEANUP;
                     }
                 }
@@ -512,16 +512,16 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
     }
 
     if (cut) {
-        printf ("have a cut\n"); fflush (stdout);
+        CC_PRINTF("have a cut\n"); CC_FFLUSH(stdout);
         rval = CCtsp_test_pure_simple_cliquetree (L->ncount, cut, &test);
         if (rval) {
-            fprintf (stderr, "CCtsp_test_pure_simple_cliquetree failed\n");
+            CC_FPRINTF(stderr, "CCtsp_test_pure_simple_cliquetree failed\n");
             CCtsp_free_lpcut_in (cut);
             CC_IFFREE (cut, CCtsp_lpcut_in);
             goto CLEANUP;
         }
         if (test == 0) {
-            fprintf (stderr, "cliquetree did not pass test\n");
+            CC_FPRINTF(stderr, "cliquetree did not pass test\n");
             CCtsp_print_lpcut_in (cut);
             CCtsp_free_lpcut_in (cut);
             CC_IFFREE (cut, CCtsp_lpcut_in);
@@ -530,7 +530,7 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
 
         tcut = CC_SAFE_MALLOC (1, CCtsp_lpcut_in);
         if (tcut == (CCtsp_lpcut_in *) NULL) {
-            fprintf (stderr, "out of memory in check_comp\n");
+            CC_FPRINTF(stderr, "out of memory in check_comp\n");
             CCtsp_free_lpcut_in (cut);
             CC_IFFREE (cut, CCtsp_lpcut_in);
             rval = 1; goto CLEANUP;
@@ -538,7 +538,7 @@ static int check_comp (CCtsp_lpgraph *L, CCtsp_tighten_info *stats,
         CCtsp_init_lpcut_in (tcut);
         rval = CCtsp_tighten_lpcut_in (L, cut, x, tcut, stats, &val);
         if (rval) {
-            fprintf (stderr, "CCtsp_tighten_lpcut_in failed\n");
+            CC_FPRINTF(stderr, "CCtsp_tighten_lpcut_in failed\n");
             CCtsp_free_lpcut_in (cut);
             CC_IFFREE (cut, CCtsp_lpcut_in);
             CC_IFFREE (tcut, CCtsp_lpcut_in);
@@ -587,7 +587,7 @@ static int grab_cliquetree (intptr *T, intptr *u1, intptr *u2, int setcount,
 
     marks = CC_SAFE_MALLOC (G->ncount, int);
     if (marks == (int *) NULL) {
-        fprintf (stderr, "out of memory in grab_cliquetree\n");
+        CC_FPRINTF(stderr, "out of memory in grab_cliquetree\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -611,20 +611,20 @@ static int grab_cliquetree (intptr *T, intptr *u1, intptr *u2, int setcount,
             toothcount++;
             rval = intptr_listadd (&teeth, e1, intptr_world);
             if (rval) {
-                fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
             }
             rval = intptr_listadd (&teeth, e2, intptr_world);
             if (rval) {
-                fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
             }
         }
     } 
     if (toothcount % 2 == 1) {
-        fprintf (stderr, "odd number of 1-teeth in cliquetree\n");
+        CC_FPRINTF(stderr, "odd number of 1-teeth in cliquetree\n");
         rval = 1; goto CLEANUP;
     }
     if (toothcount < 4) {
-        fprintf (stderr, "only %d 1-teeth in cliquetree\n", toothcount);
+        CC_FPRINTF(stderr, "only %d 1-teeth in cliquetree\n", toothcount);
         rval = 1; goto CLEANUP;
     }
 
@@ -636,14 +636,14 @@ static int grab_cliquetree (intptr *T, intptr *u1, intptr *u2, int setcount,
  
     tcut->cliques = CC_SAFE_MALLOC (toothcount + 3, CCtsp_lpclique);
     if (tcut->cliques == (CCtsp_lpclique *) NULL) {
-        fprintf (stderr, "out of memory in build_blossom\n");
+        CC_FPRINTF(stderr, "out of memory in build_blossom\n");
         rval = 1; goto CLEANUP;
     }
 
     wset = CC_SAFE_MALLOC (fullncount, int);
     tset = CC_SAFE_MALLOC (setcount, int);
     if (wset == (int *) NULL || tset == (int *) NULL) {
-        fprintf (stderr, "out of memory in grab_cliquetree\n");
+        CC_FPRINTF(stderr, "out of memory in grab_cliquetree\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -659,7 +659,7 @@ static int grab_cliquetree (intptr *T, intptr *u1, intptr *u2, int setcount,
         rval = CCtsp_shrunk_set_to_lpclique (tcount, tset, wset, expand,
                                        &tcut->cliques[i]);
         if (rval) {
-            fprintf (stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
             goto CLEANUP;
         }
         tcut->cliquecount++;
@@ -671,7 +671,7 @@ static int grab_cliquetree (intptr *T, intptr *u1, intptr *u2, int setcount,
         rval = CCtsp_shrunk_set_to_lpclique (2, tooth, wset, expand,
                                              &tcut->cliques[i+3]);
         if (rval) {
-            fprintf (stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
             goto CLEANUP;
         }
         tcut->cliquecount++;
@@ -682,7 +682,7 @@ static int grab_cliquetree (intptr *T, intptr *u1, intptr *u2, int setcount,
 
     rval = CCtsp_construct_skeleton (tcut, fullncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         goto CLEANUP;
     }
     *cut = tcut;
@@ -726,28 +726,28 @@ static int build_blossom (int *set, int setcount, intptr *toothlist,
         tcount++;
     }
     if (tcount % 2 == 0) {
-        printf ("Warning: Even number of teeth in build_blossom\n");
-        fflush (stdout);
+        CC_PRINTF("Warning: Even number of teeth in build_blossom\n");
+        CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
     cut->cliques = CC_SAFE_MALLOC (tcount + 1, CCtsp_lpclique);
     if (cut->cliques == (CCtsp_lpclique *) NULL) {
-        fprintf (stderr, "out of memory in build_blossom\n");
+        CC_FPRINTF(stderr, "out of memory in build_blossom\n");
         rval = 1; goto CLEANUP;
     }
     cut->cliquecount = 0;
 
     wset = CC_SAFE_MALLOC (fullncount, int);
     if (wset == (int *) NULL) {
-        fprintf (stderr, "out of memory in build_blossom\n");
+        CC_FPRINTF(stderr, "out of memory in build_blossom\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_shrunk_set_to_lpclique (setcount, set, wset, expand,
                                    &cut->cliques[0]);
     if (rval) {
-        fprintf (stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
         goto CLEANUP;
     }
     cut->cliquecount++;
@@ -758,7 +758,7 @@ static int build_blossom (int *set, int setcount, intptr *toothlist,
         rval = CCtsp_shrunk_set_to_lpclique (2, tooth, wset, expand,
                                              &cut->cliques[i+1]);
         if (rval) {
-            fprintf (stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_shrunk_set_to_lpclique failed\n");
             goto CLEANUP;
         }
         cut->cliquecount++;
@@ -769,7 +769,7 @@ static int build_blossom (int *set, int setcount, intptr *toothlist,
 
     rval = CCtsp_construct_skeleton (cut, fullncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         goto CLEANUP;
     }
     *newcut = cut;
@@ -800,7 +800,7 @@ static int growT (intptr **T, graph *H, CCptrworld *intptr_world)
 
     rval =  CCutil_priority_init (&q, ncount);
     if (rval) {
-        fprintf (stderr, "CCutil_priority_init failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_priority_init failed\n"); goto CLEANUP;
     } 
     for (i = 0; i < ncount; i++) {
         nodelist[i].qhandle = -1;
@@ -808,7 +808,7 @@ static int growT (intptr **T, graph *H, CCptrworld *intptr_world)
 
     vals = CC_SAFE_MALLOC (ncount, double);
     if (vals == (double *) NULL) {
-        fprintf (stderr, "out of memory in growT\n");
+        CC_FPRINTF(stderr, "out of memory in growT\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
@@ -817,7 +817,7 @@ static int growT (intptr **T, graph *H, CCptrworld *intptr_world)
 
     marks = CC_SAFE_MALLOC (ncount, int);
     if (marks == (int *) NULL) {
-        fprintf (stderr, "out of memory in growT\n");
+        CC_FPRINTF(stderr, "out of memory in growT\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
@@ -847,7 +847,7 @@ static int growT (intptr **T, graph *H, CCptrworld *intptr_world)
            (node *) NULL && delta <= -1.0) {
         rval = intptr_listadd (T, (int) (n - nodelist), intptr_world);
         if (rval) {
-            fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
         }
         marks[n - nodelist] = 1;
         for (i = 0; i < n->degree; i++) {
@@ -892,7 +892,7 @@ static int growTprime (intptr **T, graph *H, CCptrworld *intptr_world)
 
     rval =  CCutil_priority_init (&q, ncount);
     if (rval) {
-        fprintf (stderr, "CCutil_priority_init failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_priority_init failed\n"); goto CLEANUP;
     } 
     for (i = 0; i < ncount; i++) {
         nodelist[i].qhandle = -1;
@@ -900,7 +900,7 @@ static int growTprime (intptr **T, graph *H, CCptrworld *intptr_world)
 
     vals = CC_SAFE_MALLOC (ncount, double);
     if (vals == (double *) NULL) {
-        fprintf (stderr, "out of memory in growTprime\n");
+        CC_FPRINTF(stderr, "out of memory in growTprime\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
@@ -909,7 +909,7 @@ static int growTprime (intptr **T, graph *H, CCptrworld *intptr_world)
 
     marks = CC_SAFE_MALLOC (ncount, int);
     if (marks == (int *) NULL) {
-        fprintf (stderr, "out of memory in growTprime\n");
+        CC_FPRINTF(stderr, "out of memory in growTprime\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
@@ -950,7 +950,7 @@ static int growTprime (intptr **T, graph *H, CCptrworld *intptr_world)
            (node *) NULL && sum - delta >= (double) tcount - 1.5) {
         rval = intptr_listadd (T, (int) (n - nodelist), intptr_world);
         if (rval) {
-            fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
         }
         marks[n - nodelist] = 1;
         sum += vals[n - nodelist];
@@ -1001,7 +1001,7 @@ static int divide_comp (intptr *T, graph *H, intptr **u1, intptr **u2,
 
     marks = CC_SAFE_MALLOC (H->ncount, int);
     if (marks == (int *) NULL) {
-        fprintf (stderr, "out of memory in divide_comp\n");
+        CC_FPRINTF(stderr, "out of memory in divide_comp\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < H->ncount; i++) {
@@ -1028,7 +1028,7 @@ static int divide_comp (intptr *T, graph *H, intptr **u1, intptr **u2,
     }
     rval = find_split (H, T, marks, &test);
     if (rval) {
-        fprintf (stderr, "find_split failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "find_split failed\n"); goto CLEANUP;
     }
 
     if (!test) {
@@ -1042,7 +1042,7 @@ static int divide_comp (intptr *T, graph *H, intptr **u1, intptr **u2,
         }
         rval = find_split (H, T, marks, &test);
         if (rval) {
-            fprintf (stderr, "find_split failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "find_split failed\n"); goto CLEANUP;
         }
     }
 
@@ -1054,12 +1054,12 @@ static int divide_comp (intptr *T, graph *H, intptr **u1, intptr **u2,
             if (marks[i] == 2) {
                 rval = intptr_listadd (u1, i, intptr_world);
                 if (rval) {
-                    fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
                 }
             } else if (marks[i] == 3) {
                 rval = intptr_listadd (u2, i, intptr_world);
                 if (rval) {
-                    fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
                 }
             }
         }
@@ -1081,7 +1081,7 @@ static int divide_comp (intptr *T, graph *H, intptr **u1, intptr **u2,
         }
         rval = intptr_listadd (u1, u1best, intptr_world);
         if (rval) {
-            fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
         }
 
         u2best = -1;
@@ -1103,7 +1103,7 @@ static int divide_comp (intptr *T, graph *H, intptr **u1, intptr **u2,
         }
         rval = intptr_listadd (u2, u2best, intptr_world);
         if (rval) {
-            fprintf (stderr, "intptr_listadd failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "intptr_listadd failed\n"); goto CLEANUP;
         }
     }
 
@@ -1134,7 +1134,7 @@ static int find_split (graph *H, intptr *T, int *marks, int *success)
 
     dstack = CC_SAFE_MALLOC (H->ncount, int);
     if (dstack == (int *) NULL) {
-        fprintf (stderr, "out of memory in find_split\n");
+        CC_FPRINTF(stderr, "out of memory in find_split\n");
         rval = 1; goto CLEANUP;
     } 
 
@@ -1268,14 +1268,14 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist, double *x)
     if (ncount) {
         G->nodelist = CC_SAFE_MALLOC (ncount, node);
         if (G->nodelist == (node *) NULL) {
-            fprintf (stderr, "out of memory in buildgraph\n");
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n");
             rval = 1; goto CLEANUP;
         }
     }
     if (ecount) {
         G->adjspace = CC_SAFE_MALLOC (2 * ecount, edge);
         if (G->adjspace == (edge *) NULL) {
-            fprintf (stderr, "out of memory in buildgraph\n");
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n");
             CC_IFFREE (G->nodelist, node);
             rval = 1; goto CLEANUP;
         }
@@ -1344,7 +1344,7 @@ static void prclique_free_world (CCptrworld *intptr_world)
     int total, onlist;
 
     if (intptr_check_leaks (intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (intptr_world);
@@ -1362,21 +1362,21 @@ static int shrink_ones (int ncount, int ecount, int *elist, double *dlen,
 
     rval = CCcut_SRK_buildgraph (&S, ncount, ecount, elist, dlen);
     if (rval) {
-        fprintf (stderr, "buildgraph failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "buildgraph failed in shrink_ones\n");
         goto CLEANUP;
     }
     CCcut_SRK_increment_marker (&S);
 
     rval = CCcut_SRK_defluff (&S);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
         goto CLEANUP;
     }
 
     CCcut_SRK_identify_paths_to_edges (&S, &k, 0);
     rval = CCcut_SRK_grab_edges (&S, oncount, oecount, olist, olen, expand);
     if (rval) {
-        fprintf (stderr, "grab edges failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "grab edges failed in shrink_ones\n");
         goto CLEANUP;
     }
 
@@ -1405,7 +1405,7 @@ static int grab_nonzero_x (int ecount, int *elist, double *x, int *new_ecount,
     *new_elist = CC_SAFE_MALLOC (2*count, int);
     *new_x = CC_SAFE_MALLOC (count, double);
     if (*new_elist == (int *) NULL || *new_x == (double *) NULL) {
-        fprintf (stderr, "out of memory in grab_nonzero_x\n");
+        CC_FPRINTF(stderr, "out of memory in grab_nonzero_x\n");
         CC_IFFREE (*new_elist, int);
         CC_IFFREE (*new_x, double);
         return 1;
@@ -1443,7 +1443,7 @@ static int grab_nonone_edges (int ecount, int *elist, double *x,
 
     *new_elist = CC_SAFE_MALLOC (2*count, int);
     if (*new_elist == (int *) NULL) {
-        fprintf (stderr, "out of memory in grab_nonzero_x\n");
+        CC_FPRINTF(stderr, "out of memory in grab_nonzero_x\n");
         return 1;
     }
 
@@ -1471,14 +1471,14 @@ static int find_components (int ncount, int ecount, int *elist, double *x,
 
     rval = grab_nonone_edges (ecount, elist, x, &newecount, &newelist, X_FLUFF);
     if (rval) {
-        fprintf (stderr, "grab_nonone_edges failed\n");
+        CC_FPRINTF(stderr, "grab_nonone_edges failed\n");
         goto CLEANUP;
     }
 
     rval = CCcut_connect_components (ncount, newecount, newelist,
                (double *) NULL, ncomp, compcnt, comps);
     if (rval) {
-        fprintf (stderr, "CCcut_connect_components failed\n");
+        CC_FPRINTF(stderr, "CCcut_connect_components failed\n");
         goto CLEANUP;
     }
 

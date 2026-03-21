@@ -227,7 +227,7 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
     *elist = (int *) NULL;
 
     if (ncount < 3) {
-        fprintf (stderr, "Cannot run CCedgegen_edges in an %d node graph\n",
+        CC_FPRINTF(stderr, "Cannot run CCedgegen_edges in an %d node graph\n",
                  ncount);
         return 1;
     }
@@ -245,7 +245,7 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         rval =  call_random_edge (ncount, dat, plan->random, &td, silent,
                                   rstate);
         if (rval) {
-            fprintf (stderr, "call_random_edge failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "call_random_edge failed\n"); goto CLEANUP;
         }
     }
 
@@ -253,14 +253,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_nearest (ncount, dat, wcoord, plan->nearest, &kt, &td,
                           silent, rstate)) {
-            fprintf (stderr, "call_nearest failed\n");
+            CC_FPRINTF(stderr, "call_nearest failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -269,21 +269,21 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_quadnearest (ncount, dat, wcoord, plan->quadnearest, &kt, &td,
                               silent, rstate)) {
-            fprintf (stderr, "call_quadnearest failed\n");
+            CC_FPRINTF(stderr, "call_quadnearest failed\n");
             rval = 1;
             goto CLEANUP;
         }
     }
     if (plan->delaunay) {
         if (call_delaunay (ncount, dat, &td, silent)) {
-            fprintf (stderr, "call_delaunay failed\n");
+            CC_FPRINTF(stderr, "call_delaunay failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -293,18 +293,18 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if ((norm & CC_NORM_BITS) != CC_KD_NORM_TYPE) {
-            printf ("Cannot run matching Lin-Kernighan with this norm\n");
-            fflush (stdout);
+            CC_PRINTF("Cannot run matching Lin-Kernighan with this norm\n");
+            CC_FFLUSH(stdout);
         } else {
             if (call_mlinkern (ncount, dat, &kt, plan->mlinkern, &td,
                                silent, rstate)) {
-                fprintf (stderr, "call_mlinkern failed\n");
+                CC_FPRINTF(stderr, "call_mlinkern failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -313,7 +313,7 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
     if (plan->tour.random_count) {
         if (call_random_tour (ncount, dat, plan->tour.random_count, &td,
                               silent, rstate)) {
-            fprintf (stderr, "call_random_tour failed\n");
+            CC_FPRINTF(stderr, "call_random_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -322,14 +322,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_nearest_tour (ncount, dat, plan->tour.nearest_count, &kt,
                                &td, silent, rstate)) {
-            fprintf (stderr, "call_nearest_tour failed\n");
+            CC_FPRINTF(stderr, "call_nearest_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -338,13 +338,13 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_greedy_tour (ncount, dat, &kt, &td, silent, rstate)) {
-            fprintf (stderr, "call_greedy_tour failed\n");
+            CC_FPRINTF(stderr, "call_greedy_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -353,13 +353,13 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_boruvka_tour (ncount, dat, &kt, &td, silent, rstate)) {
-            fprintf (stderr, "call_boruvka_tour failed\n");
+            CC_FPRINTF(stderr, "call_boruvka_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -368,13 +368,13 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_qboruvka_tour (ncount, dat, &kt, &td, silent, rstate)) {
-            fprintf (stderr, "call_qboruvka_tour failed\n");
+            CC_FPRINTF(stderr, "call_qboruvka_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -383,14 +383,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_twoopt_tour (ncount, dat, &kt, plan->tour.twoopt_count,
                               0, 0, &td, silent, rstate)) {
-            fprintf (stderr, "call_twoopt_tour failed\n");
+            CC_FPRINTF(stderr, "call_twoopt_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -399,14 +399,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_twoopt_tour (ncount, dat, &kt, plan->tour.twoopt5_count,
                               1, 0, &td, silent, rstate)) {
-            fprintf (stderr, "call_twoopt_tour failed\n");
+            CC_FPRINTF(stderr, "call_twoopt_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -415,14 +415,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_twoopt_tour (ncount, dat, &kt, plan->tour.threeopt_count,
                               0, 1, &td, silent, rstate)) {
-            fprintf (stderr, "call_threeopt_tour failed\n");
+            CC_FPRINTF(stderr, "call_threeopt_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -431,13 +431,13 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_linkern (ncount, dat, &kt, plan, &td, silent, rstate)) {
-            fprintf (stderr, "call_linkern failed\n");
+            CC_FPRINTF(stderr, "call_linkern failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -446,14 +446,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_spanning_tree (ncount, dat, wcoord, &kt, &td, silent,
                                 rstate)) {
-            fprintf (stderr, "call_spanning_tree failed\n");
+            CC_FPRINTF(stderr, "call_spanning_tree failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -462,14 +462,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_nearest_twomatch (ncount, dat, plan->nearest_twomatch_count,
                                    &kt, &td, silent, rstate)) {
-            fprintf (stderr, "call_nearest_twomatch failed\n");
+            CC_FPRINTF(stderr, "call_nearest_twomatch failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -478,14 +478,14 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (call_f2match (ncount, dat, &kt, plan->f2match.priced,
                           plan->f2match.basic, &td, silent, rstate)) {
-            fprintf (stderr, "call_f2match failed\n");
+            CC_FPRINTF(stderr, "call_f2match failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -494,7 +494,7 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (!built_a_tree) {
             if (call_kdtree_build (&kt, ncount, dat, wcoord, &built_a_tree,
                                    silent, rstate)) {
-                fprintf (stderr, "call_kdtree_build failed\n");
+                CC_FPRINTF(stderr, "call_kdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -502,26 +502,26 @@ int CCedgegen_edges (CCedgegengroup *plan, int ncount, CCdatagroup *dat,
         if (call_f2match_nearest (ncount, dat, &kt,
                plan->f2match_nearest.number, plan->f2match_nearest.priced,
                plan->f2match_nearest.basic, &td, silent, rstate)) {
-            fprintf (stderr, "call f2match_nearest failed\n");
+            CC_FPRINTF(stderr, "call f2match_nearest failed\n");
             rval = 1;
             goto CLEANUP;
         }
     }
 
     if (!silent) {
-        printf ("Edgegen total edges: %d (%.2f seconds)\n", td.tabletotal,
+        CC_PRINTF("Edgegen total edges: %d (%.2f seconds)\n", td.tabletotal,
                 CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     rval = collect_table_edges (&td, ncount, ecount, elist);
     if (rval) {
-        fprintf (stderr, "collect_table_edges failed\n");
+        CC_FPRINTF(stderr, "collect_table_edges failed\n");
         goto CLEANUP;
     }
         
     if (intptr_check_leaks (&intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs in kdnear\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs in kdnear\n",
                  total - onlist);
     }
 
@@ -547,12 +547,12 @@ static int call_kdtree_build (CCkdtree *kt, int ncount, CCdatagroup *dat,
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         tzeit = CCutil_zeit ();
         if (CCkdtree_build (kt, ncount, dat, wcoord, rstate)) {
-            fprintf (stderr, "CCkdtree_build failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_build failed\n");
             return 1;
         }
         if (!silent) {
-            printf ("Built CCkdtree: %.2f (seconds)\n", CCutil_zeit () - tzeit);
-            fflush (stdout);
+            CC_PRINTF("Built CCkdtree: %.2f (seconds)\n", CCutil_zeit () - tzeit);
+            CC_FFLUSH(stdout);
         }
         *built_a_tree = 1;
     }
@@ -608,18 +608,18 @@ static int call_random_edge (int ncount, CCdatagroup *dat, int ecount,
     
     rval = CCutil_genedgelist (ncount, ecount, &elist, &elen, dat, 0, rstate);
     if (rval) {
-        fprintf (stderr, "CCutil_genedgelist failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_genedgelist failed\n"); goto CLEANUP;
     }
  
     rval = put_list_in_table (td, ecount, elist);
     if (rval) {
-        fprintf (stderr, "put_list_in_table failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "put_list_in_table failed\n"); goto CLEANUP;
     }
 
     if (silent) {
-        printf ("Random added %d edges (%.2f seconds)\n",
+        CC_PRINTF("Random added %d edges (%.2f seconds)\n",
                  td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
     
 CLEANUP:
@@ -642,20 +642,20 @@ static int call_nearest (int ncount, CCdatagroup *dat, double *wcoord,
 
     if (work_nearest (kt, ncount, nearnum, dat, wcoord, &tcount, &tlist,
                       silent, rstate)) {
-        fprintf (stderr, "work_nearest failed\n");
+        CC_FPRINTF(stderr, "work_nearest failed\n");
         return 1;
     }
 
     if (put_list_in_table (td, tcount, tlist)) {
-        fprintf (stderr, "put_list_in_table failed\n");
+        CC_FPRINTF(stderr, "put_list_in_table failed\n");
         CC_IFFREE (tlist, int);
         return 1;
     }
 
     if (!silent) {
-        printf ("Nearest added %d edges (%.2f seconds)\n",
+        CC_PRINTF("Nearest added %d edges (%.2f seconds)\n",
                      td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tlist, int);
@@ -673,19 +673,19 @@ static int work_nearest (CCkdtree *kt, int ncount, int nearnum,
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         if (CCkdtree_k_nearest (kt, ncount, nearnum, dat, wcoord,
                                1, ecount, elist, silent, rstate)) {
-            fprintf (stderr, "CCkdtree_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_k_nearest failed\n");
             return 1;
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (CCedgegen_x_k_nearest (ncount, nearnum, dat, wcoord, 1, ecount,
                                    elist, silent)) {
-            fprintf (stderr, "CCedgegen_x_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_x_k_nearest failed\n");
             return 1;
         }
     } else {
         if (CCedgegen_junk_k_nearest (ncount, nearnum, dat, wcoord, 1, ecount,
                                       elist, silent)) {
-            fprintf (stderr, "CCedgegen_junk_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_junk_k_nearest failed\n");
             return 1;
         }
     }
@@ -704,20 +704,20 @@ static int call_quadnearest (int ncount, CCdatagroup *dat, double *wcoord,
 
     if (work_quadnearest (kt, ncount, nearnum, dat, wcoord, &tcount, &tlist,
                           silent, rstate)) {
-        fprintf (stderr, "work_quadnearest failed\n");
+        CC_FPRINTF(stderr, "work_quadnearest failed\n");
         return 1;
     }
 
     if (put_list_in_table (td, tcount, tlist)) {
-        fprintf (stderr, "put_list_in_table failed\n");
+        CC_FPRINTF(stderr, "put_list_in_table failed\n");
         CC_IFFREE (tlist, int);
         return 1;
     }
 
     if (!silent) {
-        printf ("Quad Nearest added %d edges (%.2f seconds)\n",
+        CC_PRINTF("Quad Nearest added %d edges (%.2f seconds)\n",
                      td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tlist, int);
@@ -735,24 +735,24 @@ static int work_quadnearest (CCkdtree *kt, int ncount, int nearnum,
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         if (CCkdtree_quadrant_k_nearest (kt, ncount, nearnum, dat, wcoord,
                                1, ecount, elist, silent, rstate)) {
-            fprintf (stderr, "CCkdtree_quadrant_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_quadrant_k_nearest failed\n");
             return 1;
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (CCedgegen_x_quadrant_k_nearest (ncount, nearnum, dat, wcoord, 1,
                                   ecount, elist, silent)) {
-            fprintf (stderr, "CCedgegen_x_quadrant_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_x_quadrant_k_nearest failed\n");
             return 1;
         }
     } else {
         if (!silent) {
-            printf ("Cannot run quadrant nearest with JUNK norms\n");
-            printf ("Trying %d-nearest instead\n", 2 * nearnum);
-            fflush (stdout);
+            CC_PRINTF("Cannot run quadrant nearest with JUNK norms\n");
+            CC_PRINTF("Trying %d-nearest instead\n", 2 * nearnum);
+            CC_FFLUSH(stdout);
         }
         if (CCedgegen_junk_k_nearest (ncount, 2 * nearnum, dat, wcoord, 1,
                             ecount, elist, silent)) {
-            fprintf (stderr, "CCedgegen_junk_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_junk_k_nearest failed\n");
             return 1;
         }
     }
@@ -770,7 +770,7 @@ static int call_random_tour (int ncount, CCdatagroup *dat, int number,
     int k;
 
     if (!silent) {
-        printf ("Generate %d Random Tours\n", number); fflush (stdout);
+        CC_PRINTF("Generate %d Random Tours\n", number); CC_FFLUSH(stdout);
     }
 
     tour = CC_SAFE_MALLOC (ncount, int);
@@ -782,21 +782,21 @@ static int call_random_tour (int ncount, CCdatagroup *dat, int number,
         tzeit = CCutil_zeit ();
         randcycle (ncount, tour, dat, &val, rstate);
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             CC_FREE (tour, int);
             return 1;
         }
         if (!silent) {
-            printf ("  Random tour %d: %.0f, added %d edges (%.2f seconds)\n",
+            CC_PRINTF("  Random tour %d: %.0f, added %d edges (%.2f seconds)\n",
                      round, val, td->tabletotal - k, CCutil_zeit () - tzeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
 
     if (!silent) {
-        printf ("  TOTAL: Random tours added %d edges (%.2f seconds)\n",
+        CC_PRINTF("  TOTAL: Random tours added %d edges (%.2f seconds)\n",
                      td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tour, int);
@@ -815,8 +815,8 @@ static int call_nearest_tour (int ncount, CCdatagroup *dat, int number,
     int k;
 
     if (!silent) {
-        printf ("Generate %d Nearest Neighbor Tours\n", number);
-        fflush (stdout);
+        CC_PRINTF("Generate %d Nearest Neighbor Tours\n", number);
+        CC_FFLUSH(stdout);
     }
 
     tour = CC_SAFE_MALLOC (ncount, int);
@@ -828,26 +828,26 @@ static int call_nearest_tour (int ncount, CCdatagroup *dat, int number,
         tzeit = CCutil_zeit ();
         if (work_nearest_tour (kt, ncount, CCutil_lprand (rstate) % ncount,
                                         dat, tour, &val, silent, rstate)) {
-            fprintf (stderr, "work_nearest_tour failed\n");
+            CC_FPRINTF(stderr, "work_nearest_tour failed\n");
             CC_FREE (tour, int);
             return 1;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             CC_FREE (tour, int);
             return 1;
         }
         if (!silent) {
-            printf ("  NN tour %d: %.0f, added %d edges (%.2f seconds)\n",
+            CC_PRINTF("  NN tour %d: %.0f, added %d edges (%.2f seconds)\n",
                      round, val, td->tabletotal - k, CCutil_zeit () - tzeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
 
     if (!silent) {
-        printf ("  TOTAL: Nearest tours added %d edges (%.2f seconds)\n",
+        CC_PRINTF("  TOTAL: Nearest tours added %d edges (%.2f seconds)\n",
                      td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tour, int);
@@ -864,19 +864,19 @@ static int work_nearest_tour (CCkdtree *kt, int ncount, int start,
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         if (CCkdtree_nearest_neighbor_tour (kt, ncount, start, dat, tour,
                                             val, rstate)) {
-            fprintf (stderr, "CCkdtree_nearest_neighbor_tour failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_nearest_neighbor_tour failed\n");
             return 1;
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (CCedgegen_x_nearest_neighbor_tour (ncount, start, dat, tour,
                                                val)) {
-            fprintf (stderr, "CCedgegen_x_nearest_neighbor_tour failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_x_nearest_neighbor_tour failed\n");
             return 1;
         }
     } else {
         if (CCedgegen_junk_nearest_neighbor_tour (ncount, start, dat, tour,
                                                   val, silent)) {
-            fprintf (stderr, "CCedgegen_junk_nearest_neighbor_tour failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_junk_nearest_neighbor_tour failed\n");
             return 1;
         }
     }
@@ -897,7 +897,7 @@ static int call_greedy_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     tour = CC_SAFE_MALLOC (ncount, int);
     if (!tour) {
-        fprintf (stderr, "Out of memory in call_greedy_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in call_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -905,31 +905,31 @@ static int call_greedy_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         if (CCkdtree_greedy_tour (kt, ncount, dat, tour, &val, silent,
                                   rstate)) {
-            fprintf (stderr, "CCkdtree_greedy_tour failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_greedy_tour failed\n");
             rval = 1; goto CLEANUP;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             rval = 1; goto CLEANUP;
         }
         if (!silent) {
-            printf ("Greedy tour: %.0f, added %d edges (%.2f seconds)\n",
+            CC_PRINTF("Greedy tour: %.0f, added %d edges (%.2f seconds)\n",
                      val, td->tabletotal - current, CCutil_zeit () - szeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (CCedgegen_x_quadrant_k_nearest (ncount, 2, dat, (double *) NULL,
                 1, &tempcount, &templist, silent)) {
-            fprintf (stderr, "CCedgegen_x_quadrant_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_x_quadrant_k_nearest failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCedgegen_x_greedy_tour (ncount, dat, tour, &val, tempcount,
                                        templist, silent)) {
-            fprintf (stderr, "CCedgegen_x_greedy_tour failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_x_greedy_tour failed\n");
             rval = 1; goto CLEANUP;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             rval = 1; goto CLEANUP;
         }
     } else {
@@ -940,16 +940,16 @@ static int call_greedy_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
         }
         if (CCedgegen_junk_k_nearest (ncount, t, dat, (double *) NULL,
                 1, &tempcount, &templist, silent)) {
-            fprintf (stderr, "CCedgegen_junk_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_junk_k_nearest failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCedgegen_junk_greedy_tour (ncount, dat, tour, &val, tempcount,
                                           templist, silent)) {
-            fprintf (stderr, "CCedgegen_junk_greedy_tour failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_junk_greedy_tour failed\n");
             rval = 1; goto CLEANUP;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -977,31 +977,31 @@ static int call_boruvka_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         if (CCkdtree_boruvka_tour (kt, ncount, dat, tour, &val, rstate)) {
-            fprintf (stderr, "CCkdtree_boruvka_tour failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_boruvka_tour failed\n");
             CC_FREE (tour, int);
             return 1;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             CC_FREE (tour, int);
             return 1;
         }
         if (!silent) {
-            printf ("Boruvka tour: %.0f, added %d edges (%.2f seconds)\n",
+            CC_PRINTF("Boruvka tour: %.0f, added %d edges (%.2f seconds)\n",
                      val, td->tabletotal - current, CCutil_zeit () - szeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (!silent) {
-            printf ("No X_NORM boruvka tours, using nearest neighbor\n");
-            fflush (stdout);
+            CC_PRINTF("No X_NORM boruvka tours, using nearest neighbor\n");
+            CC_FFLUSH(stdout);
         }
         CC_FREE (tour, int);
         return call_nearest_tour (ncount, dat, 1, kt, td, silent, rstate);
     } else {
         if (!silent) {
-            printf ("No JUNK_NORM boruvka tours, using nearest neighbor\n");
-            fflush (stdout);
+            CC_PRINTF("No JUNK_NORM boruvka tours, using nearest neighbor\n");
+            CC_FFLUSH(stdout);
         }
         CC_FREE (tour, int);
         return call_nearest_tour (ncount, dat, 1, kt, td, silent, rstate);
@@ -1025,53 +1025,53 @@ static int call_qboruvka_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     tour = CC_SAFE_MALLOC (ncount, int);
     if (!tour) {
-        fprintf (stderr, "Out of memory in call_qboruvka_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in call_qboruvka_tour\n");
         rval = 1; goto CLEANUP;
     }
 
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         if (CCkdtree_qboruvka_tour (kt, ncount, dat, tour, &val, rstate)) {
-            fprintf (stderr, "CCkdtree_qboruvka_tour failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_qboruvka_tour failed\n");
             rval = 1; goto CLEANUP;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             rval = 1; goto CLEANUP;
         }
         if (!silent) {
-            printf ("Quick boruvka tour: %.0f, added %d edges (%.2f seconds)\n",
+            CC_PRINTF("Quick boruvka tour: %.0f, added %d edges (%.2f seconds)\n",
                      val, td->tabletotal - current, CCutil_zeit () - szeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (CCedgegen_x_quadrant_k_nearest (ncount, 2, dat, (double *) NULL,
                 1, &tempcount, &templist, silent)) {
-            fprintf (stderr, "CCedgegen_x_quadrant_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_x_quadrant_k_nearest failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCedgegen_x_qboruvka_tour (ncount, dat, tour, &val, tempcount,
                                        templist, silent)) {
-            fprintf (stderr, "CCedgegen_x_qboruvka_tour failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_x_qboruvka_tour failed\n");
             rval = 1; goto CLEANUP;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         if (CCedgegen_junk_k_nearest (ncount, 8, dat, (double *) NULL,
                 1, &tempcount, &templist, silent)) {
-            fprintf (stderr, "CCedgegen_junk_k_nearest failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_junk_k_nearest failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCedgegen_junk_qboruvka_tour (ncount, dat, tour, &val, tempcount,
                                           templist, silent)) {
-            fprintf (stderr, "CCedgegen_junk_qboruvka_tour failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_junk_qboruvka_tour failed\n");
             rval = 1; goto CLEANUP;
         }
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -1095,12 +1095,12 @@ static int call_twoopt_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     if (!silent) {
         if (use_3opt)
-            printf ("Generate %d 3OPT Tours from Nearest Neighbor\n", number);
+            CC_PRINTF("Generate %d 3OPT Tours from Nearest Neighbor\n", number);
         else if (two_and_a_half)
-            printf ("Generate %d 2.5OPT Tours from Nearest Neighbor\n", number);
+            CC_PRINTF("Generate %d 2.5OPT Tours from Nearest Neighbor\n", number);
         else
-            printf ("Generate %d 2OPT Tours from Nearest Neighbor\n", number);
-        fflush (stdout);
+            CC_PRINTF("Generate %d 2OPT Tours from Nearest Neighbor\n", number);
+        CC_FFLUSH(stdout);
     }
 
     tour1 = CC_SAFE_MALLOC (ncount, int);
@@ -1119,7 +1119,7 @@ static int call_twoopt_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
             tzeit = CCutil_zeit ();
             if (work_nearest_tour (kt, ncount, CCutil_lprand (rstate) % ncount,
                                         dat, tour1, &val, silent, rstate)) {
-                fprintf (stderr, "work_nearest_tour failed\n");
+                CC_FPRINTF(stderr, "work_nearest_tour failed\n");
                 CC_FREE (tour1, int);
                 CC_FREE (tour2, int);
                 return 1;
@@ -1128,7 +1128,7 @@ static int call_twoopt_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
             if (use_3opt) {
                 if (CCkdtree_3opt_tour (kt, ncount, dat, tour1, tour2, &val,
                                         1, rstate)) {
-                    fprintf (stderr, "CCkdtree_3opt_tour failed\n");
+                    CC_FPRINTF(stderr, "CCkdtree_3opt_tour failed\n");
                     CC_FREE (tour1, int);
                     CC_FREE (tour2, int);
                     return 1;
@@ -1137,41 +1137,41 @@ static int call_twoopt_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
             } else {
                 if (CCkdtree_twoopt_tour (kt, ncount, dat, tour1, tour2, &val,
                                           two_and_a_half, 1, rstate)) {
-                    fprintf (stderr, "CCkdtree_twoopt_tour failed\n");
+                    CC_FPRINTF(stderr, "CCkdtree_twoopt_tour failed\n");
                     CC_FREE (tour1, int);
                     CC_FREE (tour2, int);
                     return 1;
                 }
             }
             if (put_tour_in_table (td, ncount, tour2)) {
-                fprintf (stderr, "put_tour_in_table failed\n");
+                CC_FPRINTF(stderr, "put_tour_in_table failed\n");
                 CC_FREE (tour1, int);
                 CC_FREE (tour2, int);
                 return 1;
             }
             if (!silent) {
                 if (use_3opt)
-                    printf ("  3OPT tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
+                    CC_PRINTF("  3OPT tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
                             round, ival, val, td->tabletotal - k,
                             CCutil_zeit () - tzeit);
                 else if (two_and_a_half)
-                    printf ("  2.5OPT tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
+                    CC_PRINTF("  2.5OPT tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
                             round, ival, val, td->tabletotal - k,
                             CCutil_zeit () - tzeit);
                 else
-                    printf ("  2OPT tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
+                    CC_PRINTF("  2OPT tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
                             round, ival, val, td->tabletotal - k,
                             CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (!silent) {
             if (use_3opt)
-                printf ("No X_NORM three-opt, using nearest neighbor\n");
+                CC_PRINTF("No X_NORM three-opt, using nearest neighbor\n");
             else
-                printf ("No X_NORM two-opt, using nearest neighbor\n");
-            fflush (stdout);
+                CC_PRINTF("No X_NORM two-opt, using nearest neighbor\n");
+            CC_FFLUSH(stdout);
         }
         CC_FREE (tour1, int);
         CC_FREE (tour2, int);
@@ -1179,10 +1179,10 @@ static int call_twoopt_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
     } else {
         if (!silent) {
             if (use_3opt)
-                printf ("No JUNK_NORM three-opt, using nearest neighbor\n");
+                CC_PRINTF("No JUNK_NORM three-opt, using nearest neighbor\n");
             else
-                printf ("No JUNK_NORM two-opt, using nearest neighbor\n");
-            fflush (stdout);
+                CC_PRINTF("No JUNK_NORM two-opt, using nearest neighbor\n");
+            CC_FFLUSH(stdout);
         }
         CC_FREE (tour1, int);
         CC_FREE (tour2, int);
@@ -1191,15 +1191,15 @@ static int call_twoopt_tour (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     if (!silent) {
         if (use_3opt)
-            printf ("  TOTAL: 3-opt tours added %d edges (%.2f seconds)\n",
+            CC_PRINTF("  TOTAL: 3-opt tours added %d edges (%.2f seconds)\n",
                          td->tabletotal - current, CCutil_zeit () - szeit);
         else if (two_and_a_half)
-            printf ("  TOTAL: 2.5-opt tours added %d edges (%.2f seconds)\n",
+            CC_PRINTF("  TOTAL: 2.5-opt tours added %d edges (%.2f seconds)\n",
                         td->tabletotal - current, CCutil_zeit () - szeit);
         else
-            printf ("  TOTAL: 2-opt tours added %d edges (%.2f seconds)\n",
+            CC_PRINTF("  TOTAL: 2-opt tours added %d edges (%.2f seconds)\n",
                          td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tour1, int);
@@ -1222,27 +1222,27 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
     int norm;
     
     if (!silent) {
-        printf ("Generate %d Linkern Tours (", plan->linkern.count);
+        CC_PRINTF("Generate %d Linkern Tours (", plan->linkern.count);
         if (plan->linkern.greedy_start)
-            printf ("Greedy, ");
+            CC_PRINTF("Greedy, ");
         else if (plan->linkern.boruvka_start)
-            printf ("Boruvka, ");
+            CC_PRINTF("Boruvka, ");
         else if (plan->linkern.qboruvka_start)
-            printf ("Quick Boruvka, ");
+            CC_PRINTF("Quick Boruvka, ");
         else if (plan->linkern.random_start)
-            printf ("Random, ");
+            CC_PRINTF("Random, ");
         else
-            printf ("Nneigh, ");
-        printf ("%d kicks, ", plan->linkern.nkicks);
+            CC_PRINTF("Nneigh, ");
+        CC_PRINTF("%d kicks, ", plan->linkern.nkicks);
     
         if (plan->linkern.nearest == 0) {
-            printf ("Quad-%d Edgeset)\n", (plan->linkern.quadnearest ?
+            CC_PRINTF("Quad-%d Edgeset)\n", (plan->linkern.quadnearest ?
                                plan->linkern.quadnearest : 3));
         } else {
             if (plan->linkern.quadnearest == 0) {
-                printf ("Near-%d Edgeset)\n", plan->linkern.nearest);
+                CC_PRINTF("Near-%d Edgeset)\n", plan->linkern.nearest);
             } else {
-                printf ("Quad-%d + Near-%d Edgeset)\n",
+                CC_PRINTF("Quad-%d + Near-%d Edgeset)\n",
                     plan->linkern.quadnearest, plan->linkern.nearest);
             }
         }
@@ -1253,21 +1253,21 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
     if (plan->linkern.nearest == 0 && plan->linkern.quadnearest == 0) {
         if (work_quadnearest (kt, ncount, 3, dat, (double *) NULL,
                               &ecount, &elist, silent, rstate)) {
-            fprintf (stderr, "work_quadnearest failed\n");
+            CC_FPRINTF(stderr, "work_quadnearest failed\n");
             return 1;
         }
     } else {
         if (plan->linkern.nearest == 0) {
             if (work_quadnearest (kt, ncount, plan->linkern.quadnearest,
                      dat, (double *) NULL, &ecount, &elist, silent, rstate)) {
-                fprintf (stderr, "work_quadnearest failed\n");
+                CC_FPRINTF(stderr, "work_quadnearest failed\n");
                 return 1;
             }
         } else if (plan->linkern.quadnearest == 0) {
             if (work_nearest (kt, ncount, plan->linkern.nearest,
                               dat, (double *) NULL, &ecount, &elist, 
                               silent, rstate)) {
-                fprintf (stderr, "work_nearest failed\n");
+                CC_FPRINTF(stderr, "work_nearest failed\n");
                 return 1;
             }
         } else {
@@ -1286,11 +1286,11 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
             if (work_quadnearest (kt, ncount, plan->linkern.quadnearest,
                      dat, (double *) NULL, &tcount, &tlist, silent, rstate)) {
-                fprintf (stderr, "work_quadnearest failed\n");
+                CC_FPRINTF(stderr, "work_quadnearest failed\n");
                 return 1;
             }
             if (put_list_in_table (&tab, tcount, tlist)) {
-                fprintf (stderr, "put_list_in_table failed\n");
+                CC_FPRINTF(stderr, "put_list_in_table failed\n");
                 CC_FREE (tab.table, intptr *);
                 CC_IFFREE (tlist, int);
                 return 1;
@@ -1298,11 +1298,11 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
             if (work_nearest (kt, ncount, plan->linkern.nearest, dat,
                     (double *) NULL, &tcount, &tlist, silent, rstate)) {
-                fprintf (stderr, "work_nearest failed\n");
+                CC_FPRINTF(stderr, "work_nearest failed\n");
                 return 1;
             }
             if (put_list_in_table (&tab, tcount, tlist)) {
-                fprintf (stderr, "put_list_in_table failed\n");
+                CC_FPRINTF(stderr, "put_list_in_table failed\n");
                 CC_FREE (tab.table, intptr *);
                 CC_IFFREE (tlist, int);
                 return 1;
@@ -1317,7 +1317,7 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
         }
     }
     if (!silent) {
-        printf ("Initial Edgeset: %d\n", ecount); fflush (stdout);
+        CC_PRINTF("Initial Edgeset: %d\n", ecount); CC_FFLUSH(stdout);
     }
 
     CCutil_dat_getnorm (dat, &norm);
@@ -1331,14 +1331,14 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
             tzeit = CCutil_zeit ();
             if (CCkdtree_greedy_tour (kt, ncount, dat, gtour, &gval, silent,
                                       rstate)) {
-                fprintf (stderr, "CCkdtree_greedy_tour failed\n");
+                CC_FPRINTF(stderr, "CCkdtree_greedy_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!silent) {
-                printf ("Greedy tour: %.0f (%.2f seconds)\n",
+                CC_PRINTF("Greedy tour: %.0f (%.2f seconds)\n",
                         gval, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         } else if (plan->linkern.boruvka_start) {
             gtour = CC_SAFE_MALLOC (ncount, int);
@@ -1348,14 +1348,14 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
             }
             tzeit = CCutil_zeit ();
             if (CCkdtree_boruvka_tour (kt, ncount, dat, gtour, &gval, rstate)) {
-                fprintf (stderr, "CCkdtree_boruvka_tour failed\n");
+                CC_FPRINTF(stderr, "CCkdtree_boruvka_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!silent) {
-                printf ("Boruvka tour: %.0f (%.2f seconds)\n",
+                CC_PRINTF("Boruvka tour: %.0f (%.2f seconds)\n",
                         gval, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         } else if (plan->linkern.qboruvka_start) {
             gtour = CC_SAFE_MALLOC (ncount, int);
@@ -1365,14 +1365,14 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
             }
             tzeit = CCutil_zeit ();
             if (CCkdtree_qboruvka_tour (kt, ncount, dat, gtour, &gval, rstate)) {
-                fprintf (stderr, "CCkdtree_qboruvka_tour failed\n");
+                CC_FPRINTF(stderr, "CCkdtree_qboruvka_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!silent) {
-                printf ("Quick Boruvka tour: %.0f (%.2f seconds)\n",
+                CC_PRINTF("Quick Boruvka tour: %.0f (%.2f seconds)\n",
                         gval, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
@@ -1385,14 +1385,14 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
             tzeit = CCutil_zeit ();
             if (CCedgegen_x_greedy_tour (ncount, dat, gtour, &gval, ecount,
                                          elist, silent)) {
-                fprintf (stderr, "CCedgegen_x_greedy_tour failed\n");
+                CC_FPRINTF(stderr, "CCedgegen_x_greedy_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!silent) {
-                printf ("Greedy tour: %.0f (%.2f seconds)\n",
+                CC_PRINTF("Greedy tour: %.0f (%.2f seconds)\n",
                         gval, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         } else if (plan->linkern.qboruvka_start) {
             gtour = CC_SAFE_MALLOC (ncount, int);
@@ -1403,14 +1403,14 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
             tzeit = CCutil_zeit ();
             if (CCedgegen_x_qboruvka_tour (ncount, dat, gtour, &gval,
                                            ecount, elist, silent)) {
-                fprintf (stderr, "CCedgegen_x_qboruvka_tour failed\n");
+                CC_FPRINTF(stderr, "CCedgegen_x_qboruvka_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!silent) {
-                printf ("Quick Boruvka tour: %.0f (%.2f seconds)\n",
+                CC_PRINTF("Quick Boruvka tour: %.0f (%.2f seconds)\n",
                         gval, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
     } else {
@@ -1423,14 +1423,14 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
             tzeit = CCutil_zeit ();
             if (CCedgegen_junk_greedy_tour (ncount, dat, gtour, &gval, ecount,
                                             elist, silent)) {
-                fprintf (stderr, "CCedgegen_x_greedy_tour failed\n");
+                CC_FPRINTF(stderr, "CCedgegen_x_greedy_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!silent) {
-                printf ("Greedy tour: %.0f (%.2f seconds)\n",
+                CC_PRINTF("Greedy tour: %.0f (%.2f seconds)\n",
                         gval, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         } else if (plan->linkern.qboruvka_start) {
             gtour = CC_SAFE_MALLOC (ncount, int);
@@ -1441,14 +1441,14 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
             tzeit = CCutil_zeit ();
             if (CCedgegen_junk_qboruvka_tour (ncount, dat, gtour, &gval,
                                               ecount, elist, silent)) {
-                fprintf (stderr, "CCedgegen_x_qboruvka_tour failed\n");
+                CC_FPRINTF(stderr, "CCedgegen_x_qboruvka_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!silent) {
-                printf ("Quick Boruvka tour: %.0f (%.2f seconds)\n",
+                CC_PRINTF("Quick Boruvka tour: %.0f (%.2f seconds)\n",
                         gval, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
     }
@@ -1479,7 +1479,7 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
         } else {
             if (work_nearest_tour (kt, ncount, CCutil_lprand (rstate) % ncount,
                                         dat, itour, &val, silent, rstate)) {
-                fprintf (stderr, "work_nearest_tour failed\n");
+                CC_FPRINTF(stderr, "work_nearest_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -1489,27 +1489,27 @@ static int call_linkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
         if (CClinkern_tour (ncount, dat, ecount, elist, 100000000,
              plan->linkern.nkicks, itour, tour, &val, 1, -1.0, -1.0,
              (char *) NULL, CC_LK_GEOMETRIC_KICK, rstate)) {
-            fprintf (stderr, "CClinkern_tour failed\n");
+            CC_FPRINTF(stderr, "CClinkern_tour failed\n");
             rval = 1;
             goto CLEANUP;
         }
 
         if (put_tour_in_table (td, ncount, tour)) {
-            fprintf (stderr, "put_tour_in_table failed\n");
+            CC_FPRINTF(stderr, "put_tour_in_table failed\n");
             rval = 1;
             goto CLEANUP;
         }
         if (!silent) {
-            printf ("  LK tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
+            CC_PRINTF("  LK tour %d (from %.0f): %.0f, added %d edges (%.2f sec)\n",
                  round, ival, val, td->tabletotal - k, CCutil_zeit () - tzeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
 
     if (!silent) {
-        printf ("  TOTAL: Linkern tours added %d edges (%.2f seconds)\n",
+        CC_PRINTF("  TOTAL: Linkern tours added %d edges (%.2f seconds)\n",
                      td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -1534,7 +1534,7 @@ static int call_f2match (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     if (f2match_initial_edgeset (ncount, dat, kt, &ecount, &elist, &elen,
                                  td, silent, rstate)) {
-        fprintf (stderr, "f2match_initial_edgeset failed\n");
+        CC_FPRINTF(stderr, "f2match_initial_edgeset failed\n");
         return 1;
     }
 
@@ -1553,7 +1553,7 @@ static int call_f2match (int ncount, CCdatagroup *dat, CCkdtree *kt,
                     (CCdatagroup *) NULL, &val, mat, (int *) NULL,
                     (int *) NULL, basic, silent, rstate);
     if (i) {
-        fprintf (stderr, "CCfmatch_fractional_2match failed\n");
+        CC_FPRINTF(stderr, "CCfmatch_fractional_2match failed\n");
         CC_FREE (mat, int);
         CC_FREE (elist, int);
         CC_FREE (elen, int);
@@ -1563,7 +1563,7 @@ static int call_f2match (int ncount, CCdatagroup *dat, CCkdtree *kt,
     i = 0;
     while (mat[i] != -1) {
         if (put_in_table (td, mat[i], mat[i + 1])) {
-            fprintf (stderr, "put_in_table failed\n");
+            CC_FPRINTF(stderr, "put_in_table failed\n");
             CC_FREE (mat, int);
             CC_FREE (elist, int);
             CC_FREE (elen, int);
@@ -1596,7 +1596,7 @@ static int call_f2match_nearest (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     if (f2match_initial_edgeset (ncount, dat, kt, &ecount, &elist, &elen,
                                  td, silent, rstate)) {
-        fprintf (stderr, "f2match_initial_edgeset failed\n");
+        CC_FPRINTF(stderr, "f2match_initial_edgeset failed\n");
         return 1;
     }
 
@@ -1615,7 +1615,7 @@ static int call_f2match_nearest (int ncount, CCdatagroup *dat, CCkdtree *kt,
                  (CCdatagroup *) NULL, &val, (int *) NULL, dual,
                  (int *) NULL, basic, silent, rstate);
     if (i) {
-        fprintf (stderr, "CCfmatch_fractional_2match failed\n");
+        CC_FPRINTF(stderr, "CCfmatch_fractional_2match failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -1640,19 +1640,19 @@ static int call_f2match_nearest (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     if (work_nearest (kt, ncount, number, dat, dcoord, &ecount, &elist,
                       silent, rstate)) {
-        fprintf (stderr, "work_nearest failed\n");
+        CC_FPRINTF(stderr, "work_nearest failed\n");
         rval = 1;
         goto CLEANUP;
     }
     if (put_list_in_table (td, ecount, elist)) {
-        fprintf (stderr, "put_list_in_table failed\n");
+        CC_FPRINTF(stderr, "put_list_in_table failed\n");
         rval = 1; goto CLEANUP;
     }
 
     if (!silent) {
-        printf ("Fractional 2-match Nearest-%d added %d edges (%.2f seconds)\n",
+        CC_PRINTF("Fractional 2-match Nearest-%d added %d edges (%.2f seconds)\n",
                  number, td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -1691,12 +1691,12 @@ static int f2match_initial_edgeset (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     if (work_quadnearest (kt, ncount, 3, dat, (double *) NULL, &tcount,
                           &tlist, silent, rstate)) {
-        fprintf (stderr, "work_quadnearest failed\n");
+        CC_FPRINTF(stderr, "work_quadnearest failed\n");
         CC_FREE (tab.table, intptr *);
         return 1;
     }
     if (put_list_in_table (&tab, tcount, tlist)) {
-        fprintf (stderr, "put_list_in_table failed\n");
+        CC_FPRINTF(stderr, "put_list_in_table failed\n");
         CC_FREE (tab.table, intptr *);
         CC_FREE (tlist, int);
         return 1;
@@ -1710,13 +1710,13 @@ static int f2match_initial_edgeset (int ncount, CCdatagroup *dat, CCkdtree *kt,
     }
     if (work_nearest_tour (kt, ncount, CCutil_lprand (rstate) % ncount, dat,
                            ttour, &tval, silent, rstate)) {
-        fprintf (stderr, "work_nearest_tour failed\n");
+        CC_FPRINTF(stderr, "work_nearest_tour failed\n");
         CC_FREE (tab.table, intptr *);
         CC_FREE (ttour, int);
         return 1;
     }
     if (put_tour_in_table (&tab, ncount, ttour)) {
-        fprintf (stderr, "put_tour_in_table failed\n");
+        CC_FPRINTF(stderr, "put_tour_in_table failed\n");
         CC_FREE (tab.table, intptr *);
         CC_FREE (ttour, int);
         return 1;
@@ -1724,14 +1724,14 @@ static int f2match_initial_edgeset (int ncount, CCdatagroup *dat, CCkdtree *kt,
     CC_FREE (ttour, int);
 
     if (collect_table_edges (&tab, ncount, ecount, elist)) {
-        fprintf (stderr, "collect_table_edges failed\n");
+        CC_FPRINTF(stderr, "collect_table_edges failed\n");
         CC_FREE (tab.table, intptr *);
         return 1;
     }
     CC_FREE (tab.table, intptr *);
 
     if (collect_edge_lengths (*ecount, *elist, dat, elen)) {
-        fprintf (stderr, "collect_edge_lengths failed\n");
+        CC_FPRINTF(stderr, "collect_edge_lengths failed\n");
         CC_FREE (*elist, int);
         return 1;
     }
@@ -1756,30 +1756,30 @@ static int call_spanning_tree (int ncount, CCdatagroup *dat, double *wcoord,
     if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE) {
         if (CCkdtree_prim_spanningtree (kt, ncount, dat, wcoord, tree, &val,
                                         rstate)) {
-            fprintf (stderr, "CCkdtree_prim_spanningtree failed\n");
+            CC_FPRINTF(stderr, "CCkdtree_prim_spanningtree failed\n");
             CC_FREE (tree, int);
             return 1;
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
-        if (!silent) printf ("No X_NORM spanning tree\n");
+        if (!silent) CC_PRINTF("No X_NORM spanning tree\n");
         CC_FREE (tree, int);
         return 0;
     } else {
-        if (!silent) printf ("No JUNK_NORM spanning tree\n");
+        if (!silent) CC_PRINTF("No JUNK_NORM spanning tree\n");
         CC_FREE (tree, int);
         return 0;
     }
 
     if (put_list_in_table (td, ncount-1, tree)) {
-        fprintf (stderr, "put_list_in_table failed\n");
+        CC_FPRINTF(stderr, "put_list_in_table failed\n");
         CC_FREE (tree, int);
         return 1;
     }
 
     if (!silent) {
-        printf ("Spanning tree: %.0f, added %d edges (%.2f seconds)\n",
+        CC_PRINTF("Spanning tree: %.0f, added %d edges (%.2f seconds)\n",
              val, td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tree, int);
@@ -1799,25 +1799,25 @@ static int call_delaunay (int ncount, CCdatagroup *dat, tabledat *td,
     CCutil_dat_getnorm (dat, &norm);
     if (norm == CC_EUCLIDEAN || norm == CC_EUCLIDEAN_CEIL) {
         if (CCedgegen_delaunay (ncount, dat, 1, &tcount, &tlist)) {
-            fprintf (stderr, "delaunay failed\n");
+            CC_FPRINTF(stderr, "delaunay failed\n");
             return 1;
         }
     } else {
-        printf ("No Delaunay triangulation with norm %d\n", norm);
-        fflush (stdout);
+        CC_PRINTF("No Delaunay triangulation with norm %d\n", norm);
+        CC_FFLUSH(stdout);
         return 0;
     }
 
     if (put_list_in_table (td, tcount, tlist)) {
-        fprintf (stderr, "put_list_in_table failed\n");
+        CC_FPRINTF(stderr, "put_list_in_table failed\n");
         CC_IFFREE (tlist, int);
         return 1;
     }
 
     if (!silent) {
-        printf ("Delaunay Triangulation added %d edges (%.2f seconds)\n",
+        CC_PRINTF("Delaunay Triangulation added %d edges (%.2f seconds)\n",
                  td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tlist, int);
@@ -1836,20 +1836,20 @@ static int call_mlinkern (int ncount, CCdatagroup *dat, CCkdtree *kt,
 
     if (CCedgegen_mlinkern (ncount, dat, 1, &tcount, &tlist, kt, iterations,
         rstate)) {
-        fprintf (stderr, "mlinkern failed\n");
+        CC_FPRINTF(stderr, "mlinkern failed\n");
         return 1;
     }
 
     if (put_list_in_table (td, tcount, tlist)) {
-        fprintf (stderr, "put_list_in_table failed\n");
+        CC_FPRINTF(stderr, "put_list_in_table failed\n");
         CC_IFFREE (tlist, int);
         return 1;
     }
 
     if (!silent) {
-        printf ("Matching LinKer added %d edges (%.2f seconds)\n",
+        CC_PRINTF("Matching LinKer added %d edges (%.2f seconds)\n",
                  td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (tlist, int);
@@ -1869,8 +1869,8 @@ static int call_nearest_twomatch (int ncount, CCdatagroup *dat, int number,
     int norm;
 
     if (!silent) {
-        printf ("Generate %d Nearest Neighbor 2-matchings\n", number);
-        fflush (stdout);
+        CC_PRINTF("Generate %d Nearest Neighbor 2-matchings\n", number);
+        CC_FFLUSH(stdout);
     }
 
     mat = CC_SAFE_MALLOC (2 * ncount, int);
@@ -1884,41 +1884,41 @@ static int call_nearest_twomatch (int ncount, CCdatagroup *dat, int number,
             tzeit = CCutil_zeit ();
             if (CCkdtree_nearest_neighbor_2match (kt, ncount,
                    CCutil_lprand (rstate) % ncount, dat, mat, &val, rstate)) {
-                fprintf (stderr, "CCkdtree_nearest_neighbor_2match failed\n");
+                CC_FPRINTF(stderr, "CCkdtree_nearest_neighbor_2match failed\n");
                 CC_FREE (mat, int);
                 return 1;
             }
             if (put_list_in_table (td, ncount, mat)) {
-                fprintf (stderr, "put_list_in_table failed\n");
+                CC_FPRINTF(stderr, "put_list_in_table failed\n");
                 CC_FREE (mat, int);
                 return 1;
             }
             if (!silent) {
-                printf ("  NN 2-mat %d: %.0f, added %d edges (%.2f seconds)\n",
+                CC_PRINTF("  NN 2-mat %d: %.0f, added %d edges (%.2f seconds)\n",
                      round, val, td->tabletotal - k, CCutil_zeit () - tzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
     } else if ((norm & CC_NORM_BITS) == CC_X_NORM_TYPE) {
         if (!silent) {
-            printf ("No X_NORM NN-2match, using NN-tour instead\n");
-            fflush (stdout);
+            CC_PRINTF("No X_NORM NN-2match, using NN-tour instead\n");
+            CC_FFLUSH(stdout);
         }
         CC_FREE (mat, int);
         return call_nearest_tour (ncount, dat, number, kt, td, silent, rstate);
     } else {
         if (!silent) {
-            printf ("No JUNK_NORM NN-2match, using NN-tour instead\n");
-            fflush (stdout);
+            CC_PRINTF("No JUNK_NORM NN-2match, using NN-tour instead\n");
+            CC_FFLUSH(stdout);
         }
         CC_FREE (mat, int);
         return call_nearest_tour (ncount, dat, number, kt, td, silent, rstate);
     }
 
     if (!silent) {
-        printf ("  TOTAL: Nearest 2-matchings added %d edges (%.2f seconds)\n",
+        CC_PRINTF("  TOTAL: Nearest 2-matchings added %d edges (%.2f seconds)\n",
                  td->tabletotal - current, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (mat, int);
@@ -1931,12 +1931,12 @@ static int put_tour_in_table (tabledat *td, int ncount, int *tour)
 
     for (i = 1; i < ncount; i++) {
         if (put_in_table (td, tour[i-1], tour[i])) {
-            fprintf (stderr, "put_in_table failed\n");
+            CC_FPRINTF(stderr, "put_in_table failed\n");
             return 1;
         }
     }
     if (put_in_table (td, tour[ncount - 1], tour[0])) {
-        fprintf (stderr, "put_in_table failed\n");
+        CC_FPRINTF(stderr, "put_in_table failed\n");
         return 1;
     }
 
@@ -1949,7 +1949,7 @@ static int put_list_in_table (tabledat *td, int ecount, int *elist)
     
     for (i = 0; i < ecount; i++) {
         if (put_in_table (td, elist[2 * i], elist[(2 * i) + 1])) {
-            fprintf (stderr, "put_in_table failed\n");
+            CC_FPRINTF(stderr, "put_in_table failed\n");
             return 1;
         }
     }
@@ -1990,7 +1990,7 @@ static int collect_table_edges (tabledat *td, int ncount, int *ecount,
 
         *elist = CC_SAFE_MALLOC (2 * td->tabletotal, int);
         if (!(*elist)) {
-            fprintf (stderr, "Out of memory in collect_table_edges\n");
+            CC_FPRINTF(stderr, "Out of memory in collect_table_edges\n");
             return 1;
         }
         *ecount = td->tabletotal;
@@ -2014,7 +2014,7 @@ static int collect_edge_lengths (int ecount, int *elist, CCdatagroup *dat,
 
     *elen = CC_SAFE_MALLOC (ecount, int);
     if ((*elen) == (int *) NULL) {
-        fprintf (stderr, "Out of memory in collect_edge_lengths\n");
+        CC_FPRINTF(stderr, "Out of memory in collect_edge_lengths\n");
         return 1;
     }
     for (i=0; i<ecount; i++) {
@@ -2056,7 +2056,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
     in = fopen (egname, "r");
     if (!in) {
         perror (egname);
-        fprintf (stderr, "can't open %s for input\n", egname);
+        CC_FPRINTF(stderr, "can't open %s for input\n", egname);
         return 1;
     }
 
@@ -2074,7 +2074,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                 p++;
             if (!strcmp (area, "EDGEGEN")) {
                 if (sscanf (p, "%s", key) == EOF) {
-                    fprintf (stderr, "ERROR in EDGEGEN LINE - no keyword\n");
+                    CC_FPRINTF(stderr, "ERROR in EDGEGEN LINE - no keyword\n");
                     return 1;
                 }
                 if (!strcmp (key, "RANDOM")) {
@@ -2084,7 +2084,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->random = atoi (field);
                     } else {
-                        printf ("RANDOM count not given, using 0\n");
+                        CC_PRINTF("RANDOM count not given, using 0\n");
                         plan->random = 0;
                     }
                 } else if (!strcmp (key, "NEAREST")) {
@@ -2094,7 +2094,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->nearest = atoi (field);
                     } else {
-                        printf ("NEAREST count not given, using 1\n");
+                        CC_PRINTF("NEAREST count not given, using 1\n");
                         plan->nearest = 1;
                     }
                 } else if (!strcmp (key, "QUADNEAREST")) {
@@ -2104,7 +2104,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->quadnearest = atoi (field);
                     } else {
-                        printf ("QUADNEAREST count not given, using 1\n");
+                        CC_PRINTF("QUADNEAREST count not given, using 1\n");
                         plan->quadnearest = 1;
                     }
                 } else if (!strcmp (key, "DELAUNAY")) {
@@ -2116,7 +2116,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->mlinkern = atoi (field);
                     } else {
-                        printf ("M_LINKERN count not given, using 1\n");
+                        CC_PRINTF("M_LINKERN count not given, using 1\n");
                         plan->mlinkern = 1;
                     }
                 } else if (!strcmp (key, "TREE")) {
@@ -2128,7 +2128,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->nearest_twomatch_count = atoi (field);
                     } else {
-                        printf ("NN_TWOMATCH count not given, using 1\n");
+                        CC_PRINTF("NN_TWOMATCH count not given, using 1\n");
                         plan->nearest_twomatch_count = 1;
                     }
                 } else if (!strcmp (key, "GREEDY_TOUR")) {
@@ -2144,7 +2144,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->tour.nearest_count = atoi (field);
                     } else {
-                        printf ("NN_TOUR count not given, using 1\n");
+                        CC_PRINTF("NN_TOUR count not given, using 1\n");
                         plan->tour.nearest_count = 1;
                     }
                 } else if (!strcmp (key, "RANDOM_TOUR")) {
@@ -2154,7 +2154,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->tour.random_count = atoi (field);
                     } else {
-                        printf ("RANDOM_TOUR count not given, using 1\n");
+                        CC_PRINTF("RANDOM_TOUR count not given, using 1\n");
                         plan->tour.random_count = 1;
                     }
                 } else if (!strcmp (key, "TWOOPT_TOUR")) {
@@ -2164,7 +2164,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->tour.twoopt_count = atoi (field);
                     } else {
-                        printf ("TWOOPT_TOUR count not given, using 1\n");
+                        CC_PRINTF("TWOOPT_TOUR count not given, using 1\n");
                         plan->tour.twoopt_count = 1;
                     }
                 } else if (!strcmp (key, "TWOOPT5_TOUR")) {
@@ -2174,7 +2174,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->tour.twoopt5_count = atoi (field);
                     } else {
-                        printf ("TWOOPT5_TOUR count not given, using 1\n");
+                        CC_PRINTF("TWOOPT5_TOUR count not given, using 1\n");
                         plan->tour.twoopt5_count = 1;
                     }
                 } else if (!strcmp (key, "THREEOPT_TOUR")) {
@@ -2184,7 +2184,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                     if (sscanf (p, "%s", field) != EOF) {
                         plan->tour.threeopt_count = atoi (field);
                     } else {
-                        printf ("THREEOPT_TOUR count not given, using 1\n");
+                        CC_PRINTF("THREEOPT_TOUR count not given, using 1\n");
                         plan->tour.threeopt_count = 1;
                     }
                 } else if (!strcmp (key, "FRAC_TWOMATCH")) {
@@ -2198,7 +2198,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                         else if (!strcmp (field, "PRICED"))
                             plan->f2match.priced = 1;
                         else
-                            printf ("Unknown option in FRAC_TWOMATCH\n");
+                            CC_PRINTF("Unknown option in FRAC_TWOMATCH\n");
                         p += strlen (field);
                         while (*p == ' ')
                             p++;
@@ -2219,7 +2219,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                             p++;
                     }
                     if (plan->f2match_nearest.number == 0) {
-                        printf ("FRAC_TWOMATCH_NEAREST count not given, using 1\n");
+                        CC_PRINTF("FRAC_TWOMATCH_NEAREST count not given, using 1\n");
                         plan->f2match_nearest.number = 1;
                     }
                 } else if (!strcmp (key, "LINKERN")) {
@@ -2232,7 +2232,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                         while (*p == ' ')
                             p++;
                     } else {
-                        printf ("LINKERN count not given, using 1\n");
+                        CC_PRINTF("LINKERN count not given, using 1\n");
                         plan->linkern.count = 1;
                     }
                     if (sscanf (p, "%s", field) != EOF) {
@@ -2241,7 +2241,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                         while (*p == ' ')
                             p++;
                     } else {
-                        printf ("LINKERN nkicks not given, using 10\n");
+                        CC_PRINTF("LINKERN nkicks not given, using 10\n");
                         plan->linkern.nkicks = 10;
                     }
                     while (sscanf (p, "%s", field) != EOF) {
@@ -2262,7 +2262,7 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                             if (sscanf (p, "%s", field) != EOF) {
                                 plan->linkern.nearest = atoi (field);
                             } else {
-                                printf ("LINKERN NEAREST COUNT not given, using 5\n");
+                                CC_PRINTF("LINKERN NEAREST COUNT not given, using 5\n");
                                 plan->linkern.nearest = 5;
                                 break;
                             }
@@ -2273,31 +2273,31 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
                             if (sscanf (p, "%s", field) != EOF) {
                                 plan->linkern.quadnearest = atoi (field);
                             } else {
-                                printf ("LINKERN QUADNEAREST COUNT not given, using 3\n");
+                                CC_PRINTF("LINKERN QUADNEAREST COUNT not given, using 3\n");
                                 plan->linkern.quadnearest = 3;
                                 break;
                             }
                         } else {
-                            printf ("Unknown EDGEGEN LINKERN command %s\n",
+                            CC_PRINTF("Unknown EDGEGEN LINKERN command %s\n",
                                     field);
-                            fflush (stdout);
+                            CC_FFLUSH(stdout);
                         }
                         p += strlen (field);
                         while (*p == ' ')
                             p++;
                     }
                 } else {
-                    printf ("Unknown EDGEGEN command: %s\n", key);
-                    fflush (stdout);
+                    CC_PRINTF("Unknown EDGEGEN command: %s\n", key);
+                    CC_FFLUSH(stdout);
                 }
             } else {
-                printf ("Cannot parse command line: %s\n", area);
-                fflush (stdout);
+                CC_PRINTF("Cannot parse command line: %s\n", area);
+                CC_FFLUSH(stdout);
             }
         }
     }
     fclose (in);
-    printf ("\n");
+    CC_PRINTF("\n");
 
     if (plan->linkern.count) {
         if (!plan->linkern.quadnearest && !plan->linkern.nearest)
@@ -2309,80 +2309,80 @@ int CCedgegen_read (char *egname, CCedgegengroup *plan)
             plan->linkern.nkicks = 10;
     }
 
-    printf ("Edgegen Request:\n");
+    CC_PRINTF("Edgegen Request:\n");
     if (plan->nearest)
-        printf ("  Nearest %d\n", plan->nearest);
+        CC_PRINTF("  Nearest %d\n", plan->nearest);
     if (plan->quadnearest)
-        printf ("  Quad-Nearest %d\n", plan->quadnearest);
+        CC_PRINTF("  Quad-Nearest %d\n", plan->quadnearest);
     if (plan->f2match_nearest.number) {
-        printf ("  Frac 2-match Nearest %d (", plan->f2match_nearest.number);
+        CC_PRINTF("  Frac 2-match Nearest %d (", plan->f2match_nearest.number);
         if (plan->f2match_nearest.basic)
-            printf ("Basic ");
+            CC_PRINTF("Basic ");
         if (plan->f2match_nearest.priced)
-            printf ("Priced)\n");
+            CC_PRINTF("Priced)\n");
         else
-            printf ("Not Priced)\n");
+            CC_PRINTF("Not Priced)\n");
     }
     if (plan->delaunay)
-        printf ("  Delaunay Triangulation\n");
+        CC_PRINTF("  Delaunay Triangulation\n");
     if (plan->want_tree)
-        printf ("  Minimum Spanning Tree\n");
+        CC_PRINTF("  Minimum Spanning Tree\n");
     if (plan->nearest_twomatch_count)
-        printf ("  NN 2-matchings: %d\n", plan->nearest_twomatch_count);
+        CC_PRINTF("  NN 2-matchings: %d\n", plan->nearest_twomatch_count);
     if (plan->tour.random_count)
-        printf ("  Random Tours: %d\n", plan->tour.random_count);
+        CC_PRINTF("  Random Tours: %d\n", plan->tour.random_count);
     if (plan->tour.nearest_count)
-        printf ("  NN Tours: %d\n", plan->tour.nearest_count);
+        CC_PRINTF("  NN Tours: %d\n", plan->tour.nearest_count);
     if (plan->tour.greedy)
-        printf ("  Greedy Tour\n");
+        CC_PRINTF("  Greedy Tour\n");
     if (plan->tour.boruvka)
-        printf ("  Boruvka Tour\n");
+        CC_PRINTF("  Boruvka Tour\n");
     if (plan->tour.qboruvka)
-        printf ("  Quick Boruvka Tour\n");
+        CC_PRINTF("  Quick Boruvka Tour\n");
     if (plan->tour.twoopt_count)
-        printf ("  2OPT Tours: %d\n", plan->tour.twoopt_count);
+        CC_PRINTF("  2OPT Tours: %d\n", plan->tour.twoopt_count);
     if (plan->tour.twoopt5_count)
-        printf ("  2.5OPT Tours: %d\n", plan->tour.twoopt5_count);
+        CC_PRINTF("  2.5OPT Tours: %d\n", plan->tour.twoopt5_count);
     if (plan->tour.threeopt_count)
-        printf ("  3OPT Tours: %d\n", plan->tour.threeopt_count);
+        CC_PRINTF("  3OPT Tours: %d\n", plan->tour.threeopt_count);
     if (plan->linkern.count) {
-        printf ("  LK Tours: %d (", plan->linkern.count);
+        CC_PRINTF("  LK Tours: %d (", plan->linkern.count);
         if (plan->linkern.greedy_start)
-            printf ("Greedy, ");
+            CC_PRINTF("Greedy, ");
         else if (plan->linkern.boruvka_start)
-            printf ("Boruvka, ");
+            CC_PRINTF("Boruvka, ");
         else if (plan->linkern.qboruvka_start)
-            printf ("Quick Boruvka, ");
+            CC_PRINTF("Quick Boruvka, ");
         else if (plan->linkern.random_start)
-            printf ("Random, ");
+            CC_PRINTF("Random, ");
         else
-            printf ("NN, ");
+            CC_PRINTF("NN, ");
         if (!plan->linkern.nearest) {
-            printf ("Quad-%d, ", plan->linkern.quadnearest);
+            CC_PRINTF("Quad-%d, ", plan->linkern.quadnearest);
         } else {
             if (!plan->linkern.quadnearest) {
-                printf ("Near-%d, ", plan->linkern.nearest);
+                CC_PRINTF("Near-%d, ", plan->linkern.nearest);
             } else {
-                printf ("Quad-%d + Near-%d, ", plan->linkern.quadnearest,
+                CC_PRINTF("Quad-%d + Near-%d, ", plan->linkern.quadnearest,
                                                plan->linkern.nearest);
             }
         }
-        printf ("%d Kicks)\n", plan->linkern.nkicks);
+        CC_PRINTF("%d Kicks)\n", plan->linkern.nkicks);
     }
     if (plan->f2match.wantit) {
-        printf ("  Frac 2-matching (");
+        CC_PRINTF("  Frac 2-matching (");
         if (plan->f2match.basic)
-            printf ("Basic ");
+            CC_PRINTF("Basic ");
         if (plan->f2match.priced)
-            printf ("Priced)\n");
+            CC_PRINTF("Priced)\n");
         else
-            printf ("Not Priced)\n");
+            CC_PRINTF("Not Priced)\n");
     }
     if (plan->mlinkern) {
-        printf ("  LK matchings: %d\n", plan->mlinkern);
+        CC_PRINTF("  LK matchings: %d\n", plan->mlinkern);
     }
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 
     return 0;
 }

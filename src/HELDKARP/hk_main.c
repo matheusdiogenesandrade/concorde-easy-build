@@ -80,12 +80,12 @@ int main (int ac, char **av)
     }
 
     CCutil_sprand (seed, &rstate);
-    printf ("Using random seed %d\n", seed); fflush (stdout);
+    CC_PRINTF("Using random seed %d\n", seed); CC_FFLUSH(stdout);
 
     if (upbound != INIT_UPBOUND) {
         upper = (double) upbound;
         dupper = &upper;
-        printf ("Initial Upper Bound: %d\n", upbound); fflush (stdout);
+        CC_PRINTF("Initial Upper Bound: %d\n", upbound); CC_FFLUSH(stdout);
     }
 
     if (isdat || istsplib || in_fname == (char *) NULL) {
@@ -93,13 +93,13 @@ int main (int ac, char **av)
         if (istsplib) {
             rval = CCutil_gettsplib (in_fname, &ncount, &dat);
             if (rval) {
-                fprintf (stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
             }
         } else {
             rval = CCutil_getdata (in_fname, binary_in, norm, &ncount, &dat,
                                    nnodes_want, 0, &rstate);
             if (rval) {
-                fprintf (stderr, "CCutil_getdata failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCutil_getdata failed\n"); goto CLEANUP;
             }
         }
         havedat = 1;
@@ -112,7 +112,7 @@ int main (int ac, char **av)
         rval = CCutil_getedgelist_n (&ncount, in_fname, &ecount, &elist,
                                      &elen, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
         }
         tour_elist = CC_SAFE_MALLOC (2*ncount, int);
         CCcheck_NULL (tour_elist, "out of memory for tour_elist");
@@ -123,18 +123,18 @@ int main (int ac, char **av)
     }
 
     if (retval == HELDKARP_SEARCHLIMITEXCEEDED) {
-        printf ("Search limit exceeded\n"); goto CLEANUP;
+        CC_PRINTF("Search limit exceeded\n"); goto CLEANUP;
     } else if (retval) {
-        printf ("heldkarp error %d\n", retval); goto CLEANUP;
+        CC_PRINTF("heldkarp error %d\n", retval); goto CLEANUP;
     } else if (foundtour == 0) { 
-        printf ("Found no better tour\n");
+        CC_PRINTF("Found no better tour\n");
     } else if (anytour == 1) {
-        printf ("Found improved tour: %.0f\n", value);
+        CC_PRINTF("Found improved tour: %.0f\n", value);
     } else {
-        printf ("Optimized, value %.0f\n", value);
+        CC_PRINTF("Optimized, value %.0f\n", value);
     }
-    printf ("Running Time: %.2f seconds\n", CCutil_zeit () - szeit); 
-    fflush (stdout);
+    CC_PRINTF("Running Time: %.2f seconds\n", CCutil_zeit () - szeit); 
+    CC_FFLUSH(stdout);
 
     if (foundtour == 1) {
         if (out_fname) {
@@ -184,8 +184,8 @@ static int get_len_tlist (int ncount, int ecount, int *elist, int *elen,
             }
         }
         if (j == ecount) {
-            printf ("Could not find edge (%d, %d)\n", end0, end1);
-            fflush (stdout);
+            CC_PRINTF("Could not find edge (%d, %d)\n", end0, end1);
+            CC_FFLUSH(stdout);
             rval = 1; goto CLEANUP;
         }
     }
@@ -280,19 +280,19 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below] [filename]\n", fname);
-    fprintf (stderr, "   -a    cut off search after first tour\n");
-    fprintf (stderr, "   -b    dat file is in binary\n");
-    fprintf (stderr, "   -d    dat file (default is edge file)\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -n #  limit on number of search nodes\n");
-    fprintf (stderr, "   -o f  output tour (as edgelist) to file\n");
-    fprintf (stderr, "   -q    less output (may be repeated)\n");
-    fprintf (stderr, "   -s #  random seed\n");
-    fprintf (stderr, "   -T    tsplib file (default is edge file)\n");
-    fprintf (stderr, "   -u #  upperbound on tour length\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=JOHNSON, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
-    fprintf (stderr, "         8=DSJRAND, 9=CRYSTAL, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
-    fprintf (stderr, "         17=GEOM\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below] [filename]\n", fname);
+    CC_FPRINTF(stderr, "   -a    cut off search after first tour\n");
+    CC_FPRINTF(stderr, "   -b    dat file is in binary\n");
+    CC_FPRINTF(stderr, "   -d    dat file (default is edge file)\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -n #  limit on number of search nodes\n");
+    CC_FPRINTF(stderr, "   -o f  output tour (as edgelist) to file\n");
+    CC_FPRINTF(stderr, "   -q    less output (may be repeated)\n");
+    CC_FPRINTF(stderr, "   -s #  random seed\n");
+    CC_FPRINTF(stderr, "   -T    tsplib file (default is edge file)\n");
+    CC_FPRINTF(stderr, "   -u #  upperbound on tour length\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=JOHNSON, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
+    CC_FPRINTF(stderr, "         8=DSJRAND, 9=CRYSTAL, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
+    CC_FPRINTF(stderr, "         17=GEOM\n");
 }

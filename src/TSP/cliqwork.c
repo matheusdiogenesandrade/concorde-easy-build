@@ -321,7 +321,7 @@ int CCtsp_clique_to_array (CCtsp_lpclique *c, int **ar, int *count)
     if (count) {
         *ar = CC_SAFE_MALLOC (*count, int);
         if (!(*ar)) {
-            fprintf (stderr, "out of memory in CCtsp_clique_to_array\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_clique_to_array\n");
             rval = 1; goto CLEANUP;
         }
         CC_FOREACH_NODE_IN_CLIQUE (j, *c, tmp) {
@@ -346,7 +346,7 @@ int CCtsp_clique_delta (CCtsp_lpgraph *g, double *x, CCtsp_lpclique *c,
 
     marks = CC_SAFE_MALLOC (g->ncount, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in CCtsp_clique_delta\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_clique_delta\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -459,7 +459,7 @@ int CCtsp_segment_to_subtour (CCtsp_lpcut_in **cut, int a, int b, int ncount)
     c->cliquecount = 1;
     c->cliques = CC_SAFE_MALLOC (1, CCtsp_lpclique);
     if (!c->cliques) {
-        fprintf (stderr, "out of memory in CCtsp_segment_to_subtour\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_segment_to_subtour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -475,7 +475,7 @@ int CCtsp_segment_to_subtour (CCtsp_lpcut_in **cut, int a, int b, int ncount)
 
     rval = CCtsp_construct_skeleton (c, ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         goto CLEANUP;
     }
 
@@ -508,7 +508,7 @@ int CCtsp_array_to_subtour (CCtsp_lpcut_in **cut, int *ar, int acount,
     c->cliquecount = 1;
     c->cliques = CC_SAFE_MALLOC (1, CCtsp_lpclique);
     if (!c->cliques) {
-        fprintf (stderr, "out of memory in CCtsp_array_to_subtour\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_array_to_subtour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -522,7 +522,7 @@ int CCtsp_array_to_subtour (CCtsp_lpcut_in **cut, int *ar, int acount,
 
     rval = CCtsp_construct_skeleton (c, ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         goto CLEANUP;
     }
 
@@ -578,7 +578,7 @@ int CCtsp_array_to_lpclique (int *ar, int acount, CCtsp_lpclique *cliq)
 
     cliq->nodes = CC_SAFE_MALLOC (nseg, CCtsp_segment);
     if (!cliq->nodes) {
-        fprintf (stderr, "out of memory in CCtsp_array_to_lpclique\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_array_to_lpclique\n");
         return 1;
     }
     cliq->segcount = nseg;
@@ -605,7 +605,7 @@ int CCtsp_seglist_to_lpclique (int nseg, int *list, CCtsp_lpclique *cliq)
     perm = CC_SAFE_MALLOC (nseg, int);
     len  = CC_SAFE_MALLOC (nseg, int);
     if (!perm || !len) {
-        fprintf (stderr, "out of memory in CCtsp_seglist_to_lpclique\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_seglist_to_lpclique\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nseg; i++) {
@@ -616,7 +616,7 @@ int CCtsp_seglist_to_lpclique (int nseg, int *list, CCtsp_lpclique *cliq)
 
     cliq->nodes = CC_SAFE_MALLOC (nseg, CCtsp_segment);
     if (!cliq->nodes) {
-        fprintf (stderr, "out of memory in CCtsp_seglist_to_lpclique\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_seglist_to_lpclique\n");
         rval = 1; goto CLEANUP;
     }
     cliq->segcount = nseg;
@@ -653,7 +653,7 @@ int CCtsp_shrunk_set_to_lpclique (int cnt, int *set, int *wset,
     }
     rval = CCtsp_array_to_lpclique (wset, wcount, cliq);
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -687,7 +687,7 @@ int CCtsp_add_nodes_to_lpclique (CCtsp_lpclique *cin, CCtsp_lpclique *cout,
     marks = CC_SAFE_MALLOC (maxn + 1, char);
     ar = CC_SAFE_MALLOC (maxn + 1, int);
     if (!marks || !ar) {
-        fprintf (stderr, "out of memory in CCtsp_add_nodes_to_lpclique\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_add_nodes_to_lpclique\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < addcount; i++) {
@@ -707,7 +707,7 @@ int CCtsp_add_nodes_to_lpclique (CCtsp_lpclique *cin, CCtsp_lpclique *cout,
     }
     rval = CCtsp_array_to_lpclique (ar, count, cout);
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -738,7 +738,7 @@ int CCtsp_delete_nodes_from_lpclique (CCtsp_lpclique *cin,
     marks = CC_SAFE_MALLOC (maxn + 1, char);
     ar = CC_SAFE_MALLOC (maxn + 1, int);
     if (!marks || !ar) {
-        fprintf (stderr, "out of memory in CCtsp_delete_nodes_from_lpclique\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_delete_nodes_from_lpclique\n");
         rval = 1; goto CLEANUP;
     }
     CC_FOREACH_NODE_IN_CLIQUE (i, *cin, tmp) {
@@ -755,7 +755,7 @@ int CCtsp_delete_nodes_from_lpclique (CCtsp_lpclique *cin,
     }
     rval = CCtsp_array_to_lpclique (ar, count, cout);
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -772,45 +772,45 @@ void CCtsp_print_lpcut_in (CCtsp_lpcut_in *c)
     int j, k;
 
      
-    printf ("%d %d\n", c->cliquecount, c->rhs);
+    CC_PRINTF("%d %d\n", c->cliquecount, c->rhs);
     for (i = 0; i < c->cliquecount; i++) {
         for (j = 0; j < c->cliques[i].segcount; j++) {
             for (k = c->cliques[i].nodes[j].lo;
                 k <= c->cliques[i].nodes[j].hi; k++) {
-                printf ("%d ", k);
+                CC_PRINTF("%d ", k);
             } 
         }
-        printf ("-1\n");
+        CC_PRINTF("-1\n");
     }
-    printf ("\n");
+    CC_PRINTF("\n");
 */
 
     if (c->dominocount == 0) {
         if (c->cliquecount == 1) {
-            printf ("Subtour\n");
-            printf ("      ");
+            CC_PRINTF("Subtour\n");
+            CC_PRINTF("      ");
             CCtsp_print_lpclique (&(c->cliques[0]));
         } else {
-            printf ("Comb, Clique Tree or Wild Thing (rhs %d)\n", c->rhs);
+            CC_PRINTF("Comb, Clique Tree or Wild Thing (rhs %d)\n", c->rhs);
             for (i = 0; i < c->cliquecount; i++) {
-                printf ("      ");
+                CC_PRINTF("      ");
                 CCtsp_print_lpclique (&(c->cliques[i]));
             }
         }
     } else {
         if (c->cliquecount != 1) {
-            printf ("Bad Domino, more than one handle\n");
+            CC_PRINTF("Bad Domino, more than one handle\n");
         } else {
-            printf ("Domino Inequality\n");
-            printf ("      ");
+            CC_PRINTF("Domino Inequality\n");
+            CC_PRINTF("      ");
             CCtsp_print_lpclique (&(c->cliques[0]));
             for (i = 0; i < c->dominocount; i++) {
-                printf ("      ");
+                CC_PRINTF("      ");
                 CCtsp_print_lpdomino (&(c->dominos[i]));
             }
         }
     }
-    printf ("\n"); fflush (stdout);
+    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 }
 
 void CCtsp_print_lpclique (CCtsp_lpclique *c)
@@ -818,12 +818,12 @@ void CCtsp_print_lpclique (CCtsp_lpclique *c)
     int i;
 
     if (c->segcount == 0) {
-        printf ("Empty Clique\n"); fflush (stdout);
+        CC_PRINTF("Empty Clique\n"); CC_FFLUSH(stdout);
     } else {
         for (i = 0; i < c->segcount; i++) {
-            printf ("%d->%d ", c->nodes[i].lo, c->nodes[i].hi);
+            CC_PRINTF("%d->%d ", c->nodes[i].lo, c->nodes[i].hi);
         }
-        printf ("\n"); fflush (stdout);
+        CC_PRINTF("\n"); CC_FFLUSH(stdout);
     }
 }
 
@@ -835,15 +835,15 @@ void CCtsp_print_lpdomino (CCtsp_lpdomino *d)
     for (k = 0; k < 2; k++) { 
         c = &(d->sets[k]);
         if (c->segcount == 0) {
-            printf ("Empty Clique "); fflush (stdout);
+            CC_PRINTF("Empty Clique "); CC_FFLUSH(stdout);
         } else {
             for (i = 0; i < c->segcount; i++) {
-                printf ("%d->%d ", c->nodes[i].lo, c->nodes[i].hi);
+                CC_PRINTF("%d->%d ", c->nodes[i].lo, c->nodes[i].hi);
             }
         }
-        if (k == 0) printf (" |  ");
+        if (k == 0) CC_PRINTF(" |  ");
     }
-   printf ("\n"); fflush (stdout);
+   CC_PRINTF("\n"); CC_FFLUSH(stdout);
 }
 
 int CCtsp_lpcut_to_lpcut_in (CCtsp_lpcuts *cuts, CCtsp_lpcut *c,
@@ -856,8 +856,8 @@ int CCtsp_lpcut_to_lpcut_in (CCtsp_lpcuts *cuts, CCtsp_lpcut *c,
 
 /*
     if (c->dominocount != 0) {
-        printf ("Yipes: %d\n", c->dominocount);
-        fflush (stdout);
+        CC_PRINTF("Yipes: %d\n", c->dominocount);
+        CC_FFLUSH(stdout);
         exit (1);
     }
 */
@@ -879,7 +879,7 @@ int CCtsp_lpcut_to_lpcut_in (CCtsp_lpcuts *cuts, CCtsp_lpcut *c,
         cl = &(cuts->cliques[c->cliques[i]]);
         rval = CCtsp_copy_lpclique (cl, &new->cliques[i]);
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
             for (k = 0; k < i; k++) {
                 CC_FREE (new->cliques[k].nodes, CCtsp_segment);
             }
@@ -897,7 +897,7 @@ int CCtsp_lpcut_to_lpcut_in (CCtsp_lpcuts *cuts, CCtsp_lpcut *c,
             dom = &(cuts->dominos[c->dominos[i]]);
             rval = CCtsp_copy_lpdomino (dom, &new->dominos[i]);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpdomino failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpdomino failed\n");
                 for (k = 0; k < i; k++) {
                     CCtsp_free_lpdomino (&new->dominos[k]);
                 }
@@ -909,7 +909,7 @@ int CCtsp_lpcut_to_lpcut_in (CCtsp_lpcuts *cuts, CCtsp_lpcut *c,
 
     rval = CCtsp_copy_skeleton (&c->skel, &new->skel);
     if (rval) {
-        fprintf (stderr, "CCtsp_copy_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_copy_skeleton failed\n");
         CCtsp_free_lpcut_in (new);
         goto CLEANUP;
     }
@@ -928,7 +928,7 @@ int CCtsp_copy_lpclique (CCtsp_lpclique *c, CCtsp_lpclique *new)
     if (c->segcount) {
         s = CC_SAFE_MALLOC (c->segcount, CCtsp_segment);
         if (!s) {
-            fprintf (stderr, "out of memory in copy_lpclique\n");
+            CC_FPRINTF(stderr, "out of memory in copy_lpclique\n");
             return 1;
         }
         for (k = 0; k < c->segcount; k++) {
@@ -950,7 +950,7 @@ int CCtsp_copy_lpdomino (CCtsp_lpdomino *c, CCtsp_lpdomino *new)
     for (k = 0; k < 2; k++) {
         rval = CCtsp_copy_lpclique (&(c->sets[k]), &(new->sets[k]));
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
             CCtsp_free_lpdomino (new);
             goto CLEANUP;
         }
@@ -985,7 +985,7 @@ int CCtsp_create_lpcliques (CCtsp_lpcut_in *c, int cliquecount)
 
     c->cliques = CC_SAFE_MALLOC (cliquecount, CCtsp_lpclique);
     if (c->cliques == (CCtsp_lpclique *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_create_lpcliques\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_create_lpcliques\n");
         return 1;
     }
     for (i=0; i<cliquecount; i++) {
@@ -1071,7 +1071,7 @@ static int build_dominos (CCtsp_lpcut_in *c, int ndomino, int *Acount,
     int i, j, Amin, Bmin, tag, rval = 0;
 
     if (ndomino == 0) {
-        fprintf (stderr, "ndomino = 0 in build_dominos\n");
+        CC_FPRINTF(stderr, "ndomino = 0 in build_dominos\n");
         rval = 1;  goto CLEANUP;
     }
 

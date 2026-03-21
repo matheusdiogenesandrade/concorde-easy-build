@@ -305,7 +305,7 @@ static int
 
 static void lp_message (void)
 {
-    fprintf (stderr, "need to link an lp solver to use this function\n");
+    CC_FPRINTF(stderr, "need to link an lp solver to use this function\n");
 }
 
 int CClp_init (CClp **lp)
@@ -316,7 +316,7 @@ int CClp_init (CClp **lp)
 
     (*lp) = CC_SAFE_MALLOC (1, CClp);
     if ((*lp) == (CClp *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_init\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_init\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -334,7 +334,7 @@ int CClp_force_perturb (CClp *lp)
     /* Not implemented in illuin */
 
     if (!lp) {
-        fprintf (stderr, "CClp_force_perturb called without an lp\n");
+        CC_FPRINTF(stderr, "CClp_force_perturb called without an lp\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -348,25 +348,25 @@ int CClp_tune_small (CClp *lp)
     int rval = 0;
 
     if (!lp) {
-        fprintf (stderr, "CClp_tune_small called without an LP\n");
+        CC_FPRINTF(stderr, "CClp_tune_small called without an LP\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSset_param (lp->p, QS_PARAM_PRIMAL_PRICING, QS_PRICE_PDEVEX);
     if (rval) {
-        fprintf (stderr, "QSset_param failed\n");
+        CC_FPRINTF(stderr, "QSset_param failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSset_param (lp->p, QS_PARAM_DUAL_PRICING, QS_PRICE_DDANTZIG);
     if (rval) {
-        fprintf (stderr, "QSset_param failed\n");
+        CC_FPRINTF(stderr, "QSset_param failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSset_param (lp->p, QS_PARAM_SIMPLEX_DISPLAY, 0);
     if (rval) {
-        fprintf (stderr, "QSset_param failed\n");
+        CC_FPRINTF(stderr, "QSset_param failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -383,7 +383,7 @@ int CClp_disable_presolve (CClp *lp)
     int rval = 0;
 
     if (!lp) {
-        fprintf (stderr, "CClp_tune_small called without an LP\n");
+        CC_FPRINTF(stderr, "CClp_tune_small called without an LP\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -419,19 +419,19 @@ int CClp_loadlp (CClp *lp, const char *name, int ncols, int nrows,
                 matval, objsense, obj, rhs, sense, lb, ub, (const char **) NULL,
                 (const char **) NULL);
     if (lp->p == (QSprob) NULL) {
-        fprintf (stderr, "QSload_prob failed\n");
+        CC_FPRINTF(stderr, "QSload_prob failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSset_param (lp->p, QS_PARAM_DUAL_PRICING, QS_PRICE_DSTEEP);
     if (rval) {
-        fprintf (stderr, "QSset_param failed\n");
+        CC_FPRINTF(stderr, "QSset_param failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSset_param (lp->p, QS_PARAM_SIMPLEX_DISPLAY, 0);
     if (rval) {
-        fprintf (stderr, "QSset_param failed\n");
+        CC_FPRINTF(stderr, "QSset_param failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -448,19 +448,19 @@ int CClp_create (CClp *lp, const char *name)
     int rval = 0;
 
     if (!lp) {
-        fprintf (stderr, "CClp_create called without an lp structure\n");
+        CC_FPRINTF(stderr, "CClp_create called without an lp structure\n");
         rval = 1; goto CLEANUP;
     }
 
     lp->p = QScreate_prob (name, QS_MIN);
     if (lp->p == (QSprob) NULL) {
-        fprintf (stderr, "QScreate_prob failed\n");
+        CC_FPRINTF(stderr, "QScreate_prob failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSset_param (lp->p, QS_PARAM_DUAL_PRICING, QS_PRICE_DSTEEP);
     if (rval) {
-        fprintf (stderr, "QSset_param failed\n");
+        CC_FPRINTF(stderr, "QSset_param failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -478,7 +478,7 @@ int CClp_new_row (CClp *lp, char sense, double rhs)
 
     rval = QSnew_row (lp->p, rhs, sense, (char *) NULL);
     if (rval) {
-        fprintf (stderr, "QSnew_row failed\n");
+        CC_FPRINTF(stderr, "QSnew_row failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -493,7 +493,7 @@ int CClp_change_sense (CClp *lp, int row, char sense)
 
     rval = QSchange_sense (lp->p, row, sense);
     if (rval) {
-        fprintf (stderr, "QSchange_sense failed\n");
+        CC_FPRINTF(stderr, "QSchange_sense failed\n");
         goto CLEANUP;
     }
 
@@ -514,11 +514,11 @@ int CClp_opt (CClp *lp, int method)
         rval = dualopt (lp);
         break;
     case CClp_METHOD_BARRIER:
-        fprintf (stderr, "qsopt does not yet have a barrier code\n");
+        CC_FPRINTF(stderr, "qsopt does not yet have a barrier code\n");
         rval = 1; goto CLEANUP;
     default:
         rval = 1;
-        fprintf (stderr, "Nonexistent method in CClp_opt\n");
+        CC_FPRINTF(stderr, "Nonexistent method in CClp_opt\n");
         break;
     }
 
@@ -542,7 +542,7 @@ static int primalopt (CClp *lp)
 
     rval = QSopt_primal (lp->p, &status);
     if (rval) {
-        fprintf (stderr, "QSopt_primal failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSopt_primal failed\n"); goto CLEANUP;
     }
 
 /*
@@ -554,33 +554,33 @@ static int primalopt (CClp *lp)
 
     trickit += (CCutil_zeit () - szeit);
     if (tiii++ % 1000 == 999) {
-        printf ("I-LP: %f (%d, %f), rows = %f, cols = %f\n",
+        CC_PRINTF("I-LP: %f (%d, %f), rows = %f, cols = %f\n",
              trickit, tiii, trickit / (double) tiii, 
              tiii_rows / (double) tiii, tiii_cols / (double) tiii);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 */
 
     if (status == QS_LP_ITER_LIMIT) {
-        printf ("Primal LP Solver reached iteration limit\n"); fflush (stdout);
+        CC_PRINTF("Primal LP Solver reached iteration limit\n"); CC_FFLUSH(stdout);
         rval = QSwrite_prob (lp->p, "piter.lp", "LP");
         if (rval) {
-            fprintf (stderr, "QSwrite_prob failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "QSwrite_prob failed\n"); goto CLEANUP;
         }
-        printf ("Saved LP as piter.lp\n"); fflush (stdout);
+        CC_PRINTF("Saved LP as piter.lp\n"); CC_FFLUSH(stdout);
         rval = QSwrite_basis (lp->p, (QSbas) NULL, "piter.bas");
         if (rval) {
-            fprintf (stderr, "QSwrite_basis failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "QSwrite_basis failed\n"); goto CLEANUP;
         }
-        printf ("Saved LP as piter.bas\n"); fflush (stdout);
+        CC_PRINTF("Saved LP as piter.bas\n"); CC_FFLUSH(stdout);
     } else if (status == QS_LP_TIME_LIMIT) {
-        printf ("Primal LP Solver reached time limit\n"); fflush (stdout);
+        CC_PRINTF("Primal LP Solver reached time limit\n"); CC_FFLUSH(stdout);
     }
 
     if (status == QS_LP_INFEASIBLE) {
         rval = 2; goto CLEANUP;
     } else if (status != QS_LP_OPTIMAL) {
-        fprintf (stderr, "no optimal LP-solution exists: %d\n", status);
+        CC_FPRINTF(stderr, "no optimal LP-solution exists: %d\n", status);
         rval = 1; goto CLEANUP;
     }
 
@@ -596,30 +596,30 @@ static int dualopt (CClp *lp)
 
     rval = QSopt_dual (lp->p, &status);
     if (rval) {
-        fprintf (stderr, "QSopt_dual failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSopt_dual failed\n"); goto CLEANUP;
     }
 
     if (status == QS_LP_ITER_LIMIT) {
-        printf ("Dual LP Solver reached iteration limit\n"); fflush (stdout);
+        CC_PRINTF("Dual LP Solver reached iteration limit\n"); CC_FFLUSH(stdout);
         rval = QSwrite_prob (lp->p, "iter.lp", "LP");
         if (rval) {
-            fprintf (stderr, "QSwrite_prob failed\n");
+            CC_FPRINTF(stderr, "QSwrite_prob failed\n");
             goto CLEANUP;
         }
-        printf ("Saved LP as iter.lp\n"); fflush (stdout);
+        CC_PRINTF("Saved LP as iter.lp\n"); CC_FFLUSH(stdout);
         rval = QSwrite_basis (lp->p, (QSbas) NULL, "iter.bas");
         if (rval) {
-            fprintf (stderr, "QSwrite_basis failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "QSwrite_basis failed\n"); goto CLEANUP;
         }
-        printf ("Saved LP as iter.bas\n"); fflush (stdout);
+        CC_PRINTF("Saved LP as iter.bas\n"); CC_FFLUSH(stdout);
     } else if (status == QS_LP_TIME_LIMIT) {
-        printf ("Dual LP Solver reached time limit\n"); fflush (stdout);
+        CC_PRINTF("Dual LP Solver reached time limit\n"); CC_FFLUSH(stdout);
     }
 
     if (status == QS_LP_INFEASIBLE) {
         rval = 2; goto CLEANUP;
     } else if (status != QS_LP_OPTIMAL) {
-        fprintf (stderr, "no optimal LP-solution exists: %d\n", status);
+        CC_FPRINTF(stderr, "no optimal LP-solution exists: %d\n", status);
         rval = 1; goto CLEANUP;
     }
 
@@ -644,17 +644,17 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
 
     rval = QSget_param (lp->p, QS_PARAM_SIMPLEX_MAX_ITERATIONS, &olditer);
     if (rval) {
-        fprintf (stderr, "QSget_param failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSget_param failed\n"); goto CLEANUP;
     }
 
     rval = QSset_param (lp->p, QS_PARAM_SIMPLEX_MAX_ITERATIONS, iterationlim);
     if (rval) {
-        fprintf (stderr, "QSset_param failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSset_param failed\n"); goto CLEANUP;
     }
 
     rval = QSopt_dual (lp->p, &istatus);
     if (rval) {
-        fprintf (stderr, "QSopt_dual failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSopt_dual failed\n"); goto CLEANUP;
     }
 
     if (istatus == QS_LP_INFEASIBLE) {
@@ -662,7 +662,7 @@ int CClp_limited_dualopt (CClp *lp, int iterationlim, int *status,
     } else if (istatus == QS_LP_UNBOUNDED) {
         if (status) *status = CClp_UNBOUNDED;
     } else if (istatus == QS_LP_UNSOLVED) {
-        fprintf (stderr, "no optimal LP-solution exists\n");
+        CC_FPRINTF(stderr, "no optimal LP-solution exists\n");
         if (status) *status = CClp_FAILURE;
     } else {
         if (status) *status = CClp_SUCCESS;
@@ -685,7 +685,7 @@ int CClp_addrows (CClp *lp, int newrows, int newnz, double *rhs, char *sense,
 
     rmatcnt = CC_SAFE_MALLOC (newrows, int);
     if (!rmatcnt) {
-        fprintf (stderr, "out of memory in CClp_addrows\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_addrows\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -697,7 +697,7 @@ int CClp_addrows (CClp *lp, int newrows, int newnz, double *rhs, char *sense,
     rval = QSadd_rows (lp->p, newrows, rmatcnt, rmatbeg, rmatind, rmatval,
                         rhs, sense, (const char **) NULL);
     if (rval) {
-        fprintf (stderr, "QSadd_rows failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSadd_rows failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -715,7 +715,7 @@ int CClp_addcols (CClp *lp, int newcols, int newnz, double *obj,
 
     cmatcnt = CC_SAFE_MALLOC (newcols, int);
     if (!cmatcnt) {
-        fprintf (stderr, "out of memory in CClp_addcols\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_addcols\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -727,7 +727,7 @@ int CClp_addcols (CClp *lp, int newcols, int newnz, double *obj,
     rval = QSadd_cols (lp->p, newcols, cmatcnt, cmatbeg, cmatind, cmatval,
                         obj, lb, ub, (const char **) NULL);
     if (rval) {
-        fprintf (stderr, "QSadd_cols failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSadd_cols failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -745,7 +745,7 @@ int CClp_delete_row (CClp *lp, int i)
 
     rval = QSdelete_rows (lp->p, 1, dellist);
     if (rval) {
-        fprintf (stderr, "QSdelete_cols failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSdelete_cols failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -766,13 +766,13 @@ int CClp_delete_set_of_rows (CClp *lp, int *delstat)
         if (delstat[i]) delcnt++;
     }
     if (delcnt == 0) {
-        fprintf (stderr, "delete_set_of_rows with no deleted rows\n");
+        CC_FPRINTF(stderr, "delete_set_of_rows with no deleted rows\n");
         goto CLEANUP;
     }
 
     dellist = CC_SAFE_MALLOC (delcnt, int);
     if (dellist == (int *) NULL) {
-        fprintf (stderr, "out of memory in delete_set_of_rows\n");
+        CC_FPRINTF(stderr, "out of memory in delete_set_of_rows\n");
         return 1;
     }
     for (i = 0, j = 0; i < rcnt; i++) {
@@ -783,12 +783,12 @@ int CClp_delete_set_of_rows (CClp *lp, int *delstat)
 
     rval = QSopt_pivotin_row (lp->p, delcnt, dellist);
     if (rval) {
-        fprintf (stderr, "QSopt_pivotin_row failded, continuing anyway\n");
+        CC_FPRINTF(stderr, "QSopt_pivotin_row failded, continuing anyway\n");
     }
 
     rval = QSdelete_rows (lp->p, delcnt, dellist);
     if (rval) {
-        fprintf (stderr, "QSdelete_rows failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSdelete_rows failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -806,7 +806,7 @@ int CClp_delete_column (CClp *lp, int i)
     
     rval = QSdelete_cols (lp->p, 1, dellist);
     if (rval) {
-        fprintf (stderr, "QSdelete_cols failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSdelete_cols failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -827,13 +827,13 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
         if (delstat[i]) delcnt++;
     }
     if (delcnt == 0) {
-        fprintf (stderr, "delete_set_of_columns with no deleted columns\n");
+        CC_FPRINTF(stderr, "delete_set_of_columns with no deleted columns\n");
         goto CLEANUP;
     }
 
     dellist = CC_SAFE_MALLOC (delcnt, int);
     if (dellist == (int *) NULL) {
-        fprintf (stderr, "out of memory in delete_set_of_rows\n");
+        CC_FPRINTF(stderr, "out of memory in delete_set_of_rows\n");
         return 1;
     }
     for (i = 0, j = 0; i < ccnt; i++) {
@@ -844,7 +844,7 @@ int CClp_delete_set_of_columns (CClp *lp, int *delstat)
 
     rval = QSdelete_cols (lp->p, delcnt, dellist);
     if (rval) {
-        fprintf (stderr, "QSdelete_cols failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSdelete_cols failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -865,7 +865,7 @@ int CClp_setbnd (CClp *lp, int col, char lower_or_upper, double bnd)
 
     rval = QSchange_bounds (lp->p, 1, collist, lu, bounds);
     if (rval) {
-        fprintf (stderr, "QSchange_bounds failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSchange_bounds failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -882,7 +882,7 @@ int CClp_get_warmstart (CClp *lp, CClp_warmstart **w)
 
     (*w) = CC_SAFE_MALLOC (1, CClp_warmstart);
     if ((*w) == (CClp_warmstart *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
     init_warmstart (*w);
@@ -898,15 +898,15 @@ int CClp_get_warmstart (CClp *lp, CClp_warmstart **w)
     (*w)->dnorm = CC_SAFE_MALLOC ((*w)->nrows, double);
 
     if (!(*w)->cstat || !(*w)->rstat || !(*w)->dnorm) {
-        fprintf (stderr, "out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
 
     if (QStest_row_norms (lp->p) == 0) {
-        printf ("recomputing rownorms ...\n"); fflush (stdout);
+        CC_PRINTF("recomputing rownorms ...\n"); CC_FFLUSH(stdout);
         rval = QScompute_row_norms (lp->p);
         if (rval) {
-            fprintf (stderr, "QScompute_row_norms failed\n");
+            CC_FPRINTF(stderr, "QScompute_row_norms failed\n");
             goto CLEANUP;
         }
     }
@@ -914,12 +914,12 @@ int CClp_get_warmstart (CClp *lp, CClp_warmstart **w)
     rval = QSget_basis_and_row_norms_array (lp->p, (*w)->cstat, (*w)->rstat,
                                                     (*w)->dnorm);
     if (rval) {
-        fprintf (stderr, "QSget_basis_and_row_norms_array failed\n");
-        fprintf (stderr, "Trying to get basis\n");
+        CC_FPRINTF(stderr, "QSget_basis_and_row_norms_array failed\n");
+        CC_FPRINTF(stderr, "Trying to get basis\n");
         CC_IFFREE ((*w)->dnorm, double);
         rval = QSget_basis_array (lp->p, (*w)->cstat, (*w)->rstat);
         if (rval) {
-            fprintf (stderr, "QSget_basis_array failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "QSget_basis_array failed\n"); goto CLEANUP;
         }
     }
 
@@ -933,7 +933,7 @@ int CClp_load_warmstart (CClp *lp, CClp_warmstart *w)
     int rval = 0;
 
     if (w->cstat == (char *) NULL || w->rstat == (char *) NULL) {
-        fprintf (stderr, "WARNING: no basis in call to load_warmstart\n");
+        CC_FPRINTF(stderr, "WARNING: no basis in call to load_warmstart\n");
         goto CLEANUP;
     }
 
@@ -941,13 +941,13 @@ int CClp_load_warmstart (CClp *lp, CClp_warmstart *w)
         rval = QSload_basis_and_row_norms_array (lp->p, w->cstat, w->rstat,
                                                  w->dnorm);
         if (rval) {
-            fprintf (stderr, "QSload_basis_and_row_norms_array failed");
+            CC_FPRINTF(stderr, "QSload_basis_and_row_norms_array failed");
             goto CLEANUP;
         }
     } else {
         rval = QSload_basis_array (lp->p, w->cstat, w->rstat);
         if (rval) {
-            fprintf (stderr, "QSload_basis_array failed");
+            CC_FPRINTF(stderr, "QSload_basis_array failed");
             goto CLEANUP;
         }
     }
@@ -966,26 +966,26 @@ int CClp_build_warmstart (CClp_warmstart **w, CClp_info *i)
 
     (*w) = CC_SAFE_MALLOC (1, CClp_warmstart);
     if ((*w) == (CClp_warmstart *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
     init_warmstart (*w);
 
     (*w)->nstruct = i->nstruct;
     if ((*w)->nstruct == 0) {
-        fprintf (stderr, "No columns in CClp_info\n");
+        CC_FPRINTF(stderr, "No columns in CClp_info\n");
         rval = 1; goto CLEANUP;
     }
     (*w)->nrows = i->nrows;
     if ((*w)->nrows == 0) {
-        fprintf (stderr, "No rows in CClp_info\n");
+        CC_FPRINTF(stderr, "No rows in CClp_info\n");
         rval = 1; goto CLEANUP;
     }
 
     (*w)->cstat = CC_SAFE_MALLOC ((*w)->nstruct, char);
     (*w)->rstat = CC_SAFE_MALLOC ((*w)->nrows, char);
     if (!(*w)->cstat || !(*w)->rstat) {
-        fprintf (stderr, "out of memory in CClp_get_warmstart\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_get_warmstart\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1044,7 +1044,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
 
     if (strncmp (name, SOLVER_WARMSTART_NAME, 4) &&
         strncmp (name, "CPL5", 4)) {
-        fprintf (stderr, "warmstart for another solver (%s) ignored\n", name);
+        CC_FPRINTF(stderr, "warmstart for another solver (%s) ignored\n", name);
         goto CLEANUP;
     }
 
@@ -1053,7 +1053,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
 
     (*w) = CC_SAFE_MALLOC (1, CClp_warmstart);
     if ((*w) == (CClp_warmstart *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_sread_warmstart\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_sread_warmstart\n");
         rval = 1; goto CLEANUP;
     }
     init_warmstart (*w);
@@ -1062,7 +1062,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
     (*w)->rstat = CC_SAFE_MALLOC (nrows, char);
     if ((*w)->cstat == (char *) NULL ||
         (*w)->rstat == (char *) NULL) {
-        fprintf (stderr, "out of memory in CClp_sread_warmstart\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_sread_warmstart\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nstruct; i++) {
@@ -1083,7 +1083,7 @@ int CClp_sread_warmstart (CC_SFILE *f, CClp_warmstart **w)
     if (has_dnorms) {
         (*w)->dnorm = CC_SAFE_MALLOC (nrows, double);
         if ((*w)->dnorm == (double *) NULL) {
-            fprintf (stderr, "out of memory in CClp_sread_warmstart\n");
+            CC_FPRINTF(stderr, "out of memory in CClp_sread_warmstart\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < nrows; i++) {
@@ -1147,7 +1147,7 @@ int CClp_get_info (CClp *lp, CClp_info **i)
 
     (*i) = CC_SAFE_MALLOC (1, CClp_info);
     if ((*i) == (CClp_info *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_get_info\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_get_info\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1167,13 +1167,13 @@ int CClp_get_info (CClp *lp, CClp_info **i)
     (*i)->cstat = CC_SAFE_MALLOC ((*i)->nstruct, char);
     (*i)->rstat = CC_SAFE_MALLOC ((*i)->nrows, char);
     if (!(*i)->cstat || !(*i)->rstat) {
-        fprintf (stderr, "out of memory in CClp_get_info\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_get_info\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSget_basis_array (lp->p, (*i)->cstat, (*i)->rstat);
     if (rval) {
-        fprintf (stderr, "QSget_basis_array failed\n");
+        CC_FPRINTF(stderr, "QSget_basis_array failed\n");
         goto CLEANUP;
     }
 
@@ -1194,7 +1194,7 @@ int CClp_create_info (CClp_info **i, int rcount, int ccount)
 
     (*i) = CC_SAFE_MALLOC (1, CClp_info);
     if ((*i) == (CClp_info *) NULL) {
-        fprintf (stderr, "Out of memory in CClp_create_info\n");
+        CC_FPRINTF(stderr, "Out of memory in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1203,19 +1203,19 @@ int CClp_create_info (CClp_info **i, int rcount, int ccount)
 
     (*i)->nstruct = ccount;
     if (ccount == 0) {
-        fprintf (stderr, "No columns in CClp_create_info\n");
+        CC_FPRINTF(stderr, "No columns in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
     (*i)->nrows = rcount;
     if (rcount == 0) {
-        fprintf (stderr, "No rows in CClp_create_info\n");
+        CC_FPRINTF(stderr, "No rows in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
 
     (*i)->cstat = CC_SAFE_MALLOC ((*i)->nstruct, char);
     (*i)->rstat = CC_SAFE_MALLOC ((*i)->nrows, char);
     if (!(*i)->cstat || !(*i)->rstat) {
-        fprintf (stderr, "out of memory in CClp_create_info\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_create_info\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1288,7 +1288,7 @@ int CClp_x (CClp *lp, double *x)
 
     rval = QSget_x_array (lp->p, x);
     if (rval) {
-        fprintf (stderr, "QSget_x_array\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSget_x_array\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -1302,7 +1302,7 @@ int CClp_rc (CClp *lp, double *rc)
 
     rval = QSget_rc_array (lp->p, rc);
     if (rval) {
-        fprintf (stderr, "QSget_rc_array failed"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSget_rc_array failed"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -1317,18 +1317,18 @@ int CClp_pi (CClp *lp, double *pi)
 
     rval = QSget_status (lp->p, &status);
     if (rval) {
-        fprintf (stderr, "QSget_status failed"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSget_status failed"); goto CLEANUP;
     }
 
     if (status == QS_LP_INFEASIBLE) {
         rval = QSget_infeas_array (lp->p, pi);
         if (rval) {
-            fprintf (stderr, "QSget_infeas_array failed"); goto CLEANUP;
+            CC_FPRINTF(stderr, "QSget_infeas_array failed"); goto CLEANUP;
         }
     } else {
         rval = QSget_pi_array (lp->p, pi);
         if (rval) {
-            fprintf (stderr, "QSget_pi_array failed"); goto CLEANUP;
+            CC_FPRINTF(stderr, "QSget_pi_array failed"); goto CLEANUP;
         }
     }
 
@@ -1343,7 +1343,7 @@ int CClp_objval (CClp *lp, double *obj)
 
     rval = QSget_objval (lp->p, obj);
     if (rval) {
-        fprintf (stderr, "QSget_objval failed");
+        CC_FPRINTF(stderr, "QSget_objval failed");
         goto CLEANUP;
     }
 
@@ -1358,7 +1358,7 @@ int CClp_nrows (CClp *lp)
 
     k = QSget_rowcount (lp->p);
     if (k == 0) {
-        fprintf (stderr, "QSget_rowcount failed - continue anyway\n");
+        CC_FPRINTF(stderr, "QSget_rowcount failed - continue anyway\n");
     }
 
     return k;
@@ -1370,7 +1370,7 @@ int CClp_ncols (CClp *lp)
 
     k = QSget_colcount (lp->p);
     if (k == 0) {
-        fprintf (stderr, "QSget_colcount failed - continue anyway\n");
+        CC_FPRINTF(stderr, "QSget_colcount failed - continue anyway\n");
     }
 
     return k;
@@ -1382,7 +1382,7 @@ int CClp_nnonzeros (CClp *lp)
 
     k = QSget_nzcount (lp->p);
     if (k == 0) {
-        fprintf (stderr, "QSget_nzcount failed - continue anyway\n");
+        CC_FPRINTF(stderr, "QSget_nzcount failed - continue anyway\n");
     }
 
     return k;
@@ -1390,7 +1390,7 @@ int CClp_nnonzeros (CClp *lp)
 
 int CClp_status (CClp *lp, int *status)
 {
-    printf ("CClp_status ...\n"); fflush (stdout);
+    CC_PRINTF("CClp_status ...\n"); CC_FFLUSH(stdout);
 
     if (lp || status) {
         lp_message (); return 1;
@@ -1402,7 +1402,7 @@ int CClp_status (CClp *lp, int *status)
 int CClp_getweight (CClp *lp, int nrows, int *rmatbeg, int *rmatind,
                     double *rmatval, double *weight)
 {
-    printf ("CClp_getweight ...\n"); fflush (stdout);
+    CC_PRINTF("CClp_getweight ...\n"); CC_FFLUSH(stdout);
 
     if (lp || nrows || rmatbeg || rmatind || rmatval || weight) {
         lp_message (); return 1;
@@ -1417,7 +1417,7 @@ int CClp_dump_lp (CClp *lp, const char *fname)
 
     rval = QSwrite_prob (lp->p, fname, "LP");
     if (rval) {
-        fprintf (stderr, "QSwrite_prob failed\n");
+        CC_FPRINTF(stderr, "QSwrite_prob failed\n");
         goto CLEANUP;
     }
 
@@ -1441,13 +1441,13 @@ int CClp_getgoodlist (CClp *lp, int *goodlist, int *goodlen_p,
 
     x = CC_SAFE_MALLOC (ncols, double);
     if (!x) {
-        fprintf (stderr, "out of memory in CClp_getgoodlist\n");
+        CC_FPRINTF(stderr, "out of memory in CClp_getgoodlist\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = QSget_x_array (lp->p, x);
     if (rval) {
-        fprintf (stderr, "QSget_x_array\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSget_x_array\n"); goto CLEANUP;
     }
 
     for (i = 0, j = 0; i < ncols; i++) {
@@ -1479,7 +1479,7 @@ int CClp_strongbranch (CClp *lp, int *candidatelist, int ncand,
     rval = QSopt_strongbranch (lp->p, ncand, candidatelist, (double *) NULL,
                                downpen, uppen, iterations, upperbound);
     if (rval) {
-        fprintf (stderr, "QSopt_strongbranch failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "QSopt_strongbranch failed\n"); goto CLEANUP;
     }
 
 

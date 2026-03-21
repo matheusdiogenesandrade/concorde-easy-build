@@ -17,6 +17,9 @@ add_compile_options($<$<CONFIG:DEBUG>:${DEBUG_OPTIONS}>)
 add_compile_options($<$<AND:$<CONFIG:DEBUG>,$<CXX_COMPILER_ID:GNU>>:${GDB_DEBUG_OPTIONS}>)
 add_link_options(-fPIC -ldl)
 include_directories("src/INCLUDE")
+if(CONCORDE_SILENT)
+    add_compile_definitions(CONCORDE_SILENT)
+endif()
 
 add_library(concorde_utils
         src/UTIL/allocrus.c
@@ -245,7 +248,7 @@ add_custom_command(TARGET concorde POST_BUILD
         COMMENT "Creating libconcorde_full.a and libconcorde_full.so from individual libraries")
 
 add_custom_command(TARGET concorde POST_BUILD
-        COMMAND cat config.h machdefs.h util.h bigguy.h combs.h cut.h delaunay.h edgegen.h fmatch.h heldkarp.h kdtree.h linkern.h lp.h tsp.h consec1.h localcut.h macrorus.h mlinkern.h necklace.h pqsets.h pq.h cuttree.h tinytsp.h tsp.h verify.h | grep -v '\#include \"' > ${CMAKE_CURRENT_BINARY_DIR}/concorde.h
+        COMMAND cat config.h concorde_io.h machdefs.h util.h bigguy.h combs.h cut.h delaunay.h edgegen.h fmatch.h heldkarp.h kdtree.h linkern.h lp.h tsp.h consec1.h localcut.h macrorus.h mlinkern.h necklace.h pqsets.h pq.h cuttree.h tinytsp.h tsp.h verify.h | grep -v '\#include \"' > ${CMAKE_CURRENT_BINARY_DIR}/concorde.h
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/INCLUDE"
         COMMENT "Creating concorde.h")
 

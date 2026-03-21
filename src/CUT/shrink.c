@@ -207,15 +207,15 @@ int CCcut_SRK_subtour_shrink (CC_SRKgraph *G, double *minval, double epsilon,
 
     /* Could call a version of CCcut_SRK_identify_ones */
 
-    /* printf ("Identify PR edges ....\n"); fflush (stdout); */
+    /* CC_PRINTF("Identify PR edges ....\n"); CC_FFLUSH(stdout); */
     rval = CCcut_SRK_identify_pr_edges (G, minval, &k, (CC_SRKnode *) NULL,
                    epsilon, cb, cut, cutcount);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_identify_pr_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_SRK_identify_pr_edges failed\n"); goto CLEANUP;
     }
 
     cnt -= k;
-    /* printf ("Graph shrunk to %d nodes\n", cnt); fflush (stdout); */
+    /* CC_PRINTF("Graph shrunk to %d nodes\n", cnt); CC_FFLUSH(stdout); */
 
 CLEANUP:
 
@@ -245,7 +245,7 @@ void CCcut_SRK_identify_paths (CC_SRKgraph *G, int *newcount, int onecnt_okay)
     double dropweight = 0.0;
     int k;
 
-    /* printf ("Identify paths ...\n"); fflush (stdout); */
+    /* CC_PRINTF("Identify paths ...\n"); CC_FFLUSH(stdout); */
 
     if (!onecnt_okay)
         count_ones (G);
@@ -315,8 +315,8 @@ void CCcut_SRK_identify_paths (CC_SRKgraph *G, int *newcount, int onecnt_okay)
     }
 
     if (dropcnt > 0) {
-        printf ("dropped %d edges of total weight %f\n", dropcnt, dropweight);
-        fflush (stdout);
+        CC_PRINTF("dropped %d edges of total weight %f\n", dropcnt, dropweight);
+        CC_FFLUSH(stdout);
     }
 
     *newcount = k;
@@ -358,14 +358,14 @@ int CCcut_SRK_defluff (CC_SRKgraph *G)
     }
 
     if (ndel & 1) {
-        fprintf (stderr, "Whoa, deleted %d (odd) endpoints in CCcut_SRK_defluff\n",
+        CC_FPRINTF(stderr, "Whoa, deleted %d (odd) endpoints in CCcut_SRK_defluff\n",
                  ndel);
         return -1;
     }
 /*
-    printf ("CCcut_SRK_defluff deleted %d endpoints (weight %.6f)\n", ndel,
+    CC_PRINTF("CCcut_SRK_defluff deleted %d endpoints (weight %.6f)\n", ndel,
             delweight);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 */
     return 0;
 }
@@ -442,7 +442,7 @@ void CCcut_SRK_identify_ones (CC_SRKgraph *G, int *count, double epsilon)
     CC_SRKedge *e;
     double tol = 1.0 - epsilon;
 
-    /*  printf ("Identify ones ....\n"); fflush (stdout); */
+    /*  CC_PRINTF("Identify ones ....\n"); CC_FFLUSH(stdout); */
 
     *count = 0;
 
@@ -495,7 +495,7 @@ int CCcut_SRK_crowder_padberg (CC_SRKgraph *G, double epsilon,
                 ADD_TO_PR_QUEUE(h->end);
             }
             rval = test_node (n, &minval, cb, (int **) NULL, (int *) NULL);
-            if (rval) { fprintf (stderr, "test_node failed\n"); goto CLEANUP; }
+            if (rval) { CC_FPRINTF(stderr, "test_node failed\n"); goto CLEANUP; }
         }
     }
 
@@ -534,7 +534,7 @@ int CCcut_SRK_identify_pr_edges (CC_SRKgraph *G, double *minval, int *count,
     *count = 0;
 
     if (cut && !cutcount) {
-        fprintf (stderr, "cut defined, but not cutcount\n");
+        CC_FPRINTF(stderr, "cut defined, but not cutcount\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -568,9 +568,9 @@ int CCcut_SRK_identify_pr_edges (CC_SRKgraph *G, double *minval, int *count,
         for (e = n->adj; e && e->weight < tol; e = e->next);
         if (e) {
             rval = test_node (n, minval, cb, cut, cutcount);
-            if (rval) { fprintf (stderr, "test_node failed\n"); goto CLEANUP; }
+            if (rval) { CC_FPRINTF(stderr, "test_node failed\n"); goto CLEANUP; }
             rval = test_node (e->end, minval, cb, cut, cutcount);
-            if (rval) { fprintf (stderr, "test_node failed\n"); goto CLEANUP; }
+            if (rval) { CC_FPRINTF(stderr, "test_node failed\n"); goto CLEANUP; }
             CCcut_SRK_identify_nodes (G, n, e->end);
             (*count)++;
             ADD_TO_PR_QUEUE(n);
@@ -587,12 +587,12 @@ int CCcut_SRK_identify_pr_edges (CC_SRKgraph *G, double *minval, int *count,
                     if (f->weight >= tol2 && f->end->prweight >= tol1) {
                         rval = test_node (n, minval, cb, cut, cutcount);
                         if (rval) {
-                            fprintf (stderr, "test_node failed\n");
+                            CC_FPRINTF(stderr, "test_node failed\n");
                             goto CLEANUP;
                         }
                         rval = test_node (e->end, minval, cb, cut, cutcount);
                         if (rval) {
-                            fprintf (stderr, "test_node failed\n");
+                            CC_FPRINTF(stderr, "test_node failed\n");
                             goto CLEANUP;
                         }
                         CCcut_SRK_identify_nodes (G, n, e->end);
@@ -617,7 +617,7 @@ int CCcut_SRK_identify_pr_edges (CC_SRKgraph *G, double *minval, int *count,
                         tol += f->end->prweight;
                 }
                 if (tol >= 1.0 + onetol) {
-                    printf ("X"); fflush (stdout);
+                    CC_PRINTF("X"); CC_FFLUSH(stdout);
                     CCcut_SRK_identify_nodes (G, n, e->end);
                     (*count)++;
                     ADD_TO_PR_QUEUE(n);
@@ -674,12 +674,12 @@ static int test_node (CC_SRKnode *n, double *minval, CC_SRKcallback *cb,
 
     if (n->weight < *minval) {
         *minval = n->weight;
-        /* printf ("New minimum: %f\n", *minval); */
+        /* CC_PRINTF("New minimum: %f\n", *minval); */
         if (cut) {
             CC_IFFREE (*cut, int);
             rval = expand_the_node (n, cutcount, cut);
             if (rval) {
-                fprintf (stderr, "expand_the_node failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "expand_the_node failed\n"); goto CLEANUP;
             }
         }
     }
@@ -687,7 +687,7 @@ static int test_node (CC_SRKnode *n, double *minval, CC_SRKcallback *cb,
         if (n->weight <= cb->cutoff) {
             rval = expand_and_pass (n, cb->doit_fn, cb->pass_param);
             if (rval) {
-                fprintf (stderr,"expand_and_pass failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr,"expand_and_pass failed\n"); goto CLEANUP;
             }
         }
     }
@@ -708,12 +708,12 @@ static int expand_and_pass (CC_SRKnode *n, int (*doit_fn) (double, int, int *,
 
     rval = expand_the_node (n, &cutcount, &cut);
     if (rval) {
-        fprintf (stderr, "expand_the_node failed\n"); fflush (stdout);
+        CC_FPRINTF(stderr, "expand_the_node failed\n"); CC_FFLUSH(stdout);
     }
 
     rval = doit_fn (n->weight, cutcount, cut, pass_param);
     if (rval) {
-        fprintf (stderr, "doit_fn failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "doit_fn failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -738,7 +738,7 @@ static int expand_the_node (CC_SRKnode *n, int *cutcount, int **cut)
     }
     tcut = CC_SAFE_MALLOC (cnt, int);
     if (!tcut) {
-        fprintf (stderr, "out of memory in expand_the_node\n");
+        CC_FPRINTF(stderr, "out of memory in expand_the_node\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1179,7 +1179,7 @@ int CCcut_SRK_identify_set (CC_SRKgraph *G, int scount, int *slist)
     }
 
     if (k != scount) {
-        fprintf (stderr, "Error - did not find all nodes in set\n");
+        CC_FPRINTF(stderr, "Error - did not find all nodes in set\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -1312,7 +1312,7 @@ int CCcut_SRK_buildgraph (CC_SRKgraph *G, int ncount, int ecount, int *elist,
     G->nodespace = CC_SAFE_MALLOC(ncount, CC_SRKnode);
     G->hit = CC_SAFE_MALLOC(ncount, CC_SRKedge *);
     if (!G->nodespace || !G->hit) {
-        fprintf (stderr, "out of memory in CCcut_SRK_buildgraph\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_SRK_buildgraph\n");
         CC_IFFREE(G->nodespace, CC_SRKnode);
         CC_IFFREE(G->hit, CC_SRKedge *);
         return 1;
@@ -1326,7 +1326,7 @@ int CCcut_SRK_buildgraph (CC_SRKgraph *G, int ncount, int ecount, int *elist,
 
     degree = CC_SAFE_MALLOC(ncount, int);
     if (!degree) {
-        fprintf (stderr, "out of memory in CCcut_SRK_buildgraph\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_SRK_buildgraph\n");
         CC_IFFREE(G->nodespace, CC_SRKnode);
         CC_IFFREE(G->hit, CC_SRKedge *);
         return 1;
@@ -1357,7 +1357,7 @@ int CCcut_SRK_buildgraph (CC_SRKgraph *G, int ncount, int ecount, int *elist,
     }
     G->edgespace = CC_SAFE_MALLOC(2*newecount, CC_SRKedge);
     if (!G->edgespace) {
-        fprintf (stderr, "out of memory in CCcut_SRK_buildgraph\n");
+        CC_FPRINTF(stderr, "out of memory in CCcut_SRK_buildgraph\n");
         CC_IFFREE(G->nodespace, CC_SRKnode);
         CC_IFFREE(G->hit, CC_SRKedge *);
         return 1;
@@ -1437,7 +1437,7 @@ int CCcut_SRK_grab_edges (CC_SRKgraph *G, int *oncount, int *oecount,
     }
 
     if (ecount % 2) {
-        fprintf (stderr, "Error in grab_edges\n");
+        CC_FPRINTF(stderr, "Error in grab_edges\n");
         rval = 1; goto CLEANUP;
     } else {
         ecount /= 2;
@@ -1450,7 +1450,7 @@ int CCcut_SRK_grab_edges (CC_SRKgraph *G, int *oncount, int *oecount,
     *olist = CC_SAFE_MALLOC (ecount * 2, int);
     *olen  = CC_SAFE_MALLOC (ecount, double);
     if (!(*olist) || !(*olen)) {
-        fprintf (stderr, "out of memory in grab_edges\n");
+        CC_FPRINTF(stderr, "out of memory in grab_edges\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1466,7 +1466,7 @@ int CCcut_SRK_grab_edges (CC_SRKgraph *G, int *oncount, int *oecount,
         }
     }
     if (k != ecount) {
-        fprintf (stderr, "Error in grab_edges\n");
+        CC_FPRINTF(stderr, "Error in grab_edges\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1476,7 +1476,7 @@ int CCcut_SRK_grab_edges (CC_SRKgraph *G, int *oncount, int *oecount,
     if (expand) {
         rval = CCcut_SRK_grab_nodes (G, expand);
         if (rval) {
-            fprintf (stderr, "CCcut_SRK_grab_nodes failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCcut_SRK_grab_nodes failed\n"); goto CLEANUP;
         }
     }
 
@@ -1502,7 +1502,7 @@ int CCcut_SRK_grab_nodes (CC_SRKgraph *G, CC_SRKexpinfo *expand)
     int ncount = 0;
 
     if (!expand) {
-        fprintf (stderr, "CCcut_SRK_grab_nodes called without an expand struct\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_grab_nodes called without an expand struct\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1515,7 +1515,7 @@ int CCcut_SRK_grab_nodes (CC_SRKgraph *G, CC_SRKexpinfo *expand)
     expand->members  = CC_SAFE_MALLOC (G->original_ncount, int);
     expand->memindex = CC_SAFE_MALLOC (ncount + 1, int);
     if (!(expand->members) || !(expand->memindex)) {
-        fprintf (stderr, "out of memory in grab_nodes\n");
+        CC_FPRINTF(stderr, "out of memory in grab_nodes\n");
         rval = 1; goto CLEANUP;
     }
     for (n = G->head, i = 0; n; n = n->next, i++) {
@@ -1589,12 +1589,12 @@ int CCcut_SRK_trivial (int ncount, CC_SRKexpinfo *expand)
     CCcut_SRK_init_expinfo (expand);
     expand->memindex = CC_SAFE_MALLOC (ncount+1, int);
     if (!expand->memindex) {
-        fprintf (stderr, "Out of memory in CCcut_SRK_trivial\n");
+        CC_FPRINTF(stderr, "Out of memory in CCcut_SRK_trivial\n");
         return -1;
     }
     expand->members = CC_SAFE_MALLOC (ncount, int);
     if (!expand->members) {
-        fprintf (stderr, "Out of memory in CCcut_SRK_trivial\n");
+        CC_FPRINTF(stderr, "Out of memory in CCcut_SRK_trivial\n");
         CC_FREE (expand->memindex, int);
         return -1;
     }
@@ -1635,7 +1635,7 @@ int CCcut_SRK_expand (CC_SRKexpinfo *expand, int *arr, int size, int **pnewarr,
     }
     newarr = CC_SAFE_MALLOC (newsize, int);
     if (!newarr) {
-        fprintf (stderr, "Out of memory in CCcut_SRK_expand\n");
+        CC_FPRINTF(stderr, "Out of memory in CCcut_SRK_expand\n");
         return -1;
     }
     newsize = 0;
@@ -1662,17 +1662,17 @@ static void printgraph (CC_SRKgraph *G)
     CC_SRKedge *e;
 
     for (n = G->head; n; n = n->next) {
-        printf ("Node %d: ", n->num);
-        fflush (stdout);
+        CC_PRINTF("Node %d: ", n->num);
+        CC_FFLUSH(stdout);
         for (e = n->adj; e; e = e->next) {
-            printf ("%d [%.2f] ", e->end->num, e->weight);
-            fflush (stdout);
+            CC_PRINTF("%d [%.2f] ", e->end->num, e->weight);
+            CC_FFLUSH(stdout);
             if (e->other->end != n || e->other->weight != e->weight) {
-                printf ("(Whoops) ");
-                fflush (stdout);
+                CC_PRINTF("(Whoops) ");
+                CC_FFLUSH(stdout);
             }
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 }
 #endif

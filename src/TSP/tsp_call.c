@@ -110,14 +110,14 @@ int CCtsp_solve_sparse (int ncount, int ecount, int *elist, int *elen,
 
     rval = CCutil_graph2dat_sparse (ncount, ecount, elist, elen, 0, &dat);
     if (rval) {
-        fprintf (stderr, "CCutil_graph2dat_sparse failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_graph2dat_sparse failed\n"); goto CLEANUP;
     }
 
     rval = CCtsp_solve_dat (ncount, &dat, in_tour, out_tour, in_val, optval,
                             success, foundtour, name, timebound, hit_timebound,
                             silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_solve_dat failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_solve_dat failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -151,7 +151,7 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
     CCtsp_lp *lp = (CCtsp_lp *) NULL;
     char pname[1024];
   
-    printf ("CCtsp_solve_dat ...\n"); fflush (stdout);
+    CC_PRINTF("CCtsp_solve_dat ...\n"); CC_FFLUSH(stdout);
 
     CCutil_init_datagroup (&dat);
     CCtsp_init_cutselect (&sel);
@@ -164,14 +164,14 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
 
     rval = CCutil_copy_datagroup (ncount, indat, &dat);
     if (rval) {
-        fprintf (stderr, "CCutil_copy_datagroup failed\n");
+        CC_FPRINTF(stderr, "CCutil_copy_datagroup failed\n");
         goto CLEANUP;
     }
 
     if (!in_tour) {
         itour = CC_SAFE_MALLOC (ncount, int);
         if (!itour) {
-            fprintf (stderr, "out of memory in CCtsp_solve_dat\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_solve_dat\n");
             rval = 1; goto CLEANUP;
         }
         mytour = itour;
@@ -179,12 +179,12 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
         if (!in_val) {
             rval = find_good_tour (ncount, &dat, mytour, &val, 1, rstate);
         } else {
-            printf ("Initial bnd %f given - use short tour run\n", *in_val);
-            fflush (stdout);
+            CC_PRINTF("Initial bnd %f given - use short tour run\n", *in_val);
+            CC_FFLUSH(stdout);
             rval = find_good_tour (ncount, &dat, mytour, &val, 0, rstate);
         }
         if (rval) {
-            fprintf (stderr, "find_good_tour failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "find_good_tour failed\n"); goto CLEANUP;
         }
     } else {
         mytour = in_tour;
@@ -192,12 +192,12 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
 
     rval = CCutil_datagroup_perm (ncount, &dat, mytour);
     if (rval) {
-        fprintf (stderr, "CCutil_datagroup_perm failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_datagroup_perm failed\n"); goto CLEANUP;
     }
 
     otour = CC_SAFE_MALLOC (ncount, int);
     if (!otour) {
-        fprintf (stderr, "out of memory in CCtsp_solve_dat\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_solve_dat\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -206,8 +206,8 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
 
     perm_bound (&val, ncount, &dat);
     if (val <= upperbound) {
-        printf ("Set initial upperbound to %.0f (from tour)\n", val);
-        fflush (stdout);
+        CC_PRINTF("Set initial upperbound to %.0f (from tour)\n", val);
+        CC_FFLUSH(stdout);
         upperbound = val;
         *foundtour = 1;
         for (i = 0; i < ncount; i++) {
@@ -217,13 +217,13 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
 
     rval = build_edges (ncount, &dat, &iecount, &ielist, &ielen, rstate);
     if (rval) {
-        fprintf (stderr, "build_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_edges failed\n"); goto CLEANUP;
     }
 
     rval = build_extra_edges (ncount, &dat, &iexcount, &iexlist, &iexlen,
                               &iexvalid);
     if (rval) {
-        fprintf (stderr, "build_extra_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_extra_edges failed\n"); goto CLEANUP;
     }
 
     rval = CCtsp_init_cutpool (&ncount, (char *) NULL, &pool);
@@ -238,28 +238,28 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
     if (rval == 2) {
         int is_infeasible;
 
-        printf ("CCtsp_init_lp reports an infeasible LP\n");
-        fflush (stdout);
+        CC_PRINTF("CCtsp_init_lp reports an infeasible LP\n");
+        CC_FFLUSH(stdout);
         rval = CCtsp_verify_infeasible_lp (lp, &is_infeasible, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_infeasible_lp failed\n");
+            CC_FPRINTF(stderr, "CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (!is_infeasible) {
-            printf ("Couldn't verify infeasible LP\n"); fflush (stdout);
+            CC_PRINTF("Couldn't verify infeasible LP\n"); CC_FFLUSH(stdout);
             rval = 1; goto CLEANUP;
         }
         *optval = CCtsp_LP_MAXDOUBLE;
         *success = 1;
         goto CLEANUP;
     } else if (rval) {
-        fprintf (stderr, "CCtsp_init_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_init_lp failed\n"); goto CLEANUP;
     }
 
     if (timebound) {
         tbound = (*timebound) - (CCutil_zeit () - szeit);
         if (tbound <= 0.0) {
-            printf ("Hit time bound\n"); fflush (stdout);
+            CC_PRINTF("Hit time bound\n"); CC_FFLUSH(stdout);
             if (hit_timebound) *hit_timebound = 1;
             goto DONE;
         }
@@ -271,7 +271,7 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
     rval = tsp_solve_lp (lp, &sel, otour, optval, success, &newtour,
                          mytbound, hit_timebound, silent, rstate);
     if (rval) {
-        fprintf (stderr, "tsp_solve_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "tsp_solve_lp failed\n"); goto CLEANUP;
     }
     if (newtour == 1) *foundtour = 1;
 
@@ -282,23 +282,23 @@ int CCtsp_solve_dat (int ncount, CCdatagroup *indat, int *in_tour,
         if ((norm == CC_SPARSE) && (*foundtour)) {
             rval = CCutil_sparse_real_tour (ncount, &dat, otour, &istour);
             if (rval) {
-                fprintf (stderr, "CCutil_sparse_real_tour failed\n");
+                CC_FPRINTF(stderr, "CCutil_sparse_real_tour failed\n");
                 goto CLEANUP;
             }
             if (istour == 0) {
-                printf ("Tour uses artificial edges\n"); fflush (stdout);
+                CC_PRINTF("Tour uses artificial edges\n"); CC_FFLUSH(stdout);
                 *optval = CCtsp_LP_MAXDOUBLE;
                 *foundtour = 0;
             } else {
-                printf ("Optimal tour: %.0f\n", *optval); fflush (stdout);
+                CC_PRINTF("Optimal tour: %.0f\n", *optval); CC_FFLUSH(stdout);
             }
         } else if (*foundtour) {
-            printf ("Optimal tour: %.0f\n", *optval); fflush (stdout);
+            CC_PRINTF("Optimal tour: %.0f\n", *optval); CC_FFLUSH(stdout);
         } else {
-            printf ("Did not find a tour\n"); fflush (stdout);
+            CC_PRINTF("Did not find a tour\n"); CC_FFLUSH(stdout);
         }
     } else {
-        printf ("Did not succeed in finding optimal tour\n"); fflush (stdout);
+        CC_PRINTF("Did not succeed in finding optimal tour\n"); CC_FFLUSH(stdout);
     }
 
 DONE:
@@ -309,8 +309,8 @@ DONE:
         }
     }
 
-    printf ("Total Time to solve TSP: %.2f\n", CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_PRINTF("Total Time to solve TSP: %.2f\n", CCutil_zeit () - szeit);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -353,19 +353,19 @@ static int tsp_solve_lp (CCtsp_lp *lp, CCtsp_cutselect *sel, int *out_tour,
     *foundtour = 0;
 
     if (!lp->dat) {
-        fprintf (stderr, "tsp_solve_lp called without a datagroup\n");
+        CC_FPRINTF(stderr, "tsp_solve_lp called without a datagroup\n");
         rval = 1; goto CLEANUP;
     }
 
     tour = CC_SAFE_MALLOC (ncount, int);
     if (!tour) {
-        fprintf (stderr, "out of memory in tsp_solve_lp failed\n");
+        CC_FPRINTF(stderr, "out of memory in tsp_solve_lp failed\n");
         rval = 1;  goto CLEANUP;
     }
 
     rval = CCtsp_cutselect_set_tols (sel, lp, 1, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_cutselect_set_tols failed\n");
+        CC_FPRINTF(stderr, "CCtsp_cutselect_set_tols failed\n");
         goto CLEANUP;
     }
 
@@ -373,37 +373,37 @@ static int tsp_solve_lp (CCtsp_lp *lp, CCtsp_cutselect *sel, int *out_tour,
     if (rval == 2) {
         int is_infeasible;
 
-        printf ("CCtsp_cutting_loop reports an infeasible LP\n");
-        fflush (stdout);
+        CC_PRINTF("CCtsp_cutting_loop reports an infeasible LP\n");
+        CC_FFLUSH(stdout);
         rval = CCtsp_verify_infeasible_lp (lp, &is_infeasible, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_infeasible_lp failed\n");
+            CC_FPRINTF(stderr, "CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (!is_infeasible) {
-            printf ("Couldn't verify infeasibile LP\n"); fflush (stdout);
+            CC_PRINTF("Couldn't verify infeasibile LP\n"); CC_FFLUSH(stdout);
             rval = 1; goto CLEANUP;
         }
         *optval = CCtsp_LP_MAXDOUBLE;
         *success = 1;
-        printf ("Final LP has %d rows, %d columns, %d nonzeros\n",
+        CC_PRINTF("Final LP has %d rows, %d columns, %d nonzeros\n",
                 CClp_nrows (lp->lp), CClp_ncols (lp->lp),
                 CClp_nnonzeros (lp->lp));
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         goto CLEANUP;
     } else if (rval) {
-        fprintf (stderr, "Ctsp_cutting_loop failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "Ctsp_cutting_loop failed\n"); goto CLEANUP;
     }
 
     {
         double tourval;
         rval = CCtsp_call_x_heuristic (lp, &tourval, tour, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_call_x_heuristic failed\n");
+            CC_FPRINTF(stderr, "CCtsp_call_x_heuristic failed\n");
             goto CLEANUP;
         }
         if (tourval < lp->upperbound) {
-            printf ("Upperbound from x-heuristic: %.2f\n", tourval);
+            CC_PRINTF("Upperbound from x-heuristic: %.2f\n", tourval);
             lp->upperbound = tourval;
             *foundtour = 1;
             if (out_tour) {
@@ -415,24 +415,24 @@ static int tsp_solve_lp (CCtsp_lp *lp, CCtsp_cutselect *sel, int *out_tour,
     }
 
     if (ncount >= 100000) {
-        fprintf (stderr, "Not running branching on problems of this size\n");
+        CC_FPRINTF(stderr, "Not running branching on problems of this size\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_exact_price (lp, &exactbound, 0, 0, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_exact_price failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_exact_price failed\n"); goto CLEANUP;
     }
     lp->exact_lowerbound = exactbound;
-    printf ("Exact lower bound: %.6f\n", CCbigguy_bigguytod (exactbound));
-    printf ("DIFF: %f\n", lp->lowerbound - CCbigguy_bigguytod (exactbound));
-    fflush (stdout);
+    CC_PRINTF("Exact lower bound: %.6f\n", CCbigguy_bigguytod (exactbound));
+    CC_PRINTF("DIFF: %f\n", lp->lowerbound - CCbigguy_bigguytod (exactbound));
+    CC_FFLUSH(stdout);
 
     bupper = CCbigguy_dtobigguy (lp->upperbound);
     CCbigguy_sub (&bupper, CCbigguy_ONE);
 
     if (CCbigguy_cmp (lp->exact_lowerbound, bupper) > 0) {
-        printf ("Established Bound: %.0f\n", lp->upperbound); fflush (stdout);
+        CC_PRINTF("Established Bound: %.0f\n", lp->upperbound); CC_FFLUSH(stdout);
         *optval = lp->upperbound;
         *success = 1;
         goto CLEANUP;
@@ -440,13 +440,13 @@ static int tsp_solve_lp (CCtsp_lp *lp, CCtsp_cutselect *sel, int *out_tour,
 
     rval = CCtsp_eliminate_variables (lp, 1, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_eliminate_variables failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_eliminate_variables failed\n"); goto CLEANUP;
     }
 
     if (timebound) {
         tbound = (*timebound) - (CCutil_zeit () - szeit);
         if (tbound <= 0.0) {
-            printf ("Hit time bound\n"); fflush (stdout);
+            CC_PRINTF("Hit time bound\n"); CC_FFLUSH(stdout);
             if (hit_timebound) *hit_timebound = 1;
             goto CLEANUP;
         }
@@ -468,7 +468,7 @@ static int tsp_solve_lp (CCtsp_lp *lp, CCtsp_cutselect *sel, int *out_tour,
 
         rval = CCtsp_write_probroot_id (lp->probloc, lp);
         if (rval) {
-            fprintf (stderr, "CCtsp_write_probroot_id failed\n");
+            CC_FPRINTF(stderr, "CCtsp_write_probroot_id failed\n");
             goto CLEANUP;
         }
 
@@ -478,7 +478,7 @@ static int tsp_solve_lp (CCtsp_lp *lp, CCtsp_cutselect *sel, int *out_tour,
                 saveproof, tentative_branch_num, 0, mytbound, hit_timebound,
                 silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_bfs_brancher failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_bfs_brancher failed\n"); goto CLEANUP;
         }
 
         if (upbound < lp->upperbound && out_tour) {
@@ -487,8 +487,8 @@ static int tsp_solve_lp (CCtsp_lp *lp, CCtsp_cutselect *sel, int *out_tour,
                 out_tour[i] = tour[i];
             }
         }
-        printf ("Total number of nodes in search tree: %d\n", bbcount);
-        fflush (stdout);
+        CC_PRINTF("Total number of nodes in search tree: %d\n", bbcount);
+        CC_FFLUSH(stdout);
         *optval = upbound;
         *success = 1;
     }
@@ -523,12 +523,12 @@ static int find_good_tour (int ncount, CCdatagroup *dat, int *tour,
         kicks = (ncount > 1000 ? 500 : ncount/2);
     }
 
-    printf ("Finding a good tour for compression ...\n"); fflush (stdout);
+    CC_PRINTF("Finding a good tour for compression ...\n"); CC_FFLUSH(stdout);
 
     cyc     = CC_SAFE_MALLOC (ncount, int);
     bestcyc = CC_SAFE_MALLOC (ncount, int);
     if (!cyc || !bestcyc) {
-        fprintf (stderr, "out of memory in find_good_tour\n");
+        CC_FPRINTF(stderr, "out of memory in find_good_tour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -537,7 +537,7 @@ static int find_good_tour (int ncount, CCdatagroup *dat, int *tour,
     rval = CCedgegen_edges (&plan, ncount, dat, (double *) NULL, &ecount,
                             &elist, 1, rstate);
     if (rval) {
-        fprintf (stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
     }
     plan.quadnearest = 0;
 
@@ -546,21 +546,21 @@ static int find_good_tour (int ncount, CCdatagroup *dat, int *tour,
     rval = CCedgegen_edges (&plan, ncount, dat, (double *) NULL, &tcount,
                             &tlist, 1, rstate);
     if (rval) {
-        fprintf (stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
     }
 
     if (tcount != ncount) {
-        fprintf (stderr, "wrong edgeset from CCedgegen_edges\n");
+        CC_FPRINTF(stderr, "wrong edgeset from CCedgegen_edges\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCutil_edge_to_cycle (ncount, tlist, &istour, cyc);
     if (rval) {
-        fprintf (stderr, "CCutil_edge_to_cycle failed\n");
+        CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n");
         rval = 1; goto CLEANUP;
     }
     if (!istour) {
-        fprintf (stderr, "Starting tour has an error\n");
+        CC_FPRINTF(stderr, "Starting tour has an error\n");
         rval = 1; goto CLEANUP;
     }
     CC_FREE (tlist, int);
@@ -569,18 +569,18 @@ static int find_good_tour (int ncount, CCdatagroup *dat, int *tour,
                     cyc, bestcyc, &bestval, 0, 0.0, 0.0, (char *) NULL,
                     CC_LK_GEOMETRIC_KICK, rstate);
     if (rval) {
-        fprintf (stderr, "CClinkern_tour failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClinkern_tour failed\n"); goto CLEANUP;
     }
-    printf ("LK Initial Run: %.1f\n", bestval); fflush (stdout);
+    CC_PRINTF("LK Initial Run: %.1f\n", bestval); CC_FFLUSH(stdout);
 
     for (i = 0; i < trials; i++) {
         rval = CClinkern_tour (ncount, dat, ecount, elist, ncount, kicks,
                         (int *) NULL, cyc, &val, 1, 0.0, 0.0, (char *) NULL,
                         CC_LK_GEOMETRIC_KICK, rstate);
         if (rval) {
-            fprintf (stderr, "CClinkern_tour failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CClinkern_tour failed\n"); goto CLEANUP;
         }
-        printf ("LK Run %d: %.1f\n", i, val); fflush (stdout);
+        CC_PRINTF("LK Run %d: %.1f\n", i, val); CC_FFLUSH(stdout);
         if (val < bestval) {
             CC_SWAP (cyc, bestcyc, tmp);
             bestval = val;
@@ -592,9 +592,9 @@ static int find_good_tour (int ncount, CCdatagroup *dat, int *tour,
                         bestcyc, tour, tval, 1, 0.0, 0.0, (char *) NULL,
                         CC_LK_GEOMETRIC_KICK, rstate);
         if (rval) {
-            fprintf (stderr, "CClinkern_tour failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CClinkern_tour failed\n"); goto CLEANUP;
         }
-        printf ("LK Run from best tour: %.1f\n", *tval); fflush (stdout);
+        CC_PRINTF("LK Run from best tour: %.1f\n", *tval); CC_FFLUSH(stdout);
     } else {
         for (i = 0; i < ncount; i++) {
             tour[i] = bestcyc[i];
@@ -602,9 +602,9 @@ static int find_good_tour (int ncount, CCdatagroup *dat, int *tour,
         *tval = bestval;
     }
 
-    printf ("Time to find compression tour: %.2f (seconds)\n",
+    CC_PRINTF("Time to find compression tour: %.2f (seconds)\n",
             CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -642,12 +642,12 @@ static int build_edges (int ncount, CCdatagroup *dat, int *ecount, int **elist,
 
     if (norm == CC_SPARSE) {
         if (dat->sparse_ecount <=  2 * ncount) {
-            printf ("Use entire sparse graph as initial edge set\n");
-            fflush (stdout);
+            CC_PRINTF("Use entire sparse graph as initial edge set\n");
+            CC_FFLUSH(stdout);
             rval = CCutil_get_sparse_dat_edges (ncount, dat, ecount, elist,
                                                 elen);
             if (rval) {
-                fprintf (stderr, "CCutil_get_sparse_dat_edges failed\n");
+                CC_FPRINTF(stderr, "CCutil_get_sparse_dat_edges failed\n");
                 goto CLEANUP;
             }
         } else {
@@ -660,13 +660,13 @@ static int build_edges (int ncount, CCdatagroup *dat, int *ecount, int **elist,
             rval = grab_plan_edges (ncount, dat, &plan, &tecount, &telist,
                                     &telen, rstate);
             if (rval) {
-                fprintf (stderr, "grab_plan_edges failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "grab_plan_edges failed\n"); goto CLEANUP;
             }
 
             rval = CCutil_sparse_strip_edges (dat, tecount, telist, telen,
                                               ecount, elist, elen);
             if (rval) {
-                fprintf (stderr, "CCutil_sparse_strip_edges failed\n");
+                CC_FPRINTF(stderr, "CCutil_sparse_strip_edges failed\n");
                 CC_IFFREE (telist, int);
                 CC_IFFREE (telen, int);
                 goto CLEANUP;
@@ -685,7 +685,7 @@ static int build_edges (int ncount, CCdatagroup *dat, int *ecount, int **elist,
         rval = grab_plan_edges (ncount, dat, &plan, ecount, elist, elen,
                                 rstate);
         if (rval) {
-            fprintf (stderr, "grab_plan_edges failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "grab_plan_edges failed\n"); goto CLEANUP;
         }
     }
 
@@ -714,7 +714,7 @@ static int  build_extra_edges (int ncount, CCdatagroup *dat, int *ecount,
     if (norm == CC_SPARSE) {
         rval = CCutil_get_sparse_dat_edges (ncount, dat, ecount, elist, elen);
         if (rval) {
-            fprintf (stderr, "CCutil_get_sparse_dat_edges failed\n");
+            CC_FPRINTF(stderr, "CCutil_get_sparse_dat_edges failed\n");
             goto CLEANUP;
         }
         *valid = 1;
@@ -740,12 +740,12 @@ static int grab_plan_edges (int ncount, CCdatagroup *dat,
     rval = CCedgegen_edges (plan, ncount, dat, (double *) NULL, ecount,
                             elist, 1, rstate);
     if (rval) {
-        fprintf (stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
     }
 
     *elen = CC_SAFE_MALLOC (*ecount, int);
     if (!(*elen)) {
-        fprintf (stderr, "out of memory in grab_plan_edges\n");
+        CC_FPRINTF(stderr, "out of memory in grab_plan_edges\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < *ecount; i++) {

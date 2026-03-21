@@ -104,8 +104,8 @@ int main (int ac, char **av)
         return 1;
     CCutil_sprand (seed, &rstate);
 
-    printf ("Chained Lin-Kernighan with seed %d\n", seed);
-    fflush (stdout);
+    CC_PRINTF("Chained Lin-Kernighan with seed %d\n", seed);
+    CC_FFLUSH(stdout);
 
     if ((!nnodes_want && !nodefile) || (tsplib_in && !nodefile)) {
         usage (av[0]);
@@ -116,7 +116,7 @@ int main (int ac, char **av)
 
     if (tsplib_in) {
         if (CCutil_gettsplib (nodefile, &ncount, &dat)) {
-            fprintf (stderr, "could not read the TSPLIB file\n");
+            CC_FPRINTF(stderr, "could not read the TSPLIB file\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -149,14 +149,14 @@ int main (int ac, char **av)
     }
     if (cycfname) {
         if (CCutil_getcycle (ncount, cycfname, incycle, binary_edges)) {
-            fprintf (stderr, "CCutil_getcycle failed\n");
+            CC_FPRINTF(stderr, "CCutil_getcycle failed\n");
             rval = 1;
             goto CLEANUP;
         }
     } else if (edgecycfname) {
         if (CCutil_getcycle_edgelist (ncount, edgecycfname, incycle,
                                       binary_edges)) {
-            fprintf (stderr, "CCutil_getcycle_edgelist failed\n");
+            CC_FPRINTF(stderr, "CCutil_getcycle_edgelist failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -171,18 +171,18 @@ int main (int ac, char **av)
         }
         if (templen)
             CC_FREE (templen, int);
-        printf ("Read good-edge file: %d edges\n", tempcount);
-        fflush (stdout);
+        CC_PRINTF("Read good-edge file: %d edges\n", tempcount);
+        CC_FFLUSH(stdout);
     } else if (edgegenfname) {
         CCedgegengroup plan;
         if (CCedgegen_read (edgegenfname, &plan)) {
-            fprintf (stderr, "CCedgegen_read failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_read failed\n");
             rval = 1;
             goto CLEANUP;
         }
         if (CCedgegen_edges (&plan, ncount, &dat, (double *) NULL, &tempcount,
                      &templist, 0, &rstate)) {
-            fprintf (stderr, "CCedgegen_edges failed\n");
+            CC_FPRINTF(stderr, "CCedgegen_edges failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -195,12 +195,12 @@ int main (int ac, char **av)
         if ((!goodfname && !edgegenfname) || (!cycfname && !edgecycfname)) {
             if (CCkdtree_build (&localkt, ncount, &dat, (double *) NULL,
                                 &rstate)) {
-                fprintf (stderr, "CCkdtree_build failed\n");
+                CC_FPRINTF(stderr, "CCkdtree_build failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
-            printf ("Time to build kdtree: %.2f\n", CCutil_zeit () - kzeit);
-            fflush (stdout);
+            CC_PRINTF("Time to build kdtree: %.2f\n", CCutil_zeit () - kzeit);
+            CC_FFLUSH(stdout);
 
             if (!goodfname && !edgegenfname) {
                 kzeit = CCutil_zeit ();
@@ -208,27 +208,27 @@ int main (int ac, char **av)
                     if (CCkdtree_k_nearest (&localkt, ncount, nearnum, &dat,
                          (double *) NULL, 1, &tempcount, &templist,
                          run_silently, &rstate)) {
-                        fprintf (stderr, "CCkdtree_k_nearest failed\n");
+                        CC_FPRINTF(stderr, "CCkdtree_k_nearest failed\n");
                         rval = 1;
                         goto CLEANUP;
                     }
                     if (!run_silently) {
-                        printf ("Time to find %d-nearest: %.2f\n", nearnum,
+                        CC_PRINTF("Time to find %d-nearest: %.2f\n", nearnum,
                                                      CCutil_zeit () - kzeit);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                 } else {
                     if (CCkdtree_quadrant_k_nearest (&localkt, ncount, quadtry,
                            &dat, (double *) NULL, 1, &tempcount, &templist,
                            run_silently, &rstate)) {
-                        fprintf (stderr, "CCkdtree-quad nearest code failed\n");
+                        CC_FPRINTF(stderr, "CCkdtree-quad nearest code failed\n");
                         rval = 1;
                         goto CLEANUP;
                     }
                     if (!run_silently) {
-                        printf ("Time to find quad %d-nearest: %.2f\n",
+                        CC_PRINTF("Time to find quad %d-nearest: %.2f\n",
                                 quadtry, CCutil_zeit () - kzeit);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                 }
             }
@@ -237,21 +237,21 @@ int main (int ac, char **av)
                 if (tour_type == LK_GREEDY) {
                     if (CCkdtree_greedy_tour (&localkt, ncount,
                               &dat, incycle, &val, run_silently, &rstate)) {
-                        fprintf (stderr, "CCkdtree greedy-tour failed\n");
+                        CC_FPRINTF(stderr, "CCkdtree greedy-tour failed\n");
                         rval = 1;
                         goto CLEANUP;
                     }
                 } else if (tour_type == LK_QBORUVKA) {
                     if (CCkdtree_qboruvka_tour (&localkt, ncount,
                               &dat, incycle, &val, &rstate)) {
-                        fprintf (stderr, "CCkdtree qboruvka-tour failed\n");
+                        CC_FPRINTF(stderr, "CCkdtree qboruvka-tour failed\n");
                         rval = 1;
                         goto CLEANUP;
                     }
                 } else if (tour_type == LK_BORUVKA) {
                     if (CCkdtree_boruvka_tour (&localkt, ncount,
                               &dat, incycle, &val, &rstate)) {
-                        fprintf (stderr, "CCkdtree boruvka-tour failed\n");
+                        CC_FPRINTF(stderr, "CCkdtree boruvka-tour failed\n");
                         rval = 1;
                         goto CLEANUP;
                     }
@@ -261,15 +261,15 @@ int main (int ac, char **av)
                     if (CCkdtree_nearest_neighbor_tour (&localkt, ncount,
                                CCutil_lprand (&rstate) % ncount, &dat,
                                incycle, &val, &rstate)) {
-                        fprintf (stderr, "CCkdtree NN-tour failed\n");
+                        CC_FPRINTF(stderr, "CCkdtree NN-tour failed\n");
                         rval = 1;
                         goto CLEANUP;
                     }
                 }
                 if (!run_silently) {
-                    printf ("Time to grow tour: %.2f\n",
+                    CC_PRINTF("Time to grow tour: %.2f\n",
                             CCutil_zeit () - kzeit);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
             }
             CCkdtree_free (&localkt);
@@ -281,27 +281,27 @@ int main (int ac, char **av)
                 if (CCedgegen_x_k_nearest (ncount, nearnum, &dat,
                         (double *) NULL, 1, &tempcount, &templist,
                         run_silently)) {
-                    fprintf (stderr, "CCedgegen_x_k_nearest failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_k_nearest failed\n");
                     rval = 1;
                     goto CLEANUP;
                 }
                 if (!run_silently) {
-                    printf ("Time to find %d-nearest: %.2f\n", nearnum,
+                    CC_PRINTF("Time to find %d-nearest: %.2f\n", nearnum,
                                                  CCutil_zeit () - xzeit);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
             } else {
                 if (CCedgegen_x_quadrant_k_nearest (ncount, quadtry, &dat,
                                  (double *) NULL, 1, &tempcount, &templist,
                                  run_silently)) {
-                    fprintf (stderr, "x-quad nearest code failed\n");
+                    CC_FPRINTF(stderr, "x-quad nearest code failed\n");
                     rval = 1;
                     goto CLEANUP;
                 }
                 if (!run_silently) {
-                    printf ("Time to find quad %d-nearest: %.2f\n", quadtry,
+                    CC_PRINTF("Time to find quad %d-nearest: %.2f\n", quadtry,
                                                  CCutil_zeit () - xzeit);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
             }
         }
@@ -310,13 +310,13 @@ int main (int ac, char **av)
             if (tour_type == LK_GREEDY) {
                 if (CCedgegen_x_greedy_tour (ncount, &dat, incycle, &val,
                         tempcount, templist, run_silently)) {
-                    fprintf (stderr, "CCedgegen_x_greedy_tour failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_greedy_tour failed\n");
                     rval = 1; goto CLEANUP;
                 }
             } else if (tour_type == LK_QBORUVKA) {
                 if (CCedgegen_x_qboruvka_tour (ncount, &dat, incycle, &val,
                         tempcount, templist, run_silently)) {
-                    fprintf (stderr, "CCedgegen_x_qboruvka_tour failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_qboruvka_tour failed\n");
                     rval = 1; goto CLEANUP;
                 }
             } else if (tour_type == LK_RANDOM) {
@@ -324,14 +324,14 @@ int main (int ac, char **av)
             } else {
                 if (CCedgegen_x_nearest_neighbor_tour (ncount,
                       CCutil_lprand (&rstate) % ncount, &dat, incycle, &val)) {
-                    fprintf (stderr, "CCedgegen_x_nearest_neighbor_tour failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_nearest_neighbor_tour failed\n");
                     rval = 1;
                     goto CLEANUP;
                 }
             }
             if (!run_silently) {
-                printf ("Time to grow tour: %.2f\n", CCutil_zeit () - xzeit);
-                fflush (stdout);
+                CC_PRINTF("Time to grow tour: %.2f\n", CCutil_zeit () - xzeit);
+                CC_FFLUSH(stdout);
             }
         }
     } else {
@@ -341,14 +341,14 @@ int main (int ac, char **av)
                 nearnum = 4 * quadtry;
             if (CCedgegen_junk_k_nearest (ncount, nearnum, &dat,
                     (double *) NULL, 1, &tempcount, &templist, run_silently)) {
-                fprintf (stderr, "CCedgegen_junk_k_nearest failed\n");
+                CC_FPRINTF(stderr, "CCedgegen_junk_k_nearest failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (!run_silently) {
-                printf ("Time to find %d nearest: %.2f\n",
+                CC_PRINTF("Time to find %d nearest: %.2f\n",
                          nearnum, CCutil_zeit () - jzeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
         if (!cycfname && !edgecycfname) {
@@ -356,13 +356,13 @@ int main (int ac, char **av)
             if (tour_type == LK_GREEDY) {
                 if (CCedgegen_junk_greedy_tour (ncount, &dat, incycle, &val,
                         tempcount, templist, run_silently)) {
-                    fprintf (stderr, "CCedgegen_junk_greedy_tour failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_junk_greedy_tour failed\n");
                     rval = 1; goto CLEANUP;
                 }
             } else if (tour_type == LK_QBORUVKA) {
                 if (CCedgegen_junk_qboruvka_tour (ncount, &dat, incycle, &val,
                         tempcount, templist, run_silently)) {
-                    fprintf (stderr, "CCedgegen_junk_qboruvka_tour failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_junk_qboruvka_tour failed\n");
                     rval = 1; goto CLEANUP;
                 }
             } else if (tour_type == LK_RANDOM) {
@@ -371,14 +371,14 @@ int main (int ac, char **av)
                 if (CCedgegen_junk_nearest_neighbor_tour (ncount,
                        CCutil_lprand (&rstate) % ncount, &dat, incycle,
                        &val, run_silently)) {
-                    fprintf (stderr, "CCedgegen_junk_nearest_neighbor_tour failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_junk_nearest_neighbor_tour failed\n");
                     rval = 1;
                     goto CLEANUP;
                 }
             }
             if (!run_silently) {
-                printf ("Time to grow tour: %.2f\n", CCutil_zeit () - jzeit);
-                fflush (stdout);
+                CC_PRINTF("Time to grow tour: %.2f\n", CCutil_zeit () - jzeit);
+                CC_FFLUSH(stdout);
             }
         }
     }
@@ -393,12 +393,12 @@ int main (int ac, char **av)
         k = 0;
         best = BIGDOUBLE;
         do {
-            printf ("\nStarting Run %d\n", k);
+            CC_PRINTF("\nStarting Run %d\n", k);
             if (CClinkern_tour (ncount, &dat, tempcount, templist, 100000000,
                    in_repeater, incycle, outcycle, &val, run_silently,
                    time_bound, length_bound, (char *) NULL, kick_type,
                    &rstate)) {
-                fprintf (stderr, "CClinkern_tour failed\n");
+                CC_FPRINTF(stderr, "CClinkern_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -407,15 +407,15 @@ int main (int ac, char **av)
                 if (saveit_final) {
                     if (CCutil_writecycle_edgelist (ncount, saveit_final, 
                             outcycle, &dat, binary_edges)) {
-                        fprintf (stderr, "could not write the cycle\n");
+                        CC_FPRINTF(stderr, "could not write the cycle\n");
                         rval = 1;
                         goto CLEANUP;
                     }
                 }
             }
         } while (++k < number_runs);
-        printf ("Overall Best Cycle: %.0f\n", val);
-        fflush (stdout);
+        CC_PRINTF("Overall Best Cycle: %.0f\n", val);
+        CC_FFLUSH(stdout);
     } else {
         double lkzeit = CCutil_zeit ();
         int attempt = 1;
@@ -424,32 +424,32 @@ int main (int ac, char **av)
                    in_repeater, incycle, outcycle, &val, run_silently,
                    time_bound, length_bound, saveit_name, kick_type,
                    &rstate)) {
-                fprintf (stderr, "CClinkern_tour failed\n");
+                CC_FPRINTF(stderr, "CClinkern_tour failed\n");
                 rval = 1;
                 goto CLEANUP;
             }
             if (length_bound != -1 && val > length_bound) {
-                printf ("Cycle of value %.0f  -  did not reach %.0f\n",
+                CC_PRINTF("Cycle of value %.0f  -  did not reach %.0f\n",
                     val, length_bound);
-                printf ("Try again. Number of attempts: %d\n", ++attempt);
+                CC_PRINTF("Try again. Number of attempts: %d\n", ++attempt);
             }
         } while (length_bound != -1 && val > length_bound);
         if (saveit_final) {
             if (CCutil_writecycle_edgelist (ncount, saveit_final,
                         outcycle, &dat, binary_edges)) {
-                fprintf (stderr, "could not write the cycle\n");
+                CC_FPRINTF(stderr, "could not write the cycle\n");
                 rval = 1;
                 goto CLEANUP;
             }
         }
         if (run_silently)
-            printf ("Lin-Kernighan Running Time: %.2f\n",
+            CC_PRINTF("Lin-Kernighan Running Time: %.2f\n",
                     CCutil_zeit () - lkzeit);
-        printf ("Final Cycle: %.0f\n", val);
-        fflush (stdout);
+        CC_PRINTF("Final Cycle: %.0f\n", val);
+        CC_FFLUSH(stdout);
     }
-    printf ("Total Running Time: %.2f\n", CCutil_zeit () - startzeit);
-    fflush (stdout);
+    CC_PRINTF("Total Running Time: %.2f\n", CCutil_zeit () - startzeit);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -521,7 +521,7 @@ static int parseargs (int ac, char **av)
             else if (k == LK_GREEDY)   tour_type = LK_GREEDY;
             else if (k == LK_BORUVKA)  tour_type = LK_BORUVKA;
             else if (k == LK_QBORUVKA) tour_type = LK_QBORUVKA;
-            else fprintf (stderr, "unknown tour type, using default\n");
+            else CC_FPRINTF(stderr, "unknown tour type, using default\n");
             break;
         case 'K':
             k = atoi (boptarg);
@@ -529,7 +529,7 @@ static int parseargs (int ac, char **av)
             else if (k == CC_LK_GEOMETRIC_KICK) kick_type = CC_LK_GEOMETRIC_KICK;
             else if (k == CC_LK_CLOSE_KICK)     kick_type = CC_LK_CLOSE_KICK;
             else if (k == CC_LK_WALK_KICK)      kick_type = CC_LK_WALK_KICK;
-            else fprintf (stderr, "unknown kick type, using default\n");
+            else CC_FPRINTF(stderr, "unknown kick type, using default\n");
             break;
         case 'N':
             inorm = atoi(boptarg);
@@ -607,36 +607,36 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "usage: %s [- see below -] [tsplib_file or dat_file]\n", f);
-    fprintf (stderr, "   -s #  random number seed\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -G #  use #x# grid for random points, no dups if #<0\n");
-    fprintf (stderr, "   -K #  kick (%d-Random, %d-Geometric, %d-Close, %d-Random_Walk [default])\n",
+    CC_FPRINTF(stderr, "usage: %s [- see below -] [tsplib_file or dat_file]\n", f);
+    CC_FPRINTF(stderr, "   -s #  random number seed\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -G #  use #x# grid for random points, no dups if #<0\n");
+    CC_FPRINTF(stderr, "   -K #  kick (%d-Random, %d-Geometric, %d-Close, %d-Random_Walk [default])\n",
            CC_LK_RANDOM_KICK, CC_LK_GEOMETRIC_KICK,
            CC_LK_CLOSE_KICK, CC_LK_WALK_KICK);
-    fprintf (stderr, "   -o f  save final tour\n");
-    fprintf (stderr, "   -S f  save tour in f after every 10000 kicks\n");
-    fprintf (stderr, "   -D f  edgegen description file for the sparse edge set\n");
-    fprintf (stderr, "   -q #  use quad #-nearest as the sparse set (default is 3)\n");
-    fprintf (stderr, "   -a #  use #-nearest as the sparse edge set\n");
-    fprintf (stderr, "   -g f  use the edges in file f as the sparse edge set\n");
-    fprintf (stderr, "   -r #  number of runs\n");
-    fprintf (stderr, "   -R #  number of kicks in iterated Lin-Kernighan (default is #nodes)\n");
-    fprintf (stderr, "   -I #  generate starting cycle\n");
-    fprintf (stderr, "           (%d-Rand, %d-NNeigh, %d-Greedy, %d-Boruvka, %d-QBoruvka[default])\n",
+    CC_FPRINTF(stderr, "   -o f  save final tour\n");
+    CC_FPRINTF(stderr, "   -S f  save tour in f after every 10000 kicks\n");
+    CC_FPRINTF(stderr, "   -D f  edgegen description file for the sparse edge set\n");
+    CC_FPRINTF(stderr, "   -q #  use quad #-nearest as the sparse set (default is 3)\n");
+    CC_FPRINTF(stderr, "   -a #  use #-nearest as the sparse edge set\n");
+    CC_FPRINTF(stderr, "   -g f  use the edges in file f as the sparse edge set\n");
+    CC_FPRINTF(stderr, "   -r #  number of runs\n");
+    CC_FPRINTF(stderr, "   -R #  number of kicks in iterated Lin-Kernighan (default is #nodes)\n");
+    CC_FPRINTF(stderr, "   -I #  generate starting cycle\n");
+    CC_FPRINTF(stderr, "           (%d-Rand, %d-NNeigh, %d-Greedy, %d-Boruvka, %d-QBoruvka[default])\n",
                LK_RANDOM, LK_NEIGHBOR, LK_GREEDY, LK_BORUVKA, LK_QBORUVKA);
-    fprintf (stderr, "   -y f  starting cycle\n");
-    fprintf (stderr, "   -Y f  starting cycle (as an edgelist)\n");
-    fprintf (stderr, "   -t d  running time bound in seconds\n");
-    fprintf (stderr, "   -h d  tour length bound (stop when we hit d)\n");
-    fprintf (stderr, "   -Q    run silently\n");
-    fprintf (stderr, "   -b    dat file in binary doubles\n");
-    fprintf (stderr, "   -B    dat file in binary ints\n");
-    fprintf (stderr, "   -E    edge files in binary\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
-    fprintf (stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
-    fprintf (stderr, "         17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "   -y f  starting cycle\n");
+    CC_FPRINTF(stderr, "   -Y f  starting cycle (as an edgelist)\n");
+    CC_FPRINTF(stderr, "   -t d  running time bound in seconds\n");
+    CC_FPRINTF(stderr, "   -h d  tour length bound (stop when we hit d)\n");
+    CC_FPRINTF(stderr, "   -Q    run silently\n");
+    CC_FPRINTF(stderr, "   -b    dat file in binary doubles\n");
+    CC_FPRINTF(stderr, "   -B    dat file in binary ints\n");
+    CC_FPRINTF(stderr, "   -E    edge files in binary\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
+    CC_FPRINTF(stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
+    CC_FPRINTF(stderr, "         17=GEOM, 18=JOHNSON\n");
 }
 
 static int print_command (int ac, char **av)
@@ -659,7 +659,7 @@ static int print_command (int ac, char **av)
         cmdlen++;
     }
     cmdout[cmdlen-1] = '\0';
-    printf ("%s\n", cmdout); fflush (stdout);
+    CC_PRINTF("%s\n", cmdout); CC_FFLUSH(stdout);
 
 CLEANUP:
 

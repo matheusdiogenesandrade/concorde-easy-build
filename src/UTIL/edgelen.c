@@ -239,7 +239,7 @@ int CCutil_dat_setnorm (CCdatagroup *dat, int norm)
         dat->edgelen = toroidal_edgelen;
         break;
     default:
-        fprintf (stderr, "ERROR:  Unknown NORM %d.\n", norm);
+        CC_FPRINTF(stderr, "ERROR:  Unknown NORM %d.\n", norm);
         return 1;
     }
     dat->norm = norm;
@@ -258,11 +258,11 @@ void CCutil_dat_getnorm (CCdatagroup *dat, int *norm)
 
 static int edgelen_nonorm (int i, int j, CCdatagroup *dat)
 {
-    fprintf (stderr, "CCutil_dat_edgelen has been called with no norm set\n");
-    fprintf (stderr, "This is a FATAL ERROR\n");
+    CC_FPRINTF(stderr, "CCutil_dat_edgelen has been called with no norm set\n");
+    CC_FPRINTF(stderr, "This is a FATAL ERROR\n");
     if (i != 0 || j != 0 || dat != (CCdatagroup *) NULL) {
         /* so the compiler won't complain about unused variables */
-        fprintf (stderr, "This is a FATAL ERROR\n");
+        CC_FPRINTF(stderr, "This is a FATAL ERROR\n");
         exit (1);
     }
     return -1;

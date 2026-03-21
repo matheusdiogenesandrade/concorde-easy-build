@@ -93,7 +93,7 @@ int CCcut_mincut (int ncount, int ecount, int *elist, double *dlen,
     rval = mincut_work (ncount, ecount, elist, dlen, cutval, cut, cutcount,
                         0.0, NULL, (void *) NULL);
     if (rval) {
-        fprintf (stderr, "mincut_work failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "mincut_work failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -110,7 +110,7 @@ int CCcut_violated_cuts (int ncount, int ecount, int *elist, double *dlen,
     rval = mincut_work (ncount, ecount, elist, dlen, (double *) NULL,
                   (int **) NULL, (int *) NULL, cutoff, doit_fn, pass_param);
     if (rval) {
-        fprintf (stderr, "mincut_work failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "mincut_work failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -144,7 +144,7 @@ static int mincut_work (int ncount, int ecount, int *elist, double *dlen,
         if (cutcount) {
             *cutcount = 0;
         } else {
-            fprintf (stderr, "cut specified, but not cutcount\n");
+            CC_FPRINTF(stderr, "cut specified, but not cutcount\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -159,7 +159,7 @@ static int mincut_work (int ncount, int ecount, int *elist, double *dlen,
     if (doit_fn) {
         cb = CC_SAFE_MALLOC (1, CC_SRKcallback);
         if (!cb) {
-            fprintf (stderr, "out of memory in mincut_work\n");
+            CC_FPRINTF(stderr, "out of memory in mincut_work\n");
             rval = 1; goto CLEANUP;
         }
         cb->cutoff     = cutoff;
@@ -169,30 +169,30 @@ static int mincut_work (int ncount, int ecount, int *elist, double *dlen,
 
     rval = CCcut_SRK_buildgraph (&G, ncount, ecount, elist, dlen);
     if (rval) {
-        fprintf (stderr, "buildgraph failed in shrink_ones\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed in shrink_ones\n"); goto CLEANUP;
     }
     rval = CCcut_SRK_subtour_shrink (&G, &minval, CC_MINCUT_ONE_EPSILON,
             cb, cut, cutcount);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_subtour_shrink failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_SRK_subtour_shrink failed\n"); goto CLEANUP;
     }
 
     if (CCcut_SRK_grab_edges (&G, &sncount, &secount, &slist, &slen,
                        (CC_SRKexpinfo *) NULL)) {
-        fprintf (stderr, "grab edges failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "grab edges failed in shrink_ones\n");
         rval = 1; goto CLEANUP;
     }
 
     while (sncount > 1) {
         if ( G.head->adj       == (CC_SRKedge *) NULL ||
              G.head->next->adj == (CC_SRKedge *) NULL) {
-            fprintf (stderr, "Disconnected graph\n");
+            CC_FPRINTF(stderr, "Disconnected graph\n");
             rval = 1; goto CLEANUP;
         }
         rval = CCcut_mincut_st (sncount, secount, slist, slen, 0, 1,
                                 &val, mytcut, &tcount);
         if (rval) {
-            fprintf (stderr, "CCcut_mincut_st failed\n");
+            CC_FPRINTF(stderr, "CCcut_mincut_st failed\n");
             goto CLEANUP;
         }
         if (val < minval) {
@@ -201,7 +201,7 @@ static int mincut_work (int ncount, int ecount, int *elist, double *dlen,
                 CC_IFFREE (*cut, int);
                 rval = CCcut_SRK_grab_nodes (&G, &E);
                 if (rval) {
-                    fprintf (stderr, "CCcut_SRK_grab_nodes failed\n");
+                    CC_FPRINTF(stderr, "CCcut_SRK_grab_nodes failed\n");
                     goto CLEANUP;
                 }
                 CCcut_SRK_expand (&E, tcut, tcount, cut, cutcount);
@@ -214,14 +214,14 @@ static int mincut_work (int ncount, int ecount, int *elist, double *dlen,
 
             rval = CCcut_SRK_grab_nodes (&G, &E);
             if (rval) {
-                fprintf (stderr, "CCcut_SRK_grab_nodes failed\n");
+                CC_FPRINTF(stderr, "CCcut_SRK_grab_nodes failed\n");
                 goto CLEANUP;
             }
             CCcut_SRK_expand (&E, tcut, tcount, &fcut, &fcutcount);
             CCcut_SRK_free_expinfo (&E);
             rval = doit_fn (val, fcutcount, fcut, pass_param);
             if (rval) {
-                fprintf (stderr, "doit_fn failed\n");
+                CC_FPRINTF(stderr, "doit_fn failed\n");
                 CC_IFFREE (fcut, int);
                 goto CLEANUP;
             }
@@ -245,14 +245,14 @@ static int mincut_work (int ncount, int ecount, int *elist, double *dlen,
         CCcut_SRK_identify_pr_edges (&G, &minval, &i, squeue,
                 CC_MINCUT_ONE_EPSILON, cb, cut, cutcount);
 
-        /* if (i) { printf ("[%d]", i); fflush (stdout); } */
+        /* if (i) { CC_PRINTF("[%d]", i); CC_FFLUSH(stdout); } */
 
         CC_IFFREE (slist, int);
         CC_IFFREE (slen, double);
         rval = CCcut_SRK_grab_edges (&G, &sncount, &secount, &slist, &slen,
                             (CC_SRKexpinfo *) NULL);
         if (rval) {
-            fprintf (stderr, "grab edges failed in shrink_ones\n");
+            CC_FPRINTF(stderr, "grab edges failed in shrink_ones\n");
             goto CLEANUP;
         }
     }
@@ -265,7 +265,7 @@ static int mincut_work (int ncount, int ecount, int *elist, double *dlen,
         if (*cutcount > ncount/2) {
             rval = flip_the_cut (ncount, cut, cutcount);
             if (rval) {
-                fprintf (stderr, "flip_the_cut failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "flip_the_cut failed\n"); goto CLEANUP;
             }
         }
     }
@@ -303,7 +303,7 @@ int CCcut_shrink_cuts (int ncount, int ecount, int *elist, double *dlen,
     if (doit_fn) {
         cb = CC_SAFE_MALLOC (1, CC_SRKcallback);
         if (!cb) {
-            fprintf (stderr, "out of memory in mincut_work\n");
+            CC_FPRINTF(stderr, "out of memory in mincut_work\n");
             rval = 1; goto CLEANUP;
         }
         cb->cutoff     = cutoff;
@@ -313,11 +313,11 @@ int CCcut_shrink_cuts (int ncount, int ecount, int *elist, double *dlen,
 
     rval = CCcut_SRK_buildgraph (&G, ncount, ecount, elist, dlen);
     if (rval) {
-        fprintf (stderr, "buildgraph failed in shrink_ones\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed in shrink_ones\n"); goto CLEANUP;
     }
     rval = CCcut_SRK_crowder_padberg (&G, CC_MINCUT_ONE_EPSILON, cb);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_crowder_padberg failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_SRK_crowder_padberg failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -337,13 +337,13 @@ static int flip_the_cut (int ncount, int **cut, int *cutcount)
     int newcutcount = 0;
 
     if (*cutcount == ncount) {
-        fprintf (stderr, "cut is the entire graph\n");
+        CC_FPRINTF(stderr, "cut is the entire graph\n");
         rval = 1; goto CLEANUP;
     }
 
     marks = CC_SAFE_MALLOC (ncount, char);
     if (!marks) {
-        fprintf (stderr, "out of memory in flip_the_cut\n");
+        CC_FPRINTF(stderr, "out of memory in flip_the_cut\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
@@ -355,7 +355,7 @@ static int flip_the_cut (int ncount, int **cut, int *cutcount)
 
     newcut = CC_SAFE_MALLOC (ncount - *cutcount, int);
     if (!newcut) {
-        fprintf (stderr, "out of memory in flip_the_cut\n");
+        CC_FPRINTF(stderr, "out of memory in flip_the_cut\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
@@ -395,12 +395,12 @@ int CCcut_mincut_containing_set (int ncount, int ecount, int *elist,
     char *marks = (char *) NULL;
 
     if (scount <= 0 || slist == (int *) NULL) {
-        fprintf (stderr, "set of nodes is empty\n");
+        CC_FPRINTF(stderr, "set of nodes is empty\n");
         rval = 1;  goto CLEANUP;
     }
 
     if (scount >= ncount)  {
-        fprintf (stderr, "the entire set of nodes is in the set\n");
+        CC_FPRINTF(stderr, "the entire set of nodes is in the set\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -468,7 +468,7 @@ int CCcut_mincut_containing_set (int ncount, int ecount, int *elist,
         }
     }
 
-    printf ("Cut: %f (with %d nodes)\n", mval, mcnt); fflush (stdout);
+    CC_PRINTF("Cut: %f (with %d nodes)\n", mval, mcnt); CC_FFLUSH(stdout);
 
     if (mval < CC_MINCUT_BIGDOUBLE) {
         for (i = 0; i < mcnt; i++) {
@@ -479,7 +479,7 @@ int CCcut_mincut_containing_set (int ncount, int ecount, int *elist,
             }
         }
     } else {
-        fprintf (stderr, "did not find cut\n");
+        CC_FPRINTF(stderr, "did not find cut\n");
         rval = 1;  goto CLEANUP;
     }
 

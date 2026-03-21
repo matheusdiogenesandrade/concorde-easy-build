@@ -42,7 +42,7 @@ int main (int ac, char **av)
     init_dominfo (&D);
 
     if (ac != 2) {
-        fprintf (stderr, "Usage: %s boss\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s boss\n", av[0]);
         rval = 1; goto CLEANUP;
     }
 
@@ -53,7 +53,7 @@ int main (int ac, char **av)
     while (1) {
         s = CCutil_snet_open (bosshost, CCtsp_DOMINO_PORT);
         if (!s) {
-            fprintf (stderr, "CCutil_snet_open failed\n");
+            CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
             rval = 1;  goto CLEANUP;
         }
 
@@ -99,8 +99,8 @@ int main (int ac, char **av)
                 CCcheck_rval (rval, "CCutil_sread_int failed (id)");
                 break;
             case CCtsp_DOMINO_EXIT:
-                printf ("Shutting down the domino grunt\n");
-                fflush (stdout);
+                CC_PRINTF("Shutting down the domino grunt\n");
+                CC_FFLUSH(stdout);
                 goto CLEANUP; 
             }
   
@@ -108,8 +108,8 @@ int main (int ac, char **av)
             s = (CC_SFILE *) NULL;
 
             if (id != -1) {
-                printf ("PROCESSING node %d, graph %d\n", id, G.gid);
-                fflush (stdout);
+                CC_PRINTF("PROCESSING node %d, graph %d\n", id, G.gid);
+                CC_FFLUSH(stdout);
 
                 szeit = CCutil_zeit ();
 
@@ -141,17 +141,17 @@ static int process_subproblem (int id, domgraph *G, dominfo *D)
     int rval = 0;
 
     if (!G) {
-        fprintf (stderr, "no graph\n");
+        CC_FPRINTF(stderr, "no graph\n");
         rval = 1;  goto CLEANUP;
     }
 
     if (!D) {
-        fprintf (stderr, "no dominfo\n");
+        CC_FPRINTF(stderr, "no dominfo\n");
         rval = 1;  goto CLEANUP;
     }
 
-    printf ("process %d (ncount %d, ecount %d)\n", id, G->ncount, G->ecount);
-    fflush (stdout);
+    CC_PRINTF("process %d (ncount %d, ecount %d)\n", id, G->ncount, G->ecount);
+    CC_FFLUSH(stdout);
 
     D->count = wolf++;
 
@@ -165,7 +165,7 @@ static int receive_graph (CC_SFILE *s, domgraph *G)
     int rval = 0;
 
     if (!G) {
-        fprintf (stderr, "no graph structure\n");
+        CC_FPRINTF(stderr, "no graph structure\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -180,9 +180,9 @@ static int receive_graph (CC_SFILE *s, domgraph *G)
     rval = CCutil_sread_int (s, &G->ecount);
     CCcheck_rval (rval, "CCutil_sread_int failed (ecount)");
 
-    printf ("Graph id %d, ncount = %d, ecount = %d\n",
+    CC_PRINTF("Graph id %d, ncount = %d, ecount = %d\n",
                G->gid, G->ncount, G->ecount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 
 CLEANUP:
@@ -195,7 +195,7 @@ static int send_dominos (CC_SFILE *s, dominfo *D)
     int rval = 0;
 
     if (!D) {
-        fprintf (stderr, "no dominfo to send\n");
+        CC_FPRINTF(stderr, "no dominfo to send\n");
         rval = 1;  goto CLEANUP;
     }
 

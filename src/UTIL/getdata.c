@@ -358,7 +358,7 @@ int CCutil_getdata (char *datname, int binary_in, int innorm,
     CCutil_dat_setnorm (dat, innorm);
 
     if (datname == (char *) NULL && *ncount == 0) {
-        fprintf (stderr, "CCutil_getdata needs a datfile or a nodecount\n");
+        CC_FPRINTF(stderr, "CCutil_getdata needs a datfile or a nodecount\n");
         return 1;
     }
 
@@ -384,7 +384,7 @@ int CCutil_getdata (char *datname, int binary_in, int innorm,
         return read_rhdata (datname, innorm, binary_in, ncount,
                             &dat->rhdat);
     } else {
-        fprintf (stderr, "Unknown norm %d\n", innorm);
+        CC_FPRINTF(stderr, "Unknown norm %d\n", innorm);
         return 1;
     }
 }
@@ -405,7 +405,7 @@ int CCutil_writedata (char *datname, int binary_out, int ncount,
     } else if (norm == CC_SPARSE) {
         return write_sparse (datname, binary_out, ncount, dat);
     } else {
-        fprintf (stderr, "Output of this norm not yet implemented\n");
+        CC_FPRINTF(stderr, "Output of this norm not yet implemented\n");
         return 1;
     }
 }
@@ -416,27 +416,27 @@ int CCutil_putmaster (char *mastername, int ncount, CCdatagroup *dat,
     CC_SFILE *out = (CC_SFILE *) NULL;
 
     if (mastername == (char *) NULL) {
-        fprintf (stderr, "CCutil_writemaster needs a filename\n");
+        CC_FPRINTF(stderr, "CCutil_writemaster needs a filename\n");
         return 1;
     }
 
     if (!dat) {
-        fprintf (stderr, "Cannot put a master without a datagroup\n");
+        CC_FPRINTF(stderr, "Cannot put a master without a datagroup\n");
         return 1;
     }
     if (!perm) {
-        fprintf (stderr, "Cannot put a master without a permutation\n");
+        CC_FPRINTF(stderr, "Cannot put a master without a permutation\n");
         return 1;
     }
 
     out = CCutil_sopen (mastername, "w");
     if (out == (CC_SFILE *) NULL) {
-        fprintf (stderr, "Unable to open %s for output\n", mastername);
+        CC_FPRINTF(stderr, "Unable to open %s for output\n", mastername);
         return 1;
     }
 
     if (CCutil_writemaster (out, ncount, dat, perm)) {
-        fprintf (stderr, "CCutil_writemaster failed\n");
+        CC_FPRINTF(stderr, "CCutil_writemaster failed\n");
         CCutil_sclose (out);
         return 1;
     }
@@ -452,11 +452,11 @@ int CCutil_writemaster (CC_SFILE *out, int ncount, CCdatagroup *dat, int *perm)
     int ndepot = dat->ndepot;
 
     if (!dat) {
-        fprintf (stderr, "Cannot write a master without a datagroup\n");
+        CC_FPRINTF(stderr, "Cannot write a master without a datagroup\n");
         return 1;
     }
     if (!perm) {
-        fprintf (stderr, "Cannot write a master without a permutation\n");
+        CC_FPRINTF(stderr, "Cannot write a master without a permutation\n");
         return 1;
     }
 
@@ -533,28 +533,28 @@ int CCutil_writemaster (CC_SFILE *out, int ncount, CCdatagroup *dat, int *perm)
         }
     } else if (norm == CC_SPARSE) {
         if (writedat_sparse (out, ncount, dat)) {
-            fprintf (stderr, "writedat_sparse failed\n");
+            CC_FPRINTF(stderr, "writedat_sparse failed\n");
             return 1;
         }
     } else if (norm == CC_USER) {
         if (writemaster_user (out, ncount, &dat->userdat)) {
-            fprintf (stderr, "writemaster_user failed\n");
+            CC_FPRINTF(stderr, "writemaster_user failed\n");
             return 1;
         }
     } else if (norm == CC_RHMAP1 || norm == CC_RHMAP2 || norm == CC_RHMAP3 ||
                norm == CC_RHMAP4 || norm == CC_RHMAP5) {
         if (writemaster_rhdata (out, ncount, &dat->rhdat)) {
-            fprintf (stderr, "writemaster_rhdata failed\n");
+            CC_FPRINTF(stderr, "writemaster_rhdata failed\n");
             return 1;
         }
     } else {
-        fprintf (stderr, "unknown norm: %d\n", norm);
+        CC_FPRINTF(stderr, "unknown norm: %d\n", norm);
         return 1;
     }
 
     for (i = 0; i < ncount; i++) {
         if (perm[i] < 0 || perm[i] >= ncount) {
-            fprintf (stderr, "permutation in wrong format\n");
+            CC_FPRINTF(stderr, "permutation in wrong format\n");
             return 1;
         }
         if (CCutil_swrite_int (out, perm[i])) {
@@ -579,18 +579,18 @@ int CCutil_getmaster (char *mastername, int *ncount, CCdatagroup *dat,
     CC_SFILE *in = (CC_SFILE *) NULL;
 
     if (mastername == (char *) NULL) {
-        fprintf (stderr, "CCutil_getmaster needs a filename\n");
+        CC_FPRINTF(stderr, "CCutil_getmaster needs a filename\n");
         return 1;
     }
 
     in = CCutil_sopen (mastername, "r");
     if (in == (CC_SFILE *) NULL) {
-        fprintf (stderr, "Unable to open %s for input\n", mastername);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", mastername);
         return 1;
     }
 
     if (CCutil_readmaster (in, ncount, dat, perm)) {
-        fprintf (stderr, "CCutil_readmaster failed\n");
+        CC_FPRINTF(stderr, "CCutil_readmaster failed\n");
         CCutil_sclose (in);
         return 1;
     }
@@ -617,7 +617,7 @@ int CCutil_readmaster (CC_SFILE *in, int *ncount, CCdatagroup *dat, int **perm)
     CCcheck_rval (rval, "CCutil_sread_int failed");
 
     if (havedat != CC_MASTER_DAT) {
-        fprintf (stderr, "masterfile does not have a dat section\n");
+        CC_FPRINTF(stderr, "masterfile does not have a dat section\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -668,7 +668,7 @@ int CCutil_readmaster (CC_SFILE *in, int *ncount, CCdatagroup *dat, int **perm)
         }
         if (norm == CC_EUCTOROIDAL) {
             dat->gridsize = 1000000;
-            printf ("ASSUMING GRIDSIZE 1000000\n");
+            CC_PRINTF("ASSUMING GRIDSIZE 1000000\n");
         }
     } else if ((norm & CC_NORM_SIZE_BITS) == CC_D3_NORM_SIZE) {
         dat->x = CC_SAFE_MALLOC (*ncount + ndepot, double);
@@ -723,7 +723,7 @@ int CCutil_readmaster (CC_SFILE *in, int *ncount, CCdatagroup *dat, int **perm)
        }
     } else if (norm == CC_DSJRANDNORM) {
         if (ndepot > 0) {
-            fprintf (stderr, "cannot have depots with DSJRANDOM norm\n");
+            CC_FPRINTF(stderr, "cannot have depots with DSJRANDOM norm\n");
             rval = 1; goto CLEANUP;
         }
         dat->x = CC_SAFE_MALLOC (*ncount, double);
@@ -734,14 +734,14 @@ int CCutil_readmaster (CC_SFILE *in, int *ncount, CCdatagroup *dat, int **perm)
         }
     } else if (norm == CC_SPARSE) {
         if (ndepot > 0) {
-            fprintf (stderr, "cannot have depots with SPARSE norm\n");
+            CC_FPRINTF(stderr, "cannot have depots with SPARSE norm\n");
             rval = 1; goto CLEANUP;
         }
         rval = readdat_sparse (in, *ncount, dat);
         CCcheck_rval (rval, "readmaster_sparse failed");
     } else if (norm == CC_USER) {
         if (ndepot > 0) {
-            fprintf (stderr, "cannot have depots with USER norm\n");
+            CC_FPRINTF(stderr, "cannot have depots with USER norm\n");
             rval = 1; goto CLEANUP;
         }
         rval = readmaster_user (in, *ncount, &dat->userdat);
@@ -750,13 +750,13 @@ int CCutil_readmaster (CC_SFILE *in, int *ncount, CCdatagroup *dat, int **perm)
                norm == CC_RHMAP3 || norm == CC_RHMAP4 ||
                norm == CC_RHMAP5) {
         if (ndepot > 0) {
-            fprintf (stderr, "cannot have depots with RH norm\n");
+            CC_FPRINTF(stderr, "cannot have depots with RH norm\n");
             rval = 1; goto CLEANUP;
         }
         rval = readmaster_rhdata (in, *ncount, &dat->rhdat);
         CCcheck_rval (rval, "readmaster_rhdata failed");
     } else {
-        fprintf (stderr, "unknown norm: %d\n", norm);
+        CC_FPRINTF(stderr, "unknown norm: %d\n", norm);
         rval = 1; goto CLEANUP;
     }
 
@@ -807,13 +807,13 @@ int CCutil_getnodeweights (char *weightname, int ncount, int weight_limit,
         FILE *weightin = fopen (weightname, "r");
         if (weightin == (FILE *) NULL) {
             perror (weightname);
-            fprintf (stderr, "Unable to open %s for input\n", weightname);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", weightname);
             CC_FREE (*wcoord, double);
             return 1;
         }
         fscanf (weightin, "%d", &k);
         if (k != ncount) {
-            fprintf (stderr, "Weight file does not match node file\n");
+            CC_FPRINTF(stderr, "Weight file does not match node file\n");
             fclose (weightin);
             CC_FREE (*wcoord, double);
             return 1;
@@ -843,7 +843,7 @@ static void make_weights_nonnegative (int ncount, double *wcoord)
             minx = wcoord[i];
     }
     if (minx < 0.0) {
-        printf ("****WARNING**** Adjusting node weights by %f\n", minx);
+        CC_PRINTF("****WARNING**** Adjusting node weights by %f\n", minx);
         for (i = 0; i < ncount; i++)
             wcoord[i] -= minx;
     }
@@ -867,7 +867,7 @@ int CCutil_gettsplib(char *datname, int *ncount, CCdatagroup *dat)
 
     if ((in = fopen (datname, "r")) == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for input\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
         return 1;
     }
 
@@ -884,68 +884,68 @@ int CCutil_gettsplib(char *datname, int *ncount, CCdatagroup *dat)
             while (*p == ' ')
                 p++;
             if (!strcmp (key, "NAME")) {
-                printf ("Problem Name: %s", p);
+                CC_PRINTF("Problem Name: %s", p);
             } else if (!strcmp (key, "TYPE")) {
-                printf ("Problem Type: %s", p);
+                CC_PRINTF("Problem Type: %s", p);
                 if (sscanf (p, "%s", field) == EOF || strcmp (field, "TSP")) {
-                    fprintf (stderr, "Not a TSP problem\n");
+                    CC_FPRINTF(stderr, "Not a TSP problem\n");
                     return 1;
                 }
             } else if (!strcmp (key, "COMMENT")) {
-                printf ("%s", p);
+                CC_PRINTF("%s", p);
             } else if (!strcmp (key, "DIMENSION")) {
                 if (sscanf (p, "%s", field) == EOF) {
-                    fprintf (stderr, "ERROR in DIMENSION line\n");
+                    CC_FPRINTF(stderr, "ERROR in DIMENSION line\n");
                     return 1;
                 }
                 *ncount = atoi (field);
-                printf ("Number of Nodes: %d\n", *ncount);
+                CC_PRINTF("Number of Nodes: %d\n", *ncount);
             } else if (!strcmp (key, "EDGE_WEIGHT_TYPE")) {
                 if (sscanf (p, "%s", field) == EOF) {
-                    fprintf (stderr, "ERROR in EDGE_WEIGHT_TYPE line\n");
+                    CC_FPRINTF(stderr, "ERROR in EDGE_WEIGHT_TYPE line\n");
                     return 1;
                 }
                 if (!strcmp (field, "EXPLICIT")) {
                     norm = CC_MATRIXNORM;
-                    printf ("Explicit Lengths (CC_MATRIXNORM)\n");
+                    CC_PRINTF("Explicit Lengths (CC_MATRIXNORM)\n");
                 } else if (!strcmp (field, "EUC_2D")) {
                     norm = CC_EUCLIDEAN;
-                    printf ("Rounded Euclidean Norm (CC_EUCLIDEAN)\n");
+                    CC_PRINTF("Rounded Euclidean Norm (CC_EUCLIDEAN)\n");
                 } else if (!strcmp (field, "EUC_3D")) {
                     norm = CC_EUCLIDEAN_3D;
-                    printf ("Rounded Euclidean 3D Norm (CC_EUCLIDEAN_3D)\n");
+                    CC_PRINTF("Rounded Euclidean 3D Norm (CC_EUCLIDEAN_3D)\n");
                 } else if (!strcmp (field, "MAX_2D")) {
                     norm = CC_MAXNORM;
-                    printf ("Max Norm (CC_MAXNORM)\n");
+                    CC_PRINTF("Max Norm (CC_MAXNORM)\n");
                 } else if (!strcmp (field, "MAN_2D")) {
                     norm = CC_MANNORM;
-                    printf ("Max Norm (CC_MAXNORM)\n");
+                    CC_PRINTF("Max Norm (CC_MAXNORM)\n");
                 } else if (!strcmp (field, "GEO")) {
                     norm = CC_GEOGRAPHIC;
-                    printf ("Geographical Norm (CC_GEOGRAPHIC)\n");
+                    CC_PRINTF("Geographical Norm (CC_GEOGRAPHIC)\n");
                 } else if (!strcmp (field, "GEOM")) {
                     norm = CC_GEOM;
-                    printf ("Geographical Norm in Meters (CC_GEOM)\n");
+                    CC_PRINTF("Geographical Norm in Meters (CC_GEOM)\n");
                 } else if (!strcmp (field, "ATT")) {
                     norm = CC_ATT;
-                    printf ("ATT Norm (CC_ATT)\n");
+                    CC_PRINTF("ATT Norm (CC_ATT)\n");
                 } else if (!strcmp (field, "CEIL_2D")) {
                     norm = CC_EUCLIDEAN_CEIL;
-                    printf ("Rounded Up Euclidean Norm (CC_EUCLIDEAN_CEIL)\n");
+                    CC_PRINTF("Rounded Up Euclidean Norm (CC_EUCLIDEAN_CEIL)\n");
                 } else if (!strcmp (field, "DSJRAND")) {
                     norm = CC_DSJRANDNORM;
-                    printf ("David Johnson Random Norm (CC_DSJRANDNORM)\n");
+                    CC_PRINTF("David Johnson Random Norm (CC_DSJRANDNORM)\n");
                 } else {
-                    fprintf (stderr, "ERROR: Not set up for norm %s\n", field);
+                    CC_FPRINTF(stderr, "ERROR: Not set up for norm %s\n", field);
                     return 1;
                 }
                 if (CCutil_dat_setnorm (dat, norm)) {
-                    fprintf (stderr, "ERROR: Couldn't set norm %d\n", norm);
+                    CC_FPRINTF(stderr, "ERROR: Couldn't set norm %d\n", norm);
                     return 1;
                 }
             } else if (!strcmp (key, "EDGE_WEIGHT_FORMAT")) {
                 if (sscanf (p, "%s", field) == EOF) {
-                    fprintf (stderr, "ERROR in EDGE_WEIGHT_FORMAT line\n");
+                    CC_FPRINTF(stderr, "ERROR in EDGE_WEIGHT_FORMAT line\n");
                     return 1;
                 }
                 if (!strcmp (field, "LOWER_DIAG_ROW")) {
@@ -957,17 +957,17 @@ int CCutil_gettsplib(char *datname, int *ncount, CCdatagroup *dat)
                 } else if (!strcmp (field, "FULL_MATRIX")) {
                     matrixform = MATRIX_FULL_MATRIX;
                 } else if (strcmp (field, "FUNCTION")) {
-                    fprintf (stderr, "Cannot handle format: %s\n", field);
+                    CC_FPRINTF(stderr, "Cannot handle format: %s\n", field);
                     return 1;
                 }
             } else if (!strcmp (key, "NODE_COORD_SECTION")) {
                 int i;
                 if (*ncount <= 0) {
-                    fprintf (stderr, "ERROR: Dimension not specified\n");
+                    CC_FPRINTF(stderr, "ERROR: Dimension not specified\n");
                     return 1;
                 }
                 if (dat->x != (double *) NULL) {
-                    fprintf (stderr, "ERROR: A second NODE_COORD_SECTION?\n");
+                    CC_FPRINTF(stderr, "ERROR: A second NODE_COORD_SECTION?\n");
                     CCutil_freedatagroup (dat);
                     return 1;
                 }
@@ -1006,18 +1006,18 @@ int CCutil_gettsplib(char *datname, int *ncount, CCdatagroup *dat)
                                &(dat->x[i]), &(dat->y[i]), &(dat->z[i]));
                     }
                 } else {
-                    fprintf (stderr, "ERROR: Node coordinates with norm %d?\n",
+                    CC_FPRINTF(stderr, "ERROR: Node coordinates with norm %d?\n",
                                  norm);
                     return 1;
                 }
             } else if (!strcmp (key, "EDGE_WEIGHT_SECTION")) {
                 int i, j;
                 if (*ncount <= 0) {
-                    fprintf (stderr, "ERROR: Dimension not specified\n");
+                    CC_FPRINTF(stderr, "ERROR: Dimension not specified\n");
                     return 1;
                 }
                 if (dat->adj != (int **) NULL) {
-                    fprintf (stderr, "ERROR: A second NODE_COORD_SECTION?\n");
+                    CC_FPRINTF(stderr, "ERROR: A second NODE_COORD_SECTION?\n");
                     CCutil_freedatagroup (dat);
                     return 1;
                 }
@@ -1076,12 +1076,12 @@ int CCutil_gettsplib(char *datname, int *ncount, CCdatagroup *dat)
                         CC_FREE (tempadj, int *);
                     }
                 } else {
-                    fprintf (stderr, "ERROR: Matrix with norm %d?\n",
+                    CC_FPRINTF(stderr, "ERROR: Matrix with norm %d?\n",
                              norm);
                     return 1;
                 }
             } else if (!strcmp (key, "FIXED_EDGES_SECTION")) {
-                fprintf (stderr, "ERROR: Not set up for fixed edges\n");
+                CC_FPRINTF(stderr, "ERROR: Not set up for fixed edges\n");
                 return 1;
             }
         }
@@ -1089,7 +1089,7 @@ int CCutil_gettsplib(char *datname, int *ncount, CCdatagroup *dat)
     fclose (in);
 
     if (dat->x == (double *) NULL && dat->adj == (int **) NULL) {
-        fprintf (stderr, "ERROR: Didn't find the data\n");
+        CC_FPRINTF(stderr, "ERROR: Didn't find the data\n");
         return 1;
     } else {
         return 0;
@@ -1104,7 +1104,7 @@ int CCutil_writetsplib (const char *fname, int ncount, CCdatagroup *dat)
 
     if ((out = fopen (fname, "w")) == (FILE *) NULL) {
         perror (fname);
-        fprintf (stderr, "Unable to open %s for input\n", fname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", fname);
         rval = 1; goto CLEANUP;
     }
 
@@ -1132,7 +1132,7 @@ int CCutil_writetsplib (const char *fname, int ncount, CCdatagroup *dat)
         break;
     case CC_USER:
         fprintf (out, "USER\n");
-        fprintf (stderr, "Warning: Norm not a supported in TSPLIB\n");
+        CC_FPRINTF(stderr, "Warning: Norm not a supported in TSPLIB\n");
         rval = 1; goto CLEANUP;
     case CC_ATT:
         fprintf (out, "ATT\n");
@@ -1148,11 +1148,11 @@ int CCutil_writetsplib (const char *fname, int ncount, CCdatagroup *dat)
         break;
     case CC_DSJRANDNORM:
         fprintf (out, "DSJ_RANDOM\n");
-        fprintf (stderr, "Warning: Norm not a supported in TSPLIB\n");
+        CC_FPRINTF(stderr, "Warning: Norm not a supported in TSPLIB\n");
         rval = 1; goto CLEANUP;
     case CC_CRYSTAL:
         fprintf (out, "CRYSTAL\n");
-        fprintf (stderr, "Warning: Crystal is not supported in TSPLIB\n");
+        CC_FPRINTF(stderr, "Warning: Crystal is not supported in TSPLIB\n");
         rval = 1; goto CLEANUP;
     case CC_RHMAP1:
     case CC_RHMAP2:
@@ -1160,10 +1160,10 @@ int CCutil_writetsplib (const char *fname, int ncount, CCdatagroup *dat)
     case CC_RHMAP4:
     case CC_RHMAP5:
         fprintf (out, "RHMAPx\n");
-        fprintf (stderr, "Warning: Norm not a supported in TSPLIB\n");
+        CC_FPRINTF(stderr, "Warning: Norm not a supported in TSPLIB\n");
         rval = 1; goto CLEANUP;
     default:
-        fprintf (stderr, "unknown NORM\n");
+        CC_FPRINTF(stderr, "unknown NORM\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1199,7 +1199,7 @@ int CCutil_writetsplib (const char *fname, int ncount, CCdatagroup *dat)
         }
         break;
     default:
-        fprintf (stderr, "unknown NORM_SIZE\n");
+        CC_FPRINTF(stderr, "unknown NORM_SIZE\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1220,7 +1220,7 @@ int CCutil_getcycle_tsplib (int ncount, char *cyclename, int *outcycle)
     in = fopen (cyclename, "r");
     if (in == (FILE *) NULL) {
         perror (cyclename);
-        fprintf (stderr, "Unable to open %s for input\n", cyclename);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", cyclename);
         rval = 1; goto CLEANUP;
     }
 
@@ -1237,47 +1237,47 @@ int CCutil_getcycle_tsplib (int ncount, char *cyclename, int *outcycle)
             while (*p == ' ')
                 p++;
             if (!strcmp (key, "NAME")) {
-                printf ("Name: %s", p);
+                CC_PRINTF("Name: %s", p);
             } else if (!strcmp (key, "TYPE")) {
-                printf ("Problem Type: %s", p);
+                CC_PRINTF("Problem Type: %s", p);
                 if (sscanf (p, "%s", field) == EOF || strcmp (field, "TOUR")) {
-                    fprintf (stderr, "Not a TOUR File\n");
+                    CC_FPRINTF(stderr, "Not a TOUR File\n");
                     rval = 1; goto CLEANUP;
                 }
             } else if (!strcmp (key, "COMMENT")) {
-                printf ("%s", p);
+                CC_PRINTF("%s", p);
             } else if (!strcmp (key, "DIMENSION")) {
                 if (sscanf (p, "%s", field) == EOF) {
-                    fprintf (stderr, "ERROR in DIMENSION line\n");
+                    CC_FPRINTF(stderr, "ERROR in DIMENSION line\n");
                     rval = 1; goto CLEANUP;
                 }
                 icount = atoi (field);
                 if (icount != ncount) {
-                    fprintf (stderr, "Number of nodes does not agree\n");
+                    CC_FPRINTF(stderr, "Number of nodes does not agree\n");
                     rval = 1; goto CLEANUP;
                 }
             } else if (!strcmp (key, "TOUR_SECTION")) {
                 int i, k;
                 if (icount <= 0) {
-                    fprintf (stderr, "ERROR: Dimension not specified\n");
+                    CC_FPRINTF(stderr, "ERROR: Dimension not specified\n");
                     rval = 1; goto CLEANUP;
                 }
                 for (i = 0; i < icount; i++) {
                     fscanf (in, "%d", &k);
                     if (k < 1 && k > ncount) {
-                        fprintf (stderr, "ERROR: Bad format in TSPLIB tour\n");
+                        CC_FPRINTF(stderr, "ERROR: Bad format in TSPLIB tour\n");
                         rval = 1; goto CLEANUP;
                     }
                     outcycle[i] = k - 1;
                 }
                 fscanf (in, "%d", &k);
                 if (k != -1) {
-                    fprintf (stderr, "Warning: tour not -1 terminated\n");
+                    CC_FPRINTF(stderr, "Warning: tour not -1 terminated\n");
                 }
             } else if (!strcmp (key, "EOF")) {
                 goto CLEANUP;
             } else {
-                fprintf (stderr, "ERROR %s: Bad section in TSPLIB tour\n", key);
+                CC_FPRINTF(stderr, "ERROR %s: Bad section in TSPLIB tour\n", key);
                 rval = 1; goto CLEANUP;
             }
         }
@@ -1297,7 +1297,7 @@ int CCutil_datagroup_perm (int ncount, CCdatagroup *dat, int *perm)
 
     if (dat->norm == CC_USER) {
         if (permute_user (ncount, &dat->userdat, perm)) {
-            fprintf (stderr, "permute_user failed\n");
+            CC_FPRINTF(stderr, "permute_user failed\n");
             return 1;
         }
         return 0;
@@ -1305,12 +1305,12 @@ int CCutil_datagroup_perm (int ncount, CCdatagroup *dat, int *perm)
                dat->norm == CC_RHMAP3 || dat->norm == CC_RHMAP4 ||
                dat->norm == CC_RHMAP5) {
         if (permute_rhdata (ncount, &dat->rhdat, perm)) {
-            fprintf (stderr, "permute_rhdata failed\n");
+            CC_FPRINTF(stderr, "permute_rhdata failed\n");
             return 1;
         }
     } else if (dat->norm == CC_SPARSE) {
         if (permute_sparse (ncount, dat, perm)) {
-            fprintf (stderr, "permute_sparse failed\n");
+            CC_FPRINTF(stderr, "permute_sparse failed\n");
             return 1;
         }
         return 0;
@@ -1395,21 +1395,21 @@ int CCutil_copy_datagroup (int ncount, CCdatagroup *indat, CCdatagroup *outdat)
     CCutil_dat_setnorm (outdat, indat->norm);
 
     if (indat->norm == CC_USER) {
-        fprintf (stderr, "CCutil_copy_datagroup not set up for user norm\n");
+        CC_FPRINTF(stderr, "CCutil_copy_datagroup not set up for user norm\n");
         return 1;
     }
 
     if (indat->norm == CC_RHMAP1 || indat->norm == CC_RHMAP2 ||
         indat->norm == CC_RHMAP3 || indat->norm == CC_RHMAP4 ||
         indat->norm == CC_RHMAP5) {
-        fprintf (stderr, "CCutil_copy_datagroup not set up for rh vectors\n");
+        CC_FPRINTF(stderr, "CCutil_copy_datagroup not set up for rh vectors\n");
         return 1;
     }
 
     if (indat->norm == CC_SPARSE) {
         rval = copy_sparse (ncount, indat, outdat);
         if (rval) {
-            fprintf (stderr, "copy_sparse failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "copy_sparse failed\n"); goto CLEANUP;
         }
         goto CLEANUP;
     }
@@ -1419,7 +1419,7 @@ int CCutil_copy_datagroup (int ncount, CCdatagroup *indat, CCdatagroup *outdat)
 
         tempx = CC_SAFE_MALLOC (ncount, double);
         if (!tempx) {
-            fprintf (stderr, "out of memory in CCutil_copy_datagroup\n");
+            CC_FPRINTF(stderr, "out of memory in CCutil_copy_datagroup\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < ncount; i++) {
@@ -1432,7 +1432,7 @@ int CCutil_copy_datagroup (int ncount, CCdatagroup *indat, CCdatagroup *outdat)
 
         tempy = CC_SAFE_MALLOC (ncount, double);
         if (!tempy) {
-            fprintf (stderr, "out of memory in CCutil_copy_datagroup\n");
+            CC_FPRINTF(stderr, "out of memory in CCutil_copy_datagroup\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < ncount; i++) {
@@ -1445,7 +1445,7 @@ int CCutil_copy_datagroup (int ncount, CCdatagroup *indat, CCdatagroup *outdat)
 
         tempz = CC_SAFE_MALLOC (ncount, double);
         if (!tempz) {
-            fprintf (stderr, "out of memory in CCutil_copy_datagroup\n");
+            CC_FPRINTF(stderr, "out of memory in CCutil_copy_datagroup\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < ncount; i++) {
@@ -1461,7 +1461,7 @@ int CCutil_copy_datagroup (int ncount, CCdatagroup *indat, CCdatagroup *outdat)
         tempadjspace = CC_SAFE_MALLOC (ncount * (ncount+1) / 2, int);
         
         if (!tempadj ||!tempadjspace) {
-            fprintf (stderr, "out of memory in CCutil_copy_datagroup\n");
+            CC_FPRINTF(stderr, "out of memory in CCutil_copy_datagroup\n");
             CC_IFFREE (tempadj, int *);
             CC_IFFREE (tempadjspace, int);
             rval = 1; goto CLEANUP;
@@ -1494,12 +1494,12 @@ int CCutil_getedgelist (int ncount, char *fname, int *ecount, int **elist,
     int k;
 
     if (CCutil_getedgelist_n (&k, fname, ecount, elist, elen, binary_in)) {
-        fprintf (stderr, "CCutil_getedgelist_n failed\n");
+        CC_FPRINTF(stderr, "CCutil_getedgelist_n failed\n");
         return 1;
     }
 
     if (k != ncount) {
-        fprintf (stderr, "Edge file does not match problem\n");
+        CC_FPRINTF(stderr, "Edge file does not match problem\n");
         return 1;
     }
 
@@ -1519,18 +1519,18 @@ int CCutil_getedgelist_n (int *ncount, char *fname, int *ecount, int **elist,
 
     if (binary_in) {
         if ((s_in = CCutil_sopen (fname, "r")) == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for input\n", fname);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", fname);
             rval = 1; goto CLEANUP;
         }
         if (CCutil_sread_int (s_in, ncount) ||
             CCutil_sread_int (s_in, ecount)) {
-            fprintf (stderr, "CCutil_sread_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         if ((f_in = fopen (fname, "r")) == (FILE *) NULL) {
             perror (fname);
-            fprintf (stderr, "Unable to open %s for input\n", fname);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", fname);
             rval = 1; goto CLEANUP;
         }
         *ncount = CCutil_readint (f_in);
@@ -1539,12 +1539,12 @@ int CCutil_getedgelist_n (int *ncount, char *fname, int *ecount, int **elist,
     
     *elist = CC_SAFE_MALLOC(2 * (*ecount), int);
     if (!(*elist)) {
-        fprintf (stderr, "out of memory in CCutil_getedgelist_binary_n\n");
+        CC_FPRINTF(stderr, "out of memory in CCutil_getedgelist_binary_n\n");
         rval = 1; goto CLEANUP;
     }
     *elen = CC_SAFE_MALLOC(*ecount, int);
     if (!(*elen)) {
-        fprintf (stderr, "out of memory in CCutil_getedgelist_binary_in\n");
+        CC_FPRINTF(stderr, "out of memory in CCutil_getedgelist_binary_in\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1553,7 +1553,7 @@ int CCutil_getedgelist_n (int *ncount, char *fname, int *ecount, int **elist,
             if (CCutil_sread_int (s_in, &((*elist)[2*i])) ||
                 CCutil_sread_int (s_in, &((*elist)[2*i+1])) ||
                 CCutil_sread_int (s_in, &((*elen)[i]))) {
-                fprintf (stderr, "CCutil_sread_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
                 rval = 1; goto CLEANUP;
             }
         } else {
@@ -1587,7 +1587,7 @@ int CCutil_genedgelist (int ncount, int ecount, int **elist, int **elen,
     *elen = (int *) NULL;
 
     if (ecount > (ncount * (ncount - 1)) / 2) {
-        fprintf (stderr, "Cannot generate %d edges in a %d node graph\n",
+        CC_FPRINTF(stderr, "Cannot generate %d edges in a %d node graph\n",
                  ecount, ncount);
         rval = 1; goto CLEANUP;
     }
@@ -1595,7 +1595,7 @@ int CCutil_genedgelist (int ncount, int ecount, int **elist, int **elen,
     *elist = CC_SAFE_MALLOC(2 * (ecount), int);
     *elen  = CC_SAFE_MALLOC(ecount, int);
     if (!(*elist) || !(*elen)) {
-        fprintf (stderr, "out of memory in CCutil_genedgelist\n");
+        CC_FPRINTF(stderr, "out of memory in CCutil_genedgelist\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1620,7 +1620,7 @@ int CCutil_genedgelist (int ncount, int ecount, int **elist, int **elen,
     } else {
         rval = CCutil_edgehash_init (&eh, (int) (ecount * 1.5));
         if (rval) {
-            fprintf (stderr, "CCutil_edgehash_init failed\n");
+            CC_FPRINTF(stderr, "CCutil_edgehash_init failed\n");
             goto CLEANUP;
         }
         have_eh = 1;
@@ -1635,7 +1635,7 @@ int CCutil_genedgelist (int ncount, int ecount, int **elist, int **elen,
             } while ((head == tail) || CCutil_edgehash_find (&eh, head, tail, &val) == 0);
             rval = CCutil_edgehash_add (&eh, head, tail, 1);
             if (rval) {
-                fprintf (stderr, "CCutil_edgehash_add failed\n");
+                CC_FPRINTF(stderr, "CCutil_edgehash_add failed\n");
                 goto CLEANUP;
             }
             (*elist)[2*i]   = head;
@@ -1671,35 +1671,35 @@ int CCutil_getcycle_edgelist (int ncount, char *cyclename, int *outcycle,
     if (binary_in) {
         cycsin = CCutil_sopen (cyclename, "r");
         if (cycsin == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for input\n", cyclename);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", cyclename);
             rval = 1; goto CLEANUP;
         }
     } else {
         cycfin = fopen (cyclename, "r");
         if (cycfin == (FILE *) NULL) {
             perror (cyclename);
-            fprintf (stderr, "Unable to open %s for input\n", cyclename);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", cyclename);
             rval = 1; goto CLEANUP;
         }
     }
 
     elist = CC_SAFE_MALLOC (2 * ncount, int);
     if (!elist) {
-        fprintf (stderr, "out of memory in CCutil_getcycle_edgelist\n");
+        CC_FPRINTF(stderr, "out of memory in CCutil_getcycle_edgelist\n");
         rval = 1; goto CLEANUP;
     }
 
     if (binary_in) {
         if (CCutil_sread_int (cycsin, &i) ||
             CCutil_sread_int (cycsin, &k)) {
-            fprintf (stderr, "CCutil_sread_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         fscanf (cycfin, "%d %d", &i, &k);
     }
     if (i != ncount || k != ncount) {
-        fprintf (stderr, "file is not a cycle-edge file for this problem\n");
+        CC_FPRINTF(stderr, "file is not a cycle-edge file for this problem\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1707,7 +1707,7 @@ int CCutil_getcycle_edgelist (int ncount, char *cyclename, int *outcycle,
         if (binary_in) {
             if (CCutil_sread_int (cycsin, &(elist[2*i])) ||
                 CCutil_sread_int (cycsin, &(elist[2*i+1]))) {
-                fprintf (stderr, "CCutil_sread_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
                 rval = 1; goto CLEANUP;
             }
         } else {
@@ -1718,10 +1718,10 @@ int CCutil_getcycle_edgelist (int ncount, char *cyclename, int *outcycle,
 
     rval = CCutil_edge_to_cycle (ncount, elist, &istour, outcycle);
     if (rval) {
-        fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
     }
     if (istour == 0) {
-        fprintf (stderr, "Edge-file is not a tour\n");
+        CC_FPRINTF(stderr, "Edge-file is not a tour\n");
         rval = 1; goto CLEANUP;
     }
     rval = 0;
@@ -1743,31 +1743,31 @@ int CCutil_getcycle (int ncount, char *cyclename, int *outcycle, int binary_in)
     if (binary_in) {
         cycsin = CCutil_sopen (cyclename, "r");
         if (cycsin == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for input\n", cyclename);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", cyclename);
             rval = 1; goto CLEANUP;
         }
         if (CCutil_sread_int (cycsin, &i)) {
-            fprintf (stderr, "CCutil_sread_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         cycfin = fopen (cyclename, "r");
         if (cycfin == (FILE *) NULL) {
             perror (cyclename);
-            fprintf (stderr, "Unable to open %s for input\n", cyclename);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", cyclename);
             rval = 1; goto CLEANUP;
         }
         i = CCutil_readint (cycfin);
     }
 
     if (i != ncount) {
-        fprintf (stderr, "Cycle files has wrong number of nodes\n");
+        CC_FPRINTF(stderr, "Cycle files has wrong number of nodes\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ncount; i++) {
         if (binary_in) {
             if (CCutil_sread_int (cycsin, &outcycle[i])) {
-                fprintf (stderr, "CCutil_sread_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
                 rval = 1; goto CLEANUP;
             }
         } else {
@@ -1807,19 +1807,19 @@ int CCutil_getedges_double (int *ncount, char *fname, int *ecount, int **elist,
     if (binary_in) {
         s_in = CCutil_sopen (fname, "r");
         if (s_in == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for input\n", fname);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", fname);
             rval = 1; goto CLEANUP;
         }
         if (CCutil_sread_int (s_in, ncount) ||
             CCutil_sread_int (s_in, ecount)) {
-            fprintf (stderr, "CCutil_sread_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         f_in = fopen (fname, "r");
         if (f_in == (FILE *) NULL) {
             perror (fname);
-            fprintf (stderr, "Unable to open %s for input\n", fname);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", fname);
             return 1;
         }
 
@@ -1841,14 +1841,14 @@ int CCutil_getedges_double (int *ncount, char *fname, int *ecount, int **elist,
             if (CCutil_sread_int (s_in, &((*elist)[2*i])) ||
                 CCutil_sread_int (s_in, &((*elist)[2*i+1])) ||
                 CCutil_sread_double (s_in, &((*elen)[i]))) {
-                fprintf (stderr, "CCutil_sread_int/double failed\n");
+                CC_FPRINTF(stderr, "CCutil_sread_int/double failed\n");
                 rval = 1; goto CLEANUP;
             }
         } else {
             (*elist)[2*i] = CCutil_readint (f_in);
             (*elist)[2*i+1] = CCutil_readint (f_in);
             if (fscanf (f_in, "%lf", &((*elen)[i])) != 1) {
-                fprintf (stderr, "input file is in the wrong format\n");
+                CC_FPRINTF(stderr, "input file is in the wrong format\n");
                 rval = 1; goto CLEANUP;
             }
         }
@@ -1876,29 +1876,29 @@ int CCutil_writeedges (int ncount, char *outedgename, int ecount, int *elist,
     if (binary_out) {
         sout = CCutil_sopen (outedgename, "w");
         if (sout == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             rval = 1; goto CLEANUP;
         }
         if (CCutil_swrite_int (sout, ncount)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCutil_swrite_int (sout, ecount)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < ecount; i++) {
             if (CCutil_swrite_int (sout, elist[2*i])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
             if (CCutil_swrite_int (sout, elist[2*i+1])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
             l = CCutil_dat_edgelen (elist[2 * i], elist[(2 * i) + 1], dat);
             if (CCutil_swrite_int (sout, l)) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
             
@@ -1907,7 +1907,7 @@ int CCutil_writeedges (int ncount, char *outedgename, int ecount, int *elist,
         fout = fopen (outedgename, "w");
         if (fout == (FILE *) NULL) {
             perror (outedgename);
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             rval = 1; goto CLEANUP;
         }
         fprintf (fout, "%d %d\n", ncount, ecount);
@@ -1936,29 +1936,29 @@ int CCutil_writeedges_int (int ncount, char *outedgename, int ecount,
     if (binary_out) {
         sout = CCutil_sopen (outedgename, "w");
         if (sout == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             rval = 1; goto CLEANUP;
         }
 
         if (CCutil_swrite_int (sout, ncount)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCutil_swrite_int (sout, ecount)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < ecount; i++) {
             if (CCutil_swrite_int (sout, elist[2*i])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
             if (CCutil_swrite_int (sout, elist[2*i+1])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
             if (CCutil_swrite_int (sout, elen[i])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
         }
@@ -1966,7 +1966,7 @@ int CCutil_writeedges_int (int ncount, char *outedgename, int ecount,
         fout = fopen (outedgename, "w");
         if (fout == (FILE *) NULL) {
             perror (outedgename);
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             rval = 1; goto CLEANUP;
         }
         fprintf (fout, "%d %d\n", ncount, ecount);
@@ -1996,50 +1996,50 @@ int CCutil_writecycle_edgelist (int ncount, char *outedgename, int *cycle,
     if (binary_out) {
         sout = CCutil_sopen (outedgename, "w");
         if (sout == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             rval = 1; goto CLEANUP;
         }
         if (CCutil_swrite_int (sout, ncount)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCutil_swrite_int (sout, ncount)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 1; i < ncount; i++) {
             if (CCutil_swrite_int (sout, cycle[i-1])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
             if (CCutil_swrite_int (sout, cycle[i])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
             l = CCutil_dat_edgelen (cycle[i - 1], cycle[i], dat);
             if (CCutil_swrite_int (sout, l)) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
         }
         if (CCutil_swrite_int (sout, cycle[ncount - 1])) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         if (CCutil_swrite_int (sout, cycle[0])) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         l = CCutil_dat_edgelen (cycle[ncount - 1], cycle[0], dat);
         if (CCutil_swrite_int (sout, l)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         fout = fopen (outedgename, "w");
         if (fout == (FILE *) NULL) {
             perror (outedgename);
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             rval = 1; goto CLEANUP;
         }
         fprintf (fout, "%d %d\n", ncount, ncount);
@@ -2070,16 +2070,16 @@ int CCutil_writecycle (int ncount, char *outcyclename, int *cycle,
     if (binary_out) {
         cycsout = CCutil_sopen (outcyclename, "w");
         if (cycsout == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for output\n", outcyclename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outcyclename);
             rval = 1; goto CLEANUP;
         }
         if (CCutil_swrite_int (cycsout, ncount)) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < ncount; i++) {
             if (CCutil_swrite_int (cycsout, cycle[i])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n");
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
                 rval = 1; goto CLEANUP;
             }
         }
@@ -2087,7 +2087,7 @@ int CCutil_writecycle (int ncount, char *outcyclename, int *cycle,
         cycfout = fopen (outcyclename, "w");
         if (cycfout == (FILE *) NULL) {
             perror (outcyclename);
-            fprintf (stderr, "Unable to open %s for output\n", outcyclename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outcyclename);
             rval = 1; goto CLEANUP;
         }
         fprintf (cycfout, "%d\n", ncount);
@@ -2117,7 +2117,7 @@ int CCutil_writeedges_double (int ncount, char *outedgename, int ecount,
         CC_SFILE *out = CCutil_sopen (outedgename, "w");
 
         if (out == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             return 1;
         }
 
@@ -2150,7 +2150,7 @@ int CCutil_writeedges_double (int ncount, char *outedgename, int ecount,
 
         if (out == (FILE *) NULL) {
             perror (outedgename);
-            fprintf (stderr, "Unable to open %s for output\n", outedgename);
+            CC_FPRINTF(stderr, "Unable to open %s for output\n", outedgename);
             return 1;
         }
 
@@ -2177,7 +2177,7 @@ int CCutil_tri2dat (int ncount, int *elen, CCdatagroup *dat)
     dat->adjspace = CC_SAFE_MALLOC (ncount * (ncount+1) / 2, int);
     if (dat->adj == (int **) NULL ||
         dat->adjspace == (int *) NULL) {
-        fprintf (stderr, "Our of memory in CCutil_tri2dat\n");
+        CC_FPRINTF(stderr, "Our of memory in CCutil_tri2dat\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -2193,7 +2193,7 @@ int CCutil_tri2dat (int ncount, int *elen, CCdatagroup *dat)
         dat->adj[i][i] = 0;
     }
     if (CCutil_dat_setnorm (dat, CC_MATRIXNORM)) {
-        fprintf (stderr, "CCutil_dat_setnorm failed\n");
+        CC_FPRINTF(stderr, "CCutil_dat_setnorm failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -2219,7 +2219,7 @@ int CCutil_graph2dat_matrix (int ncount, int ecount, int *elist, int *elen,
     dat->adjspace = CC_SAFE_MALLOC (ncount * (ncount+1) / 2, int);
     if (dat->adj == (int **) NULL ||
         dat->adjspace == (int *) NULL) {
-        fprintf (stderr, "Our of memory in CCutil_graph2dat\n");
+        CC_FPRINTF(stderr, "Our of memory in CCutil_graph2dat\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -2241,7 +2241,7 @@ int CCutil_graph2dat_matrix (int ncount, int ecount, int *elist, int *elen,
         else dat->adj[j][k] = elen[i];
     }
     if (CCutil_dat_setnorm (dat, CC_MATRIXNORM)) {
-        fprintf (stderr, "CCutil_dat_setnorm failed\n");
+        CC_FPRINTF(stderr, "CCutil_dat_setnorm failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -2262,11 +2262,11 @@ int CCutil_graph2dat_sparse (int ncount, int ecount, int *elist, int *elen,
     CCutil_init_datagroup (dat);
     rval = CCutil_dat_setnorm (dat, CC_SPARSE);
     if (rval) {
-        fprintf (stderr, "CCutil_dat_setnorm failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_dat_setnorm failed\n"); goto CLEANUP;
     }
     rval = build_sparse_dat (ncount, ecount, elist, elen, dat, defaultlen);
     if (rval) {
-        fprintf (stderr, "build_sparse_dat failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_sparse_dat failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -2290,7 +2290,7 @@ static int build_sparse_dat (int ncount, int ecount, int *elist, int *elen,
 
     if (!dat->adj || !dat->adjspace || !dat->len || !dat->lenspace ||
         !dat->degree) {
-        fprintf (stderr, "out of memory in build_sparse_dat\n");
+        CC_FPRINTF(stderr, "out of memory in build_sparse_dat\n");
         CCutil_freedatagroup (dat);
         return 1;
     }
@@ -2338,14 +2338,14 @@ static int build_sparse_dat (int ncount, int ecount, int *elist, int *elen,
         }
         v =  (double) (dat->default_len + 1) *  (double) ncount;
         if (256 * v > (double) CCutil_MAXINT) {
-            printf ("WARNING: Large edge lengths in sparse graph\n");
-            fflush (stdout);
+            CC_PRINTF("WARNING: Large edge lengths in sparse graph\n");
+            CC_FFLUSH(stdout);
             dat->default_len = CCutil_MAXINT / 256;
         } else {
             dat->default_len = (dat->default_len + 1) * ncount;
         }
-        printf ("Default Edge Length: %d\n", dat->default_len); fflush (stdout);
-        fflush (stdout);
+        CC_PRINTF("Default Edge Length: %d\n", dat->default_len); CC_FFLUSH(stdout);
+        CC_FFLUSH(stdout);
     } else {
         dat->default_len = defaultlen;
     }
@@ -2361,7 +2361,7 @@ int CCutil_get_sparse_dat_edges (int ncount, CCdatagroup *dat, int *ecount,
 
     CCutil_dat_getnorm (dat, &norm);
     if (norm != CC_SPARSE) {
-        fprintf (stderr, "CCutil_get_sparse_dat_edges called with norm %d\n",
+        CC_FPRINTF(stderr, "CCutil_get_sparse_dat_edges called with norm %d\n",
                           norm);
         rval = 1; goto CLEANUP;
     }
@@ -2371,7 +2371,7 @@ int CCutil_get_sparse_dat_edges (int ncount, CCdatagroup *dat, int *ecount,
     *elen  = CC_SAFE_MALLOC (*ecount, int);
 
     if (!*elist || !(*elen)) {
-        fprintf (stderr, "out of memory in CCutil_get_sparse_dat_edges\n");
+        CC_FPRINTF(stderr, "out of memory in CCutil_get_sparse_dat_edges\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2406,7 +2406,7 @@ int CCutil_sparse_strip_edges (CCdatagroup *dat, int in_ecount,
 
     CCutil_dat_getnorm (dat, &norm);
     if (norm != CC_SPARSE) {
-        fprintf (stderr, "CCutil_sparse_strip_edges called with norm %d\n",
+        CC_FPRINTF(stderr, "CCutil_sparse_strip_edges called with norm %d\n",
                  norm);
         rval = 1; goto CLEANUP;
     }
@@ -2420,7 +2420,7 @@ int CCutil_sparse_strip_edges (CCdatagroup *dat, int in_ecount,
         *elist = CC_SAFE_MALLOC (2*count, int);
         *elen  = CC_SAFE_MALLOC (count, int);
         if (!(*elist) || !(*elen)) {
-            fprintf (stderr, "out of memory in CCutil_sparse_strip_edges\n");
+            CC_FPRINTF(stderr, "out of memory in CCutil_sparse_strip_edges\n");
             rval = 1; goto CLEANUP;
         }
 
@@ -2454,7 +2454,7 @@ int CCutil_sparse_real_tour (int ncount, CCdatagroup *dat, int *cyc,
 
     CCutil_dat_getnorm (dat, &norm);
     if (norm != CC_SPARSE) {
-        fprintf (stderr, "CCutil_sparse_real_tour called with norm %d\n", norm);
+        CC_FPRINTF(stderr, "CCutil_sparse_real_tour called with norm %d\n", norm);
         rval = 1; goto CLEANUP;
     }
 
@@ -2480,19 +2480,19 @@ static int writedat_sparse (CC_SFILE *out, int ncount, CCdatagroup *dat)
     int i, j;
 
     if (CCutil_swrite_int (out, ecount)) {
-        fprintf (stderr, "CCutil_swrite_int failed\n"); return 1;
+        CC_FPRINTF(stderr, "CCutil_swrite_int failed\n"); return 1;
     }
     
     for (i = 0; i < ncount; i++) {
         if (CCutil_swrite_int (out, dat->degree[i])) {
-            fprintf (stderr, "CCutil_swrite_int failed\n"); return 1;
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n"); return 1;
         }
         for (j = 0; j < dat->degree[i]; j++) {
             if (CCutil_swrite_int (out, dat->adj[i][j])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n"); return 1;
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n"); return 1;
             }
             if (CCutil_swrite_int (out, dat->len[i][j])) {
-                fprintf (stderr, "CCutil_swrite_int failed\n"); return 1;
+                CC_FPRINTF(stderr, "CCutil_swrite_int failed\n"); return 1;
             }
         }
     }
@@ -2506,7 +2506,7 @@ static int readdat_sparse (CC_SFILE *in, int ncount, CCdatagroup *dat)
 
     rval = CCutil_sread_int (in, &ecount);
     if (rval) {
-        fprintf (stderr, "CCutil_sread_int failed\n"); return rval;
+        CC_FPRINTF(stderr, "CCutil_sread_int failed\n"); return rval;
     }
 
     dat->adjspace = CC_SAFE_MALLOC (ecount, int);
@@ -2517,7 +2517,7 @@ static int readdat_sparse (CC_SFILE *in, int ncount, CCdatagroup *dat)
    
     if (!dat->adjspace || !dat->lenspace || !dat->adj || !dat->len ||
         !dat->degree) {
-        fprintf (stderr, "out of memory in readdat_sparse\n");
+        CC_FPRINTF(stderr, "out of memory in readdat_sparse\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2527,18 +2527,18 @@ static int readdat_sparse (CC_SFILE *in, int ncount, CCdatagroup *dat)
 
         rval = CCutil_sread_int (in, &(dat->degree[i]));
         if (rval) {
-            fprintf (stderr, "CCutil_sread_int failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_sread_int failed\n"); goto CLEANUP;
         }
         k += dat->degree[i];
 
         for (j = 0; j < dat->degree[i]; j++) {
             rval = CCutil_sread_int (in, &(dat->adj[i][j]));
             if (rval) {
-                fprintf (stderr, "CCutil_sread_int failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCutil_sread_int failed\n"); goto CLEANUP;
             }
             rval = CCutil_sread_int (in, &(dat->len[i][j]));
             if (rval) {
-                fprintf (stderr, "CCutil_sread_int failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCutil_sread_int failed\n"); goto CLEANUP;
             }
         }
     }
@@ -2570,7 +2570,7 @@ static int permute_sparse (int ncount, CCdatagroup *dat, int *perm)
     inv       = CC_SAFE_MALLOC (ncount, int);
 
     if (!tdegree || !tadj || !tadjspace || !tlen || !tlenspace || !inv) {
-        fprintf (stderr, "out of memory in permute_sparse\n");
+        CC_FPRINTF(stderr, "out of memory in permute_sparse\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2650,7 +2650,7 @@ static int copy_sparse (int ncount, CCdatagroup *indat, CCdatagroup *outdat)
 
     if (!outdat->degree || !outdat->adj || !outdat->adjspace || !outdat->len ||
         !outdat->lenspace) {
-        fprintf (stderr, "out of memory in permute_sparse\n");
+        CC_FPRINTF(stderr, "out of memory in permute_sparse\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2742,26 +2742,26 @@ static int read_crystal (char *datname, int binary_in, int *ncount,
         else
             lambda = 1.70;
 
-        printf ("Random crystal problem\n");
-        printf ("Note that the number of nodes will not match the request\n");
-        printf ("Orient:\n");
+        CC_PRINTF("Random crystal problem\n");
+        CC_PRINTF("Note that the number of nodes will not match the request\n");
+        CC_PRINTF("Orient:\n");
         for (i = 0; i < 3; i++)
-            printf (" %.4f  %.4f  %.4f\n", orient[i][0], orient[i][1],
+            CC_PRINTF(" %.4f  %.4f  %.4f\n", orient[i][0], orient[i][1],
                                                          orient[i][2]);
-        printf ("Bounds:\n");
+        CC_PRINTF("Bounds:\n");
         for (i = 0; i < 3; i++)
-            printf (" %d %d ", bounds[i][0], bounds[i][1]);
-        printf ("\nWavelength:\n");
-            printf (" %.2f\n", lambda);
-        fflush (stdout);
+            CC_PRINTF(" %d %d ", bounds[i][0], bounds[i][1]);
+        CC_PRINTF("\nWavelength:\n");
+            CC_PRINTF(" %.2f\n", lambda);
+        CC_FFLUSH(stdout);
     } else if (binary_in) {
-        fprintf (stderr, "CRYSTAL norms do not support binary input\n");
+        CC_FPRINTF(stderr, "CRYSTAL norms do not support binary input\n");
         return 1;
     } else {
         datin = fopen (datname, "r");
         if (datin == (FILE *) NULL) {
             perror (datname);
-            fprintf (stderr, "Unable to open %s for input\n", datname);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
             return 1;
         }
 
@@ -2780,13 +2780,13 @@ static int read_crystal (char *datname, int binary_in, int *ncount,
     }
 
     if (crygenpts (orient, lambda, bounds, &crypoints, &ncrypoints)) {
-        fprintf (stderr, "crygenpts failed\n");
+        CC_FPRINTF(stderr, "crygenpts failed\n");
         if (crypoints)
             CC_FREE (crypoints, three_d);
         return 1;
     }
     cry_quicksort (crypoints, 0, ncrypoints -1);
-    printf ("Number of crystal points: %d\n", ncrypoints);
+    CC_PRINTF("Number of crystal points: %d\n", ncrypoints);
 
     dat->x = CC_SAFE_MALLOC (ncrypoints, double);
     if (!dat->x) {
@@ -3007,7 +3007,7 @@ static int read_d2 (char *datname, int binary_in, int *ncount,
 {
     if (innorm == CC_EUCTOROIDAL) {
         dat->gridsize = gridsize;
-        printf ("Using TOROIDAL gridsize %.0f\n", dat->gridsize);
+        CC_PRINTF("Using TOROIDAL gridsize %.0f\n", dat->gridsize);
     }
     if (datname == (char *) NULL) {
         return build_d2 (ncount, dat, rstate, innorm, gridsize, allow_dups);
@@ -3034,8 +3034,8 @@ static int build_d2 (int *ncount, CCdatagroup *dat, CCrandstate *rstate,
     int i;
     int j;
     
-    printf ("Random %d point set\n", *ncount);
-    fflush (stdout);
+    CC_PRINTF("Random %d point set\n", *ncount);
+    CC_FFLUSH(stdout);
     dat->x = CC_SAFE_MALLOC (*ncount, double);
     if (!dat->x)
         return 1;
@@ -3058,7 +3058,7 @@ static int build_d2 (int *ncount, CCdatagroup *dat, CCrandstate *rstate,
             hit      = CC_SAFE_MALLOC (*ncount, int *);
             hitcount = CC_SAFE_MALLOC (*ncount, int);
             if (!hit || !hitcount) {
-                fprintf (stderr, "out of memory in CCutil_getdata\n");
+                CC_FPRINTF(stderr, "out of memory in CCutil_getdata\n");
                 CC_IFFREE (hit, int *);
                 CC_IFFREE (hitcount, int);
                 CCutil_freedatagroup (dat);
@@ -3083,7 +3083,7 @@ static int build_d2 (int *ncount, CCdatagroup *dat, CCrandstate *rstate,
                     if (j == hitcount[x]) {
                         if (CCutil_reallocrus_count ((void **) &(hit[x]),
                                                      hitcount[x] + 1, sizeof (int))) {
-                            fprintf (stderr, "CCutil_reallocrus_count failed\n");
+                            CC_FPRINTF(stderr, "CCutil_reallocrus_count failed\n");
                             for (i = 0; i < *ncount; i++) {
                                 CC_IFFREE (hit[i], int);
                             }
@@ -3097,7 +3097,7 @@ static int build_d2 (int *ncount, CCdatagroup *dat, CCrandstate *rstate,
                         winner = 1;
                     }
                     if (!winner) {
-                        printf ("X"); fflush (stdout);
+                        CC_PRINTF("X"); CC_FFLUSH(stdout);
                     }
                 }
             } while (!allow_dups && !winner);
@@ -3114,9 +3114,9 @@ static int build_d2 (int *ncount, CCdatagroup *dat, CCrandstate *rstate,
     }
    
 /*
-    printf ("%d\n", *ncount);
+    CC_PRINTF("%d\n", *ncount);
     for (i = 0; i < *ncount; i++) {
-        printf ("%d %d\n", (int) dat->x[i], (int) dat->y[i]);
+        CC_PRINTF("%d %d\n", (int) dat->x[i], (int) dat->y[i]);
 
     }
 */
@@ -3130,14 +3130,14 @@ static int read_d2_binary (char *datname, int *ncount, CCdatagroup *dat,
     CC_SFILE *f = CCutil_sopen (datname, "r");
 
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "could not open %s for reading\n", datname);
+        CC_FPRINTF(stderr, "could not open %s for reading\n", datname);
         rval = 1;  goto CLEANUP;
     }
 
     rval = CCutil_sread_int (f, ncount);
     CCcheck_rval (rval, "CCutil_sread_int failed");
 
-    printf ("nnodes = %d\n", *ncount); fflush (stdout);
+    CC_PRINTF("nnodes = %d\n", *ncount); CC_FFLUSH(stdout);
 
     dat->x = CC_SAFE_MALLOC (*ncount, double);
     CCcheck_NULL (dat->x, "out of memory in read_d2_binary");
@@ -3167,7 +3167,7 @@ CLEANUP:
     if (f) {
         tval = CCutil_sclose (f);
         if (tval) {
-            fprintf (stderr, "CCutil_sclose failed\n");
+            CC_FPRINTF(stderr, "CCutil_sclose failed\n");
             if (rval == 0)  rval = tval;
         }
     }
@@ -3184,11 +3184,11 @@ static int read_d2_text (char *datname, int *ncount, CCdatagroup *dat)
     
     if (datin == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for input\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
         return 1;
     }
     fscanf (datin, "%d", ncount);
-    printf ("nnodes = %d\n", *ncount);
+    CC_PRINTF("nnodes = %d\n", *ncount);
     dat->x = CC_SAFE_MALLOC (*ncount, double);
     if (!dat->x) {
         fclose (datin);
@@ -3213,12 +3213,12 @@ static int write_d2_binary (char *datname, int ncount, CCdatagroup *dat)
     CC_SFILE *f = CCutil_sopen (datname, "w");
 
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "could not open %s for output\n", datname);
+        CC_FPRINTF(stderr, "could not open %s for output\n", datname);
         rval = 1;  goto CLEANUP;
     }
 
-    printf ("Creating binary-double-dat file, ncount %d\n", ncount);
-    fflush (stdout);
+    CC_PRINTF("Creating binary-double-dat file, ncount %d\n", ncount);
+    CC_FFLUSH(stdout);
 
     rval = CCutil_swrite_int (f, ncount);
     CCcheck_rval (rval, "CCutil_swrite_int failed");
@@ -3235,7 +3235,7 @@ CLEANUP:
     if (f) {
         tval = CCutil_sclose (f);
         if (tval) {
-            fprintf (stderr, "CCutil_sclose failed\n");
+            CC_FPRINTF(stderr, "CCutil_sclose failed\n");
             if (rval == 0)  rval = tval;
         }
     }
@@ -3248,7 +3248,7 @@ static int write_d2_text (char *datname, int ncount, CCdatagroup *dat)
     
     if (datout == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for output\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for output\n", datname);
         return 1;
     }
     fprintf (datout, "%d\n", ncount);
@@ -3278,7 +3278,7 @@ static int write_d3 (char *datname, int binary_out, int ncount,
         CCdatagroup *dat)
 {
     if (binary_out) {
-        fprintf (stderr, "Binary output of this norm is not yet implemented\n");
+        CC_FPRINTF(stderr, "Binary output of this norm is not yet implemented\n");
         return 1;
         
     } else {
@@ -3291,8 +3291,8 @@ static int build_d3 (int *ncount, CCdatagroup *dat, CCrandstate *rstate,
 {
     int i;
     
-    printf ("Random %d point set\n", *ncount);
-    fflush (stdout);
+    CC_PRINTF("Random %d point set\n", *ncount);
+    CC_FFLUSH(stdout);
     dat->x = CC_SAFE_MALLOC (*ncount, double);
     if (!dat->x)
         return 1;
@@ -3328,25 +3328,25 @@ static int read_d3_binary (char *datname, int *ncount, CCdatagroup *dat)
         CCutil_sclose (f);
         return 1;
     }
-    printf ("nnodes = %d\n", *ncount);
-    fflush (stdout);
+    CC_PRINTF("nnodes = %d\n", *ncount);
+    CC_FFLUSH(stdout);
     dat->x = CC_SAFE_MALLOC (*ncount, double);
     if (!dat->x) {
         if (CCutil_sclose (f))
-            fprintf (stderr, "Could not close file\n");
+            CC_FPRINTF(stderr, "Could not close file\n");
         return 1;
     }
     dat->y = CC_SAFE_MALLOC (*ncount, double);
     if (!dat->y) {
         if (CCutil_sclose (f))
-            fprintf (stderr, "Could not close file\n");
+            CC_FPRINTF(stderr, "Could not close file\n");
         CCutil_freedatagroup (dat);
         return 1;
     }
     dat->z = CC_SAFE_MALLOC (*ncount, double);
     if (!dat->z) {
         if (CCutil_sclose (f))
-            fprintf (stderr, "Could not close file\n");
+            CC_FPRINTF(stderr, "Could not close file\n");
         CCutil_freedatagroup (dat);
         return 1;
     }
@@ -3384,11 +3384,11 @@ static int read_d3_text (char *datname, int *ncount, CCdatagroup *dat)
     
     if (datin == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for input\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
         return 1;
     }
     fscanf (datin, "%d", ncount);
-    printf ("nnodes = %d\n", *ncount);
+    CC_PRINTF("nnodes = %d\n", *ncount);
     dat->x = CC_SAFE_MALLOC (*ncount, double);
     if (!dat->x) {
         fclose (datin);
@@ -3421,7 +3421,7 @@ static int write_d3_text (char *datname, int ncount, CCdatagroup *dat)
     
     if (datout == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for output\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for output\n", datname);
         return 1;
     }
     fprintf (datout, "%d\n", ncount);
@@ -3451,7 +3451,7 @@ static int write_matrix (char *datname, int binary_out, int ncount,
 {
     /* Matrix is the lower triangle plus the diagonal */
     if (binary_out) {
-        fprintf (stderr, "Binary output of this norm not yet implemented\n");
+        CC_FPRINTF(stderr, "Binary output of this norm not yet implemented\n");
         return 1;
     } else {
         return write_matrix_text (datname, ncount, dat);
@@ -3463,9 +3463,9 @@ static int build_matrix (int *ncount, CCdatagroup *dat, CCrandstate *rstate)
     int i;
     int j;
     
-    printf ("Complete graph with %d nodes and random edge lengths\n",
+    CC_PRINTF("Complete graph with %d nodes and random edge lengths\n",
             *ncount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     dat->adj = CC_SAFE_MALLOC (*ncount, int *);
     dat->adjspace = CC_SAFE_MALLOC ((*ncount) * (*ncount+1) / 2,
                                     int);
@@ -3498,8 +3498,8 @@ static int read_matrix_binary (char *datname, int *ncount, CCdatagroup *dat)
         CCutil_sclose (f);
         return 1;
     }
-    printf ("nnodes = %d\n", *ncount);
-    fflush (stdout);
+    CC_PRINTF("nnodes = %d\n", *ncount);
+    CC_FFLUSH(stdout);
     dat->adj = CC_SAFE_MALLOC (*ncount, int *);
     dat->adjspace = CC_SAFE_MALLOC ((*ncount) * (*ncount+1) / 2,
                                     int);
@@ -3508,7 +3508,7 @@ static int read_matrix_binary (char *datname, int *ncount, CCdatagroup *dat)
         CC_IFFREE (dat->adj, int *);
         CC_IFFREE (dat->adjspace, int);
         if (CCutil_sclose (f))
-            fprintf (stderr, "Could not close file\n");
+            CC_FPRINTF(stderr, "Could not close file\n");
         return 1;
     }
     for (i = 0, j = 0; i < *ncount; i++) {
@@ -3539,11 +3539,11 @@ static int read_matrix_text (char *datname, int *ncount, CCdatagroup *dat)
     
     if (datin == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for input\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
         return 1;
     }
     *ncount = CCutil_readint (datin);
-    printf ("nnodes = %d\n", *ncount);
+    CC_PRINTF("nnodes = %d\n", *ncount);
     dat->adj = CC_SAFE_MALLOC (*ncount, int *);
     dat->adjspace = CC_SAFE_MALLOC ((*ncount) * (*ncount+1) / 2,
                                     int);
@@ -3576,16 +3576,16 @@ static int write_matrix_text (char *datname, int ncount, CCdatagroup *dat)
     
     if (datout == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for output\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for output\n", datname);
         return 1;
     }
-    printf ("%d\n", ncount);
+    CC_PRINTF("%d\n", ncount);
     for (i = 0; i < ncount; i++) {
         for (j = 0; j <= i; j++) {
-            printf ("%d ", dat->adj[i][j]);
-            if (j%10 == 9) printf ("\n");
+            CC_PRINTF("%d ", dat->adj[i][j]);
+            if (j%10 == 9) CC_PRINTF("\n");
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
     
     fclose (datout);
@@ -3606,7 +3606,7 @@ static int read_dsjrand (char *datname, int binary_in, int *ncount,
     if (datname == (char *) NULL) {
         CCutil_dsjrand_init (dat, 1000000, 1);
     } else if (binary_in) {
-        fprintf (stderr, "DSJRANDNORM doesn't support binary input\n");
+        CC_FPRINTF(stderr, "DSJRANDNORM doesn't support binary input\n");
         CC_IFFREE (dat->x, double);
         return 1;
     } else {
@@ -3616,7 +3616,7 @@ static int read_dsjrand (char *datname, int binary_in, int *ncount,
         
         if (datin == (FILE *) NULL) {
             perror (datname);
-            fprintf (stderr, "Unable to open %s for input\n", datname);
+            CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
             return 1;
         }
         fscanf (datin, "%d", &seed);
@@ -3641,7 +3641,7 @@ static int write_sparse (char *datname, int binary_out, int ncount,
         CCdatagroup *dat)
 {
     if (binary_out) {
-        fprintf (stderr, "Binary output of sparse data not yet implemented\n");
+        CC_FPRINTF(stderr, "Binary output of sparse data not yet implemented\n");
         return 1;
     } else {
         return write_sparse_text (datname, ncount, dat);
@@ -3656,17 +3656,17 @@ static int build_sparse (int *ncount, CCdatagroup *dat, CCrandstate *rstate)
     int rval = 0;
     
     ecount = SPARSE_ECOUNT * (*ncount);
-    printf ("Random graph with %d nodes, %d edges, and random edge lengths\n",
+    CC_PRINTF("Random graph with %d nodes, %d edges, and random edge lengths\n",
             *ncount, ecount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     rval = CCutil_genedgelist (*ncount, ecount, &elist, &elen,
                      (CCdatagroup *) NULL, MATRAND_SCALE * (*ncount), rstate);
     if (rval) {
-        fprintf (stderr, "CCutil_genedgelist failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_genedgelist failed\n"); goto CLEANUP;
     }
     rval = build_sparse_dat (*ncount, ecount, elist, elen, dat, 0);
     if (rval) {
-        fprintf (stderr, "build_sparse_dat failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_sparse_dat failed\n"); goto CLEANUP;
     }
 
  CLEANUP:
@@ -3686,14 +3686,14 @@ static int read_sparse_text (char *datname, int *ncount, CCdatagroup *dat,
     rval = CCutil_getedgelist_n (ncount, datname, &ecount, &elist,
                                  &elen, binary_in);
     if (rval) {
-        fprintf (stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_getedgelist failed\n"); goto CLEANUP;
     }
-    printf ("Have a sparse graph with %d nodes and %d edges\n",
+    CC_PRINTF("Have a sparse graph with %d nodes and %d edges\n",
             *ncount, ecount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     rval = build_sparse_dat (*ncount, ecount, elist, elen, dat, 0);
     if (rval) {
-        fprintf (stderr, "build_sparse_dat failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_sparse_dat failed\n"); goto CLEANUP;
     }
     
  CLEANUP:
@@ -3711,7 +3711,7 @@ static int write_sparse_text (char *datname, int ncount, CCdatagroup *dat)
 
     if (datout == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for output\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for output\n", datname);
         return 1;
     }
 
@@ -3765,7 +3765,7 @@ static int build_user (int *ncount, CCdata_user *userdat, CCrandstate *rstate,
     userdat->x = (double *) NULL;
     userdat->y = (double *) NULL;
 
-    printf ("Random %d point set\n", *ncount); fflush (stdout);
+    CC_PRINTF("Random %d point set\n", *ncount); CC_FFLUSH(stdout);
     userdat->x = CC_SAFE_MALLOC (*ncount, double);
     userdat->y = CC_SAFE_MALLOC (*ncount, double);
     if (userdat->x == (double *) NULL ||
@@ -3807,7 +3807,7 @@ static int read_user_binary (char *datname, int *ncount, CCdata_user *userdat)
     f = CCutil_sopen (datname, "r");
     if (f == (CC_SFILE *) NULL) goto FAILURE;
     if (CCutil_sread_int (f, ncount)) goto FAILURE;
-    printf ("nnodes = %d\n", *ncount); fflush (stdout);
+    CC_PRINTF("nnodes = %d\n", *ncount); CC_FFLUSH(stdout);
     userdat->x = CC_SAFE_MALLOC (*ncount, double);
     userdat->y = CC_SAFE_MALLOC (*ncount, double);
     if (userdat->x == (double *) NULL ||
@@ -3852,11 +3852,11 @@ static int read_user_text (char *datname, int *ncount, CCdata_user *userdat)
     datin = fopen (datname, "r");
     if (datin == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for input\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
         goto FAILURE;
     }
     fscanf (datin, "%d", ncount);
-    printf ("nnodes = %d\n", *ncount); fflush (stdout);
+    CC_PRINTF("nnodes = %d\n", *ncount); CC_FFLUSH(stdout);
     userdat->x = CC_SAFE_MALLOC (*ncount, double);
     userdat->y = CC_SAFE_MALLOC (*ncount, double);
     if (userdat->x == (double *) NULL ||
@@ -3912,7 +3912,7 @@ static int readmaster_user (CC_SFILE *in, int ncount, CCdata_user *userdat)
     userdat->y = CC_SAFE_MALLOC (ncount, double);
     if (userdat->x == (double *) NULL ||
         userdat->y == (double *) NULL) {
-        fprintf (stderr, "out of memory in readmaster_user\n");
+        CC_FPRINTF(stderr, "out of memory in readmaster_user\n");
         goto FAILURE;
     }
     for (i=0; i<ncount; i++) {
@@ -3961,10 +3961,10 @@ static int read_rhdata (char *datname, int innorm, int binary_in, int *ncount,
         CCdata_rhvector *dat)
 {
     if (datname == (char *) NULL) {
-        fprintf (stderr, "generating random rhdata not supported\n");
+        CC_FPRINTF(stderr, "generating random rhdata not supported\n");
         return 1;
     } else if (binary_in) {
-        fprintf (stderr, "reading binary rhdata not supported\n");
+        CC_FPRINTF(stderr, "reading binary rhdata not supported\n");
         return 1;
     } else {
         return read_rhdata_text (datname, innorm, ncount, dat);
@@ -3990,21 +3990,21 @@ static int read_rhdata_text (char *datname, int innorm, int *ncount,
     datin = fopen (datname, "r");
     if (datin == (FILE *) NULL) {
         perror (datname);
-        fprintf (stderr, "Unable to open %s for input\n", datname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", datname);
         goto FAILURE;
     }
     fscanf (datin, "%d%d", &nvectors, &rhlength);
     *ncount = nvectors+1;
-    printf ("nnodes = %d, rhlength %d, ", *ncount, rhlength);
+    CC_PRINTF("nnodes = %d, rhlength %d, ", *ncount, rhlength);
     switch (innorm) {
-    case CC_RHMAP1: printf ("rh norm 1\n"); break;
-    case CC_RHMAP2: printf ("rh norm 2\n"); break;
-    case CC_RHMAP3: printf ("rh norm 3\n"); break;
-    case CC_RHMAP4: printf ("rh norm 4\n"); break;
-    case CC_RHMAP5: printf ("rh norm 5\n"); break;
-    default:        printf ("UNKNOWN rh norm\n"); break;
+    case CC_RHMAP1: CC_PRINTF("rh norm 1\n"); break;
+    case CC_RHMAP2: CC_PRINTF("rh norm 2\n"); break;
+    case CC_RHMAP3: CC_PRINTF("rh norm 3\n"); break;
+    case CC_RHMAP4: CC_PRINTF("rh norm 4\n"); break;
+    case CC_RHMAP5: CC_PRINTF("rh norm 5\n"); break;
+    default:        CC_PRINTF("UNKNOWN rh norm\n"); break;
     }        
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     dat->space = CC_SAFE_MALLOC (nvectors * rhlength, char);
     dat->vectors = CC_SAFE_MALLOC (nvectors+1, char *);
     if (dat->space == (char *) NULL ||
@@ -4025,7 +4025,7 @@ static int read_rhdata_text (char *datname, int innorm, int *ncount,
         for (j=0; j<rhlength; j++) {
             xj = getc(datin);
             if (xj < '0' || xj > '2') {
-                fprintf (stderr, "Syntax error in text rhvector %d data - entry (octal %o) %c\n", i, xj, xj);
+                CC_FPRINTF(stderr, "Syntax error in text rhvector %d data - entry (octal %o) %c\n", i, xj, xj);
                 goto FAILURE;
             }
             v[j] = xj - '0';

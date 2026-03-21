@@ -34,7 +34,7 @@ int main (int ac, char **av)
     seed = (int) CCutil_real_zeit ();
 
     if (ac != 4) {
-        fprintf (stderr, "Usage: %s tsp pi cuts\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s tsp pi cuts\n", av[0]);
         rval = 1; goto CLEANUP;
     }
 
@@ -46,22 +46,22 @@ int main (int ac, char **av)
     CCutil_dat_getnorm (&dat, &norm);
 
     if ((norm & CC_NORM_SIZE_BITS) != CC_D2_NORM_SIZE) {                    
-        fprintf (stderr, "Only set up for 2D norms\n");
+        CC_FPRINTF(stderr, "Only set up for 2D norms\n");
         rval = 1;  goto CLEANUP;                                            
     } 
 
     in = fopen (av[2], "r");
     if (!in) {
-        fprintf (stderr, "could not open %s for reading\n", av[2]);
+        CC_FPRINTF(stderr, "could not open %s for reading\n", av[2]);
         rval = 1;  goto CLEANUP;
     }
 
-    printf ("ncount = %d\n", ncount); fflush (stdout);
+    CC_PRINTF("ncount = %d\n", ncount); CC_FFLUSH(stdout);
 
 
     fscanf (in, "%d", &k);
     if (k != ncount) {
-        fprintf (stderr, "pi file does not match dat file\n");
+        CC_FPRINTF(stderr, "pi file does not match dat file\n");
         rval = 1;  goto CLEANUP;
     }
     pi = CC_SAFE_MALLOC (ncount, double);
@@ -74,18 +74,18 @@ int main (int ac, char **av)
 
     in = fopen (av[3], "r");
     if (!in) {
-        fprintf (stderr, "could not open %s for reading\n", av[2]);
+        CC_FPRINTF(stderr, "could not open %s for reading\n", av[2]);
         rval = 1;  goto CLEANUP;
     }
 
     fscanf (in, "%d %d", &k, &scount);
     if (k != ncount) {
-        fprintf (stderr, "cut file does not match pi file\n");
+        CC_FPRINTF(stderr, "cut file does not match pi file\n");
         rval = 1;  goto CLEANUP;
     }
     smax = 100000 + scount + 2*ncount;
 
-    printf ("%d Cuts\n", scount); fflush (stdout);
+    CC_PRINTF("%d Cuts\n", scount); CC_FFLUSH(stdout);
 
     slist = CC_SAFE_MALLOC (smax, subby *);
     CCcheck_NULL (slist, "out of memory for slist");
@@ -135,7 +135,7 @@ static int print_the_subs (int ncount, double *pi, int *p_scount,
     int scount = *p_scount;
     int *ar = (int *) NULL;
 
-    printf ("print_the_subs ...\n"); fflush (stdout);
+    CC_PRINTF("print_the_subs ...\n"); CC_FFLUSH(stdout);
 
 
     hit = CC_SAFE_MALLOC (ncount, int);
@@ -166,18 +166,18 @@ static int print_the_subs (int ncount, double *pi, int *p_scount,
             }
         }
     }
-    printf ("%d 2-node subtours\n", ecnt); fflush (stdout);
+    CC_PRINTF("%d 2-node subtours\n", ecnt); CC_FFLUSH(stdout);
 
     icnt = 0;
 
 DOGGY:
 
-    printf ("Check for crossings\n"); fflush (stdout);
+    CC_PRINTF("Check for crossings\n"); CC_FFLUSH(stdout);
 
     for (i = 0; i < scount; i++) {
         for (j = i+1; j < scount; j++) {
             if (subby_cross (slist[i], slist[j], hit)) {
-                printf ("Cross X[%d,%d]\n", i, j);
+                CC_PRINTF("Cross X[%d,%d]\n", i, j);
                 rval = subby_uncross (i, j, &scount, slist, hit, ncount, pi);
                 CCcheck_rval (rval, "subby_uncross failed");
                 icnt++;
@@ -185,8 +185,8 @@ DOGGY:
             }
         }
     }
-    if (icnt) printf ("\n");
-    printf ("Number of intersections: %d\n", icnt); fflush (stdout);
+    if (icnt) CC_PRINTF("\n");
+    CC_PRINTF("Number of intersections: %d\n", icnt); CC_FFLUSH(stdout);
 
     sperm = CC_SAFE_MALLOC (scount, int);
     CCcheck_NULL (sperm, "out of memory in print_the_subs");
@@ -201,14 +201,14 @@ DOGGY:
     sprintf (buf, "full.bnd");
     out = fopen (buf, "w");
     if (!out) {
-        fprintf (stderr, "could not open %s for writing\n", buf);
+        CC_FPRINTF(stderr, "could not open %s for writing\n", buf);
         rval = 1;  goto CLEANUP;
     }
     fprintf (out, "%d\n", ncount);
     for (i = 0; i < ncount; i++) {
         fprintf (out, "%f\n", pi[i]);
     }
-    printf ("scount = %d\n", scount); fflush (stdout);
+    CC_PRINTF("scount = %d\n", scount); CC_FFLUSH(stdout);
     fprintf (out, "%d\n", scount);
     for (i = 0; i < scount; i++) {
         k = sperm[i];
@@ -250,7 +250,7 @@ static int subby_complement (subby *s, int ncount)
         }
     }
     if (k != ncount - s->count) {
-        fprintf (stderr, "lost a node\n");
+        CC_FPRINTF(stderr, "lost a node\n");
         rval = 1;  goto CLEANUP;
     }
     s->count = k;
@@ -311,9 +311,9 @@ static int subby_uncross (int is, int it, int *scount, subby **slist, int *hit,
     subby *tmp, *u, *v;
     int icount = 0, ucount = 0;
 
-    printf ("uncross subtour %d (%d count) and subtour %d (%d count)\n",
+    CC_PRINTF("uncross subtour %d (%d count) and subtour %d (%d count)\n",
               is, s->count, it, t->count);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
     if (s->pi < t->pi) {
         CC_SWAP (s, t, tmp);
@@ -330,7 +330,7 @@ static int subby_uncross (int is, int it, int *scount, subby **slist, int *hit,
     }
 
     if (ucount == ncount) {
-       fprintf (stderr, "union of subtours is entire node set\n");
+       CC_FPRINTF(stderr, "union of subtours is entire node set\n");
        rval = 1;  goto CLEANUP;
     }
 
@@ -363,7 +363,7 @@ static int subby_uncross (int is, int it, int *scount, subby **slist, int *hit,
         }
     }
     if (ucount != u->count || icount != v->count) {
-        fprintf (stderr, "bad counts in uncross\n");
+        CC_FPRINTF(stderr, "bad counts in uncross\n");
         rval = 1;  goto CLEANUP;
     }
 

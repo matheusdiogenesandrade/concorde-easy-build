@@ -62,27 +62,27 @@ int main (int ac, char **av)
     parse_log (&boss, &task, &process);
 
     if (kill_process) {
-        printf ("killing process %d, task %d, and reporting to %s\n",
+        CC_PRINTF("killing process %d, task %d, and reporting to %s\n",
                 process, task, boss);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else {
-        printf ("reporting dead task %d to %s\n", task, boss);
-        fflush (stdout);
+        CC_PRINTF("reporting dead task %d to %s\n", task, boss);
+        CC_FFLUSH(stdout);
     }
 
     if (kill_process) {
         rval = kill ((pid_t) process, SIGTERM);
         if (rval) {
             perror ("kill");
-            fprintf (stderr, "Unable to kill process %d\n", process);
+            CC_FPRINTF(stderr, "Unable to kill process %d\n", process);
 /*
             if (errno == ESRCH) {   /* Does not work on Red Hat 8 */
-                fprintf (stderr, "Process does not exist, telling boss anyway\n");
+                CC_FPRINTF(stderr, "Process does not exist, telling boss anyway\n");
             } else {
                 goto CLEANUP;
             }
 */
-            fprintf (stderr, "Process does not exist, telling boss anyway\n");
+            CC_FPRINTF(stderr, "Process does not exist, telling boss anyway\n");
         }
     }
 
@@ -90,24 +90,24 @@ int main (int ac, char **av)
     if (boss != (char *) NULL && task >= 0) {
         f = CCutil_snet_open (boss, CCtsp_HOST_PORT);
         if (f == (CC_SFILE *) NULL) {
-            fprintf (stderr, "Could not open connection to host %s\n", boss);
+            CC_FPRINTF(stderr, "Could not open connection to host %s\n", boss);
             rval = 1; goto CLEANUP;
         }
         rval = CCutil_swrite_char (f, CCtsp_BBREQ_DEADNODE);
         if (rval) {
-            fprintf (stderr, "CCutil_swrite_char failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
             goto CLEANUP;
         }
         rval = CCutil_swrite_int (f, task);
         if (rval) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             goto CLEANUP;
         }
 
         rval = CCutil_sclose (f);
         f = (CC_SFILE *) NULL;
         if (rval) {
-            fprintf (stderr, "CCutil_sclose failed\n");
+            CC_FPRINTF(stderr, "CCutil_sclose failed\n");
             goto CLEANUP;
         }
     }
@@ -115,7 +115,7 @@ int main (int ac, char **av)
 
 #else /* CC_NETREADY */
 
-    fprintf (stderr, "Networking disabled, unable to tell boss\n");
+    CC_FPRINTF(stderr, "Networking disabled, unable to tell boss\n");
     rval = 1;
 
 #endif
@@ -197,6 +197,6 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [- see below -] < log_file\n", f);
-    fprintf (stderr, "  -k   do not kill process\n");
+    CC_FPRINTF(stderr, "Usage: %s [- see below -] < log_file\n", f);
+    CC_FPRINTF(stderr, "  -k   do not kill process\n");
 }

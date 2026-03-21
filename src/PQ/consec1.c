@@ -83,7 +83,7 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
 
     rval = CCpq_cuttree_to_pq (ctree, &pqt);
     if (rval) {
-        fprintf (stderr, "CCpq_cuttree_to_pq failed\n");
+        CC_FPRINTF(stderr, "CCpq_cuttree_to_pq failed\n");
         goto CLEANUP;
     }
 
@@ -91,7 +91,7 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
                                     0.0, 4.0 - MINVIOL, &cliquecount,
                                     nodecount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_clique_prices failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_clique_prices failed\n");
         goto CLEANUP;
     }
 
@@ -101,7 +101,7 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
 
     perm = CC_SAFE_MALLOC (cliquecount, int);
     if (perm == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCpq_consecutiveones\n");
+        CC_FPRINTF(stderr, "Out of memory in CCpq_consecutiveones\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<cliquecount; i++) perm[i] = i;
@@ -118,12 +118,12 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
         if (bot3 + cliquevals[perm[top]] < 10.0 - MINVIOL) {
             rval = CCtsp_get_clique (pool, cliquenums[perm[bot]], &c);
             if (rval) {
-                fprintf (stderr, "CCtsp_get_clique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_get_clique failed\n");
                 goto CLEANUP;
             }
             rval = CCpq_apply_clique (&pqt, c, &status);
             if (rval) {
-                fprintf (stderr, "CCpq_apply_clique failed\n");
+                CC_FPRINTF(stderr, "CCpq_apply_clique failed\n");
                 goto CLEANUP;
             }
             if (status == CCpq_STATUS_NOSOL) {
@@ -132,7 +132,7 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
                                               cliquenums[perm[bot]], pool,
                                               cliquenums, perm, bot);
                 if (rval) {
-                    fprintf (stderr, "found_clique_conflict failed\n");
+                    CC_FPRINTF(stderr, "found_clique_conflict failed\n");
                     goto CLEANUP;
                 }
                 perm[bot] = -1;
@@ -142,7 +142,7 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
             } else if (status == CCpq_STATUS_NONTRIVIAL) {
                 cnt_nontrivial++;
             } else {
-                fprintf (stderr, "Unknown PQ status %d\n", status);
+                CC_FPRINTF(stderr, "Unknown PQ status %d\n", status);
                 rval = 1; goto CLEANUP;
             }
             bot++;
@@ -151,7 +151,7 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
         } else {
             rval = CCtsp_get_clique (pool, cliquenums[perm[top]], &c);
             if (rval) {
-                fprintf (stderr, "CCtsp_get_clique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_get_clique failed\n");
                 goto CLEANUP;
             }
             CCpq_check_clique (&pqt, c, &status);
@@ -161,7 +161,7 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
                                               cliquenums[perm[top]], pool,
                                               cliquenums, perm, bot);
                 if (rval) {
-                    fprintf (stderr, "found_clique_conflict failed\n");
+                    CC_FPRINTF(stderr, "found_clique_conflict failed\n");
                     goto CLEANUP;
                 }
             }
@@ -170,12 +170,12 @@ int CCpq_consecutiveones (CCtsp_lpcut_in **cuts, int *cutcount,
     }
 
 /*
-    printf ("PQ: %d bottom: %d nontrivial, %d trivial, %d contrad\n",
+    CC_PRINTF("PQ: %d bottom: %d nontrivial, %d trivial, %d contrad\n",
             bot, cnt_nontrivial, cnt_trivial, cnt_bot_contrad);
-    printf ("PQ: %d top: %d contrad\n", cliquecount-1 - top, cnt_top_contrad);
-    printf ("CCpq_consecutiveones finished in %.2f seconds\n",
+    CC_PRINTF("PQ: %d top: %d contrad\n", cliquecount-1 - top, cnt_top_contrad);
+    CC_PRINTF("CCpq_consecutiveones finished in %.2f seconds\n",
             CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 */
 
     rval = 0;
@@ -212,19 +212,19 @@ static int found_clique_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
     for (;;) {
         rval = CCpq_cuttree_to_pq (ctree, &pqt);
         if (rval) {
-            fprintf (stderr, "CCpq_cuttree_to_pq failed\n");
+            CC_FPRINTF(stderr, "CCpq_cuttree_to_pq failed\n");
             goto CLEANUP;
         }
         for (i = 0; i < conflict_cnt; i++) {
             rval = CCtsp_get_clique (pool, conflict_list[i], &c);
             if (rval) {
-                fprintf (stderr, "CCtsp_get_clique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_get_clique failed\n");
                 goto CLEANUP;
             }
 
             rval = CCpq_apply_clique (&pqt, c, &status);
             if (rval) {
-                fprintf (stderr, "CCpq_apply_clique failed\n");
+                CC_FPRINTF(stderr, "CCpq_apply_clique failed\n");
                 goto CLEANUP;
             }
 
@@ -232,14 +232,14 @@ static int found_clique_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
                 rval = found_ctree_conflict (cuts, cutcount, conflict_list,
                                              conflict_cnt, ctree, pool);
                 if (rval) {
-                    fprintf (stderr, "found_ctree_conflict failed\n");
+                    CC_FPRINTF(stderr, "found_ctree_conflict failed\n");
                 }
                 goto CLEANUP;
             }
         }
         if (conflict_cnt == 4) {
 #ifdef DEBUG
-            printf ("violation uses > 4 + ctree\n");
+            CC_PRINTF("violation uses > 4 + ctree\n");
 #endif
             rval = 0;
             goto CLEANUP;
@@ -250,13 +250,13 @@ static int found_clique_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
             if (perm[i] != -1) {
                 rval = CCtsp_get_clique (pool, cliquenums[perm[i]], &c);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_get_clique failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_get_clique failed\n");
                     goto CLEANUP;
                 }
 
                 rval = CCpq_apply_clique (&pqt, c, &status);
                 if (rval) {
-                    fprintf (stderr, "CCpq_apply_clique failed\n");
+                    CC_FPRINTF(stderr, "CCpq_apply_clique failed\n");
                     goto CLEANUP;
                 }
 
@@ -271,7 +271,7 @@ static int found_clique_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
         }
         if (conflict_found == 0) {
 #ifdef DEBUG
-            printf ("violation vanished\n");
+            CC_PRINTF("violation vanished\n");
 #endif
             rval = 0;
             goto CLEANUP;
@@ -299,14 +299,14 @@ static int found_ctree_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
     CCpq_tree_init (&pqt);
 
     if (conflict_cnt > 4) {
-        fprintf (stderr, "Whoa, bogus conflict count %d\n", conflict_cnt);
+        CC_FPRINTF(stderr, "Whoa, bogus conflict count %d\n", conflict_cnt);
         rval = 1; goto CLEANUP;
     }
 
     for (i=0; i<conflict_cnt; i++) {
         rval = CCtsp_get_clique (pool, conflict_list[i], &conflict_cliques[i]);
         if (rval) {
-            fprintf (stderr, "CCtsp_get_clique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_get_clique failed\n");
             goto CLEANUP;
         }
     }
@@ -316,13 +316,13 @@ static int found_ctree_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
     for (;;) {
         rval = CCpq_tree_trivial (&pqt, nodecount, ctree->extern_node);
         if (rval) {
-            fprintf (stderr, "CCpq_tree_trivial failed\n");
+            CC_FPRINTF(stderr, "CCpq_tree_trivial failed\n");
             goto CLEANUP;
         }
         for (i=0; i<clique_cnt; i++) {
             rval = CCpq_apply_clique (&pqt, conflict_cliques[i], &status);
             if (rval) {
-                fprintf (stderr, "CCpq_apply_clique failed\n");
+                CC_FPRINTF(stderr, "CCpq_apply_clique failed\n");
                 goto CLEANUP;
             }
             if (status == CCpq_STATUS_NOSOL) {
@@ -330,19 +330,19 @@ static int found_ctree_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
                     rval = found_comb_conflict (cuts, cutcount, nodecount,
                                                 conflict_cliques);
                     if (rval) {
-                        fprintf (stderr, "found_comb_conflict failed\n");
+                        CC_FPRINTF(stderr, "found_comb_conflict failed\n");
                     }
                     goto CLEANUP;
                 }
 #ifdef DEBUG
-                printf ("conflict with < 4 cliques\n");
+                CC_PRINTF("conflict with < 4 cliques\n");
 #endif
                 rval = 0; goto CLEANUP;
             }
         }
         if (clique_cnt >= 4) {
 #ifdef DEBUG
-            printf ("no conflict with 4 cliques\n");
+            CC_PRINTF("no conflict with 4 cliques\n");
 #endif
             rval = 0; goto CLEANUP;
         }
@@ -353,13 +353,13 @@ static int found_ctree_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
         rval = CCpq_cuttree_gen_cliques (ctree, (void *) &conflict_data,
                                     conflict_callback);
         if (rval) {
-            fprintf (stderr, "CCpq_cuttree_gen_cliques failed\n");
+            CC_FPRINTF(stderr, "CCpq_cuttree_gen_cliques failed\n");
             goto CLEANUP;
         }
 
         if (conflict_data.conflict == (CCtsp_lpclique *) NULL) {
 #ifdef DEBUG
-            printf ("conflict vanished\n");
+            CC_PRINTF("conflict vanished\n");
 #endif
             rval = 0; goto CLEANUP;
         }
@@ -392,19 +392,19 @@ static int conflict_callback (int *arr, int cnt, int *stop, void *u_data)
     }
     rval = CCpq_apply (pqt, &status);
     if (rval) {
-        fprintf (stderr, "CCpq_apply failed\n");
+        CC_FPRINTF(stderr, "CCpq_apply failed\n");
         goto CLEANUP;
     }
 
     if (status == CCpq_STATUS_NOSOL) {
         conflict_data->conflict = CC_SAFE_MALLOC (1, CCtsp_lpclique);
         if (conflict_data->conflict == (CCtsp_lpclique *) NULL) {
-            fprintf (stderr, "Out of memory in conflict_callback\n");
+            CC_FPRINTF(stderr, "Out of memory in conflict_callback\n");
             rval = 1; goto CLEANUP;
         }
         rval = CCtsp_array_to_lpclique (arr, cnt, conflict_data->conflict);
         if (rval) {
-            fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
             rval = 1; goto CLEANUP;
         }
         *stop = 1;
@@ -446,7 +446,7 @@ static int found_comb_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
 
     mark = CC_SAFE_MALLOC (nodecount, int);
     if (mark == (int *) NULL) {
-        fprintf (stderr, "Out of memory in found_comb_conflict\n");
+        CC_FPRINTF(stderr, "Out of memory in found_comb_conflict\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -490,7 +490,7 @@ static int found_comb_conflict (CCtsp_lpcut_in **cuts, int *cutcount,
                 rval = add_conflict_to_cuts (cuts, cutcount, conflict_cliques,
                         nodecount);
                 if (rval) {
-                    fprintf (stderr, "add_conflict_to_cliques failed\n");
+                    CC_FPRINTF(stderr, "add_conflict_to_cliques failed\n");
                     goto CLEANUP;
                 }
                 rval = 0;
@@ -542,14 +542,14 @@ static int add_conflict_to_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
 
     c = CC_SAFE_MALLOC (1, CCtsp_lpcut_in);
     if (c == (CCtsp_lpcut_in *) NULL) {
-        fprintf (stderr, "Out of memory in add_conflict_to_cuts\n");
+        CC_FPRINTF(stderr, "Out of memory in add_conflict_to_cuts\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_init_lpcut_in (c);
     c->cliquecount = 4;
     c->cliques = CC_SAFE_MALLOC (4, CCtsp_lpclique);
     if (c->cliques == (CCtsp_lpclique *) NULL) {
-        fprintf (stderr, "Out of memory in add_conflict_to_cuts\n");
+        CC_FPRINTF(stderr, "Out of memory in add_conflict_to_cuts\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -561,7 +561,7 @@ static int add_conflict_to_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
     for (i=0; i<4; i++) {
         rval = CCtsp_copy_lpclique (conflict_cliques[i], &c->cliques[i]);
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
             goto CLEANUP;
         }
     }
@@ -571,7 +571,7 @@ static int add_conflict_to_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
     c->branch = 0;
     rval = CCtsp_construct_skeleton (c, ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         goto CLEANUP;
     }
         

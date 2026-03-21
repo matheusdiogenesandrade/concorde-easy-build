@@ -298,7 +298,7 @@ int CCtsp_init_cutpool (int *ncount, char *poolfilename, CCtsp_lpcuts **pool)
 
     p = CC_SAFE_MALLOC (1, CCtsp_lpcuts);
     if (!p) {
-        fprintf (stderr, "out of memory in CCtsp_init_cutpool\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_init_cutpool\n");
         return 1;
     }
     *pool = p;
@@ -320,17 +320,17 @@ int CCtsp_init_cutpool (int *ncount, char *poolfilename, CCtsp_lpcuts **pool)
 
     if (poolfilename == (char *) NULL) {
         if (ncount == (int *) NULL || *ncount <= 0) {
-            fprintf (stderr, "Neither poolfilename nor ncount\n");
+            CC_FPRINTF(stderr, "Neither poolfilename nor ncount\n");
             rval = 1; goto CLEANUP;
         }
         rval = init_empty_cutpool_hash (*ncount, p);
         if (rval) {
-            fprintf (stderr, "init_empty_cutpool_hash failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "init_empty_cutpool_hash failed\n"); goto CLEANUP;
         }
     } else {
         rval = read_cutpool (ncount, poolfilename, p);
         if (rval) {
-            fprintf (stderr, "read_cutpool failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "read_cutpool failed\n"); goto CLEANUP;
         }
     }
 
@@ -422,7 +422,7 @@ static int cut_eq (void *v_cut1, void *v_cut2, void *u_data)
         int diff = 0;
         CCtsp_compare_skeletons (&cut1->skel, &cut2->skel, &diff);
         if (diff) {
-          printf ("SURPRISE - cuts look equal but have different skeletons\n");
+          CC_PRINTF("SURPRISE - cuts look equal but have different skeletons\n");
           return 1;
         }
     }
@@ -454,23 +454,23 @@ static int read_cutpool (int *ncount, char *poolfilename, CCtsp_lpcuts *pool)
     int rval = 0;
 
     if (poolfilename == (char *) NULL) {
-        fprintf (stderr, "pool file name is not set\n");
+        CC_FPRINTF(stderr, "pool file name is not set\n");
         rval = 1; goto CLEANUP;
     }
 
     in = CCutil_sopen (poolfilename, "r");
     if (!in) {
-        fprintf (stderr, "CCutil_sopen failed\n");
+        CC_FPRINTF(stderr, "CCutil_sopen failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_read_cuts (in, &n, pool, 0, 1);
     if (rval < 0) {
-        fprintf (stderr, "CCtsp_read_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_read_cuts failed\n"); goto CLEANUP;
     }
 
     if (ncount != (int *) NULL && *ncount > 0 && n != *ncount) {
-        fprintf (stderr, "cutpool %s does not have the correct ncount\n",
+        CC_FPRINTF(stderr, "cutpool %s does not have the correct ncount\n",
                             poolfilename);
         rval = 1; goto CLEANUP;
     }
@@ -480,7 +480,7 @@ static int read_cutpool (int *ncount, char *poolfilename, CCtsp_lpcuts *pool)
     rval = CCutil_sclose (in);
     in = (CC_SFILE *) NULL;
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n"); goto CLEANUP;
     }
 
     rval = 0;
@@ -513,7 +513,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
     if (CCutil_sread_char (f, &version)) goto FAILURE;
 
     if (version != 1 && version != 2) {
-        fprintf (stderr, "Unknown cuts version %d\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown cuts version %d\n", (unsigned) version);
         goto FAILURE;
     } else {
         if (CCutil_sread_int (f, ncount)) goto FAILURE;
@@ -522,7 +522,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
         if (buildhash) {
             rval = init_empty_cutpool_hash (*ncount, cuts);
             if (rval) {
-                fprintf (stderr, "init_empty_cutpool_hash failed\n");
+                CC_FPRINTF(stderr, "init_empty_cutpool_hash failed\n");
                 goto FAILURE;
             }
         }
@@ -531,16 +531,16 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
         for (i = 0; i < cliqcount; i++) {
             rval = CCtsp_read_lpclique (f, &c, *ncount);
             if (rval) {
-                fprintf (stderr, "CCtsp_read_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_read_lpclique failed\n");
                 goto FAILURE;
             }
             k = CCtsp_register_clique (cuts, &c);
             if (k == -1) {
-                fprintf (stderr, "CCtsp_register_clique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_register_clique failed\n");
                 goto FAILURE;
             }
             if (k != i) {
-                fprintf (stderr, "clique registration number is out of seq\n");
+                CC_FPRINTF(stderr, "clique registration number is out of seq\n");
                 goto FAILURE;
             }
             CCtsp_free_lpclique (&c);
@@ -554,16 +554,16 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
         for (i = 0; i < dominocount; i++) {
             rval = CCtsp_read_lpdomino (f, &d, *ncount);
             if (rval) {
-                fprintf (stderr, "CCtsp_read_lpdomino failed\n");
+                CC_FPRINTF(stderr, "CCtsp_read_lpdomino failed\n");
                 goto FAILURE;
             }
             k = CCtsp_register_domino (cuts, &d);
             if (k == -1) {
-                fprintf (stderr, "CCtsp_register_domino failed\n");
+                CC_FPRINTF(stderr, "CCtsp_register_domino failed\n");
                 goto FAILURE;
             }
             if (k != i) {
-                fprintf (stderr, "domino registration number is out of seq\n");
+                CC_FPRINTF(stderr, "domino registration number is out of seq\n");
                 goto FAILURE;
             }
             CCtsp_free_lpdomino (&d);
@@ -572,7 +572,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
         if (cliqcount) {
             hits = CC_SAFE_MALLOC (cliqcount, int);
             if (!hits) {
-                fprintf (stderr, "out of memory in CCtsp_read_cuts\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_read_cuts\n");
                 goto FAILURE;
             }
             for (i = 0; i < cliqcount; i++) hits[i] = 0;
@@ -581,7 +581,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
         if (dominocount) {
             domhits = CC_SAFE_MALLOC (dominocount, int);
             if (!domhits) {
-                fprintf (stderr, "out of memory in CCtsp_read_cuts\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_read_cuts\n");
                 goto FAILURE;
             }
             for (i = 0; i < dominocount; i++) domhits[i] = 0;
@@ -609,7 +609,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
             u.age = 0;
             u.cliques = CC_SAFE_MALLOC (ncliq, int);
             if (!u.cliques) {
-                fprintf (stderr, "out of memory in CCtsp_read_cuts\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_read_cuts\n");
                 goto FAILURE;
             }
             for (j = 0; j < ncliq; j++) {
@@ -624,7 +624,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
             if (ndom) {
                 u.dominos = CC_SAFE_MALLOC (ndom, int);
                 if (!u.dominos) {
-                    fprintf (stderr, "out of memory in CCtsp_read_cuts\n");
+                    CC_FPRINTF(stderr, "out of memory in CCtsp_read_cuts\n");
                     goto FAILURE;
                 }
                 for (j = 0; j < ndom; j++) {
@@ -647,7 +647,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
                 if (nmod) {
                     u.mods = CC_SAFE_MALLOC (nmod, CCtsp_sparser);
                     if (!u.mods) {
-                        fprintf (stderr, "out of memory in CCtsp_read_cuts\n");
+                        CC_FPRINTF(stderr, "out of memory in CCtsp_read_cuts\n");
                         CC_FREE (u.cliques, int);
                         goto FAILURE;
                     }
@@ -669,17 +669,17 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
 
             rval = CCtsp_read_skeleton (f, &u.skel, *ncount);
             if (rval) {
-                fprintf (stderr, "CCtsp_read_skeleton failed\n");
+                CC_FPRINTF(stderr, "CCtsp_read_skeleton failed\n");
                 goto FAILURE;
             }
 
             k = CCtsp_add_cut_to_cutlist (cuts, &u);
             if (k == -1) {
-                fprintf (stderr, "CCtsp_add_cut_to_cutlist failed\n");
+                CC_FPRINTF(stderr, "CCtsp_add_cut_to_cutlist failed\n");
                 goto FAILURE;
             }
             if (k != i) {
-                fprintf (stderr, "cut location is out of seq\n");
+                CC_FPRINTF(stderr, "cut location is out of seq\n");
                 goto FAILURE;
             }
         }
@@ -690,7 +690,7 @@ int CCtsp_read_cuts (CC_SFILE *f, int *ncount, CCtsp_lpcuts *cuts,
         if (buildhash) {
             rval = register_lpcuts (cuts);
             if (rval) {
-                fprintf (stderr, "register_lpcuts failed\n");
+                CC_FPRINTF(stderr, "register_lpcuts failed\n");
                 goto FAILURE;
             }
         }
@@ -769,7 +769,7 @@ int CCtsp_read_lpcut_in (CC_SFILE *f, CCtsp_lpcut_in *c, int ncount)
 
     rval = CCtsp_read_skeleton (f, &c->skel, ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_read_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_read_skeleton failed\n");
         goto CLEANUP;
     }
                   
@@ -796,12 +796,12 @@ int CCtsp_read_lpclique (CC_SFILE *f, CCtsp_lpclique *c, int ncount)
     
     rval = CCutil_sread_bits (f, &size, nbits);
     if (rval) {
-        fprintf (stderr, "CCutil_sread_int failed\n");
+        CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
         goto CLEANUP;
     }
     c->nodes = CC_SAFE_MALLOC (size, CCtsp_segment);
     if (c->nodes == (CCtsp_segment *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_read_lpclique\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_read_lpclique\n");
         rval = 1; goto CLEANUP;
     }
     c->segcount = size;
@@ -809,12 +809,12 @@ int CCtsp_read_lpclique (CC_SFILE *f, CCtsp_lpclique *c, int ncount)
     for (i=0; i < size; i++) {
         rval = CCutil_sread_bits (f, &lo, nbits);
         if (rval) {
-            fprintf (stderr, "CCutil_sread_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
             goto CLEANUP;
         }
         rval = CCutil_sread_bits (f, &hi, nbits);
         if (rval) {
-            fprintf (stderr, "CCutil_sread_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
             goto CLEANUP;
         }
         c->nodes[i].lo = lo;
@@ -881,7 +881,7 @@ int CCtsp_write_cuts (CC_SFILE *f, int ncount, CCtsp_lpcuts *cuts,
         for (i = 0; i < cend; i++) {
             if (marks[i]) {
                 if (marks[i] != cuts->cliques[i].refcount) {
-                    fprintf (stderr, "ERROR in refcount for clique %d\n", i);
+                    CC_FPRINTF(stderr, "ERROR in refcount for clique %d\n", i);
                     rval = 1;  goto CLEANUP;
                 }
                 marks[i] = cnt+1;
@@ -915,7 +915,7 @@ int CCtsp_write_cuts (CC_SFILE *f, int ncount, CCtsp_lpcuts *cuts,
         for (i = 0; i < dend; i++) {
             if (dmarks[i]) {
                 if (dmarks[i] != cuts->dominos[i].refcount) {
-                    fprintf (stderr, "ERROR in ref for domino %d (%d, %d)\n",
+                    CC_FPRINTF(stderr, "ERROR in ref for domino %d (%d, %d)\n",
                                       i, dmarks[i], cuts->dominos[i].refcount);
                     rval = 1;  goto CLEANUP;
                 }
@@ -997,7 +997,7 @@ int CCtsp_send_newcuts (int ncount, CCtsp_lpcuts *pool, char *remotehost,
 #ifdef CC_NETREADY
     f = CCutil_snet_open (remotehost, remoteport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 #endif /* CC_NETREADY */
@@ -1145,19 +1145,19 @@ int CCtsp_write_cutpool (int ncount, const char *poolfilename,
     int rval = 0;
 
     if (!poolfilename) {
-        fprintf (stderr, "pool file name not set\n");
+        CC_FPRINTF(stderr, "pool file name not set\n");
         return 1;
     }
 
     out = CCutil_sopen (poolfilename, "w");
     if (!out) {
-        fprintf (stderr, "CCutil_sopen failed\n");
+        CC_FPRINTF(stderr, "CCutil_sopen failed\n");
         return 1;
     }
 
     rval = CCtsp_write_cuts (out, ncount, pool, 0);
     if (rval) {
-        fprintf (stderr, "CCtsp_write_cuts failed\n");
+        CC_FPRINTF(stderr, "CCtsp_write_cuts failed\n");
         CCutil_sclose (out);
         return 1;
     }
@@ -1194,7 +1194,7 @@ int CCtsp_copy_cuts (CC_SFILE *f, CC_SFILE *t, int copymods)
     if (rval) goto CLEANUP;
 
     if (version != 1 && version != 2) {
-        fprintf (stderr, "Unknown cuts version %d\n", (unsigned) version);
+        CC_FPRINTF(stderr, "Unknown cuts version %d\n", (unsigned) version);
         rval = 1;  goto CLEANUP;
     }
 
@@ -1323,13 +1323,13 @@ int CCtsp_search_cutpool (CCtsp_lpcuts *pool, CCtsp_lpcut_in **cuts,
     double lmaxviol;
 
 /*
-    printf ("CCtsp_search_cutpool (%d)\n", pool->cutcount);
-    fflush (stdout);
+    CC_PRINTF("CCtsp_search_cutpool (%d)\n", pool->cutcount);
+    CC_FFLUSH(stdout);
 */
 
     for (i = 0; i < pool->cutcount; i++) {
         if (pool->cuts[i].dominocount != 0) {
-            fprintf (stderr, "POOL yipes %d\n", pool->cuts[i].dominocount);
+            CC_FPRINTF(stderr, "POOL yipes %d\n", pool->cuts[i].dominocount);
             rval = 1; goto CLEANUP;
         }
     }
@@ -1342,7 +1342,7 @@ int CCtsp_search_cutpool (CCtsp_lpcuts *pool, CCtsp_lpcut_in **cuts,
 
     cval = CC_SAFE_MALLOC (pool->cutcount, double);
     if (!cval) {
-        fprintf (stderr, "out of memory in CCtsp_search_cutpool\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1350,20 +1350,20 @@ int CCtsp_search_cutpool (CCtsp_lpcuts *pool, CCtsp_lpcut_in **cuts,
         rval = CCtsp_price_cuts_threaded (pool, ncount, ecount, elist, x, cval,
                                           nthreads);
         if (rval) {
-            fprintf (stderr, "CCtsp_price_cuts_threaded failed\n");
+            CC_FPRINTF(stderr, "CCtsp_price_cuts_threaded failed\n");
             goto CLEANUP;
         }
     } else {
         rval = CCtsp_price_cuts (pool, ncount, ecount, elist, x, cval);
         if (rval) {
-            fprintf (stderr, "CCtsp_price_cuts failed\n");
+            CC_FPRINTF(stderr, "CCtsp_price_cuts failed\n");
             goto CLEANUP;
         }
     }
 
     ind = CC_SAFE_MALLOC (pool->cutcount, int);
     if (!ind) {
-        fprintf (stderr, "out of memory in CCtsp_search_cutpool\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1381,7 +1381,7 @@ int CCtsp_search_cutpool (CCtsp_lpcuts *pool, CCtsp_lpcut_in **cuts,
             CCcheck_NULL (newc, "out of memory in CCtsp_search_cutpool");
             rval = CCtsp_lpcut_to_lpcut_in (pool, &pool->cuts[ind[i]], newc);
             if (rval) {
-                fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
+                CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
                 CC_FREE (newc, CCtsp_lpcut_in);
                 goto CLEANUP;
             }
@@ -1419,56 +1419,56 @@ int CCtsp_search_remotepool (char *remotehost, unsigned short remoteport,
 #ifdef CC_NETREADY
     f = CCutil_snet_open (remotehost, remoteport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 #endif /* CC_NETREADY */
 
     rval = CCutil_swrite_char (f, CCtsp_POOL_GETCUTS);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_char failed\n");
+        CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
         goto CLEANUP;
     }
 
     rval = CCutil_swrite_int (f, ncount);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_int failed\n");
+        CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
         goto CLEANUP;
     }
 
     rval = CCutil_swrite_int (f, ecount);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_int failed\n");
+        CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
         goto CLEANUP;
     }
 
     for (i=0; i<ecount; i++) {
         rval = CCutil_swrite_int (f, elist[2*i]);
         if (rval) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             goto CLEANUP;
         }
         rval = CCutil_swrite_int (f, elist[2*i+1]);
         if (rval) {
-            fprintf (stderr, "CCutil_swrite_int failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_int failed\n");
             goto CLEANUP;
         }
         rval = CCutil_swrite_double (f, x[i]);
         if (rval) {
-            fprintf (stderr, "CCutil_swrite_double failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_double failed\n");
             goto CLEANUP;
         }
     }
 
     rval = CCutil_sread_int (f, &cnt);
     if (rval) {
-        fprintf (stderr, "CCutil_sread_int failed\n");
+        CC_FPRINTF(stderr, "CCutil_sread_int failed\n");
         goto CLEANUP;
     }
 
     rval = CCutil_sread_double (f, maxviol);
     if (rval) {
-        fprintf (stderr, "CCutil_sread_double failed\n");
+        CC_FPRINTF(stderr, "CCutil_sread_double failed\n");
         goto CLEANUP;
     }
 
@@ -1477,7 +1477,7 @@ int CCtsp_search_remotepool (char *remotehost, unsigned short remoteport,
         CCcheck_NULL (newc, "out of memory in CCtsp_search_cutpool");
         rval = CCtsp_read_lpcut_in (f, newc, ncount);
         if (rval) {
-            fprintf (stderr, "read_lpcut_in failed\n");
+            CC_FPRINTF(stderr, "read_lpcut_in failed\n");
             goto CLEANUP;
         }
         newc->next = *cuts;
@@ -1489,7 +1489,7 @@ int CCtsp_search_remotepool (char *remotehost, unsigned short remoteport,
     rval = CCutil_sclose (f);
     f = (CC_SFILE *) NULL;
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     
@@ -1502,7 +1502,7 @@ CLEANUP:
     }
     CC_IFFREE (newc, CCtsp_lpcut_in);
     if (rval) {
-        fprintf (stderr, "Failure in CCtsp_search_remotepool, continuing anyway\n");
+        CC_FPRINTF(stderr, "Failure in CCtsp_search_remotepool, continuing anyway\n");
         rval = 0;
     }
     
@@ -1531,20 +1531,20 @@ int CCtsp_search_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
 
     cval = CC_SAFE_MALLOC (pool->cliqueend, double);
     if (!cval) {
-        fprintf (stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = price_cliques (pool->cliques, ncount, ecount, elist, x, cval,
                           pool->cliqueend);
     if (rval) {
-        fprintf (stderr, "price_cliques failed\n");
+        CC_FPRINTF(stderr, "price_cliques failed\n");
         goto CLEANUP;
     }
 
     ind = CC_SAFE_MALLOC (pool->cliqueend, int);
     if (!ind) {
-        fprintf (stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < pool->cliqueend; i++) {
@@ -1564,19 +1564,19 @@ int CCtsp_search_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
     }
 
     if (ccount == 0) {
-        printf ("Found no nearly tight cliques\n"); fflush (stdout);
+        CC_PRINTF("Found no nearly tight cliques\n"); CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
     *cliques = CC_SAFE_MALLOC (ccount, CCtsp_lpclique);
     if (!(*cliques)) {
-        fprintf (stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
         rval = 1; goto CLEANUP;
     }
     if (cliquevals) {
         *cliquevals = CC_SAFE_MALLOC (ccount, double);
         if (!(*cliquevals)) {
-            fprintf (stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
             CC_FREE (*cliques, CCtsp_lpclique);
             rval = 1; goto CLEANUP;
         }
@@ -1588,7 +1588,7 @@ int CCtsp_search_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
             rval = CCtsp_copy_lpclique (&(pool->cliques[ind[i]]),
                                         &((*cliques)[ccount]));
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
                 for (k = 0; k < ccount; k++) {
                     CC_FREE ((*cliques)[k].nodes, CCtsp_segment);
                 }
@@ -1606,9 +1606,9 @@ int CCtsp_search_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
     }
     *cliquecount = ccount;
 
-    printf ("%d nearly tight cliques found, range (%.3f, %.3f)\n",
+    CC_PRINTF("%d nearly tight cliques found, range (%.3f, %.3f)\n",
               *cliquecount, lowerdelta, upperdelta);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -1645,14 +1645,14 @@ int CCtsp_branch_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
     bval  = CC_SAFE_MALLOC (nwant + 1, double);
     cval = CC_SAFE_MALLOC (pool->cliqueend, double);
     if (!blist || !bval || !cval) {
-        fprintf (stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = price_cliques (pool->cliques, ncount, ecount, elist, x, cval,
                           pool->cliqueend);
     if (rval) {
-        fprintf (stderr, "price_cliques failed\n");
+        CC_FPRINTF(stderr, "price_cliques failed\n");
         goto CLEANUP;
     }
 
@@ -1690,19 +1690,19 @@ int CCtsp_branch_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
     }
 
     if (ccount == 0) {
-        printf ("Found no nearly tight cliques\n"); fflush (stdout);
+        CC_PRINTF("Found no nearly tight cliques\n"); CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
     *cliques = CC_SAFE_MALLOC (ccount, CCtsp_lpclique);
     if (!(*cliques)) {
-        fprintf (stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
         rval = 1; goto CLEANUP;
     }
     if (cliquevals) {
         *cliquevals = CC_SAFE_MALLOC (ccount, double);
         if (!(*cliquevals)) {
-            fprintf (stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_search_cutpool_cliques\n");
             CC_FREE (*cliques, CCtsp_lpclique);
             rval = 1; goto CLEANUP;
         }
@@ -1714,7 +1714,7 @@ int CCtsp_branch_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
             rval = CCtsp_copy_lpclique (&(pool->cliques[blist[i]]),
                                       &((*cliques)[ccount]));
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
                 for (k = 0; k < ccount; k++) {
                     CC_FREE ((*cliques)[k].nodes, CCtsp_segment);
                 }
@@ -1733,9 +1733,9 @@ int CCtsp_branch_cutpool_cliques (CCtsp_lpcuts *pool, CCtsp_lpclique **cliques,
     *cliquecount = ccount;
 
     if (!silent) {
-        printf ("%d candidate branching cliques, range (%.3f, %.3f)\n",
+        CC_PRINTF("%d candidate branching cliques, range (%.3f, %.3f)\n",
                   *cliquecount, lowerdelta, upperdelta);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
 
@@ -1766,14 +1766,14 @@ int CCtsp_get_clique_prices (CCtsp_lpcuts *pool, int **p_cliquenums,
 
     cval = CC_SAFE_MALLOC (pool->cliqueend, double);
     if (cval == (double *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_get_clique_prices\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_get_clique_prices\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = price_cliques (pool->cliques, ncount, ecount, elist, x, cval,
                           pool->cliqueend);
     if (rval) {
-        fprintf (stderr, "price_cliques failed\n");
+        CC_FPRINTF(stderr, "price_cliques failed\n");
         goto CLEANUP;
     }
 
@@ -1791,14 +1791,14 @@ int CCtsp_get_clique_prices (CCtsp_lpcuts *pool, int **p_cliquenums,
     
     cliquenums = CC_SAFE_MALLOC (cliquecount, int);
     if (cliquenums == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_get_clique_prices\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_get_clique_prices\n");
         rval = 1; goto CLEANUP;
     }
 
     if (p_cliquevals) {
         cliquevals = CC_SAFE_MALLOC (cliquecount, double);
         if (cliquevals == (double *) NULL) {
-            fprintf (stderr, "Out of memory in CCtsp_get_clique_prices\n");
+            CC_FPRINTF(stderr, "Out of memory in CCtsp_get_clique_prices\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -1834,7 +1834,7 @@ int CCtsp_get_clique (CCtsp_lpcuts *pool, int cliquenum,
 {
     if (cliquenum < 0 || cliquenum >= pool->cliqueend ||
         pool->cliques[cliquenum].segcount <= 0) {
-        fprintf (stderr, "Illegal cliquenum in CCtsp_get_clique\n");
+        CC_FPRINTF(stderr, "Illegal cliquenum in CCtsp_get_clique\n");
         return -1;
     }
     *p_clique = &pool->cliques[cliquenum];
@@ -1854,13 +1854,13 @@ int CCtsp_add_to_cutpool (CCtsp_lpcuts *pool, CCtsp_lpcuts *cuts,
 
     rval = CCtsp_lpcut_to_lpcut_in (cuts, c, &cin);
     if (rval) {
-        fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
+        CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
         goto CLEANUP;
     }
 
     rval = CCtsp_add_to_cutpool_lpcut_in (pool, &cin);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_to_cutpool_lpcut_in failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_to_cutpool_lpcut_in failed\n");
         goto CLEANUP;
     }
 
@@ -1877,13 +1877,13 @@ int CCtsp_add_to_dominopool (CCtsp_lpcuts *pool, CCtsp_lpcuts *cuts,
     CCtsp_lpcut_in cin;
 
 /*
-    printf ("CCtsp_add_to_dominopool (%d, %d)\n", c->cliquecount,
+    CC_PRINTF("CCtsp_add_to_dominopool (%d, %d)\n", c->cliquecount,
                                                   c->dominocount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 */
 
     if (!pool) {
-        fprintf (stderr, "NO domino pool!\n");
+        CC_FPRINTF(stderr, "NO domino pool!\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -1893,13 +1893,13 @@ int CCtsp_add_to_dominopool (CCtsp_lpcuts *pool, CCtsp_lpcuts *cuts,
 
     rval = CCtsp_lpcut_to_lpcut_in (cuts, c, &cin);
     if (rval) {
-        fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
+        CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
         goto CLEANUP;
     }
 
     rval = CCtsp_add_to_cutpool_lpcut_in (pool, &cin);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_to_cutpool_lpcut_in failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_to_cutpool_lpcut_in failed\n");
         goto CLEANUP;
     }
 
@@ -1932,7 +1932,7 @@ int CCtsp_add_to_cutpool_lpcut_in (CCtsp_lpcuts *pool, CCtsp_lpcut_in *cut)
 
     rval = CCtsp_copy_skeleton (&cut->skel, &new.skel);
     if (rval) {
-        fprintf (stderr, "CCtsp_copy_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_copy_skeleton failed\n");
         CCtsp_unregister_cliques (pool, &new);
         CCtsp_unregister_dominos (pool, &new);
         goto CLEANUP;
@@ -1943,7 +1943,7 @@ int CCtsp_add_to_cutpool_lpcut_in (CCtsp_lpcuts *pool, CCtsp_lpcut_in *cut)
 
     cutloc = CCtsp_add_cut_to_cutlist (pool, &new);
     if (cutloc < 0) {
-        fprintf (stderr, "CCtsp_add_cut_to_cutlist failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_cut_to_cutlist failed\n");
         CCtsp_unregister_cliques (pool, &new);
         CCtsp_unregister_dominos (pool, &new);
         rval = cutloc;
@@ -1961,7 +1961,7 @@ int CCtsp_add_to_cutpool_lpcut_in (CCtsp_lpcuts *pool, CCtsp_lpcut_in *cut)
     rval = CCutil_genhash_insert_h (pool->cuthash, hval,
             (void *) ((long) cutloc),  (void *) ((long) 1));
     if (rval) {
-        fprintf (stderr, "CCutil_genhash_insert_h failed\n");
+        CC_FPRINTF(stderr, "CCutil_genhash_insert_h failed\n");
         CCtsp_delete_cut_from_cutlist (pool, cutloc);
         goto CLEANUP; 
     }
@@ -2000,14 +2000,14 @@ static int register_lpcuts (CCtsp_lpcuts *pool)
             rval = CCutil_genhash_insert_h (pool->cuthash, hval,
                     (void *) ((long) i), (void *) ((long) 1));
             if (rval) {
-                fprintf (stderr, "CCutil_genhash_insert_h failed\n");
+                CC_FPRINTF(stderr, "CCutil_genhash_insert_h failed\n");
                 return rval;
             }
         }
     }
     if (ndup) {
-        printf ("%d duplicates detected in pool\n", ndup);
-        fflush (stdout);
+        CC_PRINTF("%d duplicates detected in pool\n", ndup);
+        CC_FFLUSH(stdout);
     }
     return 0;
 }
@@ -2019,7 +2019,7 @@ int CCtsp_display_cutpool (CCtsp_lpcuts *pool)
 
     for (i = 0; i < pool->cutcount; i++) {
         if (CCtsp_lpcut_to_lpcut_in (pool, &(pool->cuts[i]), &c)) {
-            fprintf (stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
+            CC_FPRINTF(stderr, "CCtsp_lpcut_to_lpcut_in failed\n");
             return 1;
         }
         CCtsp_print_lpcut_in (&c);
@@ -2195,7 +2195,7 @@ int CCtsp_price_cuts_threaded (CCtsp_lpcuts *pool, int ncount, int ecount,
     if (pool->workloads == (double *) NULL) {
         pool->workloads = CC_SAFE_MALLOC (nthreads*4+1, double);
         if (pool->workloads == (double *) NULL) {
-            fprintf (stderr, "Out of memory in CCtsp_price_cuts_threaded\n");
+            CC_FPRINTF(stderr, "Out of memory in CCtsp_price_cuts_threaded\n");
             rval = 1; goto CLEANUP;
         }
         pool->workloads[0] = (double) nthreads;
@@ -2221,20 +2221,20 @@ int CCtsp_price_cuts_threaded (CCtsp_lpcuts *pool, int ncount, int ecount,
         clargs    == (priceclique_args *) NULL ||
         cuargs    == (pricecut_args *) NULL ||
         thread_id == (pthread_t *) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_price_cuts\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_price_cuts\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = pthread_attr_init (&attr);
     if (rval) {
-        fprintf (stderr, "pthread_attr_init failed, rval %d\n", rval);
+        CC_FPRINTF(stderr, "pthread_attr_init failed, rval %d\n", rval);
         rval = 1; goto CLEANUP;
     }
 
 #ifdef PTHREAD_CREATE_JOINABLE
     rval = pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE);
     if (rval) {
-        fprintf (stderr, "pthread_attr_setdetachstate failed, rval %d\n",
+        CC_FPRINTF(stderr, "pthread_attr_setdetachstate failed, rval %d\n",
                  rval);
         rval = 1; goto CLEANUP;
     }
@@ -2242,7 +2242,7 @@ int CCtsp_price_cuts_threaded (CCtsp_lpcuts *pool, int ncount, int ecount,
 #ifdef PTHREAD_CREATE_UNDETACHED
     rval = pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_UNDETACHED);
     if (rval) {
-        fprintf (stderr, "pthread_attr_setdetachstate failed, rval %d\n",
+        CC_FPRINTF(stderr, "pthread_attr_setdetachstate failed, rval %d\n",
                  rval);
         rval = 1; goto CLEANUP;
     }
@@ -2269,29 +2269,29 @@ int CCtsp_price_cuts_threaded (CCtsp_lpcuts *pool, int ncount, int ecount,
                                &clargs[i]);
         if (rval) {
             perror ("pthread_create");
-            fprintf (stderr, "pthread_create failed, rval %d\n", rval);
+            CC_FPRINTF(stderr, "pthread_create failed, rval %d\n", rval);
             goto CLEANUP;
         }
     }
     for (i=0; i<nthreads; i++) {
         rval = pthread_join (thread_id[i], &thr_rval);
         if (rval) {
-            fprintf (stderr, "pthread_join failed\n");
+            CC_FPRINTF(stderr, "pthread_join failed\n");
             goto CLEANUP;
         }
         clrval = (priceclique_args *) thr_rval;
         if (clrval->rval) {
-            fprintf (stderr, "pricing clique thread failed\n");
+            CC_FPRINTF(stderr, "pricing clique thread failed\n");
             rval = clrval->rval; goto CLEANUP;
         }
         worktimes[i] = clrval->real_zeit;
     }
 
-    printf ("\nThread clique:");
+    CC_PRINTF("\nThread clique:");
     for (i=0; i<nthreads; i++) {
-        printf (" %.0f", worktimes[i]);
+        CC_PRINTF(" %.0f", worktimes[i]);
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     
     rebalance_load (nthreads, cliqueworkload, worktimes, balancework);
 
@@ -2311,30 +2311,30 @@ int CCtsp_price_cuts_threaded (CCtsp_lpcuts *pool, int ncount, int ecount,
         rval = pthread_create (&thread_id[i], &attr, price_cuts_thread,
                                &cuargs[i]);
         if (rval) {
-            fprintf (stderr, "pthread_create failed\n");
+            CC_FPRINTF(stderr, "pthread_create failed\n");
             goto CLEANUP;
         }
     }
     for (i=0; i<nthreads; i++) {
         rval = pthread_join (thread_id[i], &thr_rval);
         if (rval) {
-            fprintf (stderr, "pthread_join failed\n");
+            CC_FPRINTF(stderr, "pthread_join failed\n");
             goto CLEANUP;
         }
         curval = (pricecut_args *) thr_rval;
         if (curval->rval) {
-            fprintf (stderr, "pricing cut thread failed\n");
+            CC_FPRINTF(stderr, "pricing cut thread failed\n");
             rval = curval->rval; goto CLEANUP;
         }
         worktimes[i] = curval->real_zeit;
     }
     
-    printf (" cut:");
+    CC_PRINTF(" cut:");
     for (i=0; i<nthreads; i++) {
-        printf (" %.0f", worktimes[i]);
+        CC_PRINTF(" %.0f", worktimes[i]);
     }
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
     
     rebalance_load (nthreads, cutworkload, worktimes, balancework);
 
@@ -2383,7 +2383,7 @@ static int price_cliques (CCtsp_lpclique *cliques, int ncount, int ecount,
 
     rval = make_pricing_graph (ncount, ecount, elist, x, &nlist, &espace);
     if (rval) {
-        fprintf (stderr, "make_pricing_graph failed\n");
+        CC_FPRINTF(stderr, "make_pricing_graph failed\n");
         goto CLEANUP;
     }
     for (i = 0; i < cend; i++) {
@@ -2418,7 +2418,7 @@ static int make_pricing_graph (int ncount, int ecount, int *elist, double *x,
     
     nlist =  CC_SAFE_MALLOC (ncount, poolnode);
     if (nlist == (poolnode *) NULL) {
-        fprintf (stderr, "out of memory in make_pricing_graph\n");
+        CC_FPRINTF(stderr, "out of memory in make_pricing_graph\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2438,7 +2438,7 @@ static int make_pricing_graph (int ncount, int ecount, int *elist, double *x,
 
     espace = CC_SAFE_MALLOC (2*count, pooledge);
     if (espace == (pooledge *) NULL) {
-        fprintf (stderr, "out of memory in price_cliques\n");
+        CC_FPRINTF(stderr, "out of memory in price_cliques\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2617,9 +2617,9 @@ void CCtsp_delete_cut_from_cutlist (CCtsp_lpcuts *cuts, int ind)
     int i;
 
 /*
-    printf ("CCtsp_delete_cut_from_cutlist (%d)\n",
+    CC_PRINTF("CCtsp_delete_cut_from_cutlist (%d)\n",
               cuts->cuts[ind].dominocount);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 */
 
     CCtsp_unregister_cliques (cuts, &cuts->cuts[ind]);

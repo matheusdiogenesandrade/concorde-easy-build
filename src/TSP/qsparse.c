@@ -199,14 +199,14 @@ int CCtsp_qsparsify (CCtsp_qsparsegroup **pqs, CCtsp_lpgraph *g, int *pnzlist,
             if (nodes[edges[e].ends[0]].mark != g->nodemarker) {
                 rval = update_queues(edges[e].ends[0], qs, g);
                 if (rval) {
-                    fprintf (stderr, "update_queues failed\n"); return rval;
+                    CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
                 }
                 nodes[edges[e].ends[0]].mark = g->nodemarker;
             }
             if (nodes[edges[e].ends[1]].mark != g->nodemarker) {
                 rval = update_queues(edges[e].ends[1], qs, g);
                 if (rval) {
-                    fprintf (stderr, "update_queues failed\n"); return rval;
+                    CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
                 }
                 nodes[edges[e].ends[1]].mark = g->nodemarker;
             }
@@ -227,7 +227,7 @@ int CCtsp_qsparsify (CCtsp_qsparsegroup **pqs, CCtsp_lpgraph *g, int *pnzlist,
             (qs->mults[v])++;
             rval = add_node (v, qs, g, pnzlist);
             if (rval) {
-                fprintf (stderr, "add_node failed\n"); return rval;
+                CC_FPRINTF(stderr, "add_node failed\n"); return rval;
             }
         } else {
             k += (count_1[w] - (nodes[w].deg - count_non0[w]));
@@ -236,7 +236,7 @@ int CCtsp_qsparsify (CCtsp_qsparsegroup **pqs, CCtsp_lpgraph *g, int *pnzlist,
             (qs->mults[w])--;
             rval = sub_node (w, qs, g, pnzlist);
             if (rval) {
-                fprintf (stderr, "sub_node failed\n"); return rval;
+                CC_FPRINTF(stderr, "sub_node failed\n"); return rval;
             }
         }
     }
@@ -299,8 +299,8 @@ int CCtsp_qsparsify (CCtsp_qsparsegroup **pqs, CCtsp_lpgraph *g, int *pnzlist,
     *savedcount = k;
 
 #if 0
-    printf ("sscount = %d  savedcount = %d\n", *scount, *savedcount);
-    fflush (stdout);
+    CC_PRINTF("sscount = %d  savedcount = %d\n", *scount, *savedcount);
+    CC_FFLUSH(stdout);
 #endif
 
     return 0;
@@ -353,14 +353,14 @@ static int add_node(int v, CCtsp_qsparsegroup *qs, CCtsp_lpgraph *g,
             qs->count_1[w]++;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         } else if (e->coef == 1) {
             qs->count_1[v]--;
             qs->count_1[w]--;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         } else if (e->coef == -1) {
             qs->count_m1[v]--;
@@ -369,21 +369,21 @@ static int add_node(int v, CCtsp_qsparsegroup *qs, CCtsp_lpgraph *g,
             qs->count_non0[w]--;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         } else if (e->coef == -2) {
             qs->count_m1[v]++;
             qs->count_m1[w]++;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         }
         e->coef++;
     }
     rval = update_queues (v, qs, g);
     if (rval) {
-        fprintf (stderr, "update_queues failed\n"); return rval;
+        CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
     }
     return 0;
 }
@@ -410,14 +410,14 @@ static int sub_node(int v, CCtsp_qsparsegroup *qs, CCtsp_lpgraph *g,
             qs->count_m1[w]++;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         } else if (e->coef == -1) {
             qs->count_m1[v]--;
             qs->count_m1[w]--;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         } else if (e->coef == 1) {
             qs->count_1[v]--;
@@ -426,21 +426,21 @@ static int sub_node(int v, CCtsp_qsparsegroup *qs, CCtsp_lpgraph *g,
             qs->count_non0[w]--;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         } else if (e->coef == 2) {
             qs->count_1[v]++;
             qs->count_1[w]++;
             rval = update_queues (w, qs, g);
             if (rval) {
-                fprintf (stderr, "update_queues failed\n"); return rval;
+                CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
             }
         }
         e->coef--;
     }
     rval = update_queues (v, qs, g);
     if (rval) {
-        fprintf (stderr, "update_queues failed\n"); return rval;
+        CC_FPRINTF(stderr, "update_queues failed\n"); return rval;
     }
     return 0;
 }
@@ -460,7 +460,7 @@ static int update_queues (int v, CCtsp_qsparsegroup *qs, CCtsp_lpgraph *g)
             rval = queue_add (qs->add_queue, v,
                   qs->count_m1[v] - (g->nodes[v].deg - qs->count_non0[v]));
             if (rval) {
-                fprintf (stderr, "queue_add failed\n"); return rval;
+                CC_FPRINTF(stderr, "queue_add failed\n"); return rval;
             }
             qs->on_add_queue[v] = 1;
         }
@@ -479,7 +479,7 @@ static int update_queues (int v, CCtsp_qsparsegroup *qs, CCtsp_lpgraph *g)
             rval = queue_add (qs->sub_queue, v,
                   qs->count_1[v] - (g->nodes[v].deg - qs->count_non0[v]));
             if (rval) {
-                fprintf (stderr, "queue_add failed\n"); return rval;
+                CC_FPRINTF(stderr, "queue_add failed\n"); return rval;
             }
             qs->on_sub_queue[v] = 1;
         }

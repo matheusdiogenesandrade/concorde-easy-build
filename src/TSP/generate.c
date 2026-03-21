@@ -116,7 +116,7 @@ int CCtsp_init_edgegenerator (CCtsp_edgegenerator *eg, int ncount,
     int norm;
 
     if (!silent) {
-        printf ("CCtsp_init_edgegenerator (%d)\n", nneighbors); fflush (stdout);
+        CC_PRINTF("CCtsp_init_edgegenerator (%d)\n", nneighbors); CC_FFLUSH(stdout);
     }
 
     eg->node_piest = (double *) NULL;
@@ -140,17 +140,17 @@ int CCtsp_init_edgegenerator (CCtsp_edgegenerator *eg, int ncount,
               dg->ndepot == 0) {
             eg->supply = CC_SAFE_MALLOC (ncount, int);
             if (!eg->supply) {
-                fprintf (stderr, "out of memory in CCtsp_init_edgegenerator\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_init_edgegenerator\n");
                 return 1;
             }
             eg->xprice = CC_SAFE_MALLOC (1, CCtsp_xnorm_pricer);
             if (!eg->xprice) {
-                fprintf (stderr, "out of memory in CCtsp_init_edgegenerator\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_init_edgegenerator\n");
                 return 1;
             }
             rval = xprice_build (ncount, dg, eg->xprice, silent);
             if (rval) {
-                fprintf (stderr, "xprice_build failed\n");
+                CC_FPRINTF(stderr, "xprice_build failed\n");
                 CC_FREE (eg->xprice, CCtsp_xnorm_pricer);
                 return rval;
             }
@@ -176,13 +176,13 @@ int CCtsp_init_edgegenerator (CCtsp_edgegenerator *eg, int ncount,
                 rval = CCkdtree_build (&kt, ncount, dg, (double *) NULL,
                                        rstate);
                 if (rval) {
-                    fprintf (stderr, "CCkdtree_build failed\n");
+                    CC_FPRINTF(stderr, "CCkdtree_build failed\n");
                     return rval;
                 }
                 rval = CCkdtree_k_nearest (&kt, ncount, eg->nneighbors, dg,
                          (double *) NULL, 1, &ecount, &elist, silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCkdtree_k_nearest failed\n");
+                    CC_FPRINTF(stderr, "CCkdtree_k_nearest failed\n");
                     return rval;
                 }
                 CCkdtree_free (&kt);
@@ -191,20 +191,20 @@ int CCtsp_init_edgegenerator (CCtsp_edgegenerator *eg, int ncount,
                 rval = CCedgegen_x_k_nearest (ncount, eg->nneighbors, dg,
                         (double *) NULL, 1, &ecount, &elist, silent);
                 if (rval) {
-                    fprintf (stderr, "CCedgegen_x_k_nearest failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_x_k_nearest failed\n");
                     return rval;
                 }
             } else {
                 rval = CCedgegen_junk_k_nearest (ncount, eg->nneighbors, dg,
                          (double *) NULL, 1, &ecount, &elist, silent);
                 if (rval) {
-                    fprintf (stderr, "CCedgegen_junk_k_nearest failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_junk_k_nearest failed\n");
                     return rval;
                 }
             }
             eg->adj = CC_SAFE_MALLOC (ncount, CCtsp_genadj);
             if (!eg->adj) {
-                fprintf (stderr, "out of memory in CCtsp_init_edgegenerator\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_init_edgegenerator\n");
                 CC_IFFREE (elist, int);
                 return 1;
             }
@@ -219,7 +219,7 @@ int CCtsp_init_edgegenerator (CCtsp_edgegenerator *eg, int ncount,
 
             eg->adjobjspace = CC_SAFE_MALLOC (ecount, CCtsp_genadjobj);
             if (!eg->adjobjspace) {
-                fprintf (stderr, "out of memory in CCtsp_init_edgegenerator\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_init_edgegenerator\n");
                 CC_IFFREE (elist, int);
                 CC_IFFREE (eg->adj, CCtsp_genadj);
                 return 1;
@@ -244,21 +244,21 @@ int CCtsp_init_edgegenerator (CCtsp_edgegenerator *eg, int ncount,
             eg->supplyhead = 0;
             eg->supply = CC_SAFE_MALLOC (eg->nneighbors, int);
             if (!eg->supply) {
-                fprintf (stderr, "out of memory in CCtsp_init_edgegenerator\n");
+                CC_FPRINTF(stderr, "out of memory in CCtsp_init_edgegenerator\n");
                 return 1;
             }
 
             if ((norm & CC_NORM_BITS) == CC_KD_NORM_TYPE && dg->ndepot == 0) {
                 eg->kdtree = CC_SAFE_MALLOC (1, CCkdtree);
                 if (!eg->kdtree) {
-                    fprintf (stderr, "out of memory in CCtsp_init_edgegenerator\n");
+                    CC_FPRINTF(stderr, "out of memory in CCtsp_init_edgegenerator\n");
                     CC_FREE (eg->supply, int);
                     return 1;
                 }
                 rval = CCkdtree_build (eg->kdtree, ncount, dg,
                         (double *) NULL, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCkdtree_build failed\n");
+                    CC_FPRINTF(stderr, "CCkdtree_build failed\n");
                     CC_FREE (eg->kdtree, CCkdtree);
                     CC_FREE (eg->supply, int);
                     return rval;
@@ -267,14 +267,14 @@ int CCtsp_init_edgegenerator (CCtsp_edgegenerator *eg, int ncount,
                                   dg->ndepot == 0) {
                 eg->xnear = CC_SAFE_MALLOC (1, CCxnear);
                 if (!eg->xnear) {
-                    fprintf (stderr, "out of memory in CCtsp_init_edgegenerator\n");
+                    CC_FPRINTF(stderr, "out of memory in CCtsp_init_edgegenerator\n");
                     CC_FREE (eg->supply, int);
                     return 1;
                 }
                 rval = CCedgegen_xnear_build (ncount, dg, (double *) NULL,
                         eg->xnear);
                 if (rval) {
-                    fprintf (stderr, "CCedgegen_xnear_build failed\n");
+                    CC_FPRINTF(stderr, "CCedgegen_xnear_build failed\n");
                     CC_FREE (eg->xnear, CCxnear);
                     CC_FREE (eg->supply, int);
                     return rval;
@@ -316,7 +316,7 @@ int CCtsp_reset_edgegenerator (CCtsp_edgegenerator *eg, double *node_piest,
         eg->supplyhead = -1;
         if (eg->xprice) {
             if (xprice_reset (eg->xprice, node_piest, eg->current, silent)) {
-                fprintf (stderr, "xprice_reset failed\n");
+                CC_FPRINTF(stderr, "xprice_reset failed\n");
                 return 1;
             }
             eg->supplycount = 0;
@@ -338,13 +338,13 @@ int CCtsp_generate_edges (CCtsp_edgegenerator *eg, int nwant, int *pngot,
     int rval;
 
     if (!silent) {
-        printf ("CCtsp_generate_edges (%d)\n", nwant); fflush (stdout);
+        CC_PRINTF("CCtsp_generate_edges (%d)\n", nwant); CC_FFLUSH(stdout);
     }
 
     *finished = 0;
     *pngot = 0;
     if (!eg->node_piest) {
-        fprintf (stderr, "generate, but no node_piest\n");
+        CC_FPRINTF(stderr, "generate, but no node_piest\n");
         return 1;
     }
 
@@ -374,7 +374,7 @@ int CCtsp_generate_edges (CCtsp_edgegenerator *eg, int nwant, int *pngot,
                             rval = xprice_reset (eg->xprice, eg->node_piest,
                                                  0, silent);
                             if (rval) {
-                                fprintf (stderr, "xprice_reset failed\n");
+                                CC_FPRINTF(stderr, "xprice_reset failed\n");
                                 return rval;
                             }
                         }
@@ -382,7 +382,7 @@ int CCtsp_generate_edges (CCtsp_edgegenerator *eg, int nwant, int *pngot,
                     rval = xprice_node (eg->xprice, current, &supplycount,
                                                                   supply);
                     if (rval) {
-                        fprintf (stderr, "xprice_node failed\n");
+                        CC_FPRINTF(stderr, "xprice_node failed\n");
                         return rval;
                     }
                     supplyhead = 0;
@@ -399,8 +399,8 @@ int CCtsp_generate_edges (CCtsp_edgegenerator *eg, int nwant, int *pngot,
                         elen[ngot] = len;
                         ngot++;
                         if (ngot % 100000 == 0) {
-                            printf ("Y[%d]", current);
-                            fflush (stdout);
+                            CC_PRINTF("Y[%d]", current);
+                            CC_FFLUSH(stdout);
                         }
                     }
                     supplyhead++;
@@ -514,14 +514,14 @@ int CCtsp_generate_edges (CCtsp_edgegenerator *eg, int nwant, int *pngot,
                             current, eg->nneighbors, eg->dg, (double *) NULL,
                             supply, rstate);
                     if (rval) {
-                        fprintf (stderr, "CCkdtree_node_k_nearest failed\n");
+                        CC_FPRINTF(stderr, "CCkdtree_node_k_nearest failed\n");
                         return rval;
                     }
                 } else if (eg->xnear) {
                     rval = CCedgegen_x_node_k_nearest (eg->xnear, current,
                             eg->nneighbors, eg->ncount, supply);
                     if (rval) {
-                        fprintf (stderr, "CCedgegen_x_node_k_nearest failed\n");
+                        CC_FPRINTF(stderr, "CCedgegen_x_node_k_nearest failed\n");
                         return 1;
                     }
                 } else {
@@ -529,7 +529,7 @@ int CCtsp_generate_edges (CCtsp_edgegenerator *eg, int nwant, int *pngot,
                             (double *) NULL, current, eg->nneighbors,
                             eg->ncount, supply);
                     if (rval) {
-                        fprintf (stderr, "CCedgegen_junk_node_k_nearest failed\n");
+                        CC_FPRINTF(stderr, "CCedgegen_junk_node_k_nearest failed\n");
                         return 1;
                     }
                 }
@@ -566,7 +566,7 @@ static int xprice_build (int ncount, CCdatagroup *dat, CCtsp_xnorm_pricer *xp,
     int norm;
 
     if (!silent) {
-        printf ("xprice_build\n"); fflush (stdout);
+        CC_PRINTF("xprice_build\n"); CC_FFLUSH(stdout);
     }
 
     xp->pi = (double *) NULL;
@@ -578,13 +578,13 @@ static int xprice_build (int ncount, CCdatagroup *dat, CCtsp_xnorm_pricer *xp,
     CCutil_dat_getnorm (dat, &norm);
     if ((norm & CC_NORM_BITS) != CC_KD_NORM_TYPE &&
         (norm & CC_NORM_BITS) != CC_X_NORM_TYPE) {
-        fprintf (stderr, "cannot run xprice_build with norm %d\n", norm);
+        CC_FPRINTF(stderr, "cannot run xprice_build with norm %d\n", norm);
         xprice_free (xp);
         return 1;
     }
 
     if (dat->ndepot != 0) {
-        fprintf (stderr, "cannot run xprice_build with depotcosts\n");
+        CC_FPRINTF(stderr, "cannot run xprice_build with depotcosts\n");
         xprice_free (xp);
         return 1;
     }
@@ -594,14 +594,14 @@ static int xprice_build (int ncount, CCdatagroup *dat, CCtsp_xnorm_pricer *xp,
 
     xp->pi = CC_SAFE_MALLOC (ncount, double);
     if (!xp->pi) {
-        fprintf (stderr, "out of memory in xprice_build\n");
+        CC_FPRINTF(stderr, "out of memory in xprice_build\n");
         xprice_free (xp);
         return 1;
     }
 
     xp->order = CC_SAFE_MALLOC (ncount, int);
     if (!xp->order) {
-        fprintf (stderr, "out of memory in xprice_build\n");
+        CC_FPRINTF(stderr, "out of memory in xprice_build\n");
         xprice_free (xp);
         return 1;
     }
@@ -611,14 +611,14 @@ static int xprice_build (int ncount, CCdatagroup *dat, CCtsp_xnorm_pricer *xp,
 
     xp->xminuspi_space = CC_SAFE_MALLOC (ncount + 1, CCtsp_xnorm_pricer_val);
     if (!xp->xminuspi_space) {
-        fprintf (stderr, "out of memory in xprice_build\n");
+        CC_FPRINTF(stderr, "out of memory in xprice_build\n");
         xprice_free (xp);
         return 1;
     }
 
     xp->invxminuspi = CC_SAFE_MALLOC (ncount, int);
     if (!xp->invxminuspi) {
-        fprintf (stderr, "out of memory in xprice_build\n");
+        CC_FPRINTF(stderr, "out of memory in xprice_build\n");
         xprice_free (xp);
         return 1;
     }
@@ -637,7 +637,7 @@ static int xprice_reset (CCtsp_xnorm_pricer *xp, double *pi, int currentnode,
     int norm;
 
     if (!silent) {
-        printf ("xprice_reset (%d)\n", currentnode); fflush (stdout);
+        CC_PRINTF("xprice_reset (%d)\n", currentnode); CC_FFLUSH(stdout);
     }
 
     for (i = 0; i < xp->ncount; i++)
@@ -646,7 +646,7 @@ static int xprice_reset (CCtsp_xnorm_pricer *xp, double *pi, int currentnode,
     xpi = CC_SAFE_MALLOC (count, double);
     xpiperm = CC_SAFE_MALLOC (count, int);
     if (!xpi || !xpiperm) {
-        fprintf (stderr, "out of memory in xprice_build\n");
+        CC_FPRINTF(stderr, "out of memory in xprice_build\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -770,7 +770,7 @@ int CCtsp_edgelist_to_genadj (int ncount, int ecount, int *elist, int *elen,
 
     *adj = CC_SAFE_MALLOC (ncount, CCtsp_genadj);
     if (!(*adj)) {
-        fprintf (stderr, "out of memory in CCtsp_edgelist_to_genadj\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_edgelist_to_genadj\n");
         return 1;
     }
     a = *adj;
@@ -786,7 +786,7 @@ int CCtsp_edgelist_to_genadj (int ncount, int ecount, int *elist, int *elen,
 
     *adjobjspace = CC_SAFE_MALLOC (ecount, CCtsp_genadjobj);
     if (!(*adjobjspace)) {
-        fprintf (stderr, "out of memory in CCtsp_edgelist_to_genadj\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_edgelist_to_genadj\n");
         CC_IFFREE (*adj, CCtsp_genadj);
         return 1;
     }

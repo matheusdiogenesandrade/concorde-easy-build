@@ -300,7 +300,7 @@ static void
 
 static void lp_message (void)
 {
-    fprintf (stderr, "need to link an lp solver to use this function\n");
+    CC_FPRINTF(stderr, "need to link an lp solver to use this function\n");
 }
 
 int CClp_init (CClp **lp)

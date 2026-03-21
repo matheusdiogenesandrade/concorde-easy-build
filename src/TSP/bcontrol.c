@@ -304,7 +304,7 @@ int CCtsp_bfs_brancher (char *probloc, int id, double lowerbound,
 
     rootbbnode = tsp_bbnode_alloc (&info.bbnode_world);
     if (!rootbbnode) {
-        fprintf (stderr, "Failed to allocate root node\n");
+        CC_FPRINTF(stderr, "Failed to allocate root node\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -318,7 +318,7 @@ int CCtsp_bfs_brancher (char *probloc, int id, double lowerbound,
 
     problabel = CCtsp_problabel (probloc);
     if (problabel == (char *) NULL) {
-        fprintf (stderr, "CCtsp_problabel failed\n");
+        CC_FPRINTF(stderr, "CCtsp_problabel failed\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -355,18 +355,18 @@ int CCtsp_bfs_brancher (char *probloc, int id, double lowerbound,
     if ((unsigned int) hostport == 0) {
         rval = bfs_process (&info, rstate, timebound, hit_timebound);
         if (rval) {
-            fprintf (stderr, "bfs_process failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "bfs_process failed\n"); goto CLEANUP;
         }
         rval = 0;
     } else {
 #ifdef CC_NETREADY
         rval = net_process (&info);
         if (rval) {
-            fprintf (stderr, "net_process failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "net_process failed\n"); goto CLEANUP;
         }
         rval = 0;
 #else
-        fprintf (stderr, "Network code is disabled\n");
+        CC_FPRINTF(stderr, "Network code is disabled\n");
         rval = 1; goto CLEANUP;
 #endif
     }
@@ -405,11 +405,11 @@ int CCtsp_bfs_restart (char *probloc, char *restart_name, CCtsp_cutselect *sel,
                          &restart_upbound, &restart_ncount, bbcount,
                          branchzeit, &info.bbnode_world);
     if (rval) {
-        fprintf (stderr, "read_restart failed\n");
+        CC_FPRINTF(stderr, "read_restart failed\n");
         goto CLEANUP;
     }
     if (ncount != restart_ncount) {
-        fprintf (stderr, "wrong ncount in restart file\n");
+        CC_FPRINTF(stderr, "wrong ncount in restart file\n");
         rval = 1; goto CLEANUP;
     }
     if (restart_upbound < *upbound) *upbound = restart_upbound;
@@ -447,18 +447,18 @@ int CCtsp_bfs_restart (char *probloc, char *restart_name, CCtsp_cutselect *sel,
     if ((unsigned int) hostport == 0) {
         rval = bfs_process (&info, rstate, timebound, hit_timebound);
         if (rval) {
-            fprintf (stderr, "bfs_process failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "bfs_process failed\n"); goto CLEANUP;
         }
         rval = 0;
     } else {
 #ifdef CC_NETREADY
         rval = net_process (&info);
         if (rval) {
-            fprintf (stderr, "net_process failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "net_process failed\n"); goto CLEANUP;
         }
         rval = 0;
 #else /* CC_NETREADY */
-        fprintf (stderr, "Network branching not enabled\n");
+        CC_FPRINTF(stderr, "Network branching not enabled\n");
         rval = 1;
         goto CLEANUP;
 #endif /* CC_NETREADY */
@@ -488,7 +488,7 @@ static int bfs_process (tsp_bbinfo *info, CCrandstate *rstate, double *tbound,
     rval = write_restart (info->problabel, info->bbroot, *info->upbound,
                           info->ncount, *info->bbcount, *info->branchzeit);
     if (rval) {
-        fprintf (stderr, "write_restart failed\n");
+        CC_FPRINTF(stderr, "write_restart failed\n");
         return rval;
     }
 
@@ -498,7 +498,7 @@ static int bfs_process (tsp_bbinfo *info, CCrandstate *rstate, double *tbound,
     while (info->finished == 0) {
         if (tbound) {
             if (CCutil_zeit () - szeit > *tbound) {
-                fprintf (stderr, "Hit time limit in bfs branching\n");
+                CC_FPRINTF(stderr, "Hit time limit in bfs branching\n");
                 if (hit_tbound) *hit_tbound = 1;
                  return 0;
             }
@@ -506,13 +506,13 @@ static int bfs_process (tsp_bbinfo *info, CCrandstate *rstate, double *tbound,
 
         rval = get_task (info, &bbtask, 1);
         if (rval) {
-            fprintf (stderr, "get_task failed\n");
+            CC_FPRINTF(stderr, "get_task failed\n");
             return rval;
         }
 
         rval = do_task (info, &bbtask, rstate);
         if (rval) {
-            fprintf (stderr, "do_task failed\n");
+            CC_FPRINTF(stderr, "do_task failed\n");
             return rval;
         }
         
@@ -521,7 +521,7 @@ static int bfs_process (tsp_bbinfo *info, CCrandstate *rstate, double *tbound,
                     *info->upbound, info->ncount, *info->bbcount,
                     *info->branchzeit);
             if (rval) {
-                fprintf (stderr, "write_restart failed\n");
+                CC_FPRINTF(stderr, "write_restart failed\n");
                 return rval;
             }
             info->changed = 0;
@@ -558,7 +558,7 @@ static void bblist_info (tsp_bbnode *bblist, int *cutavail, int *tcutavail,
                 }
             }
         } else {
-            fprintf (stderr, "Hmm, bbnode status %d on active list\n",
+            CC_FPRINTF(stderr, "Hmm, bbnode status %d on active list\n",
                      b->status);
         }
     }
@@ -576,8 +576,8 @@ static int net_process (tsp_bbinfo *info)
     int rval = 0;
     CC_SPORT *p = (CC_SPORT *) NULL;
 
-    printf ("\nBEGINNING NET PROCESSING\n\n");
-    fflush (stdout);
+    CC_PRINTF("\nBEGINNING NET PROCESSING\n\n");
+    CC_FFLUSH(stdout);
 
     collect_active_nodes (info->bbroot, &info->bblist, &info->max_id);
     /* convert from circular to linear list */
@@ -587,13 +587,13 @@ static int net_process (tsp_bbinfo *info)
     rval = write_restart (info->problabel, info->bbroot, *info->upbound,
                           info->ncount, *info->bbcount, *info->branchzeit);
     if (rval) {
-        fprintf (stderr, "write_restart failed\n");
+        CC_FPRINTF(stderr, "write_restart failed\n");
         goto CLEANUP;
     }
 
     p = CCutil_snet_listen (info->hostport);
     if (p == (CC_SPORT *) NULL) {
-        fprintf (stderr, "CCutil_snet_listen failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_listen failed\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -603,7 +603,7 @@ static int net_process (tsp_bbinfo *info)
     while (info->finished == 0) {
         rval = process_connection (p, info);
         if (rval) {
-            fprintf (stderr, "process_connection failed\n");
+            CC_FPRINTF(stderr, "process_connection failed\n");
         }
 
         if (info->changed) {
@@ -611,7 +611,7 @@ static int net_process (tsp_bbinfo *info)
                     *info->upbound, info->ncount, *info->bbcount,
                     *info->branchzeit);
             if (rval) {
-                fprintf (stderr, "write_restart failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "write_restart failed\n"); goto CLEANUP;
             }
             info->changed = 0;
         }
@@ -633,7 +633,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
 
     f = CCutil_snet_receive (p);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_receive failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_receive failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -644,14 +644,14 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_TASK:
         rval = boss_send_task (f, info);
         if (rval) {
-            fprintf (stderr, "boss_send_task failed\n");
+            CC_FPRINTF(stderr, "boss_send_task failed\n");
             goto CLEANUP;
         }
         break;
       case CCtsp_BBREQ_TOUR:
         rval = boss_receive_tour (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_tour failed\n");
+            CC_FPRINTF(stderr, "boss_receive_tour failed\n");
             goto CLEANUP;
         }
         boss_status (1, "TOUR:", info);
@@ -659,7 +659,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_CUTDONE:
         rval = boss_receive_cutnode (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_cutnode failed\n");
+            CC_FPRINTF(stderr, "boss_receive_cutnode failed\n");
             goto CLEANUP;
         }
         info->cutcount--;
@@ -668,7 +668,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_TENTATIVE_CUTDONE:
         rval = boss_receive_tentative_cutnode (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_tentative_cutnode failed\n");
+            CC_FPRINTF(stderr, "boss_receive_tentative_cutnode failed\n");
             goto CLEANUP;
         }
         info->tcutcount--;
@@ -677,7 +677,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_NOBRANCH:
         rval = boss_receive_nobranch (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_nobranch failed\n");
+            CC_FPRINTF(stderr, "boss_receive_nobranch failed\n");
             goto CLEANUP;
         }
         info->branchcount--;
@@ -686,7 +686,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_BRANCHDONE:
         rval = boss_receive_branch (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_branch failed\n");
+            CC_FPRINTF(stderr, "boss_receive_branch failed\n");
             goto CLEANUP;
         }
         info->branchcount--;
@@ -695,7 +695,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_TENTATIVE_BRANCHDONE:
         rval = boss_receive_tentative_branch (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_tentative_branch failed\n");
+            CC_FPRINTF(stderr, "boss_receive_tentative_branch failed\n");
             goto CLEANUP;
         }
         info->branchcount--;
@@ -704,7 +704,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_HELLO:
         rval = boss_receive_hello (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_hello failed\n");
+            CC_FPRINTF(stderr, "boss_receive_hello failed\n");
             goto CLEANUP;
         }
         info->gruntcount++;
@@ -713,7 +713,7 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
       case CCtsp_BBREQ_DEADNODE:
         rval = boss_receive_deadnode (f, info);
         if (rval) {
-            fprintf (stderr, "boss_receive_deadnode failed\n");
+            CC_FPRINTF(stderr, "boss_receive_deadnode failed\n");
             goto CLEANUP;
         }
         boss_status (1, "DEAD:", info);
@@ -723,12 +723,12 @@ static int process_connection (CC_SPORT *p, tsp_bbinfo *info)
         boss_status (1, "EXIT:", info);
         break;
       default:
-        fprintf (stderr, "Unknown host request %c\n", request);
+        CC_FPRINTF(stderr, "Unknown host request %c\n", request);
         rval = 1; goto CLEANUP;
     }
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
 
@@ -752,15 +752,15 @@ static void boss_status (int dir, const char *desc, tsp_bbinfo *info)
     bblist_info (info->bblist, &cutavail, &tcutavail, &branchavail,
                  &active, &lb);
     
-    printf ("%-1s %-8s  cut %2d/%3d  tcut %2d/%3d  bra %2d/%3d  wait %d  cpu %.2f\n",
+    CC_PRINTF("%-1s %-8s  cut %2d/%3d  tcut %2d/%3d  bra %2d/%3d  wait %d  cpu %.2f\n",
             dir == 1 ? "R" : "S", desc, info->cutcount, cutavail,
             info->tcutcount, tcutavail, info->branchcount, branchavail,
             info->gruntcount - info->cutcount - info->tcutcount -
             info->branchcount, *info->branchzeit);
     if (dir == 1) {
-        printf ("  Lower Bound: %f   Remaining Nodes: %d\n", lb, active);
+        CC_PRINTF("  Lower Bound: %f   Remaining Nodes: %d\n", lb, active);
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 }
 
 int CCtsp_grunt (char *hostname, unsigned short hostport, char *poolfname,
@@ -806,7 +806,7 @@ int CCtsp_grunt (char *hostname, unsigned short hostport, char *poolfname,
 
     rval = grunt_send_hello (&info);
     if (rval) {
-        fprintf (stderr, "send_hello failed\n");
+        CC_FPRINTF(stderr, "send_hello failed\n");
         goto CLEANUP;
     }
 
@@ -814,13 +814,13 @@ int CCtsp_grunt (char *hostname, unsigned short hostport, char *poolfname,
     
     info.besttour = CC_SAFE_MALLOC (info.ncount, int);
     if (info.besttour == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_grunt\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_grunt\n");
         goto CLEANUP;
     }
 
     rval = CCtsp_init_cutpool (&info.ncount, poolfname, &info.pool);
     if (rval) {
-        fprintf (stderr, "CCtsp_init_cutpool failed\n");
+        CC_FPRINTF(stderr, "CCtsp_init_cutpool failed\n");
         goto CLEANUP;
     }
 
@@ -836,13 +836,13 @@ int CCtsp_grunt (char *hostname, unsigned short hostport, char *poolfname,
     while (info.finished == 0) {
         rval = grunt_receive_task (&info, &bbtask);
         if (rval) {
-            fprintf (stderr, "grunt_receive_task failed\n");
+            CC_FPRINTF(stderr, "grunt_receive_task failed\n");
             goto CLEANUP;
         }
 
         rval = do_task (&info, &bbtask, rstate);
         if (rval) {
-            fprintf (stderr, "do_task failed\n");
+            CC_FPRINTF(stderr, "do_task failed\n");
             goto CLEANUP;
         }
     }
@@ -870,7 +870,7 @@ static int boss_send_task (CC_SFILE *f, tsp_bbinfo *info)
     
     rval = get_task (info, &bbtask, 0);
     if (rval) {
-        fprintf (stderr, "get_task failed\n");
+        CC_FPRINTF(stderr, "get_task failed\n");
         return rval;
     }
     switch (bbtask.type) {
@@ -943,7 +943,7 @@ static int boss_send_task (CC_SFILE *f, tsp_bbinfo *info)
         boss_status (2, "TBRANCH:", info);
         break;
       default:
-        fprintf (stderr, "Unknown bbtask type %d\n", bbtask.type);
+        CC_FPRINTF(stderr, "Unknown bbtask type %d\n", bbtask.type);
         return 1;
     }
     return 0;
@@ -958,7 +958,7 @@ static int grunt_receive_task (tsp_bbinfo *info, tsp_bbtask *task)
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1018,13 +1018,13 @@ static int grunt_receive_task (tsp_bbinfo *info, tsp_bbtask *task)
         if (rval) goto CLEANUP;
         break;
       default:
-        fprintf (stderr, "Unknown bbtask code %c\n", tasktype);
+        CC_FPRINTF(stderr, "Unknown bbtask code %c\n", tasktype);
         rval = 1; goto CLEANUP;
     }
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1047,7 +1047,7 @@ static int boss_receive_tour (CC_SFILE *f, tsp_bbinfo *info)
 
     tour = CC_SAFE_MALLOC (ncount, int);
     if (tour == (int *) NULL) {
-        fprintf (stderr, "Out of memory in receive_tour\n");
+        CC_FPRINTF(stderr, "Out of memory in receive_tour\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -1066,7 +1066,7 @@ static int boss_receive_tour (CC_SFILE *f, tsp_bbinfo *info)
         }
         rval = report_tour (info);
         if (rval) {
-            fprintf (stderr, "report_tour failed\n");
+            CC_FPRINTF(stderr, "report_tour failed\n");
             goto CLEANUP;
         }
     }
@@ -1085,7 +1085,7 @@ static int grunt_send_tour (tsp_bbinfo *info)
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1102,7 +1102,7 @@ static int grunt_send_tour (tsp_bbinfo *info)
     
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1137,7 +1137,7 @@ static int boss_receive_cutnode (CC_SFILE *f, tsp_bbinfo *info)
 
     rval = report_cut (info, id, new_id, prune, val, cputime, 0);
     if (rval) {
-        fprintf (stderr, "report_cut failed\n");
+        CC_FPRINTF(stderr, "report_cut failed\n");
         return rval;
     }
     return 0;
@@ -1165,7 +1165,7 @@ static int boss_receive_tentative_cutnode (CC_SFILE *f, tsp_bbinfo *info)
 
     rval = report_tentative_cut (info, id, new_id, prune, val, cputime);
     if (rval) {
-        fprintf (stderr, "report_tentative_cut failed\n");
+        CC_FPRINTF(stderr, "report_tentative_cut failed\n");
         return rval;
     }
     return 0;
@@ -1180,7 +1180,7 @@ static int grunt_send_cutnode (tsp_bbinfo *info, int id, int new_id, int prune,
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1200,7 +1200,7 @@ static int grunt_send_cutnode (tsp_bbinfo *info, int id, int new_id, int prune,
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1221,7 +1221,7 @@ static int grunt_send_tentative_cutnode (tsp_bbinfo *info, int id, int new_id,
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1241,7 +1241,7 @@ static int grunt_send_tentative_cutnode (tsp_bbinfo *info, int id, int new_id,
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1267,7 +1267,7 @@ static int boss_receive_nobranch (CC_SFILE *f, tsp_bbinfo *info)
 
     rval = report_nobranch (info, id, cputime);
     if (rval) {
-        fprintf (stderr, "report_nobranch failed\n");
+        CC_FPRINTF(stderr, "report_nobranch failed\n");
         return rval;
     }
     return 0;
@@ -1280,7 +1280,7 @@ static int grunt_send_nobranch (tsp_bbinfo *info, int id, double cputime)
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1294,7 +1294,7 @@ static int grunt_send_nobranch (tsp_bbinfo *info, int id, double cputime)
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1339,7 +1339,7 @@ static int boss_receive_branch (CC_SFILE *f, tsp_bbinfo *info)
     rval = report_branch (info, id, child0, child1, val0, val1, prune0,
                           prune1, cputime);
     if (rval) {
-        fprintf (stderr, "report_branch failed\n");
+        CC_FPRINTF(stderr, "report_branch failed\n");
         return rval;
     }
     return 0;
@@ -1357,12 +1357,12 @@ static int boss_receive_tentative_branch (CC_SFILE *f, tsp_bbinfo *info)
     rval = CCutil_sread_int (f, &num);
     if (rval) goto CLEANUP;
     if (num <= 0) {
-        fprintf (stderr, "received %d tentative children\n", num);
+        CC_FPRINTF(stderr, "received %d tentative children\n", num);
         rval = 1; goto CLEANUP;
     }
     children = CC_SAFE_MALLOC (num, tsp_treport);
     if (children == (tsp_treport *) NULL) {
-        fprintf (stderr, "out of memory in boss_receive_tentative_branch\n");
+        CC_FPRINTF(stderr, "out of memory in boss_receive_tentative_branch\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < num; i++) {
@@ -1384,7 +1384,7 @@ static int boss_receive_tentative_branch (CC_SFILE *f, tsp_bbinfo *info)
 
     rval = report_tentative_branch (info, id, num, children, cputime);
     if (rval) {
-        fprintf (stderr, "report_tentative_branch failed\n");
+        CC_FPRINTF(stderr, "report_tentative_branch failed\n");
         return rval;
     }
 
@@ -1402,7 +1402,7 @@ static int grunt_send_branch (tsp_bbinfo *info, int id, int child0, int child1,
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1428,7 +1428,7 @@ static int grunt_send_branch (tsp_bbinfo *info, int id, int child0, int child1,
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1450,7 +1450,7 @@ static int grunt_send_tentative_branch (tsp_bbinfo *info, int id, int num,
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1482,7 +1482,7 @@ static int grunt_send_tentative_branch (tsp_bbinfo *info, int id, int num,
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1504,7 +1504,7 @@ static int grunt_send_hello (tsp_bbinfo *info)
 
     f = CCutil_snet_open (info->hostname, info->hostport);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "CCutil_snet_open failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1516,7 +1516,7 @@ static int grunt_send_hello (tsp_bbinfo *info)
     CC_IFFREE (info->problabel, char);
     info->problabel = CCtsp_problabel (info->probloc);
     if (info->problabel == (char *) NULL) {
-        fprintf (stderr, "CCtsp_problabel failed\n");
+        CC_FPRINTF(stderr, "CCtsp_problabel failed\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -1567,7 +1567,7 @@ static int grunt_send_hello (tsp_bbinfo *info)
 
     rval = CCutil_sclose (f);
     if (rval) {
-        fprintf (stderr, "CCutil_sclose failed\n");
+        CC_FPRINTF(stderr, "CCutil_sclose failed\n");
         goto CLEANUP;
     }
     f = (CC_SFILE *) NULL;
@@ -1653,10 +1653,10 @@ static int boss_receive_deadnode (CC_SFILE *f, tsp_bbinfo *info)
     
     bbnode = find_bbnode (info->bblist, id);
     if (bbnode == (tsp_bbnode *) NULL) {
-        printf ("BBnode %d no longer active\n", id);
+        CC_PRINTF("BBnode %d no longer active\n", id);
         return 0;
     } else if (bbnode->workstatus != BB_WORKING) {
-        printf ("BBnode %d is not working\n", id);
+        CC_PRINTF("BBnode %d is not working\n", id);
         return 0;
     }
 
@@ -1683,7 +1683,7 @@ static int get_task (tsp_bbinfo *info, tsp_bbtask *task, int verbose)
     
     if (bblist == (tsp_bbnode *) NULL) {
         task->type = TASK_EXIT;
-        printf ("\n"); fflush (stdout);
+        CC_PRINTF("\n"); CC_FFLUSH(stdout);
         return 0;
     } else {
         b = select_bbnode (bblist, verbose, info->silent);
@@ -1712,7 +1712,7 @@ static int get_task (tsp_bbinfo *info, tsp_bbtask *task, int verbose)
                     task->child1 = ++(info->max_id);
                 }
             } else {
-                fprintf (stderr, "Bogus bbnode status %d\n", b->status);
+                CC_FPRINTF(stderr, "Bogus bbnode status %d\n", b->status);
                 return 1;
             }
             return 0;
@@ -1733,13 +1733,13 @@ static int do_task (tsp_bbinfo *info, tsp_bbtask *task, CCrandstate *rstate)
     
     switch (task->type) {
       case TASK_EXIT:
-        printf ("Task %d: Exit\n", info->taskcount++);
-        fflush (stdout);
+        CC_PRINTF("Task %d: Exit\n", info->taskcount++);
+        CC_FFLUSH(stdout);
         info->finished = 1;
         break;
       case TASK_WAIT:
-        printf ("Task %d: Wait\n", info->taskcount++);
-        fflush (stdout);
+        CC_PRINTF("Task %d: Wait\n", info->taskcount++);
+        CC_FFLUSH(stdout);
 #ifdef HAVE_SLEEP
         sleep (TASK_WAIT_SECONDS);
 #else
@@ -1751,33 +1751,33 @@ static int do_task (tsp_bbinfo *info, tsp_bbtask *task, CCrandstate *rstate)
 #endif /* HAVE_SLEEP */
         break;
       case TASK_TENTATIVE_CUT:
-        printf ("Task %d: Tentative Cutting on node %d\n",
+        CC_PRINTF("Task %d: Tentative Cutting on node %d\n",
                  info->taskcount++, task->id);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         szeit = CCutil_zeit();
         rval = CCtsp_bb_cutting (info->probloc, task->id, task->new_id, 
                 info->ncount, info->dat, info->ptour, info->upbound,
                 info->pool, info->tsel, &val, &prune, &foundtour,
                 info->besttour, 0, info->silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_bb_cutting failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_bb_cutting failed\n"); goto CLEANUP;
         }
         cputime = CCutil_zeit() - szeit;
         if (foundtour) {
             rval = report_tour (info);
             if (rval) {
-                fprintf (stderr, "report_tour failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_tour failed\n"); goto CLEANUP;
             }
         }
         rval = report_tentative_cut (info, task->id, task->new_id, prune, val,
                                      cputime);
         if (rval) {
-            fprintf (stderr, "report_tentative_cut failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "report_tentative_cut failed\n"); goto CLEANUP;
         }
         break;
       case TASK_CUT:
-        printf ("Task %d: Cutting on node %d\n", info->taskcount++, task->id);
-        fflush (stdout);
+        CC_PRINTF("Task %d: Cutting on node %d\n", info->taskcount++, task->id);
+        CC_FFLUSH(stdout);
         szeit = CCutil_zeit();
         rval = CCtsp_bb_cutting (info->probloc, task->id, task->new_id, 
                 info->ncount, info->dat, info->ptour, info->upbound,
@@ -1785,53 +1785,53 @@ static int do_task (tsp_bbinfo *info, tsp_bbtask *task, CCrandstate *rstate)
                 info->besttour, 1 /* 1 for normal, -1 for fast FAST HACK */,
                 info->silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_bb_cutting failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_bb_cutting failed\n"); goto CLEANUP;
         }
         cputime = CCutil_zeit() - szeit;
         if (foundtour) {
             rval = report_tour (info);
             if (rval) {
-                fprintf (stderr, "report_tour failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_tour failed\n"); goto CLEANUP;
             }
         }
         rval = report_cut (info, task->id, task->new_id, prune, val, cputime,
                            1);
         if (rval) {
-            fprintf (stderr, "report_cut failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "report_cut failed\n"); goto CLEANUP;
         }
         break;
       case TASK_BRANCH:
-        printf ("Task %d: Branching on node %d\n", info->taskcount++,
+        CC_PRINTF("Task %d: Branching on node %d\n", info->taskcount++,
                 task->id);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         szeit = CCutil_zeit();
         rval = CCtsp_bb_find_branch (info->probloc, task->id, info->ncount,
                 info->dat, info->ptour, info->upbound, info->pool, 1, &ngot,
                 &b, info->usecliques, info->longedge_branching, &prune,
                 &foundtour, info->besttour, info->silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_bb_find_branch failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_bb_find_branch failed\n"); goto CLEANUP;
         }
         if (prune) {
             cputime = CCutil_zeit() - szeit;
             rval = report_nobranch (info, task->id, cputime);
             if (rval) {
-                fprintf (stderr, "report_nobranch failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_nobranch failed\n"); goto CLEANUP;
             }
         } else if (foundtour) {
             cputime = CCutil_zeit() - szeit;
             rval = report_tour (info);
             if (rval) {
-                fprintf (stderr, "report_tour failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_tour failed\n"); goto CLEANUP;
             }
             rval = report_nobranch (info, task->id, cputime);
             if (rval) {
-                fprintf (stderr, "report_nobranch failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_nobranch failed\n"); goto CLEANUP;
             }
         } else {
             if (!info->silent) {
-                printf ("Found Branch - split problem into children\n");
-                fflush (stdout);
+                CC_PRINTF("Found Branch - split problem into children\n");
+                CC_FFLUSH(stdout);
             }
             id0 = task->child0;
             id1 = task->child1;
@@ -1842,20 +1842,20 @@ static int do_task (tsp_bbinfo *info, tsp_bbtask *task, CCrandstate *rstate)
             CCtsp_free_branchobj (&b[0]);
             CC_IFFREE (b, CCtsp_branchobj);
             if (rval) {
-                fprintf (stderr, "CCtsp_bb_splitprob failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCtsp_bb_splitprob failed\n"); goto CLEANUP;
             }
             cputime = CCutil_zeit() - szeit;
             rval = report_branch (info, task->id, id0, id1, val0, val1,
                                   prune0, prune1, cputime);
             if (rval) {
-                fprintf (stderr, "report_branch failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_branch failed\n"); goto CLEANUP;
             }
         }
         break;
       case TASK_TENTATIVE_BRANCH:
-        printf ("Task %d: Tentative branching on node %d\n", info->taskcount++,
+        CC_PRINTF("Task %d: Tentative branching on node %d\n", info->taskcount++,
                 task->id);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         szeit = CCutil_zeit();
         rval = CCtsp_bb_find_branch (info->probloc, task->id, info->ncount,
                 info->dat, info->ptour, info->upbound, info->pool, 
@@ -1863,49 +1863,49 @@ static int do_task (tsp_bbinfo *info, tsp_bbtask *task, CCrandstate *rstate)
                 info->usecliques, info->longedge_branching, &prune, &foundtour,
                 info->besttour, info->silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_bb_find_branch failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_bb_find_branch failed\n"); goto CLEANUP;
         }
         if (prune) {
             cputime = CCutil_zeit() - szeit;
             rval = report_nobranch (info, task->id, cputime);
             if (rval) {
-                fprintf (stderr, "report_nobranch failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_nobranch failed\n"); goto CLEANUP;
             }
         } else if (foundtour) {
             cputime = CCutil_zeit() - szeit;
             rval = report_tour (info);
             if (rval) {
-                fprintf (stderr, "report_tour failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_tour failed\n"); goto CLEANUP;
             }
             rval = report_nobranch (info, task->id, cputime);
             if (rval) {
-                fprintf (stderr, "report_nobranch failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "report_nobranch failed\n"); goto CLEANUP;
             }
         } else {
             if (!info->silent) {
-                printf ("Found Tentative Branch for %d - create tchildren\n",
+                CC_PRINTF("Found Tentative Branch for %d - create tchildren\n",
                              task->id);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
 
                 for (i = 0; i < ngot; i++) {
-                    printf ("    Tbranchobj %d: ", i); 
+                    CC_PRINTF("    Tbranchobj %d: ", i); 
                     if (b[i].ends[0] != -1) {
-                        printf ("Edge (%d,%d)", b[i].ends[0], b[i].ends[1]);
+                        CC_PRINTF("Edge (%d,%d)", b[i].ends[0], b[i].ends[1]);
                     } else {
-                        printf ("Clique ");
+                        CC_PRINTF("Clique ");
                         for (j = 0; j < b[i].clique->segcount; j++) {
-                            printf ("%d->%d ", b[i].clique->nodes[j].lo,
+                            CC_PRINTF("%d->%d ", b[i].clique->nodes[j].lo,
                                                b[i].clique->nodes[j].hi);
                         }
                     }
-                    printf ("\n");
-                    fflush (stdout);
+                    CC_PRINTF("\n");
+                    CC_FFLUSH(stdout);
                 }
             }
 
             trp = CC_SAFE_MALLOC (ngot, tsp_treport);
             if (trp == (tsp_treport *) NULL) {
-                fprintf (stderr, "out of memory in do_task\n");
+                CC_FPRINTF(stderr, "out of memory in do_task\n");
                 rval = 1; goto CLEANUP;
             }
             for (i = 0; i < ngot; i++) {
@@ -1917,7 +1917,7 @@ static int do_task (tsp_bbinfo *info, tsp_bbtask *task, CCrandstate *rstate)
                     &b[i], trp[i].id0, trp[i].id1, &trp[i].val0, &trp[i].val1,
                     &trp[i].prune0, &trp[i].prune1, info->silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_bb_splitprob failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_bb_splitprob failed\n");
                     
                     for (j = 0; j < i; j++) {
                         CCtsp_free_branchobj (&b[j]);
@@ -1930,13 +1930,13 @@ static int do_task (tsp_bbinfo *info, tsp_bbtask *task, CCrandstate *rstate)
             rval = report_tentative_branch (info, task->id, ngot, trp,
                                             cputime);
             if (rval) {
-                fprintf (stderr, "report_tentative_branch failed\n");
+                CC_FPRINTF(stderr, "report_tentative_branch failed\n");
                 goto CLEANUP;
             }
         }
         break;
       default:
-        fprintf (stderr, "BOGUS TASK: %d\n", task->type);
+        CC_FPRINTF(stderr, "BOGUS TASK: %d\n", task->type);
         rval = 1; goto CLEANUP;
     }
     
@@ -1955,14 +1955,14 @@ static int report_tour (tsp_bbinfo *info)
 {
     int rval;
 
-    printf ("TOUR FOUND - upperbound is %.2f\n", *info->upbound);
-    fflush (stdout);
+    CC_PRINTF("TOUR FOUND - upperbound is %.2f\n", *info->upbound);
+    CC_FFLUSH(stdout);
 
 #ifdef CC_NETREADY
     if (info->hostname != (char *) NULL) {
         rval = grunt_send_tour (info);
         if (rval) {
-            fprintf (stderr, "grunt_send_tour failed\n");
+            CC_FPRINTF(stderr, "grunt_send_tour failed\n");
             return rval;
         }
         return 0;
@@ -1972,7 +1972,7 @@ static int report_tour (tsp_bbinfo *info)
     rval = CCtsp_dumptour (info->ncount, info->dat, info->ptour,
                info->problabel, info->besttour, (char *) NULL, 0, info->silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_dumptour failed\n");
+        CC_FPRINTF(stderr, "CCtsp_dumptour failed\n");
         return rval;
     }
     info->changed = 1;
@@ -1988,12 +1988,12 @@ static int report_cut (tsp_bbinfo *info, int id, int new_id, int prune,
 
     if (standalone && info->hostname == (char *) NULL) {
         char buf[1024];
-        printf ("Writing Pool: %d cuts\n", info->pool->cutcount);
-        fflush (stdout);
+        CC_PRINTF("Writing Pool: %d cuts\n", info->pool->cutcount);
+        CC_FFLUSH(stdout);
         sprintf (buf, "%s.pul", info->problabel);
         rval = CCtsp_write_cutpool (info->ncount, buf, info->pool);
         if (rval) {
-            fprintf (stderr, "CCtsp_write_cutpool failed\n"); return rval;
+            CC_FPRINTF(stderr, "CCtsp_write_cutpool failed\n"); return rval;
         }
     }
 
@@ -2001,7 +2001,7 @@ static int report_cut (tsp_bbinfo *info, int id, int new_id, int prune,
     if (info->hostname != (char *) NULL) {
         rval = grunt_send_cutnode (info, id, new_id, prune, val, cputime);
         if (rval) {
-            fprintf (stderr, "grunt_send_cutnode failed\n");
+            CC_FPRINTF(stderr, "grunt_send_cutnode failed\n");
             return rval;
         }
         return 0;
@@ -2010,12 +2010,12 @@ static int report_cut (tsp_bbinfo *info, int id, int new_id, int prune,
     
     bbnode = find_bbnode (info->bblist, id);
     if (bbnode == (tsp_bbnode *) NULL) {
-        printf ("BBnode %d no longer active\n", id);
+        CC_PRINTF("BBnode %d no longer active\n", id);
         return 0;
     }
 
     if (bbnode->status != BB_NEEDS_CUTTING) {
-        printf ("BBnode %d does not need cutting\n", id);
+        CC_PRINTF("BBnode %d does not need cutting\n", id);
         return 0;
     }
 
@@ -2025,9 +2025,9 @@ static int report_cut (tsp_bbinfo *info, int id, int new_id, int prune,
     *info->branchzeit += cputime;
 
     if (prune) {
-        printf ("BBnode %d (now %d) can be pruned: upperbound %.2f (%.2f seconds)\n",
+        CC_PRINTF("BBnode %d (now %d) can be pruned: upperbound %.2f (%.2f seconds)\n",
                 id, new_id, *info->upbound, cputime);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         delete_bbnode (&info->bblist, bbnode);
         info->changed = 1;
         rval = CCtsp_prob_file_delete (info->probloc, id);
@@ -2037,9 +2037,9 @@ static int report_cut (tsp_bbinfo *info, int id, int new_id, int prune,
             if (rval) return rval;
         }
     } else {
-        printf ("BBnode %d (now %d) done cutting: lowerbound %.2f (%.2f seconds)\n",
+        CC_PRINTF("BBnode %d (now %d) done cutting: lowerbound %.2f (%.2f seconds)\n",
                 id, new_id, val, cputime);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         bbnode->status     = BB_NEEDS_BRANCHING;
         bbnode->workstatus = BB_IDLE;
         info->changed = 1;
@@ -2060,7 +2060,7 @@ static int report_tentative_cut (tsp_bbinfo *info, int id, int new_id,
         rval = grunt_send_tentative_cutnode (info, id, new_id, prune, val, 
                                              cputime);
         if (rval) {
-            fprintf (stderr, "grunt_send_tentative_cutnode failed\n");
+            CC_FPRINTF(stderr, "grunt_send_tentative_cutnode failed\n");
             return rval;
         }
         return 0;
@@ -2069,15 +2069,15 @@ static int report_tentative_cut (tsp_bbinfo *info, int id, int new_id,
     
     bbnode = find_bbnode (info->bblist, id);
     if (bbnode == (tsp_bbnode *) NULL) {
-        printf ("BBnode %d no longer active\n", id);
+        CC_PRINTF("BBnode %d no longer active\n", id);
         return 0;
     }
     if (bbnode->tparent == (tsp_tnode *) NULL) {
-        printf ("BBnode %d is not a tentative bbnode\n", id);
+        CC_PRINTF("BBnode %d is not a tentative bbnode\n", id);
         return 0;
     }
     if (bbnode->status != BB_NEEDS_TENTATIVE_CUTTING) {
-        printf ("BBnode %d does not need tentative cutting\n", id);
+        CC_PRINTF("BBnode %d does not need tentative cutting\n", id);
         return 0;
     }
     bbnode->id = new_id;
@@ -2085,9 +2085,9 @@ static int report_tentative_cut (tsp_bbinfo *info, int id, int new_id,
     bbnode->cputime   += cputime;
     *info->branchzeit += cputime;
 
-    printf ("Tnode %d (now %d) done tentative cutting: lowerbound %.2f (%.2f seconds)\n",
+    CC_PRINTF("Tnode %d (now %d) done tentative cutting: lowerbound %.2f (%.2f seconds)\n",
             id, new_id, val, cputime);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     bbnode->status = BB_DONE;
     if (prune) {
         bbnode->workstatus = BB_PRUNED;
@@ -2118,13 +2118,13 @@ static int update_tentative_bbnode (tsp_bbinfo *info, tsp_bbnode *b)
         double bestval = -CCtsp_LP_MAXDOUBLE;
         double val;
 
-        printf ("Tentative Branching on BBnode %d\n", b->id);
-        fflush (stdout);
+        CC_PRINTF("Tentative Branching on BBnode %d\n", b->id);
+        CC_FFLUSH(stdout);
         for (i = 0; i < b->numtentative; i++) {
             t = &(b->tentative_nodes[i]);
-            printf ("    Tbranch %d:  %9.2f %9.2f\n", i,
+            CC_PRINTF("    Tbranch %d:  %9.2f %9.2f\n", i,
                               t->child0->lowerbound, t->child1->lowerbound);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
             val = TSP_TENATIVE_BRANCH_VAL (t->child0->lowerbound, 
                                            t->child1->lowerbound);
             if (val > bestval) {
@@ -2133,7 +2133,7 @@ static int update_tentative_bbnode (tsp_bbinfo *info, tsp_bbnode *b)
             }
         }
         if (tbest == (tsp_tnode *) NULL) {
-            fprintf (stderr, "error in update_tentative_bbnode\n");
+            CC_FPRINTF(stderr, "error in update_tentative_bbnode\n");
             return 1;
         }
 
@@ -2183,12 +2183,12 @@ static int update_tentative_bbnode (tsp_bbinfo *info, tsp_bbnode *b)
             rval = CCtsp_prob_file_delete (info->probloc, b->id);
             if (rval) return rval;
         }
-        printf ("BBnode %d split into %d (%.2f%s) %d (%.2f%s)\n", b->id,
+        CC_PRINTF("BBnode %d split into %d (%.2f%s) %d (%.2f%s)\n", b->id,
             b->child0->id, b->child0->lowerbound,
             (b->child0->status == BB_DONE) ? "X" : "",
             b->child1->id, b->child1->lowerbound,
             (b->child1->status == BB_DONE) ? "X" : "");
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         *(info->bbcount) += 2;
     }
     return 0;
@@ -2203,7 +2203,7 @@ static int report_nobranch (tsp_bbinfo *info, int id, double cputime)
     if (info->hostname != (char *) NULL) {
         rval = grunt_send_nobranch (info, id, cputime);
         if (rval) {
-            fprintf (stderr, "grunt_send_nobranch failed\n");
+            CC_FPRINTF(stderr, "grunt_send_nobranch failed\n");
             return rval;
         }
         return 0;
@@ -2212,19 +2212,19 @@ static int report_nobranch (tsp_bbinfo *info, int id, double cputime)
 
     bbnode = find_bbnode (info->bblist, id);
     if (bbnode == (tsp_bbnode *) NULL) {
-        printf ("BBnode %d no longer active\n", id);
+        CC_PRINTF("BBnode %d no longer active\n", id);
         return 0;
     } else if (bbnode->status != BB_NEEDS_BRANCHING) {
-        printf ("BBnode %d does not need branching\n", id);
+        CC_PRINTF("BBnode %d does not need branching\n", id);
         return 0;
     }
 
     bbnode->cputime   += cputime;
     *info->branchzeit += cputime;
 
-    printf ("BBnode %d is pruned - no branching (%.2f seconds)\n", id,
+    CC_PRINTF("BBnode %d is pruned - no branching (%.2f seconds)\n", id,
             cputime);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     delete_bbnode (&info->bblist, bbnode);
     info->changed = 1;
     if (info->save_proof == 0 || id != 0) { /* don't delete the root */
@@ -2245,7 +2245,7 @@ static int report_branch (tsp_bbinfo *info, int id, int child0, int child1,
         rval = grunt_send_branch (info, id, child0, child1, val0, val1,
                 prune0, prune1, cputime);
         if (rval) {
-            fprintf (stderr, "grunt_send_branch failed\n");
+            CC_FPRINTF(stderr, "grunt_send_branch failed\n");
             return rval;
         }
         return 0;
@@ -2254,25 +2254,25 @@ static int report_branch (tsp_bbinfo *info, int id, int child0, int child1,
 
     bbnode = find_bbnode (info->bblist, id);
     if (bbnode == (tsp_bbnode *) NULL) {
-        printf ("BBnode %d no longer active\n", id);
+        CC_PRINTF("BBnode %d no longer active\n", id);
         return 0;
     } else if (bbnode->status != BB_NEEDS_BRANCHING) {
-        printf ("BBnode %d does not need branching\n", id);
+        CC_PRINTF("BBnode %d does not need branching\n", id);
         return 0;
     }
 
     bbnode->cputime   += cputime;
     *info->branchzeit += cputime;
     
-    printf ("BBnode %d split into %d (%.2f%s) %d (%.2f%s) (%.2f seconds)\n",
+    CC_PRINTF("BBnode %d split into %d (%.2f%s) %d (%.2f%s) (%.2f seconds)\n",
             id, child0, val0, prune0 ? "X" : "", child1, val1,
             prune1 ? "X" : "", cputime);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     
     rval = add_children (&info->bblist, bbnode, child0, child1, val0, val1,
                          prune0, prune1, &info->bbnode_world);
     if (rval) {
-        fprintf (stderr, "add_children failed\n"); return rval;
+        CC_FPRINTF(stderr, "add_children failed\n"); return rval;
     }
     info->changed = 1;
     *(info->bbcount) += 2;
@@ -2306,7 +2306,7 @@ static int report_tentative_branch (tsp_bbinfo *info, int id, int num,
     if (info->hostname != (char *) NULL) {
         rval = grunt_send_tentative_branch (info, id, num, children, cputime);
         if (rval) {
-            fprintf (stderr, "grunt_send_tentative_branch failed\n");
+            CC_FPRINTF(stderr, "grunt_send_tentative_branch failed\n");
             return rval;
         }
         return 0;
@@ -2315,10 +2315,10 @@ static int report_tentative_branch (tsp_bbinfo *info, int id, int num,
 
     bbnode = find_bbnode (info->bblist, id);
     if (bbnode == (tsp_bbnode *) NULL) {
-        printf ("BBnode %d no longer active\n", id);
+        CC_PRINTF("BBnode %d no longer active\n", id);
         goto CLEANUP;
     } else if (bbnode->status != BB_NEEDS_BRANCHING) {
-        printf ("BBnode %d does not need branching\n", id);
+        CC_PRINTF("BBnode %d does not need branching\n", id);
         goto CLEANUP;
     }
 
@@ -2326,25 +2326,25 @@ static int report_tentative_branch (tsp_bbinfo *info, int id, int num,
     *info->branchzeit += cputime;
     bbnode->workstatus = BB_IDLE;
     
-    printf ("BBnode %d tentative split with %d trials (%.2f seconds)\n",
+    CC_PRINTF("BBnode %d tentative split with %d trials (%.2f seconds)\n",
             id, num, cputime);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
     bbnode->numtentative = num;
     bbnode->tentative_nodes = CC_SAFE_MALLOC (num, tsp_tnode);
     if (bbnode->tentative_nodes == (tsp_tnode *) NULL) {
-        fprintf (stderr, "out of memory in report_tentative_branch\n");
+        CC_FPRINTF(stderr, "out of memory in report_tentative_branch\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < num; i++) {
-        printf ("  %3d %9.2f   %3d %9.2f\n",
+        CC_PRINTF("  %3d %9.2f   %3d %9.2f\n",
                  children[i].id0, children[i].val0,
                  children[i].id1, children[i].val1);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         bbnode->tentative_nodes[i].parent = bbnode;
         child = tsp_bbnode_alloc (&info->bbnode_world);
         if (!child) {
-            fprintf (stderr, "Failed to allocate child 0\n");
+            CC_FPRINTF(stderr, "Failed to allocate child 0\n");
             rval = 1; goto CLEANUP;
         }
     
@@ -2368,7 +2368,7 @@ static int report_tentative_branch (tsp_bbinfo *info, int id, int num,
 
         child = tsp_bbnode_alloc (&info->bbnode_world);
         if (!child) {
-            fprintf (stderr, "Failed to allocate child 0\n");
+            CC_FPRINTF(stderr, "Failed to allocate child 0\n");
             rval = 1; goto CLEANUP;
         }
     
@@ -2393,7 +2393,7 @@ static int report_tentative_branch (tsp_bbinfo *info, int id, int num,
     info->changed = 1;
     rval =  update_tentative_bbnode (info, bbnode);
     if (rval) {
-        fprintf (stderr, "update_tentative_bbnode failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "update_tentative_bbnode failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -2466,7 +2466,7 @@ static int write_restart (char *problabel, tsp_bbnode *rootbbnode,
     if (restart_name == (char *) NULL ||
         new_name == (char *) NULL ||
         back_name == (char *) NULL) {
-        fprintf (stderr, "Out of memory in write_restart\n");
+        CC_FPRINTF(stderr, "Out of memory in write_restart\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2480,7 +2480,7 @@ static int write_restart (char *problabel, tsp_bbnode *rootbbnode,
     f = fopen (new_name, "w");
     if (f == (FILE*) NULL) {
         perror (new_name);
-        fprintf (stderr, "Unable to open %s for output in write_restart\n",
+        CC_FPRINTF(stderr, "Unable to open %s for output in write_restart\n",
                  new_name);
         rval = 1; goto CLEANUP;
     }
@@ -2489,18 +2489,18 @@ static int write_restart (char *problabel, tsp_bbnode *rootbbnode,
             bbcount, branchzeit);
     if (rval <= 0) {
         perror (new_name);
-        fprintf (stderr, "fprintf to %s failed\n", new_name);
+        CC_FPRINTF(stderr, "fprintf to %s failed\n", new_name);
         rval = 1; goto CLEANUP;
     }
     rval = write_bbtree (f, rootbbnode);
     if (rval) {
-        fprintf (stderr, "write_bbtree failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "write_bbtree failed\n"); goto CLEANUP;
     }
     
     rval = fclose (f);
     if (rval) {
         perror (new_name);
-        fprintf (stderr, "fclose %s failed\n", new_name);
+        CC_FPRINTF(stderr, "fclose %s failed\n", new_name);
         rval = 1; goto CLEANUP;
     }
     f = (FILE *) NULL;
@@ -2509,7 +2509,7 @@ static int write_restart (char *problabel, tsp_bbnode *rootbbnode,
     rval = rename (new_name, restart_name);
     if (rval) {
         perror (restart_name);
-        fprintf (stderr, "rename %s to %s failed\n", new_name, restart_name);
+        CC_FPRINTF(stderr, "rename %s to %s failed\n", new_name, restart_name);
         rval = 1; goto CLEANUP;
     }
     
@@ -2536,7 +2536,7 @@ static int write_bbtree (FILE *f, tsp_bbnode *b)
                     b->lowerbound, b->cputime);
     if (rval <= 0) {
         perror ("restart_file");
-        fprintf (stderr, "fprintf failed writing restart file\n");
+        CC_FPRINTF(stderr, "fprintf failed writing restart file\n");
         return 1;
     }
     if (b->tentative_nodes) {
@@ -2564,7 +2564,7 @@ static int write_tentative_nodes (FILE *f, int count, tsp_tnode *list)
         s = &list[i];
         if (s->child0 == (tsp_bbnode *) NULL ||
             s->child1 == (tsp_bbnode *) NULL) {
-            fprintf (stderr, "tnode has NULL bbnodes\n");
+            CC_FPRINTF(stderr, "tnode has NULL bbnodes\n");
             return 1;
         }
         rval = fprintf (f, "  %1d %4d %13.2f %9.2f    %1d %4d %13.2f %9.2f\n",
@@ -2574,7 +2574,7 @@ static int write_tentative_nodes (FILE *f, int count, tsp_tnode *list)
                s->child1->cputime);
         if (rval <= 0) {
             perror ("restart_file");
-            fprintf (stderr, "fprintf failed writing restart file\n");
+            CC_FPRINTF(stderr, "fprintf failed writing restart file\n");
             return 1;
         }
     } 
@@ -2592,14 +2592,14 @@ static int read_restart (char *restart_name, char **p_problabel,
     f = fopen (restart_name, "r");
     if (f == (FILE*) NULL) {
         perror (restart_name);
-        fprintf (stderr, "Unable to open %s for input in read_restart\n",
+        CC_FPRINTF(stderr, "Unable to open %s for input in read_restart\n",
                  restart_name);
         rval = 1; goto CLEANUP;
     }
 
     problabel = CC_SAFE_MALLOC (CCtsp_PROB_FILE_NAME_LEN, char);
     if (problabel == (char *) NULL) {
-        fprintf (stderr, "Out of memory in read_restart\n");
+        CC_FPRINTF(stderr, "Out of memory in read_restart\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2609,18 +2609,18 @@ static int read_restart (char *restart_name, char **p_problabel,
             p_branchzeit);
     if (rval <= 0) {
         perror (restart_name);
-        fprintf (stderr, "fscanf from %s failed\n", restart_name);
+        CC_FPRINTF(stderr, "fscanf from %s failed\n", restart_name);
         rval = 1; goto CLEANUP;
     }
     rval = read_bbtree (f, p_rootbbnode, bbnode_world);
     if (rval) {
-        fprintf (stderr, "read_bbtree failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "read_bbtree failed\n"); goto CLEANUP;
     }
     
     rval = fclose (f);
     if (rval) {
         perror (restart_name);
-        fprintf (stderr, "fclose %s failed\n", restart_name);
+        CC_FPRINTF(stderr, "fclose %s failed\n", restart_name);
         rval = 1; goto CLEANUP;
     }
     f = (FILE *) NULL;
@@ -2648,7 +2648,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
 
     b = tsp_bbnode_alloc (bbnode_world);
     if (b == (tsp_bbnode *) NULL) {
-        fprintf (stderr, "tsp_bbnode_alloc failed\n");
+        CC_FPRINTF(stderr, "tsp_bbnode_alloc failed\n");
         rval = 1; goto CLEANUP;
     }
     init_bbnode (b);
@@ -2658,7 +2658,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
                     &b->cputime);
     if (rval <= 0) {
         perror ("restart_file");
-        fprintf (stderr, "fscanf failed reading restart file\n");
+        CC_FPRINTF(stderr, "fscanf failed reading restart file\n");
         rval = 1; goto CLEANUP;
     }
     b->workstatus = BB_IDLE;
@@ -2667,7 +2667,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
         rval = read_tentative_nodes (f, b->numtentative, &b->tentative_nodes,
                                      b, bbnode_world);
         if (rval) {
-            fprintf (stderr, "read_tentative_nodes failed\n");
+            CC_FPRINTF(stderr, "read_tentative_nodes failed\n");
             goto CLEANUP;
         }
     }
@@ -2676,7 +2676,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
         rval = read_bbtree (f, &(b->child0), bbnode_world);
         if (rval) goto CLEANUP;
         if (b->child0->id != child0) {
-            fprintf (stderr, "syntax error in restart file\n");
+            CC_FPRINTF(stderr, "syntax error in restart file\n");
             rval = 1; goto CLEANUP;
         }
         b->child0->parent = b;
@@ -2685,7 +2685,7 @@ static int read_bbtree (FILE *f, tsp_bbnode **p_b, CCptrworld *bbnode_world)
         rval = read_bbtree (f, &(b->child1), bbnode_world);
         if (rval) goto CLEANUP;
         if (b->child1->id != child1) {
-            fprintf (stderr, "syntax error in restart file\n");
+            CC_FPRINTF(stderr, "syntax error in restart file\n");
             rval = 1; goto CLEANUP;
         }
         b->child1->parent = b;
@@ -2713,7 +2713,7 @@ static int read_tentative_nodes (FILE *f, int count, tsp_tnode **list,
 
     *list = CC_SAFE_MALLOC (count, tsp_tnode);
     if (*list == (tsp_tnode *) NULL) {
-        fprintf (stderr, "out of memory in read_tentative_nodes\n");
+        CC_FPRINTF(stderr, "out of memory in read_tentative_nodes\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2721,13 +2721,13 @@ static int read_tentative_nodes (FILE *f, int count, tsp_tnode **list,
         s = &((*list)[obtained]);
         child0 = tsp_bbnode_alloc (bbnode_world);
         if (child0 == (tsp_bbnode *) NULL) {
-            fprintf (stderr, "tsp_bbnode_alloc failed\n");
+            CC_FPRINTF(stderr, "tsp_bbnode_alloc failed\n");
             rval = 1; goto CLEANUP;
         }
         init_bbnode (child0);
         child1 = tsp_bbnode_alloc (bbnode_world);
         if (child1 == (tsp_bbnode *) NULL) {
-            fprintf (stderr, "tsp_bbnode_alloc failed\n");
+            CC_FPRINTF(stderr, "tsp_bbnode_alloc failed\n");
             tsp_bbnode_free (bbnode_world, child0);
             rval = 1; goto CLEANUP;
         }
@@ -2746,7 +2746,7 @@ static int read_tentative_nodes (FILE *f, int count, tsp_tnode **list,
 
         if (rval <= 0) {
             perror ("restart_file");
-            fprintf (stderr, "fscanf failed reading tentative line\n");
+            CC_FPRINTF(stderr, "fscanf failed reading tentative line\n");
             rval = 1; goto CLEANUP;
         }
         child0->tparent = s;
@@ -2778,7 +2778,7 @@ static int add_children (tsp_bbnode **firstbbnode, tsp_bbnode *parent,
 
     child = tsp_bbnode_alloc (bbnode_world);
     if (!child) {
-        fprintf (stderr, "Failed to allocate child 0\n");
+        CC_FPRINTF(stderr, "Failed to allocate child 0\n");
         rval = 1; goto CLEANUP;
     }
     
@@ -2789,10 +2789,10 @@ static int add_children (tsp_bbnode **firstbbnode, tsp_bbnode *parent,
     parent->child0 = child;
 
     if (val0 == CCtsp_LP_MAXDOUBLE) {
-        printf ("Child 0 is infeasible\n"); fflush (stdout);
+        CC_PRINTF("Child 0 is infeasible\n"); CC_FFLUSH(stdout);
         child->status = BB_DONE;
     } else if (prune0) {
-        printf ("Child 0 is pruned\n"); fflush (stdout);
+        CC_PRINTF("Child 0 is pruned\n"); CC_FFLUSH(stdout);
         child->status = BB_DONE;
     } else {
         child->status = BB_NEEDS_CUTTING;
@@ -2801,7 +2801,7 @@ static int add_children (tsp_bbnode **firstbbnode, tsp_bbnode *parent,
 
     child = tsp_bbnode_alloc (bbnode_world);
     if (!child) {
-        fprintf (stderr, "Failed to allocate child 0\n");
+        CC_FPRINTF(stderr, "Failed to allocate child 0\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2812,10 +2812,10 @@ static int add_children (tsp_bbnode **firstbbnode, tsp_bbnode *parent,
     parent->child1 = child;
 
     if (val1 == CCtsp_LP_MAXDOUBLE) {
-        printf ("Child 1 is infeasible\n"); fflush (stdout);
+        CC_PRINTF("Child 1 is infeasible\n"); CC_FFLUSH(stdout);
         child->status = BB_DONE;
     } else if (prune1) {
-        printf ("Child 1 is pruned\n"); fflush (stdout);
+        CC_PRINTF("Child 1 is pruned\n"); CC_FFLUSH(stdout);
         child->status = BB_DONE;
     } else {
         insert_bbnode (firstbbnode, child);
@@ -2854,9 +2854,9 @@ static tsp_bbnode *select_bbnode (tsp_bbnode *firstbbnode, int verbose,
         bblist_info (firstbbnode, &cutavail, &tcutavail, &branchavail,
                      &active, &lowerbound);
 
-        printf ("LOWER BOUND: %f   ACTIVE NODES: %d\n\n", lowerbound,
+        CC_PRINTF("LOWER BOUND: %f   ACTIVE NODES: %d\n\n", lowerbound,
                 active);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     if (firstbbnode) {
@@ -2888,20 +2888,20 @@ static tsp_bbnode *select_bbnode (tsp_bbnode *firstbbnode, int verbose,
 
     if (verbose && !silent) {
         if (!bestbbnode) {
-            printf ("No idle bbnodes\n"); fflush (stdout);
+            CC_PRINTF("No idle bbnodes\n"); CC_FFLUSH(stdout);
         } else {
-            printf ("Selected bbnode:  id %d  lowerbound %.2f\n",
+            CC_PRINTF("Selected bbnode:  id %d  lowerbound %.2f\n",
                     bestbbnode->id, bestbound);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
             if (active > 1) {
-                printf ("Remaining active bbnodes:\n");
+                CC_PRINTF("Remaining active bbnodes:\n");
                 for (b = firstbbnode; b; b = b->next) {
                     if (b->id != bestbbnode->id) {
-                        printf ("  id %d  lowerbound %.2f\n",
+                        CC_PRINTF("  id %d  lowerbound %.2f\n",
                                 b->id, b->lowerbound);
                     }
                 }
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         }
     }
@@ -2949,38 +2949,38 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
     CCtsp_branchobj *b = (CCtsp_branchobj *) NULL;
 
     if (!lp->full_edges_valid) {
-        fprintf (stderr, "CCtsp_easy_dfs_brancher needs valid extra edges\n");
+        CC_FPRINTF(stderr, "CCtsp_easy_dfs_brancher needs valid extra edges\n");
         rval = 1; goto CLEANUP;
     }
 
-    printf ("Node %d, Depth %d: ", *bbcount, depth); fflush (stdout);
+    CC_PRINTF("Node %d, Depth %d: ", *bbcount, depth); CC_FFLUSH(stdout);
     (*bbcount)++;
     if (!silent) {
-        printf ("\n");
+        CC_PRINTF("\n");
         CCtsp_print_branchhistory (lp);
     }
 
     rval = CCtsp_pricing_loop (lp, &bnd, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_pricing_loop failed\n");  goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_pricing_loop failed\n");  goto CLEANUP;
     }
     lp->lowerbound = bnd;
     lp->upperbound = *upbound;
     if (silent) {
-        printf ("%.2f -> ", bnd); fflush (stdout);
+        CC_PRINTF("%.2f -> ", bnd); CC_FFLUSH(stdout);
     }
 
     if (lp->lowerbound >= lp->upperbound - 0.9) {
         rval = CCtsp_verify_lp_prune (lp, &prune, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_lp_prune failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_verify_lp_prune failed\n"); goto CLEANUP;
         }
         if (prune) {
-            printf ("PRUNE SEARCH: upperbound = %f\n", *upbound);
-            fflush (stdout);
+            CC_PRINTF("PRUNE SEARCH: upperbound = %f\n", *upbound);
+            CC_FFLUSH(stdout);
             rval = 0; goto CLEANUP;
         } else {
-            fprintf (stderr, "exact pricing could not prune the search\n");
+            CC_FPRINTF(stderr, "exact pricing could not prune the search\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -2994,26 +2994,26 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
             goto CLEANUP;
         }
         if (prune) {
-            printf ("PRUNE SEARCH - infeasible LP\n"); fflush (stdout);
+            CC_PRINTF("PRUNE SEARCH - infeasible LP\n"); CC_FFLUSH(stdout);
             rval = 0; goto CLEANUP;
         } else {
-            fprintf (stderr, "exact pricing did not verify an infeasible LP\n");
+            CC_FPRINTF(stderr, "exact pricing did not verify an infeasible LP\n");
             rval = 1; goto CLEANUP;
         }
     } else if (rval) {
-        fprintf (stderr, "CCtsp_cutting_loop failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_cutting_loop failed\n"); goto CLEANUP;
     }
 
     if (silent) {
-        printf ("%.2f (%.2f seconds)\n", lp->lowerbound, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("%.2f (%.2f seconds)\n", lp->lowerbound, CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
     }
 
     if (!simple_branching && lp->lowerbound < lp->upperbound - 0.9) {
         CCutil_start_timer (&lp->stats.linkern);
         rval = CCtsp_call_x_heuristic (lp, &val, besttour, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_call_x_heuristic failed\n");
+            CC_FPRINTF(stderr, "CCtsp_call_x_heuristic failed\n");
             goto CLEANUP;
         }
         if (silent) {
@@ -3022,13 +3022,13 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
             CCutil_stop_timer (&lp->stats.linkern, 1);
         }
         if (val < lp->upperbound) {
-            printf ("New upperbound from x-heuristic: %.2f\n", val);
+            CC_PRINTF("New upperbound from x-heuristic: %.2f\n", val);
             lp->upperbound = val;
             *upbound = val;
             rval = CCtsp_dumptour (lp->graph.ncount, lp->dat, lp->perm,
                      lp->problabel, besttour, (char *) NULL, 0, silent);
             if (rval) {
-                fprintf (stderr, "CCtsp_dumptour failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCtsp_dumptour failed\n"); goto CLEANUP;
             }
         }
     }
@@ -3036,21 +3036,21 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
     if (lp->lowerbound >= lp->upperbound - 0.9) {
         rval = CCtsp_verify_lp_prune (lp, &prune, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_lp_prune failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_verify_lp_prune failed\n"); goto CLEANUP;
         }
         if (prune) {
-            printf ("PRUNE SEARCH: upperbound = %f\n", *upbound);
-            fflush (stdout);
+            CC_PRINTF("PRUNE SEARCH: upperbound = %f\n", *upbound);
+            CC_FFLUSH(stdout);
             rval = 0; goto CLEANUP;
         } else {
-            fprintf (stderr, "exact pricing could not prune the search\n");
+            CC_FPRINTF(stderr, "exact pricing could not prune the search\n");
             rval = 1; goto CLEANUP;
         }
     }
 
     oldbound = lp->lowerbound;
     if (!silent) {
-        printf ("Find branch object ...\n"); fflush (stdout);
+        CC_PRINTF("Find branch object ...\n"); CC_FFLUSH(stdout);
     }
 
     szeit = CCutil_zeit ();
@@ -3058,21 +3058,21 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
         rval = CCtsp_find_fast_branch (lp, &ngot, &b, &val, &cyc, usecliques,
                                   longedge_branching, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_find_fast_branch failed\n");
+            CC_FPRINTF(stderr, "CCtsp_find_fast_branch failed\n");
             goto CLEANUP;
         }
     } else {
         rval = CCtsp_find_branch (lp, 1, &ngot, &b, &val, &cyc, usecliques, 
                                   longedge_branching, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_find_branch failed\n");
+            CC_FPRINTF(stderr, "CCtsp_find_branch failed\n");
             goto CLEANUP;
         }
     }
     st = CCutil_zeit () - szeit;
 
     if (ngot == 0) {
-        printf ("TOUR FOUND: %.2f\n", val); fflush (stdout);
+        CC_PRINTF("TOUR FOUND: %.2f\n", val); CC_FFLUSH(stdout);
         if (val < *upbound) {
             *upbound = val;
             lp->upperbound = val;
@@ -3082,21 +3082,21 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
             rval = CCtsp_dumptour (lp->graph.ncount, lp->dat, lp->perm,
                          lp->problabel, besttour, (char *) NULL, 0, silent);
             if (rval) {
-                fprintf (stderr, "CCtsp_dumptour failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCtsp_dumptour failed\n"); goto CLEANUP;
             }
         }
         CC_IFFREE (cyc, int);
         rval = CCtsp_verify_lp_prune (lp, &prune, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_lp_prune failed\n");
+            CC_FPRINTF(stderr, "CCtsp_verify_lp_prune failed\n");
             goto CLEANUP;
         }
         if (prune) {
-            printf ("with new tour, the node can be pruned\n");
-            fflush (stdout);
+            CC_PRINTF("with new tour, the node can be pruned\n");
+            CC_FFLUSH(stdout);
             rval = 0; goto CLEANUP;
         } else {
-            fprintf (stderr, "could not verify the pruning\n");
+            CC_FPRINTF(stderr, "could not verify the pruning\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -3106,52 +3106,52 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
 
 
     if (b[0].ends[0] != -1) {
-        printf ("Branch: set edge (%d, %d) to 0 (%.2f seconds)\n",
+        CC_PRINTF("Branch: set edge (%d, %d) to 0 (%.2f seconds)\n",
                      b[0].ends[0], b[0].ends[1], st);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         b[0].rhs = 0;
     } else {
-        printf ("Branch: set clique <= 2 (%.2f seconds)\n", st);
-        fflush (stdout);
+        CC_PRINTF("Branch: set clique <= 2 (%.2f seconds)\n", st);
+        CC_FFLUSH(stdout);
         b[0].rhs = 2; b[0].sense = 'L';
     }
     rval = CCtsp_execute_branch (lp, &b[0], silent, rstate);
     if (rval == 2) {
-        fprintf (stderr, "branched lp was infeasible\n");
+        CC_FPRINTF(stderr, "branched lp was infeasible\n");
         rval = CCtsp_verify_infeasible_lp (lp, &prune, silent);
         if (rval) {
             fprintf (stderr ,"CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (prune) {
-            printf ("PRUNE SIDE - infeasible LP\n"); fflush (stdout);
+            CC_PRINTF("PRUNE SIDE - infeasible LP\n"); CC_FFLUSH(stdout);
             rval = 0; 
         } else {
-            fprintf (stderr, "exact pricing did not verify an infeasible LP\n");
+            CC_FPRINTF(stderr, "exact pricing did not verify an infeasible LP\n");
             rval = 1; goto CLEANUP;
         }
     } else if (rval) {
-        fprintf (stderr, "CCtsp_execute_branch failed\n");
+        CC_FPRINTF(stderr, "CCtsp_execute_branch failed\n");
         rval = 1; goto CLEANUP;
     } else {
         rval = CCtsp_easy_dfs_brancher (lp, sel, depth + 1, upbound, bbcount,
                       usecliques, besttour, longedge_branching, simple_branching,
                       silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_easy_dfs_brancher failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_easy_dfs_brancher failed\n"); goto CLEANUP;
         }
     }
     rval = CCtsp_execute_unbranch (lp, (CClp_warmstart *) NULL, silent, rstate);
     if (rval == 2) {
-        fprintf (stderr, "branched lp was infeasible\n");
+        CC_FPRINTF(stderr, "branched lp was infeasible\n");
         rval = CCtsp_verify_infeasible_lp (lp, &prune, silent);
         if (rval) {
             fprintf (stderr ,"CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (prune) {
-            printf ("PRUNE BOTH SIDES - infeasible unbranched LP\n");
-            fflush (stdout);
+            CC_PRINTF("PRUNE BOTH SIDES - infeasible unbranched LP\n");
+            CC_FFLUSH(stdout);
             rval = 0; 
 
             lp->lowerbound = oldbound;
@@ -3160,11 +3160,11 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
 
             goto CLEANUP;
         } else {
-            fprintf (stderr, "exact pricing did not verify an infeasible LP\n");
+            CC_FPRINTF(stderr, "exact pricing did not verify an infeasible LP\n");
             rval = 1; goto CLEANUP;
         }
     } else if (rval) {
-        fprintf (stderr, "CCtsp_execute_unbranch failed\n");
+        CC_FPRINTF(stderr, "CCtsp_execute_unbranch failed\n");
         goto CLEANUP; 
     }
     lp->lowerbound = oldbound;
@@ -3174,60 +3174,60 @@ int CCtsp_easy_dfs_brancher (CCtsp_lp *lp, CCtsp_cutselect *sel, int depth,
 
 
     if (b[0].ends[0] != -1) {
-        printf ("Branch: set edge (%d, %d) to 1 (depth %d)\n",
+        CC_PRINTF("Branch: set edge (%d, %d) to 1 (depth %d)\n",
                      b[0].ends[0], b[0].ends[1], depth);
         b[0].rhs = 1;
     } else {
-        printf ("Branch: set clique >= 4 (depth %d)\n", depth);
+        CC_PRINTF("Branch: set clique >= 4 (depth %d)\n", depth);
         b[0].rhs   = 4; b[0].sense = 'G';
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
     rval = CCtsp_execute_branch (lp, &b[0], silent, rstate);
     if (rval == 2) {
-        fprintf (stderr, "branched lp was infeasible\n");
+        CC_FPRINTF(stderr, "branched lp was infeasible\n");
         rval = CCtsp_verify_infeasible_lp (lp, &prune, silent);
         if (rval) {
             fprintf (stderr ,"CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (prune) {
-            printf ("PRUNE SIDE - infeasible LP\n"); fflush (stdout);
+            CC_PRINTF("PRUNE SIDE - infeasible LP\n"); CC_FFLUSH(stdout);
             rval = 0; 
         } else {
-            fprintf (stderr, "exact pricing did not verify an infeasible LP\n");
+            CC_FPRINTF(stderr, "exact pricing did not verify an infeasible LP\n");
             rval = 1; goto CLEANUP;
         }
         rval = 0;
     } else if (rval) {
-        fprintf (stderr, "CCtsp_execute_branch failed\n");
+        CC_FPRINTF(stderr, "CCtsp_execute_branch failed\n");
         rval = 1; goto CLEANUP;
     } else {
         rval = CCtsp_easy_dfs_brancher (lp, sel, depth + 1, upbound, bbcount,
                       usecliques, besttour, longedge_branching, simple_branching,
                       silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_easy_dfs_brancher failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_easy_dfs_brancher failed\n"); goto CLEANUP;
         }
     }
     rval = CCtsp_execute_unbranch (lp, (CClp_warmstart *) NULL, silent, rstate);
     if (rval == 2) {
-        fprintf (stderr, "unbranched lp was infeasible\n");
+        CC_FPRINTF(stderr, "unbranched lp was infeasible\n");
         rval = CCtsp_verify_infeasible_lp (lp, &prune, silent);
         if (rval) {
             fprintf (stderr ,"CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (prune) {
-            printf ("NOTE - infeasible unbranched LP\n");
-            fflush (stdout);
+            CC_PRINTF("NOTE - infeasible unbranched LP\n");
+            CC_FFLUSH(stdout);
             rval = 0; 
             goto CLEANUP;
         } else {
-            fprintf (stderr, "exact pricing did not verify an infeasible LP\n");
+            CC_FPRINTF(stderr, "exact pricing did not verify an infeasible LP\n");
             rval = 1; goto CLEANUP;
         }
     } else if (rval) {
-        fprintf (stderr, "CCtsp_execute_unbranch failed\n");
+        CC_FPRINTF(stderr, "CCtsp_execute_unbranch failed\n");
         goto CLEANUP; 
     }
     lp->lowerbound = oldbound;
@@ -3250,57 +3250,57 @@ int CCtsp_do_interactive_branch (CCtsp_lp *lp, int silent, CCrandstate *rstate)
 
     CCtsp_init_branchobj (&b);
 
-    printf ("Enter the (integer) id's for the two child nodes: ");
-    fflush (stdout);
+    CC_PRINTF("Enter the (integer) id's for the two child nodes: ");
+    CC_FFLUSH(stdout);
     scanf ("%d %d", &ch0, &ch1);
 
-    printf ("Enter 0 if edge-branch, 1 if clique-branch (internal),\n");
-    printf ("      2 if clique-branch (original): ");
-    fflush (stdout);
+    CC_PRINTF("Enter 0 if edge-branch, 1 if clique-branch (internal),\n");
+    CC_PRINTF("      2 if clique-branch (original): ");
+    CC_FFLUSH(stdout);
     scanf ("%d", &tbran);
 
     if (tbran == 0) {
-        printf ("Enter ends of branching edge (use neg if original): ");
-        fflush (stdout);
+        CC_PRINTF("Enter ends of branching edge (use neg if original): ");
+        CC_FFLUSH(stdout);
         scanf ("%d %d", &bend0, &bend1);
         if (bend0 < 0) {
             if (bend1 >= 0) {
-                fprintf (stderr, "both ends must be from the same order\n");
+                CC_FPRINTF(stderr, "both ends must be from the same order\n");
                 rval = 1; goto CLEANUP;
             }
             for (i = 0; i < lp->graph.ncount; i++) {
                 if (lp->perm[i] == -bend0) bend0 = i;
                 if (lp->perm[i] == -bend1) bend1 = i;
             }
-            printf ("Current Names of the Ends: %d %d\n", bend0, bend1);
-            fflush (stdout);
+            CC_PRINTF("Current Names of the Ends: %d %d\n", bend0, bend1);
+            CC_FFLUSH(stdout);
         }
         b.ends[0] = bend0;
         b.ends[1] = bend1;
         b.rhs     = 1;
     } else if (tbran == 1) {
-        printf ("Enter the number of segments in clique: ");
-        fflush (stdout);
+        CC_PRINTF("Enter the number of segments in clique: ");
+        CC_FFLUSH(stdout);
         scanf ("%d", &nseg);
         slist = CC_SAFE_MALLOC (2*nseg, int);
         if (!slist) {
-            fprintf (stderr, "out of memory\n");
+            CC_FPRINTF(stderr, "out of memory\n");
             rval = 1; goto CLEANUP;
         }
-        printf ("Enter the ends of the segments: ");
-        fflush (stdout);
+        CC_PRINTF("Enter the ends of the segments: ");
+        CC_FFLUSH(stdout);
         for (i = 0; i < nseg; i++) {
             scanf ("%d %d", &slist[2*i], &slist[2*i+1]);
         }
         c = CC_SAFE_MALLOC (1, CCtsp_lpclique);
         if (!c) {
-            fprintf (stderr, "out of memory\n");
+            CC_FPRINTF(stderr, "out of memory\n");
             CC_IFFREE (slist, int);
             rval = 1; goto CLEANUP;
         }
         rval = CCtsp_seglist_to_lpclique (nseg, slist, c);
         if (rval) {
-            fprintf (stderr, "CCtsp_seglist_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_seglist_to_lpclique failed\n");
             goto CLEANUP;
         }
         CC_IFFREE (slist, int);
@@ -3309,16 +3309,16 @@ int CCtsp_do_interactive_branch (CCtsp_lp *lp, int silent, CCrandstate *rstate)
         b.sense  = 'G';
         CCtsp_print_lpclique (b.clique);
     } else {
-        printf ("Enter the number of nodes in clique: ");
-        fflush (stdout);
+        CC_PRINTF("Enter the number of nodes in clique: ");
+        CC_FFLUSH(stdout);
         scanf ("%d", &nseg);
         slist = CC_SAFE_MALLOC (nseg, int);
         if (!slist) {
-            fprintf (stderr, "out of memory\n");
+            CC_FPRINTF(stderr, "out of memory\n");
             rval = 1; goto CLEANUP;
         }
-        printf ("Enter the nodes in the clique: ");
-        fflush (stdout);
+        CC_PRINTF("Enter the nodes in the clique: ");
+        CC_FFLUSH(stdout);
         for (i = 0; i < nseg; i++) {
             scanf ("%d", &bend0);
             for (bend1 = 0; bend1 < lp->graph.ncount; bend1++) {
@@ -3330,13 +3330,13 @@ int CCtsp_do_interactive_branch (CCtsp_lp *lp, int silent, CCrandstate *rstate)
         }
         c = CC_SAFE_MALLOC (1, CCtsp_lpclique);
         if (!c) {
-            fprintf (stderr, "out of memory\n");
+            CC_FPRINTF(stderr, "out of memory\n");
             CC_IFFREE (slist, int);
             rval = 1; goto CLEANUP;
         }
         rval = CCtsp_array_to_lpclique (slist, nseg, c);
         if (rval) {
-            fprintf (stderr, "CCtsp_seglist_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_seglist_to_lpclique failed\n");
             goto CLEANUP;
         }
         CC_IFFREE (slist, int);
@@ -3348,7 +3348,7 @@ int CCtsp_do_interactive_branch (CCtsp_lp *lp, int silent, CCrandstate *rstate)
 
     rval = CCtsp_splitprob (lp, &b, ch0, ch1, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_splitprob failed\n");
+        CC_FPRINTF(stderr, "CCtsp_splitprob failed\n");
         goto CLEANUP;
     }
 

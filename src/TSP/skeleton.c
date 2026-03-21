@@ -92,7 +92,7 @@ int CCtsp_copy_skeleton (CCtsp_skeleton *old, CCtsp_skeleton *new)
     if (old->atomcount == 0) return 0;
     new->atoms = CC_SAFE_MALLOC (old->atomcount, int);
     if (new->atoms == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_copy_skeleton\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_copy_skeleton\n");
         return 1;
     }
     for (i=0; i<old->atomcount; i++) {
@@ -115,7 +115,7 @@ int CCtsp_read_skeleton (CC_SFILE *f, CCtsp_skeleton *skel, int ncount)
 
     rval = CCutil_sread_char (f, &type);
     if (rval) {
-        fprintf (stderr, "CCutil_sread_char failed\n");
+        CC_FPRINTF(stderr, "CCutil_sread_char failed\n");
         goto CLEANUP;
     }
 
@@ -123,7 +123,7 @@ int CCtsp_read_skeleton (CC_SFILE *f, CCtsp_skeleton *skel, int ncount)
     case SKELETON_WILD:
         rval = CCutil_sread_bits (f, &atomcount, nbits);
         if (rval) {
-            fprintf (stderr, "CCutil_sread_bits failed\n");
+            CC_FPRINTF(stderr, "CCutil_sread_bits failed\n");
             goto CLEANUP;
         }
         skel->atomcount = atomcount;
@@ -136,20 +136,20 @@ int CCtsp_read_skeleton (CC_SFILE *f, CCtsp_skeleton *skel, int ncount)
         
         skel->atoms = CC_SAFE_MALLOC (atomcount, int);
         if (skel->atoms == (int *) NULL) {
-            fprintf (stderr, "Out of memory in CCtsp_read_skeleton\n");
+            CC_FPRINTF(stderr, "Out of memory in CCtsp_read_skeleton\n");
             rval = 1; goto CLEANUP;
         }
 
         for (i=0; i<atomcount; i++) {
             rval = CCutil_sread_bits (f, &skel->atoms[i], nbits);
             if (rval) {
-                fprintf (stderr, "CCutil_sread_bits failed\n");
+                CC_FPRINTF(stderr, "CCutil_sread_bits failed\n");
                 goto CLEANUP;
             }
         }
         break;
     default:
-        fprintf (stderr, "Unknown skeleton type %ud\n", (unsigned) type);
+        CC_FPRINTF(stderr, "Unknown skeleton type %ud\n", (unsigned) type);
         rval = 1; goto CLEANUP;
     }
     rval = 0;
@@ -170,20 +170,20 @@ int CCtsp_write_skeleton (CC_SFILE *f, CCtsp_skeleton *skel, int ncount)
 
     rval = CCutil_swrite_char (f, SKELETON_WILD);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_char failed\n");
+        CC_FPRINTF(stderr, "CCutil_swrite_char failed\n");
         goto CLEANUP;
     }
     
     rval = CCutil_swrite_bits (f, atomcount, nbits);
     if (rval) {
-        fprintf (stderr, "CCutil_swrite_bits failed\n");
+        CC_FPRINTF(stderr, "CCutil_swrite_bits failed\n");
         goto CLEANUP;
     }
 
     for (i=0; i<atomcount; i++) {
         rval = CCutil_swrite_bits (f, skel->atoms[i], nbits);
         if (rval) {
-            fprintf (stderr, "CCutil_swrite_bits failed\n");
+            CC_FPRINTF(stderr, "CCutil_swrite_bits failed\n");
             goto CLEANUP;
         }
     }
@@ -213,8 +213,8 @@ int CCtsp_construct_skeleton (CCtsp_lpcut_in *c, int nodecount)
     int rval = 0;
 
     if (c->dominocount != 0) {
-        printf ("Skeleton Yipes %d\n", c->dominocount);
-        fflush (stdout);
+        CC_PRINTF("Skeleton Yipes %d\n", c->dominocount);
+        CC_FFLUSH(stdout);
         exit (1);
     }
     
@@ -223,7 +223,7 @@ int CCtsp_construct_skeleton (CCtsp_lpcut_in *c, int nodecount)
 
     label = CC_SAFE_MALLOC (nodecount, int);
     if (label == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_construct_skeleton\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_construct_skeleton\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -253,7 +253,7 @@ int CCtsp_construct_skeleton (CCtsp_lpcut_in *c, int nodecount)
         atomsize == (int *) NULL ||
         atomnew == (int *) NULL ||
         atomwork == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_construct_skeleton\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_construct_skeleton\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -304,7 +304,7 @@ int CCtsp_construct_skeleton (CCtsp_lpcut_in *c, int nodecount)
     }
     atoms = CC_SAFE_MALLOC (atomcount, int);
     if (atoms == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtsp_construct_skeleton\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtsp_construct_skeleton\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -339,12 +339,12 @@ int CCtsp_construct_skeleton (CCtsp_lpcut_in *c, int nodecount)
     atoms = (int *) NULL;
 
 #ifdef DEBUG_CONSTRUCT
-    printf ("skeleton:");
+    CC_PRINTF("skeleton:");
     for (i=0; i<c->skel.atomcount; i++) {
-        printf (" %d", c->skel.atoms[i]);
+        CC_PRINTF(" %d", c->skel.atoms[i]);
     }
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 #endif
 
     rval = 0;

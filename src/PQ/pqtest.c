@@ -26,7 +26,7 @@ int main (int ac, char **av)
     int rval;
     int status;
 
-    printf ("%d\n", (int) (sizeof (CCpq_node)));
+    CC_PRINTF("%d\n", (int) (sizeof (CCpq_node)));
     if (ac > 1) {
         nnodes = atoi(av[1]);
     }
@@ -34,7 +34,7 @@ int main (int ac, char **av)
 
     rval = CCpq_tree_trivial (&pqt, nnodes, 0);
     if (rval) {
-        fprintf (stderr, "CCpq_tree_trivial failed\n");
+        CC_FPRINTF(stderr, "CCpq_tree_trivial failed\n");
         goto CLEANUP;
     }
 
@@ -45,24 +45,24 @@ int main (int ac, char **av)
             CCpq_add_leaflist (&pqt, i);
         }
         if (pqt.leaflist == (CCpq_node *) NULL) break;
-        printf ("adding:");
+        CC_PRINTF("adding:");
         for (n = pqt.leaflist; n; n = n->next) {
-            printf (" %d", (int) (n - pqt.elems));
+            CC_PRINTF(" %d", (int) (n - pqt.elems));
         }
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         rval = CCpq_apply (&pqt, &status);
         if (rval) {
-            fprintf (stderr, "CCpq_apply failed\n");
+            CC_FPRINTF(stderr, "CCpq_apply failed\n");
             goto CLEANUP;
         }
         if (status == CCpq_STATUS_TRIVIAL) {
-            printf ("  (trivial)\n");
+            CC_PRINTF("  (trivial)\n");
         } else if (status == CCpq_STATUS_NONTRIVIAL) {
-            printf (" (nontrivial)\n");
+            CC_PRINTF(" (nontrivial)\n");
         } else if (status == CCpq_STATUS_NOSOL) {
-            printf (" (failed)\n");
+            CC_PRINTF(" (failed)\n");
         } else {
-            fprintf (stderr, "Unknown PQ status %d\n", status);
+            CC_FPRINTF(stderr, "Unknown PQ status %d\n", status);
             rval = 1; goto CLEANUP;
         }
     }

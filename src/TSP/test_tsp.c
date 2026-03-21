@@ -57,7 +57,7 @@ int main (int ac, char **av)
     if (parseargs (ac, av)) goto CLEANUP;
 
     CCutil_sprand (seed, &rstate);
-    printf ("Using random seed %d\n", seed); fflush (stdout);
+    CC_PRINTF("Using random seed %d\n", seed); CC_FFLUSH(stdout);
 
     mybnd = (init_ub == CCtsp_LP_MAXDOUBLE ? (double *) NULL : &init_ub);
     mytimebound = (in_timebound == 0.0 ? (double *) NULL : &in_timebound);
@@ -66,36 +66,36 @@ int main (int ac, char **av)
         rval = CCutil_getedgelist_n (&ncount, edgefname, &ecount, &elist,
                                      &elen, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getedgelist_n failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_getedgelist_n failed\n"); goto CLEANUP;
         }
     } else {
         rval = CCutil_gettsplib (edgefname, &ncount, &dat);
         if (rval) {
-            fprintf (stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
         }
     }
 
     out_tour  = CC_SAFE_MALLOC (ncount, int);
     if (!out_tour) {
-        fprintf (stderr, "out of memory in main\n");
+        CC_FPRINTF(stderr, "out of memory in main\n");
         rval = 1; goto CLEANUP;
     }
 
     probname = CCtsp_problabel (edgefname);
     if (!probname) {
-        fprintf (stderr, "CCtsp_problabel failed\n");
+        CC_FPRINTF(stderr, "CCtsp_problabel failed\n");
         rval = 1; goto CLEANUP;
     }
 
     if (tourfname) {
         in_tour = CC_SAFE_MALLOC (ncount, int);
         if (!in_tour) {
-            fprintf (stderr, "out of memory in main\n");
+            CC_FPRINTF(stderr, "out of memory in main\n");
             rval = 1; goto CLEANUP;
         }
         rval = CCutil_getcycle (ncount, tourfname, in_tour, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_getcycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_getcycle failed\n"); goto CLEANUP;
         }
     }
 
@@ -106,51 +106,51 @@ int main (int ac, char **av)
                   out_tour, mybnd, &optval, &success, &foundtour, 
                   probname, mytimebound, &hit_timebound, run_silently, &rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_solve_sparse failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_solve_sparse failed\n"); goto CLEANUP;
         }
     } else {
         rval = CCtsp_solve_dat (ncount, &dat, in_tour, out_tour, mybnd,
                  &optval, &success, &foundtour, probname, mytimebound,
                  &hit_timebound, run_silently, &rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_solve_dat failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_solve_dat failed\n"); goto CLEANUP;
         }
     }
 
     if (hit_timebound) {
-        printf ("Code hit time bound\n");
+        CC_PRINTF("Code hit time bound\n");
         if (foundtour) {
-            printf ("A possibly non-optimal tour has been found\n");
+            CC_PRINTF("A possibly non-optimal tour has been found\n");
         }
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else if (success) {
         if (optval == CCtsp_LP_MAXDOUBLE) {
-            printf ("Graph does not contain a tour\n"); fflush (stdout);
+            CC_PRINTF("Graph does not contain a tour\n"); CC_FFLUSH(stdout);
         } else {
             if (foundtour == 0) {
-                printf ("Lowerbound %.0f established\n", optval);
+                CC_PRINTF("Lowerbound %.0f established\n", optval);
             } else {
-                printf ("Found the optimal tour: %.0f\n", optval);
+                CC_PRINTF("Found the optimal tour: %.0f\n", optval);
             }
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     } else {
-        printf ("Code hit limit, did not succeed\n");
+        CC_PRINTF("Code hit limit, did not succeed\n");
         if (foundtour) {
-            printf ("A possibly non-optimal tour has been found\n");
+            CC_PRINTF("A possibly non-optimal tour has been found\n");
         }
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     if (foundtour && outfname) {
         rval = CCutil_writecycle (ncount, outfname, out_tour, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_writecycle failed\n"); fflush (stdout);
+            CC_FPRINTF(stderr, "CCutil_writecycle failed\n"); CC_FFLUSH(stdout);
         }
     }
 
-    printf ("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_PRINTF("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -206,14 +206,14 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "usage: %s [- below -] file\n", f);
-    fprintf (stderr, "   -o f  write tour (node node node format)\n");
-    fprintf (stderr, "   -Q    run quietly (don't generate so much output)\n");
-    fprintf (stderr, "   -s #  random seed\n");
-    fprintf (stderr, "   -t f  starting tour file (node node node format)\n");
-    fprintf (stderr, "   -T    file is a TSPLIB file (default is edge file)\n");
-    fprintf (stderr, "   -u #  bound on tour length\n");
-    fprintf (stderr, "   -z #  bound on running time\n");
+    CC_FPRINTF(stderr, "usage: %s [- below -] file\n", f);
+    CC_FPRINTF(stderr, "   -o f  write tour (node node node format)\n");
+    CC_FPRINTF(stderr, "   -Q    run quietly (don't generate so much output)\n");
+    CC_FPRINTF(stderr, "   -s #  random seed\n");
+    CC_FPRINTF(stderr, "   -t f  starting tour file (node node node format)\n");
+    CC_FPRINTF(stderr, "   -T    file is a TSPLIB file (default is edge file)\n");
+    CC_FPRINTF(stderr, "   -u #  bound on tour length\n");
+    CC_FPRINTF(stderr, "   -z #  bound on running time\n");
 }
 
 

@@ -261,32 +261,32 @@ int CCpq_necklaces (CCtsp_lpcut_in **cuts, int *cutcount,
 
     necknum = CC_SAFE_MALLOC (ecount, int);
     if (necknum == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCpq_necklaces\n");
+        CC_FPRINTF(stderr, "Out of memory in CCpq_necklaces\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCpq_cuttree_build_necklaces (ctree, ecount, elist, x, &neckcount,
                                     &necklist, necknum);
     if (rval) {
-        fprintf (stderr, "CCpq_cuttree_build_necklaces failed\n");
+        CC_FPRINTF(stderr, "CCpq_cuttree_build_necklaces failed\n");
         goto CLEANUP;
     }
 
     rval = necklace_build_graph (&ng, ncount, ecount, elist, x, necknum);
     if (rval) {
-        fprintf (stderr, "necklace_build_graph failed\n");
+        CC_FPRINTF(stderr, "necklace_build_graph failed\n");
         goto CLEANUP;
     }
 
     rval = cuttree_to_necktree (ctree, &ng, neckcount, necklist);
     if (rval) {
-        fprintf (stderr, "cuttree_to_necktree failed\n");
+        CC_FPRINTF(stderr, "cuttree_to_necktree failed\n");
         goto CLEANUP;
     }
 
 #ifdef DEBUG
 #if (DEBUGLVL>1)
-    printf ("Necklaces:\n");
+    CC_PRINTF("Necklaces:\n");
     dump_necklaces (&ng);
 #endif
 #endif
@@ -295,12 +295,12 @@ int CCpq_necklaces (CCtsp_lpcut_in **cuts, int *cutcount,
 
     rval = necklace_build_spantree (&ng);
     if (rval) {
-        fprintf (stderr, "necklace_build_spantree failed\n");
+        CC_FPRINTF(stderr, "necklace_build_spantree failed\n");
         goto CLEANUP;
     }
 
     if (ng.spanroot == (necknode *) NULL) {
-        fprintf (stderr, "necklace_build_spantree couldn't build spantree\n");
+        CC_FPRINTF(stderr, "necklace_build_spantree couldn't build spantree\n");
         rval = 0;
         goto CLEANUP;
     }
@@ -308,7 +308,7 @@ int CCpq_necklaces (CCtsp_lpcut_in **cuts, int *cutcount,
     ng.spanroot->toroot = (intptr *) NULL;
     rval = compute_toroots (ng.spanroot, &ng.intptr_world);
     if (rval) {
-        fprintf (stderr, "compute_toroots failed\n");
+        CC_FPRINTF(stderr, "compute_toroots failed\n");
         goto CLEANUP;
     }
 
@@ -320,14 +320,14 @@ int CCpq_necklaces (CCtsp_lpcut_in **cuts, int *cutcount,
 
     rval = necklace_crunch_cuts (cuts, cutcount, &ng, rstate);
     if (rval) {
-        fprintf (stderr, "necklace_crunch_cuts failed\n");
+        CC_FPRINTF(stderr, "necklace_crunch_cuts failed\n");
         goto CLEANUP;
     }
 
 /*
-    printf ("CCpq_necklaces finished in %.2f seconds\n",
+    CC_PRINTF("CCpq_necklaces finished in %.2f seconds\n",
             CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 */
 
     rval = 0;
@@ -384,31 +384,31 @@ static void neckgraph_free (neckgraph *g)
     g->neckcount = 0;
 
     if (intptr_check_leaks (&g->intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding NECKLACE-intptr's\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding NECKLACE-intptr's\n",
                  total - onlist);
     }
     CCptrworld_delete (&g->intptr_world);
 
     if (intptrptr_check_leaks (&g->intptrptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding NECKLACE-intptrptr's\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding NECKLACE-intptrptr's\n",
                  total - onlist);
     }
     CCptrworld_delete (&g->intptrptr_world);
     
     if (neckedgeptr_check_leaks (&g->neckedgeptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding NECKLACE-neckedgeptr's\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding NECKLACE-neckedgeptr's\n",
                  total - onlist);
     }
     CCptrworld_delete (&g->neckedgeptr_world);
     
     if (necknode_check_leaks (&g->necknode_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding NECKLACE-necknode's\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding NECKLACE-necknode's\n",
                  total - onlist);
     }
     CCptrworld_delete (&g->necknode_world);
     
     if (eqn_check_leaks (&g->eqn_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding NECKLACE-eqn's\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding NECKLACE-eqn's\n",
                  total - onlist);
     }
     CCptrworld_delete (&g->eqn_world);
@@ -429,7 +429,7 @@ static int necklace_build_graph (neckgraph *g, int ncount, int ecount,
 
     perm = CC_SAFE_MALLOC (ecount, int);
     if (perm == (int *) NULL) {
-        fprintf (stderr, "Out of memory in necklace_build_graph\n");
+        CC_FPRINTF(stderr, "Out of memory in necklace_build_graph\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -441,7 +441,7 @@ static int necklace_build_graph (neckgraph *g, int ncount, int ecount,
     edgelist = CC_SAFE_MALLOC (ecount, neckedge);
     if (nodelist == (necknode *) NULL ||
         edgelist == (neckedge *) NULL) {
-        fprintf (stderr, "Out of memory in necklace_build_graph\n");
+        CC_FPRINTF(stderr, "Out of memory in necklace_build_graph\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -474,7 +474,7 @@ static int necklace_build_graph (neckgraph *g, int ncount, int ecount,
 
     rval = neckgraph_build_adj (g);
     if (rval) {
-        fprintf (stderr, "neckgraph_build_adj failed\n");
+        CC_FPRINTF(stderr, "neckgraph_build_adj failed\n");
         goto CLEANUP;
     }
 
@@ -514,7 +514,7 @@ static int neckgraph_build_adj (neckgraph *g)
         n1 = edgelist[i].ends[1];
         p = neckedgeptr_alloc (&g->neckedgeptr_world);
         if (p == (neckedgeptr *) NULL) {
-            fprintf (stderr, "neckedgeptr_alloc failed\n");
+            CC_FPRINTF(stderr, "neckedgeptr_alloc failed\n");
             rval = 1; goto CLEANUP;
         }
         p->this = &edgelist[i];
@@ -524,7 +524,7 @@ static int neckgraph_build_adj (neckgraph *g)
 
         p = neckedgeptr_alloc (&g->neckedgeptr_world);
         if (p == (neckedgeptr *) NULL) {
-            fprintf (stderr, "neckedgeptr_alloc failed\n");
+            CC_FPRINTF(stderr, "neckedgeptr_alloc failed\n");
             rval = 1; goto CLEANUP;
         }
         p->this = &edgelist[i];
@@ -571,20 +571,20 @@ static int cuttree_to_necktree (CCtsp_cuttree *ctree, neckgraph *g,
     rval = CCutil_genhash_init (&neckmap, 2*ncount, neckcmp, neckhash,
                          (void *) NULL, 1.0, 0.5);
     if (rval) {
-        fprintf (stderr, "CCutil_genhash_init failed\n");
+        CC_FPRINTF(stderr, "CCutil_genhash_init failed\n");
         return 1;
     }
 
     g->cutroot = cuttree_to_necktree_work (ctree->root, ctree->nodelist,
                                     g->nodelist, &neckmap, &g->necknode_world);
     if (g->cutroot == (necknode *) NULL) {
-        fprintf (stderr, "cuttree_to_necktree failed\n");
+        CC_FPRINTF(stderr, "cuttree_to_necktree failed\n");
         rval = 1; goto CLEANUP;
     }
 
     newnecklist = CC_SAFE_MALLOC (neckcount, necknode *);
     if (newnecklist == (necknode **) NULL) {
-        fprintf (stderr, "Out of memory in cuttree_to_necktree\n");
+        CC_FPRINTF(stderr, "Out of memory in cuttree_to_necktree\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -592,7 +592,7 @@ static int cuttree_to_necktree (CCtsp_cuttree *ctree, neckgraph *g,
         newnecklist[i] = (necknode *) CCutil_genhash_lookup (&neckmap,
                                                              necklist[i]);
         if (newnecklist[i] == (necknode *) NULL) {
-            fprintf (stderr, "Couldn't map necklist\n");
+            CC_FPRINTF(stderr, "Couldn't map necklist\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -629,7 +629,7 @@ static necknode *cuttree_to_necktree_work (CCtsp_cutnode *n,
 
     nn = necknode_alloc (necknode_world);
     if (nn == (necknode *) NULL) {
-        fprintf (stderr, "out of memory in cuttree_to_necktree_work\n");
+        CC_FPRINTF(stderr, "out of memory in cuttree_to_necktree_work\n");
         goto FAILURE;
     }
     nn->child = (necknode *) NULL;
@@ -639,7 +639,7 @@ static necknode *cuttree_to_necktree_work (CCtsp_cutnode *n,
 
     rval = CCutil_genhash_insert (neckmap, (void *) n, (void *) nn);
     if (rval) {
-        fprintf (stderr, "CCutil_genhash_insert failed\n");
+        CC_FPRINTF(stderr, "CCutil_genhash_insert failed\n");
         goto FAILURE;
     }
 
@@ -706,7 +706,7 @@ static int necklace_build_spantree (neckgraph *g)
         }
     }
     if (k) {
-        fprintf (stderr, "necklace graph is not connected\n");
+        CC_FPRINTF(stderr, "necklace graph is not connected\n");
         g->spanroot = (necknode *) NULL;
         return 0;
     }
@@ -742,7 +742,7 @@ static int necklace_build_spantree (neckgraph *g)
         front = front->next;
     }
     if (cnt < ncount) {
-        fprintf (stderr, "lost the spanning tree\n");
+        CC_FPRINTF(stderr, "lost the spanning tree\n");
         g->spanroot = (necknode *) NULL;
         return 1;
     }
@@ -768,7 +768,7 @@ static int necklace_crunch_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
 
     rval = binsys_init (&necksys, neckcount);
     if (rval) {
-        fprintf (stderr, "binsys_init failed\n");
+        CC_FPRINTF(stderr, "binsys_init failed\n");
         goto CLEANUP;
     }
 
@@ -782,7 +782,7 @@ static int necklace_crunch_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
 
     oneseqn = eqn_alloc (&g->eqn_world);
     if (oneseqn == (eqn *) NULL) {
-        fprintf (stderr, "eqn_alloc failed\n");
+        CC_FPRINTF(stderr, "eqn_alloc failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -795,16 +795,16 @@ static int necklace_crunch_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
 
     rval = binsys_add_dense (&necksys, oneseqn, &status);
     if (rval) {
-        fprintf (stderr, "binsys_add_dense failed\n");
+        CC_FPRINTF(stderr, "binsys_add_dense failed\n");
         goto CLEANUP;
     }
     oneseqn = (eqn *) NULL;
     if (status == BINSYS_INFEAS) {
-        fprintf (stderr, "ZZZ ODDNESS CONSTRAINT FAILED\n");
+        CC_FPRINTF(stderr, "ZZZ ODDNESS CONSTRAINT FAILED\n");
         rval = 1; goto CLEANUP;
     }
 #ifdef DEBUG
-    printf ("1"); fflush (stdout);
+    CC_PRINTF("1"); CC_FFLUSH(stdout);
 #endif
 
     found = (intptrptr *) NULL;
@@ -819,28 +819,28 @@ static int necklace_crunch_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
         if (!edgelist[i].inspanning) {
             rval = necklace_add_edge_to_sys (&edgelist[i], &necksys, &status);
             if (rval) {
-                fprintf (stderr, "necklace_add_edge_to_sys failed\n");
+                CC_FPRINTF(stderr, "necklace_add_edge_to_sys failed\n");
                 goto CLEANUP;
             }
             if (status == BINSYS_NONTRIV) {
                 edgelist[i].insystem = 1;
 #ifdef DEBUG
-                printf ("+"); fflush (stdout);
+                CC_PRINTF("+"); CC_FFLUSH(stdout);
 #endif
                 tried = 0;
                 if (necksys.nfreevars <= trynext) {
 #ifdef DEBUG
-                    printf (" (%.2f:%d)",edgelist[i].x,necksys.nfreevars);
-                    fflush (stdout);
+                    CC_PRINTF(" (%.2f:%d)",edgelist[i].x,necksys.nfreevars);
+                    CC_FFLUSH(stdout);
 #endif
                     rval = necklace_try_solutions (cuts, cutcount, g,
                                                    &necksys, &found);
                     if (rval) {
-                        fprintf (stderr, "necklace_try_solutions failed\n");
+                        CC_FPRINTF(stderr, "necklace_try_solutions failed\n");
                         goto CLEANUP;
                     }
 #ifdef DEBUG
-                    printf ("\n"); fflush (stdout);
+                    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 #endif
                     tried = 1;
                     trynext = NECK_NEXTTRY (trynext);
@@ -848,11 +848,11 @@ static int necklace_crunch_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
             } else if (status == BINSYS_TRIVIAL) {
                 edgelist[i].insystem = 1;
 #ifdef DEBUG
-                printf ("."); fflush (stdout);
+                CC_PRINTF("."); CC_FFLUSH(stdout);
 #endif
             } else {
 #ifdef DEBUG
-                printf ("-"); fflush (stdout);
+                CC_PRINTF("-"); CC_FFLUSH(stdout);
 #endif
 #ifdef ONLY_EXACT
                 rval = 0; goto CLEANUP;
@@ -862,17 +862,17 @@ static int necklace_crunch_cuts (CCtsp_lpcut_in **cuts, int *cutcount,
     }
     if (!tried) {
 #ifdef DEBUG
-        printf (" (%.2f:%d)",edgelist[i-1].x,necksys.nfreevars);
+        CC_PRINTF(" (%.2f:%d)",edgelist[i-1].x,necksys.nfreevars);
 
-        fflush (stdout);
+        CC_FFLUSH(stdout);
 #endif
         rval = necklace_try_solutions (cuts, cutcount, g, &necksys, &found);
         if (rval) {
-            fprintf (stderr, "necklace_try_solutions failed\n");
+            CC_FPRINTF(stderr, "necklace_try_solutions failed\n");
             goto CLEANUP;
         }
 #ifdef DEBUG
-        printf ("\n"); fflush (stdout);
+        CC_PRINTF("\n"); CC_FFLUSH(stdout);
 #endif
     }
 
@@ -894,21 +894,21 @@ static int necklace_edge_to_eqn (neckedge *e, eqn **p_eq, bin_system *s)
 
     neweqn = eqn_alloc (s->eqn_world);
     if (neweqn == (eqn *) NULL) {
-        fprintf (stderr, "eqn_alloc failed\n");
+        CC_FPRINTF(stderr, "eqn_alloc failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = intptr_add (e->ends[0]->toroot, e->ends[1]->toroot, &neweqn->lhs,
                        s->intptr_world);
     if (rval) {
-        fprintf (stderr, "intptr_add failed\n");
+        CC_FPRINTF(stderr, "intptr_add failed\n");
         goto CLEANUP;
     }
 
     if (e->necklabel != -1) {
         tmp = intptr_alloc (s->intptr_world);
         if (tmp == (intptr *) NULL) {
-            fprintf (stderr, "intptr_alloc failed\n");
+            CC_FPRINTF(stderr, "intptr_alloc failed\n");
             rval = 1; goto CLEANUP;
         }
         tmp->this = e->necklabel;
@@ -933,13 +933,13 @@ static int necklace_add_edge_to_sys (neckedge *e, bin_system *s, int *status)
 
     rval = necklace_edge_to_eqn (e, &neweqn, s);
     if (rval) {
-        fprintf (stderr, "necklace_edge_to_eqn failed\n");
+        CC_FPRINTF(stderr, "necklace_edge_to_eqn failed\n");
         goto CLEANUP;
     }
 
     rval = binsys_add_sparse (s, neweqn, status);
     if (rval) {
-        fprintf (stderr, "binsys_add_sparse failed\n");
+        CC_FPRINTF(stderr, "binsys_add_sparse failed\n");
         goto CLEANUP;
     }
     rval = 0;
@@ -959,14 +959,14 @@ static int necklace_try_solutions (CCtsp_lpcut_in **cuts, int *cutcount,
     for (i=0; i<NECK_ENUM_NTRIES; i++) {
         rval = binsys_random_minimal_solution (necksys, &sollst);
         if (rval) {
-            fprintf (stderr, "binsys_random_minimal_solution failed\n");
+            CC_FPRINTF(stderr, "binsys_random_minimal_solution failed\n");
             goto CLEANUP;
         }
         if (intptr_list_size (sollst) >= 3 &&
             !find_solution (sollst, *p_found)) {
             new = intptrptr_alloc (&g->intptrptr_world);
             if (new == (intptrptr *) NULL) {
-                fprintf (stderr, "intptrptr_alloc failed\n");
+                CC_FPRINTF(stderr, "intptrptr_alloc failed\n");
                 rval = 1; goto CLEANUP;
             }
             new->this = sollst;
@@ -975,7 +975,7 @@ static int necklace_try_solutions (CCtsp_lpcut_in **cuts, int *cutcount,
             *p_found = new;
             rval = necklace_checkout_solution (new->this, g, cuts, cutcount);
             if (rval) {
-                fprintf (stderr, "necklace_checkout_solution failed\n");
+                CC_FPRINTF(stderr, "necklace_checkout_solution failed\n");
                 goto CLEANUP;
             }
         } else {
@@ -1017,13 +1017,13 @@ static int compute_toroots (necknode *n, CCptrworld *intptr_world)
                     rval = intptr_add (n->toroot, &tmp, &m->toroot,
                                        intptr_world);
                     if (rval) {
-                        fprintf (stderr, "intptr_add failed\n");
+                        CC_FPRINTF(stderr, "intptr_add failed\n");
                         return rval;
                     }
                 } else {
                     rval = intptr_copy (n->toroot, &m->toroot, intptr_world);
                     if (rval) {
-                        fprintf (stderr, "intptr_copy failed\n");
+                        CC_FPRINTF(stderr, "intptr_copy failed\n");
                         return rval;
                     }
                 }
@@ -1054,7 +1054,7 @@ static int intptr_add (intptr *a, intptr *b, intptr **p_c,
         } else if (a->this < b->this) {
             *sumend = intptr_alloc (intptr_world);
             if (*sumend == (intptr *) NULL) {
-                fprintf (stderr, "intptr_alloc failed\n");
+                CC_FPRINTF(stderr, "intptr_alloc failed\n");
                 rval = 1; goto CLEANUP;
             }
             (*sumend)->this = a->this;
@@ -1064,7 +1064,7 @@ static int intptr_add (intptr *a, intptr *b, intptr **p_c,
             assert (a->this > b->this);
             *sumend = intptr_alloc (intptr_world);
             if (*sumend == (intptr *) NULL) {
-                fprintf (stderr, "intptr_alloc failed\n");
+                CC_FPRINTF(stderr, "intptr_alloc failed\n");
                 rval = 1; goto CLEANUP;
             }
             (*sumend)->this = b->this;
@@ -1075,13 +1075,13 @@ static int intptr_add (intptr *a, intptr *b, intptr **p_c,
     if (a) {
         rval = intptr_copy (a, sumend, intptr_world);
         if (rval) {
-            fprintf (stderr, "intptr_copy failed\n");
+            CC_FPRINTF(stderr, "intptr_copy failed\n");
             goto CLEANUP;
         }
     } else if (b) {
         rval = intptr_copy (b, sumend, intptr_world);
         if (rval) {
-            fprintf (stderr, "intptr_copy failed\n");
+            CC_FPRINTF(stderr, "intptr_copy failed\n");
             goto CLEANUP;
         }
     } else {
@@ -1162,7 +1162,7 @@ static int intptr_addto (intptr *a, intptr *b, intptr **p_c,
             assert (a->this > b->this);
             *sumend = intptr_alloc (intptr_world);
             if (*sumend == (intptr *) NULL) {
-                fprintf (stderr, "intptr_alloc failed\n");
+                CC_FPRINTF(stderr, "intptr_alloc failed\n");
                 rval = 1; goto CLEANUP;
             }
             (*sumend)->this = b->this;
@@ -1175,7 +1175,7 @@ static int intptr_addto (intptr *a, intptr *b, intptr **p_c,
     } else if (b) {
         rval = intptr_copy (b, sumend, intptr_world);
         if (rval) {
-            fprintf (stderr, "intptr_copy failed\n");
+            CC_FPRINTF(stderr, "intptr_copy failed\n");
             goto CLEANUP;
         }
     } else {
@@ -1206,7 +1206,7 @@ static int intptr_copy (intptr *a, intptr **p_b, CCptrworld *intptr_world)
     while (a) {
         *sumend = intptr_alloc (intptr_world);
         if (*sumend == (intptr *) NULL) {
-            fprintf (stderr, "intptr_alloc failed\n");
+            CC_FPRINTF(stderr, "intptr_alloc failed\n");
             rval = 1; goto CLEANUP;
         }
         (*sumend)->this = a->this;
@@ -1232,7 +1232,7 @@ static int eqn_addto (eqn *a, eqn *b, bin_system *s)
 
     rval = intptr_addto (a->lhs, b->lhs, &a->lhs, s->intptr_world);
     if (rval) {
-        fprintf (stderr, "intptr_addto failed\n");
+        CC_FPRINTF(stderr, "intptr_addto failed\n");
         eqn_free (s->eqn_world, a);
         return rval;
     }
@@ -1289,8 +1289,8 @@ static int necklace_checkout_solution (intptr *sollst, neckgraph *g,
     int rval;
 
 #ifdef DEBUG
-    printf ("s");
-    fflush (stdout);
+    CC_PRINTF("s");
+    CC_FFLUSH(stdout);
 #endif
 
     g->magicnum++;
@@ -1302,8 +1302,8 @@ static int necklace_checkout_solution (intptr *sollst, neckgraph *g,
 
     if (cnt % 2 == 0) {
 #ifdef DEBUG
-        printf ("E");
-        fflush (stdout);
+        CC_PRINTF("E");
+        CC_FFLUSH(stdout);
 #endif
         rval = 0; goto CLEANUP;
     }
@@ -1316,24 +1316,24 @@ static int necklace_checkout_solution (intptr *sollst, neckgraph *g,
         if (!check_realization (necklist[p->this], cnt, &lefthalf,
                                 &righthalf)) {
 #ifdef DEBUG
-            printf ("U");
-            fflush (stdout);
+            CC_PRINTF("U");
+            CC_FFLUSH(stdout);
 #endif
 #ifdef DUMP_UNREALIZABLE
-            printf ("Unrealizable cut, %d total children\n", cnt);
+            CC_PRINTF("Unrealizable cut, %d total children\n", cnt);
             for (p = sollst; p; p = p->next) {
-                printf ("%d(%d): ", p->this,
+                CC_PRINTF("%d(%d): ", p->this,
                         necklist[p->this]->labeled_children_count);
                 dump_necklace_work (g, necklist[p->this]);
-                printf ("\n");
+                CC_PRINTF("\n");
             }
 #endif /* DUMP_UNREALIZABLE */
             rval = 0; goto CLEANUP;
         }
     }
 #ifdef DEBUG
-    printf ("c");
-    fflush (stdout);
+    CC_PRINTF("c");
+    CC_FFLUSH(stdout);
 #endif
 
     cut = CC_SAFE_MALLOC (1, CCtsp_lpcut_in);
@@ -1343,7 +1343,7 @@ static int necklace_checkout_solution (intptr *sollst, neckgraph *g,
     cut->cliquecount = cnt + 1;
     cut->cliques = CC_SAFE_MALLOC (cut->cliquecount, CCtsp_lpclique);
     if (cut->cliques == (CCtsp_lpclique *) NULL) {
-        fprintf (stderr, "Out of memory in necklace_checkout_solution\n");
+        CC_FPRINTF(stderr, "Out of memory in necklace_checkout_solution\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1358,20 +1358,20 @@ static int necklace_checkout_solution (intptr *sollst, neckgraph *g,
     for (p = sollst, cnt2=1; p; p = p->next) {
         if (!check_realization (necklist[p->this], cnt, &lefthalf,
                                 &righthalf)) {
-            fprintf (stderr, "ZZZ Whoops, necklace broke\n");
+            CC_FPRINTF(stderr, "ZZZ Whoops, necklace broke\n");
             rval = 1; goto CLEANUP;
         }
         rval = collect_necklace_tooth (g, lefthalf, righthalf,
                                        necklist[p->this], &cut->cliques[cnt2]);
         if (rval) {
-            fprintf (stderr, "collect_necklace_tooth failed\n");
+            CC_FPRINTF(stderr, "collect_necklace_tooth failed\n");
             goto CLEANUP;
         }
         cnt2++;
     }
     rval = collect_necklace_handle (g, &cut->cliques[0]);
     if (rval) {
-        fprintf (stderr, "collect_necklace_handle failed\n");
+        CC_FPRINTF(stderr, "collect_necklace_handle failed\n");
         goto CLEANUP;
     }
     cut->rhs = CCtsp_COMBRHS(cut);
@@ -1381,7 +1381,7 @@ static int necklace_checkout_solution (intptr *sollst, neckgraph *g,
 
     rval = CCtsp_construct_skeleton (cut, ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         goto CLEANUP;
     }
 
@@ -1392,8 +1392,8 @@ static int necklace_checkout_solution (intptr *sollst, neckgraph *g,
         cut = (CCtsp_lpcut_in *) NULL;
     } else {
 /*#ifdef DEBUG*/
-        printf ("V");
-        fflush (stdout);
+        CC_PRINTF("V");
+        CC_FFLUSH(stdout);
 /*#endif*/
     }
 
@@ -1470,7 +1470,7 @@ static int collect_necklace_tooth (neckgraph *g, necknode *lefthalf,
 
     arr = CC_SAFE_MALLOC (g->ncount, int);
     if (arr == (int *) NULL) {
-        fprintf (stderr, "out of memory in collect_necklace_tooth\n");
+        CC_FPRINTF(stderr, "out of memory in collect_necklace_tooth\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1487,7 +1487,7 @@ static int collect_necklace_tooth (neckgraph *g, necknode *lefthalf,
 
     rval = CCtsp_array_to_lpclique (arr, cnt, c);
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
         goto CLEANUP;
     }
     rval = 0;
@@ -1544,7 +1544,7 @@ static int collect_necklace_handle (neckgraph *g, CCtsp_lpclique *c)
 
     arr = CC_SAFE_MALLOC (ncount, int);
     if (arr == (int *) NULL) {
-        fprintf (stderr, "out of memory in collect_necklace_handle\n");
+        CC_FPRINTF(stderr, "out of memory in collect_necklace_handle\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1569,7 +1569,7 @@ static int collect_necklace_handle (neckgraph *g, CCtsp_lpclique *c)
     }
     rval = CCtsp_array_to_lpclique (arr, cnt2, c);
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
         goto CLEANUP;
     }
     rval = 0;
@@ -1610,7 +1610,7 @@ static int binsys_init (bin_system *s, int nvars)
 
     s->vars = CC_SAFE_MALLOC (nvars, bin_var);
     if (s->vars == (bin_var *) NULL) {
-        fprintf (stderr, "out of memory in binsys_init\n");
+        CC_FPRINTF(stderr, "out of memory in binsys_init\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1639,7 +1639,7 @@ static int binsys_add_dense (bin_system *s, eqn *e, int *status)
 
     rval = binsys_elim (s, e);
     if (rval) {
-        fprintf (stderr, "binsys_elim failed\n");
+        CC_FPRINTF(stderr, "binsys_elim failed\n");
         return rval;
     }
 
@@ -1667,7 +1667,7 @@ static int binsys_add_sparse (bin_system *s, eqn *e, int *status)
 
     rval = binsys_elim (s, e);
     if (rval) {
-        fprintf (stderr, "binsys_elim failed\n");
+        CC_FPRINTF(stderr, "binsys_elim failed\n");
         return rval;
     }
 
@@ -1698,7 +1698,7 @@ static int binsys_add_sparse (bin_system *s, eqn *e, int *status)
     if (s->denseeqn && find_label (s->denseeqn->lhs, e->pivot)) {
         rval = eqn_addto (s->denseeqn, e, s);
         if (rval) {
-            fprintf (stderr, "eqn_addto failed\n");
+            CC_FPRINTF(stderr, "eqn_addto failed\n");
             s->denseeqn = (eqn *) NULL;
             free_equation (e, s);
             return rval;
@@ -1729,13 +1729,13 @@ static int binsys_elim (bin_system *s, eqn *e)
             if (f->lhs && f->lhs->this == q->this) {
                 rval = eqn_addto (e, f, s);
                 if (rval) {
-                    fprintf (stderr, "eqn_addto failed\n");
+                    CC_FPRINTF(stderr, "eqn_addto failed\n");
                     return rval;
                 }
             } else {
                 rval = eqn_addto (e, f, s);
                 if (rval) {
-                    fprintf (stderr, "eqn_addto failed\n");
+                    CC_FPRINTF(stderr, "eqn_addto failed\n");
                     return rval;
                 }
                 p = &e->lhs;
@@ -1768,7 +1768,7 @@ static int binsys_random_minimal_solution (bin_system *s, intptr **sollst)
                 s->vars[i].fixed = 1;
                 rval = binsys_force_zero (s, i, &status);
                 if (rval) {
-                    fprintf (stderr, "binsys_force_zero failed\n");
+                    CC_FPRINTF(stderr, "binsys_force_zero failed\n");
                     goto CLEANUP;
                 }
                 if (status == BINSYS_NONTRIV) {
@@ -1780,7 +1780,7 @@ static int binsys_random_minimal_solution (bin_system *s, intptr **sollst)
     binsys_random_solution (s);
     rval = binsys_list_solution (s, sollst);
     if (rval) {
-        fprintf (stderr, "binsys_list_solution failed\n");
+        CC_FPRINTF(stderr, "binsys_list_solution failed\n");
         goto CLEANUP;
     }
     rval = 0;
@@ -1788,7 +1788,7 @@ static int binsys_random_minimal_solution (bin_system *s, intptr **sollst)
   CLEANUP:
     for (i=0; i<nadded; i++) {
         if (binsys_pop_sparse (s)) {
-            fprintf (stderr, "binsys_pop_sparse failed\n");
+            CC_FPRINTF(stderr, "binsys_pop_sparse failed\n");
             rval = 1;
         }
     }
@@ -1839,14 +1839,14 @@ static int binsys_force_zero (bin_system *s, int v, int *status)
 
     e = eqn_alloc (s->eqn_world);
     if (e == (eqn *) NULL) {
-        fprintf (stderr, "eqn_alloc failed\n");
+        CC_FPRINTF(stderr, "eqn_alloc failed\n");
         rval = 1; goto CLEANUP;
     }
 
     e->rhs = 0;
     p = intptr_alloc (s->intptr_world);
     if (p == (intptr *) NULL) {
-        fprintf (stderr, "intptr_alloc failed\n");
+        CC_FPRINTF(stderr, "intptr_alloc failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1873,7 +1873,7 @@ static int binsys_pop_sparse (bin_system *s)
     if (e->hitdense && s->denseeqn) {
         rval = eqn_addto (s->denseeqn, e, s);
         if (rval) {
-            fprintf (stderr, "eqn_addto failed\n");
+            CC_FPRINTF(stderr, "eqn_addto failed\n");
             return rval;
         }
     }
@@ -1895,7 +1895,7 @@ static int binsys_list_solution (bin_system *s, intptr **p_sollst)
         if (s->vars[i].value == 1) {
             new = intptr_alloc (s->intptr_world);
             if (new == (intptr *) NULL) {
-                fprintf (stderr, "intptr_alloc failed\n");
+                CC_FPRINTF(stderr, "intptr_alloc failed\n");
                 rval = 1; goto CLEANUP;
             }
             new->this = i;
@@ -1940,9 +1940,9 @@ static void dump_necklaces (neckgraph *g)
     int i;
 
     for (i=0; i<g->neckcount; i++) {
-        printf ("%d: ", i);
+        CC_PRINTF("%d: ", i);
         dump_necklace_work (g, g->necklist[i]);
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 }
 
@@ -1956,13 +1956,13 @@ static void dump_necklace_work (neckgraph *g, necknode *n)
                 c->child && c->child->sibling &&
                 !c->child->sibling->sibling)) {
             j = find_neck_label (c, g->necklist, g->neckcount);
-            printf ("%d ", j);
+            CC_PRINTF("%d ", j);
         } else if (c->type == CCtsp_CUT_LEAF) {
-            printf ("n%d ", c - g->nodelist);
+            CC_PRINTF("n%d ", c - g->nodelist);
         } else {
-            printf ("(");
+            CC_PRINTF("(");
             dump_necklace_work (g, c);
-            printf (") ");
+            CC_PRINTF(") ");
         }
     }
 }
@@ -1976,25 +1976,25 @@ static void dump_neckgraph (neckgraph *g)
     neckedge *edgelist = g->edgelist;
     intptr *p;
 
-    printf ("Neck nodes:\n");
+    CC_PRINTF("Neck nodes:\n");
     for (i=0; i<ncount; i++) {
-        printf ("%d:", i);
+        CC_PRINTF("%d:", i);
         for (p = nodelist[i].toroot; p; p = p->next) {
-            printf (" %d", p->this);
+            CC_PRINTF(" %d", p->this);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
-    printf ("Neck edges:\n");
+    CC_PRINTF("Neck edges:\n");
     for (i=0; i<ecount; i++) {
-        printf ("%d (%d %d) %.2f:", i, edgelist[i].ends[0] - nodelist,
+        CC_PRINTF("%d (%d %d) %.2f:", i, edgelist[i].ends[0] - nodelist,
                 edgelist[i].ends[1] - nodelist, edgelist[i].x);
-        if (edgelist[i].insystem) printf (" sys");
-        if (edgelist[i].inspanning) printf (" span");
+        if (edgelist[i].insystem) CC_PRINTF(" sys");
+        if (edgelist[i].inspanning) CC_PRINTF(" span");
         if (edgelist[i].necklabel != -1)
-            printf (" neck %d", edgelist[i].necklabel);
-        printf ("\n");
+            CC_PRINTF(" neck %d", edgelist[i].necklabel);
+        CC_PRINTF("\n");
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 }
 
 static int find_neck_label (necknode *n, necknode **necklist, int neckcount)

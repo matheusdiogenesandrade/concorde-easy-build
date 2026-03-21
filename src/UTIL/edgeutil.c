@@ -195,7 +195,7 @@ int CCutil_edge_to_cycle (int ncount, int *elist, int *yesno, int *cyc)
     Lside = CC_SAFE_MALLOC (ncount, int);
     Rside = CC_SAFE_MALLOC (ncount, int);
     if (!Lside || !Rside) {
-        fprintf (stderr, "out of memory in CCutil_edge_to_cycle\n");
+        CC_FPRINTF(stderr, "out of memory in CCutil_edge_to_cycle\n");
         rval = 1; goto CLEANUP;
     }
 

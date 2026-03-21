@@ -168,7 +168,7 @@ int CCutil_edgehash_getall (CCutil_edgehash *h, int *ecount, int **elist,
         *elist = CC_SAFE_MALLOC (2*k, int);
         *elen  = CC_SAFE_MALLOC (k, int);
         if (!(*elist) || !(*elen)) {
-            fprintf (stderr, "out of memory in CCutil_edgehash_getall\n");
+            CC_FPRINTF(stderr, "out of memory in CCutil_edgehash_getall\n");
             CC_IFFREE (*elist, int);
             CC_IFFREE (*elen, int);
             return 1;

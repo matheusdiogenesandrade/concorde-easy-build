@@ -123,7 +123,7 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
     if (handle2) *handle2 = -1;
 
     if (ccount < 5 || c->sense != 'G') {
-        printf ("wrong ccount or sense in ddecker\n"); fflush (stdout);
+        CC_PRINTF("wrong ccount or sense in ddecker\n"); CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
@@ -132,7 +132,7 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
     hashvalues = CC_SAFE_MALLOC (ccount, int);
     hperm      = CC_SAFE_MALLOC (ccount, int);
     if (!hashvalues || !hperm) {
-        fprintf (stderr, "out of memory in CCtsp_test_pure_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_test_pure_double_decker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ccount; i++) {
@@ -144,7 +144,7 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
     rcliques = CC_SAFE_MALLOC (ccount, int);
     rmult    = CC_SAFE_MALLOC (ccount, int);
     if (!rcliques || !rmult) {
-        fprintf (stderr, "out of memory in CCtsp_test_pure_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_test_pure_double_decker\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -178,11 +178,11 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
     /* must have an odd number of distinct cliques */
 
     if (rcount % 2 != 1 || rcount < 5) {
-        printf ("either an even number of distinct cliques or too few: %d\n",
+        CC_PRINTF("either an even number of distinct cliques or too few: %d\n",
                  rcount);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         for (i = 0; i < rcount; i++) {
-            printf ("Clique %d [%d]: ", i, hashvalues[rcliques[i]]);
+            CC_PRINTF("Clique %d [%d]: ", i, hashvalues[rcliques[i]]);
             CCtsp_print_lpclique (&cliques[rcliques[i]]);
         }
         goto CLEANUP;
@@ -192,7 +192,7 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
 
     for (i = 0; i < rcount; i++) {
         if (rmult[i] > 2) {
-            printf ("some clique appears more than twice\n"); fflush (stdout);
+            CC_PRINTF("some clique appears more than twice\n"); CC_FFLUSH(stdout);
             goto CLEANUP;
         }
     }
@@ -209,7 +209,7 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
     }
     marks = CC_SAFE_MALLOC (maxn + 1, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in CCtsp_test_pure_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_test_pure_double_decker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < rcount; i++) {
@@ -240,7 +240,7 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
     }
     CCtsp_mark_clique (&cliques[rcliques[0]], marks, 0);
     if (hand0 == -1) {
-        printf ("no potential handle in ddecker\n"); fflush (stdout);
+        CC_PRINTF("no potential handle in ddecker\n"); CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
@@ -268,7 +268,7 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
         }
     }
     if (hand1 == -1) {
-        printf ("no second handle in ddecker\n"); fflush (stdout);
+        CC_PRINTF("no second handle in ddecker\n"); CC_FFLUSH(stdout);
         goto CLEANUP;
     }
     CCtsp_mark_clique (&cliques[rcliques[hand1]], marks, 0);
@@ -282,8 +282,8 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
         if (i != hand0 && i != hand1) {
             CCtsp_is_clique_marked (&cliques[rcliques[i]], marks, 1, &marked);
             if (!marked) {
-                printf ("tooth does not meet inner handle\n");
-                fflush (stdout);
+                CC_PRINTF("tooth does not meet inner handle\n");
+                CC_FFLUSH(stdout);
                 goto CLEANUP;
             }
         }
@@ -298,8 +298,8 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
         if (i != hand0 && i != hand1) {
             CCtsp_is_clique_marked (&cliques[rcliques[i]], marks, 0, &marked);
             if (!marked) {
-                printf ("tooth does not have node outside handles\n");
-                fflush (stdout);
+                CC_PRINTF("tooth does not have node outside handles\n");
+                CC_FFLUSH(stdout);
                 goto CLEANUP;
             }
         }
@@ -313,8 +313,8 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
         if (i != hand0 && i != hand1) {
             CCtsp_is_clique_marked (&cliques[rcliques[i]], marks, 1, &marked);
             if (marked) {
-                printf ("teeth are not disjoint\n");
-                fflush (stdout);
+                CC_PRINTF("teeth are not disjoint\n");
+                CC_FFLUSH(stdout);
                 goto CLEANUP;
             }
             CCtsp_mark_clique (&cliques[rcliques[i]], marks, 1);
@@ -335,8 +335,8 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
         if (i != hand0 && i != hand1) {
             CCtsp_is_clique_marked (&cliques[rcliques[i]], marks, 1, &marked);
             if ((marked && rmult[i] != 1) || (!marked && rmult[i] != 2)) {
-                printf ("duplicated tooth has an extra cavity\n");
-                fflush (stdout);
+                CC_PRINTF("duplicated tooth has an extra cavity\n");
+                CC_FFLUSH(stdout);
                 goto CLEANUP;
             }
         }
@@ -356,8 +356,8 @@ int CCtsp_test_pure_double_decker (CCtsp_lpcut_in *c, int *yes_no,
     rhs = (2 * (k + 1) * alpha) + (2 * beta);
 
     if (rhs != c->rhs) {
-        printf ("bad rhs in ddecker: %d instead of %d\n", c->rhs, rhs);
-        fflush (stdout);
+        CC_PRINTF("bad rhs in ddecker: %d instead of %d\n", c->rhs, rhs);
+        CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
@@ -394,14 +394,14 @@ int CCtsp_comb_to_double_decker (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = CCtsp_test_pure_comb (g->ncount, c, &test, &ihandle);
     if (rval) {
-        fprintf (stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
     }
     if (!test) goto CLEANUP;
 
     handle = &c->cliques[ihandle];
     teeth = CC_SAFE_MALLOC (c->cliquecount - 1, CCtsp_lpclique *);
     if (teeth == (CCtsp_lpclique **) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_comb_to_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_comb_to_double_decker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < c->cliquecount; i++) {
@@ -412,19 +412,19 @@ int CCtsp_comb_to_double_decker (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = comb_to_ddecker (g, handle, nteeth, teeth, x, d);
     if (rval) {
-        fprintf (stderr, "comb_to_ddecker failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "comb_to_ddecker failed\n"); goto CLEANUP;
     }
         
     rval = stretch_teeth (g, h, handle, nteeth, teeth, &bigcliques, 2,
                          (int *) NULL, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "strech_teeth failed\n");
+        CC_FPRINTF(stderr, "strech_teeth failed\n");
         goto CLEANUP;
     }
 
     bigteeth = CC_SAFE_MALLOC (nteeth, CCtsp_lpclique *);
     if (bigteeth == (CCtsp_lpclique **) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_comb_to_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_comb_to_double_decker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nteeth; i++) {
@@ -433,7 +433,7 @@ int CCtsp_comb_to_double_decker (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = comb_to_ddecker (g, handle, nteeth, bigteeth, x, d);
     if (rval) {
-        fprintf (stderr, "comb_to_ddecker failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "comb_to_ddecker failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -490,7 +490,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
 
     marks = CC_SAFE_MALLOC (g->ncount, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in comb_to_ddecker\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_ddecker\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_clique_and_neighbors (g, handle, marks, 0);
@@ -499,13 +499,13 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     }
 
     if (nteeth % 2 == 0) {
-        fprintf (stderr, "even number of teeth\n");
+        CC_FPRINTF(stderr, "even number of teeth\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nteeth; i++) {
         CCtsp_clique_marked_count (teeth[i], marks, 1, &test);
         if (test > 0) {
-            fprintf (stderr, "teeth are not disjoint\n");
+            CC_FPRINTF(stderr, "teeth are not disjoint\n");
             rval = 1; goto CLEANUP;
         }
         CCtsp_mark_clique (teeth[i], marks, 1);
@@ -518,16 +518,16 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     for (i = 0; i < nteeth; i++) {
         CCtsp_clique_marked_count (teeth[i], marks, 1, &test);
         if (test == 0) {
-            fprintf (stderr, "tooth does not meet handle\n");
-            printf ("Tooth %d: ", i); fflush (stdout);
+            CC_FPRINTF(stderr, "tooth does not meet handle\n");
+            CC_PRINTF("Tooth %d: ", i); CC_FFLUSH(stdout);
             CCtsp_print_lpclique (teeth[i]);
-            printf ("Handle: "); fflush (stdout);
+            CC_PRINTF("Handle: "); CC_FFLUSH(stdout);
             CCtsp_print_lpclique (handle);
             rval = 1; goto CLEANUP;
         }
         CCtsp_clique_marked_count (teeth[i], marks, 0, &test);
         if (test == 0) {
-            fprintf (stderr, "tooth does not have a cavity\n");
+            CC_FPRINTF(stderr, "tooth does not have a cavity\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -535,7 +535,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
 
     values = CC_SAFE_MALLOC (g->ncount, double);
     if (!values) {
-        fprintf (stderr, "out of memory in comb_to_ddecker\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_ddecker\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_clique_and_neighbors_double (g, handle, values, 0.0);
@@ -554,7 +554,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     beta      = CC_SAFE_MALLOC (nteeth, int);
     if (!addnodes || !addnodes2 || !addnodes_x || !subnodes || !subnodes2 ||
         !subnodes_x || !beta) {
-        fprintf (stderr, "out of memory in comb_to_ddecker\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_ddecker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nteeth; i++) {
@@ -565,7 +565,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
 #ifdef TRY_QUAD_DECKERS
     addnodes3 = CC_SAFE_MALLOC (nteeth, int);
     if (!addnodes3) {
-        fprintf (stderr, "out of memory in comb_to_ddecker\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_ddecker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nteeth; i++) {
@@ -655,7 +655,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             rval = add_or_subtract_nodes (handle, &newclique, nteeth,
                                           addnodes, 0);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 goto CLEANUP;
             }
             wnodes = addnodes;
@@ -664,7 +664,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             rval = add_or_subtract_nodes (handle, &newclique, nteeth,
                                           subnodes, 1);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 goto CLEANUP;
             }
             wnodes = subnodes;
@@ -673,7 +673,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             rval = add_or_subtract_nodes (handle, &newclique, nteeth,
                                           addnodes_x, 0);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 goto CLEANUP;
             }
             wnodes = addnodes_x;
@@ -682,7 +682,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             rval = add_or_subtract_nodes (handle, &newclique, nteeth,
                                           subnodes_x, 1);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 goto CLEANUP;
             }
             wnodes = subnodes_x;
@@ -697,7 +697,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
         rval = build_star (&dp, 2, harray, alpha, nteeth, teeth, beta,
                            g->ncount);
         if (rval) {
-            fprintf (stderr, "build_star failed\n");
+            CC_FPRINTF(stderr, "build_star failed\n");
             CCtsp_free_lpclique (&newclique);
             goto CLEANUP;
         }
@@ -707,12 +707,12 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             rval = CCtsp_test_pure_double_decker (dp, &test,
                                                  (int *) NULL, (int *) NULL);
             if (rval) {
-                fprintf (stderr, "CCtsp_test_pure_double_decker failed\n");
+                CC_FPRINTF(stderr, "CCtsp_test_pure_double_decker failed\n");
                 CCtsp_free_lpcut_in (dp);
                 goto CLEANUP;
             }
             if (!test) {
-                fprintf (stderr, "ddecker is not valid\n");
+                CC_FPRINTF(stderr, "ddecker is not valid\n");
                 CCtsp_print_lpcut_in (dp);
                 rval = 1; goto CLEANUP;
             }
@@ -730,13 +730,13 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             rval = add_or_subtract_nodes (handle, &newclique, nteeth,
                                           addnodes, 0);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 goto CLEANUP;
             }
             rval = add_or_subtract_nodes (&newclique, &newclique2, nteeth,
                                           addnodes2, 0);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 CCtsp_free_lpclique (&newclique);
                 goto CLEANUP;
             }
@@ -747,13 +747,13 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             rval = add_or_subtract_nodes (handle, &newclique, nteeth,
                                           subnodes, 1);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 goto CLEANUP;
             }
             rval = add_or_subtract_nodes (&newclique, &newclique2, nteeth,
                                           subnodes2, 1);
             if (rval) {
-                fprintf (stderr, "add_or_subtract_nodes failed\n");
+                CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
                 CCtsp_free_lpclique (&newclique);
                 goto CLEANUP;
             }
@@ -779,7 +779,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
         rval = build_star (&dp, 3, harray, alpha, nteeth, teeth, beta,
                            g->ncount);
         if (rval) {
-            fprintf (stderr, "build_star failed\n");
+            CC_FPRINTF(stderr, "build_star failed\n");
             CCtsp_free_lpclique (&newclique);
             CCtsp_free_lpclique (&newclique2);
             goto CLEANUP;
@@ -795,23 +795,23 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
 
 #ifdef TRY_QUAD_DECKERS
     if (addcount3 > 0) {
-        printf ("Try"); fflush (stdout);
+        CC_PRINTF("Try"); CC_FFLUSH(stdout);
         rval = add_or_subtract_nodes (handle, &newclique, nteeth, addnodes, 0);
         if (rval) {
-            fprintf (stderr, "add_or_subtract_nodes failed\n");
+            CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
             goto CLEANUP;
         }
         rval = add_or_subtract_nodes (&newclique, &newclique2, nteeth,
                                       addnodes2, 0);
         if (rval) {
-            fprintf (stderr, "add_or_subtract_nodes failed\n");
+            CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
             CCtsp_free_lpclique (&newclique);
             goto CLEANUP;
         }
         rval = add_or_subtract_nodes (&newclique2, &newclique3, nteeth,
                                       addnodes3, 0);
         if (rval) {
-            fprintf (stderr, "add_or_subtract_nodes failed\n");
+            CC_FPRINTF(stderr, "add_or_subtract_nodes failed\n");
             CCtsp_free_lpclique (&newclique);
             CCtsp_free_lpclique (&newclique2);
             goto CLEANUP;
@@ -840,7 +840,7 @@ static int comb_to_ddecker (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
         rval = build_star (&dp, 4, harray, alpha, nteeth, teeth, beta,
                            g->ncount);
         if (rval) {
-            fprintf (stderr, "build_star failed\n");
+            CC_FPRINTF(stderr, "build_star failed\n");
             CCtsp_free_lpclique (&newclique);
             CCtsp_free_lpclique (&newclique2);
             goto CLEANUP;
@@ -902,7 +902,7 @@ static int build_star (CCtsp_lpcut_in **cut, int nhandles,
 
     dp->cliques = CC_SAFE_MALLOC (alphasum + betasum, CCtsp_lpclique);
     if (!dp->cliques) {
-        fprintf (stderr, "out of memory in build_star\n");
+        CC_FPRINTF(stderr, "out of memory in build_star\n");
         CC_FREE (dp, CCtsp_lpcut_in);
         rval = 1; goto CLEANUP;
     }
@@ -911,7 +911,7 @@ static int build_star (CCtsp_lpcut_in **cut, int nhandles,
         for (j = 0; j < alpha[i]; j++) {
             rval = CCtsp_copy_lpclique (handles[i], &dp->cliques[k]);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
                 for (j = 0; j < k; j++) {
                     CCtsp_free_lpclique (&dp->cliques[j]);
                 }
@@ -927,7 +927,7 @@ static int build_star (CCtsp_lpcut_in **cut, int nhandles,
         for (j = 0; j < beta[i]; j++) {
             rval = CCtsp_copy_lpclique (teeth[i], &dp->cliques[k]);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
                 for (j = 0; j < k; j++) {
                     CCtsp_free_lpclique (&dp->cliques[j]);
                 }
@@ -945,12 +945,12 @@ static int build_star (CCtsp_lpcut_in **cut, int nhandles,
     dp->sense = 'G';
 
     if (dp->dominocount != 0) {
-        printf ("DDECKER Yipes %d\n", dp->dominocount); fflush (stdout);
+        CC_PRINTF("DDECKER Yipes %d\n", dp->dominocount); CC_FFLUSH(stdout);
         exit (1);
     }
     rval = CCtsp_construct_skeleton (dp, ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         CCtsp_free_lpcut_in (dp);
         goto CLEANUP;
     }
@@ -978,7 +978,7 @@ static int stretch_teeth (CCtsp_lpgraph *g, CC_GCgraph *h,
 
     gset  = CC_SAFE_MALLOC (g->ncount, int);
     if (gset == (int *) NULL) {
-        fprintf (stderr, "out of memory in stretch_teeth\n");
+        CC_FPRINTF(stderr, "out of memory in stretch_teeth\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -989,7 +989,7 @@ static int stretch_teeth (CCtsp_lpgraph *g, CC_GCgraph *h,
         
     newteeth = CC_SAFE_MALLOC (nteeth, CCtsp_lpclique);
     if (newteeth == (CCtsp_lpclique *) NULL) {
-        fprintf (stderr, "out of memory in stretch_teeth\n");
+        CC_FPRINTF(stderr, "out of memory in stretch_teeth\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -997,7 +997,7 @@ static int stretch_teeth (CCtsp_lpgraph *g, CC_GCgraph *h,
         if (targets == (int *) NULL || targets[i] != 0) {
             rval = CCtsp_clique_to_array (teeth[i], &ar, &acount);
             if (rval) {
-                fprintf (stderr, "CCtsp_clique_to_array failed\n");
+                CC_FPRINTF(stderr, "CCtsp_clique_to_array failed\n");
                 for (j = 0; j < i; j++) {
                     CCtsp_free_lpclique (&newteeth[j]);
                 }
@@ -1013,7 +1013,7 @@ static int stretch_teeth (CCtsp_lpgraph *g, CC_GCgraph *h,
             rval = CCcombs_greedy_cut (h, &gcount, gset, 1, forced, 0, forced,
                                        test, &gval);
             if (rval) {
-                fprintf (stderr, "CCcombs_greedy_cut failed\n");
+                CC_FPRINTF(stderr, "CCcombs_greedy_cut failed\n");
                 for (j = 0; j < i; j++) {
                     CCtsp_free_lpclique (&newteeth[j]);
                 }
@@ -1031,7 +1031,7 @@ static int stretch_teeth (CCtsp_lpgraph *g, CC_GCgraph *h,
 
             rval = CCtsp_array_to_lpclique (gset, gcount, &newteeth[i]);
             if (rval) {
-                fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
                 for (j = 0; j < i; j++) {
                     CCtsp_free_lpclique (&newteeth[j]);
                 }
@@ -1042,7 +1042,7 @@ static int stretch_teeth (CCtsp_lpgraph *g, CC_GCgraph *h,
         } else {
             rval = CCtsp_copy_lpclique (teeth[i], &newteeth[i]);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
                 for (j = 0; j < i; j++) {
                     CCtsp_free_lpclique (&newteeth[j]);
                 }
@@ -1077,7 +1077,7 @@ static int add_or_subtract_nodes (CCtsp_lpclique *old, CCtsp_lpclique *new,
 
     ar = CC_SAFE_MALLOC (icount, int);
     if (!ar) {
-        fprintf (stderr, "out of memory in add_or_subtract_nodes\n");
+        CC_FPRINTF(stderr, "out of memory in add_or_subtract_nodes\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < icount; i++) {
@@ -1088,13 +1088,13 @@ static int add_or_subtract_nodes (CCtsp_lpclique *old, CCtsp_lpclique *new,
     if (add_or_sub == 0) {
         rval = CCtsp_add_nodes_to_lpclique (old, new, count, ar);
         if (rval) {
-            fprintf (stderr, "CCtsp_add_nodes_to_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_add_nodes_to_lpclique failed\n");
             goto CLEANUP;
         }
     } else {
         rval = CCtsp_delete_nodes_from_lpclique (old, new, count, ar);
         if (rval) {
-            fprintf (stderr, "CCtsp_delete_nodes_from_lpclique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_delete_nodes_from_lpclique failed\n");
             goto CLEANUP;
         }
     }
@@ -1214,14 +1214,14 @@ int CCtsp_comb_to_star (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = CCtsp_test_pure_comb (g->ncount, c, &test, &ihandle);
     if (rval) {
-        fprintf (stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
     }
     if (!test) goto CLEANUP;
 
     handle = &c->cliques[ihandle];
     teeth = CC_SAFE_MALLOC (c->cliquecount - 1, CCtsp_lpclique *);
     if (teeth == (CCtsp_lpclique **) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_star_to_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_star_to_double_decker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < c->cliquecount; i++) {
@@ -1232,19 +1232,19 @@ int CCtsp_comb_to_star (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = comb_to_star (g, handle, nteeth, teeth, x, d);
     if (rval) {
-        fprintf (stderr, "comb_to_star failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "comb_to_star failed\n"); goto CLEANUP;
     }
         
     rval = stretch_teeth (g, h, handle, nteeth, teeth, &bigcliques, 2,
                          (int *) NULL, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "strech_teeth failed\n");
+        CC_FPRINTF(stderr, "strech_teeth failed\n");
         goto CLEANUP;
     }
 
     bigteeth = CC_SAFE_MALLOC (nteeth, CCtsp_lpclique *);
     if (bigteeth == (CCtsp_lpclique **) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_star_to_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_star_to_double_decker\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nteeth; i++) {
@@ -1253,7 +1253,7 @@ int CCtsp_comb_to_star (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = comb_to_star (g, handle, nteeth, bigteeth, x, d);
     if (rval) {
-        fprintf (stderr, "comb_to_star failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "comb_to_star failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -1301,7 +1301,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     marks  = CC_SAFE_MALLOC (g->ncount, int);
     values = CC_SAFE_MALLOC (g->ncount, double);
     if (!marks || !values) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_clique_and_neighbors (g, handle, marks, 0);
@@ -1313,7 +1313,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
 
     csize  = CC_SAFE_MALLOC (nteeth, int);
     if (!csize) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1336,7 +1336,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     bigdelta = CC_SAFE_MALLOC (nbig, double);
     if (!bigteeth || !bsize || !beta || !buse || !tadd || !tload ||
         !bigdelta || !wsize) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0, nbig = 0; i < nteeth; i++) {
@@ -1344,7 +1344,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
             bigteeth[nbig] = teeth[i];
             rval = CCtsp_clique_delta (g, x, bigteeth[nbig], &bigdelta[nbig]);
             if (rval) {
-                 fprintf (stderr, "CCtsp_clique_delta failed\n"); goto CLEANUP;
+                 CC_FPRINTF(stderr, "CCtsp_clique_delta failed\n"); goto CLEANUP;
             }
             bsize[nbig++]  = csize[i];
         }
@@ -1354,7 +1354,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     nwinners = CC_SAFE_MALLOC (nbig, int *);
     nvalues  = CC_SAFE_MALLOC (nbig, double *);
     if (!norder || !nwinners || !nvalues) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nbig; i++) {
@@ -1367,7 +1367,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
         nvalues[i]  = CC_SAFE_MALLOC (bsize[i], double);
         nwinners[i] = CC_SAFE_MALLOC (bsize[i], int);
         if (!norder[i] || !nvalues[i] || !nwinners[i]) {
-            fprintf (stderr, "out of memory in comb_to_star\n");
+            CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -1419,7 +1419,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     handles = CC_SAFE_MALLOC (lcm, CCtsp_lpclique);
     alpha   = CC_SAFE_MALLOC (lcm, int);
     if (!handles || !alpha) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < lcm; i++) {
@@ -1431,7 +1431,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     }
     ar = CC_SAFE_MALLOC (j, int);
     if (!ar) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1462,13 +1462,13 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
         if (handlenum == 0) {
             rval = CCtsp_copy_lpclique (handle, &(handles[0]));
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n"); goto CLEANUP;
             }
         } else {
             rval = CCtsp_add_nodes_to_lpclique (&(handles[handlenum-1]),
                                        &(handles[handlenum]), acount, ar);
             if (rval) {
-                fprintf (stderr, "CCtsp_add_nodes_to_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_add_nodes_to_lpclique failed\n");
                 goto CLEANUP;
             }
         }
@@ -1486,7 +1486,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
 
     abeta = CC_SAFE_MALLOC (nteeth, int);
     if (!abeta) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0, k = 0; i < nteeth; i++) {
@@ -1499,7 +1499,7 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
 
     ghandles = CC_SAFE_MALLOC (handlenum, CCtsp_lpclique *);
     if (!ghandles) {
-        fprintf (stderr, "out of memory in comb_to_star\n");
+        CC_FPRINTF(stderr, "out of memory in comb_to_star\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < handlenum; i++) {
@@ -1509,13 +1509,13 @@ static int comb_to_star (CCtsp_lpgraph *g, CCtsp_lpclique *handle,
     rval = build_star (&dp, handlenum, ghandles, alpha, nteeth, teeth, abeta,
                        g->ncount); 
     if (rval) {
-        fprintf (stderr, "build_star failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_star failed\n"); goto CLEANUP;
     }
 
     if (dp) {
         rval = CCverify_cut (dp, CC_TYPE_STAR, (int *) NULL);
         if (rval) {
-            printf ("Bad star\n"); fflush (stdout);
+            CC_PRINTF("Bad star\n"); CC_FFLUSH(stdout);
             rval = 0; goto CLEANUP;
         }
         dp->next = *cuts;
@@ -1580,14 +1580,14 @@ int CCtsp_comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = CCtsp_test_pure_comb (g->ncount, c, &test, &ihandle);
     if (rval) {
-        fprintf (stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
     }
     if (!test) goto CLEANUP;
 
     handle = &c->cliques[ihandle];
     teeth = CC_SAFE_MALLOC (c->cliquecount - 1, CCtsp_lpclique *);
     if (teeth == (CCtsp_lpclique **) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_star_to_double_decker\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_star_to_double_decker\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1600,7 +1600,7 @@ int CCtsp_comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h, double *x,
 
     rval = comb_handling (g, h, handle, nteeth, teeth, x, d);
     if (rval) {
-        fprintf (stderr, "comb_handling failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "comb_handling failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -1630,7 +1630,7 @@ static int comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h,
 
     marks  = CC_SAFE_MALLOC (g->ncount, int);
     if (!marks) {
-        fprintf (stderr, "out of memory in comb_handling\n");
+        CC_FPRINTF(stderr, "out of memory in comb_handling\n");
         rval = 1; goto CLEANUP;
     }
     CCtsp_mark_clique_and_neighbors (g, handle, marks, 0);
@@ -1643,7 +1643,7 @@ static int comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h,
     beta         = CC_SAFE_MALLOC (nteeth, int);
     workingteeth = CC_SAFE_MALLOC (nteeth, CCtsp_lpclique *);
     if (!targets || !alpha || !beta || !workingteeth) {
-        fprintf (stderr, "out of memory in comb_handling\n");
+        CC_FPRINTF(stderr, "out of memory in comb_handling\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < nteeth; i++) {
@@ -1657,7 +1657,7 @@ static int comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h,
 
     handlearray  = CC_SAFE_MALLOC (MAX_ROUNDS + 1, CCtsp_lpclique *);
     if (!handlearray) {
-        fprintf (stderr, "out of memory in comb_handling\n");
+        CC_FPRINTF(stderr, "out of memory in comb_handling\n");
         rval = 1; goto CLEANUP;
     }
     handlearray[0] = handle;
@@ -1684,7 +1684,7 @@ static int comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h,
         }
 
         if (rval) {
-            fprintf (stderr, "stretch_teeth failed\n");
+            CC_FPRINTF(stderr, "stretch_teeth failed\n");
             goto CLEANUP;
         }
         if (test == 0) {
@@ -1701,7 +1701,7 @@ static int comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h,
         rval = grow_handle (g, x, handlearray[round], nteeth, workingteeth,
                             &newhandle, marks);
         if (rval) {
-            fprintf (stderr, "grow_handle failed\n");
+            CC_FPRINTF(stderr, "grow_handle failed\n");
             for (i = 0; i < nteeth; i++) {
                 CCtsp_free_lpclique (workingteeth[i]);
             }
@@ -1713,15 +1713,15 @@ static int comb_handling (CCtsp_lpgraph *g, CC_GCgraph *h,
         rval = build_star (&dp, round+1, handlearray, alpha, nteeth, 
                            workingteeth, beta, g->ncount);
         if (rval) {
-            fprintf (stderr, "build_star failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "build_star failed\n"); goto CLEANUP;
         }
 
         if (dp) {
             rval = CCverify_cut (dp, CC_TYPE_STAR, (int *) NULL);
             if (rval) {
-                printf ("Bad star\n"); fflush (stdout);
-                printf ("Number Handles: %d   Number Teeth: %d\n",
-                           round+1, nteeth); fflush (stdout);
+                CC_PRINTF("Bad star\n"); CC_FFLUSH(stdout);
+                CC_PRINTF("Number Handles: %d   Number Teeth: %d\n",
+                           round+1, nteeth); CC_FFLUSH(stdout);
                 CCtsp_print_lpcut_in (dp);
                 rval = 0; goto CLEANUP;
             }
@@ -1775,7 +1775,7 @@ static int grow_handle (CCtsp_lpgraph *g, double *x, CCtsp_lpclique *handle,
     values   = CC_SAFE_MALLOC (g->ncount, double);
     addnodes = CC_SAFE_MALLOC (nteeth, int);
     if (!values || !addnodes) {
-        fprintf (stderr, "out of memory in grow_handle\n");
+        CC_FPRINTF(stderr, "out of memory in grow_handle\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1795,14 +1795,14 @@ static int grow_handle (CCtsp_lpgraph *g, double *x, CCtsp_lpclique *handle,
 
     clique = CC_SAFE_MALLOC (1, CCtsp_lpclique);
     if (!clique) {
-        fprintf (stderr, "out of memory in grow_handle\n");
+        CC_FPRINTF(stderr, "out of memory in grow_handle\n");
         rval = 1; goto CLEANUP;
     }
 
 
     rval = CCtsp_add_nodes_to_lpclique (handle, clique, nteeth, addnodes);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_nodes_to_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_nodes_to_lpclique failed\n");
         CC_IFFREE (clique, CCtsp_lpclique);
         goto CLEANUP;
     }

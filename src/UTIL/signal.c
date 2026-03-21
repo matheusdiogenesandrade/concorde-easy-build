@@ -103,7 +103,7 @@ int CCutil_signal_handler (int ccsignum, CCutil_handler handler)
 
     if (signum == -1) {
 #if 0
-        fprintf (stderr, "Signal %s doesn't exist on this system\n",
+        CC_FPRINTF(stderr, "Signal %s doesn't exist on this system\n",
                  ccsignal_name (ccsignum));
 #endif
         return -1;
@@ -112,7 +112,7 @@ int CCutil_signal_handler (int ccsignum, CCutil_handler handler)
     rval = sigemptyset (&new.sa_mask);
     if (rval) {
         perror ("sigemptyset");
-        fprintf (stderr, "sigemptyset failed for signal %s\n",
+        CC_FPRINTF(stderr, "sigemptyset failed for signal %s\n",
                  ccsignal_name (ccsignum));
         return -1;
     }
@@ -124,7 +124,7 @@ int CCutil_signal_handler (int ccsignum, CCutil_handler handler)
     rval = sigaction (signum, &new, (struct sigaction *) NULL);
     if (rval) {
         perror ("sigaction");
-        fprintf (stderr, "Sigaction for signal %s failed\n",
+        CC_FPRINTF(stderr, "Sigaction for signal %s failed\n",
                  ccsignal_name (ccsignum));
         return -1;
     }
@@ -143,7 +143,7 @@ int CCutil_signal_handler (int ccsignum, CCutil_handler handler)
 
     if (signum == -1) {
 #if 0
-        fprintf (stderr, "Signal %s doesn't exist on this system\n",
+        CC_FPRINTF(stderr, "Signal %s doesn't exist on this system\n",
                  ccsignal_name (ccsignum));
 #endif
         return -1;
@@ -152,7 +152,7 @@ int CCutil_signal_handler (int ccsignum, CCutil_handler handler)
     sigval = signal (signum, handler);
     if (sigval == SIG_ERR) {
         perror ("signal");
-        fprintf (stderr, "Signal() for signal %s failed\n",
+        CC_FPRINTF(stderr, "Signal() for signal %s failed\n",
                  ccsignal_name (ccsignum));
         return -1;
     }
@@ -167,7 +167,7 @@ int CCutil_signal_handler (int ccsignum, CCutil_handler handler)
 int CCutil_signal_handler (int ccsignum, CCutil_handler handler)
 {
     if (ccsignum || handler) {
-        fprintf (stderr, "No signal handling enabled\n");
+        CC_FPRINTF(stderr, "No signal handling enabled\n");
     }
     return -1;
 }
@@ -180,7 +180,7 @@ int CCutil_signal_default (int ccsignum)
 
     rval = CCutil_signal_handler (ccsignum, SIG_DFL);
     if (rval) {
-        fprintf (stderr, "CCutil_signal_handler failed\n");
+        CC_FPRINTF(stderr, "CCutil_signal_handler failed\n");
         return rval;
     }
     return 0;
@@ -192,7 +192,7 @@ int CCutil_signal_ignore (int ccsignum)
 
     rval = CCutil_signal_handler (ccsignum, SIG_IGN);
     if (rval) {
-        fprintf (stderr, "CCutil_signal_handler failed\n");
+        CC_FPRINTF(stderr, "CCutil_signal_handler failed\n");
         return rval;
     }
     return 0;
@@ -486,7 +486,7 @@ static int ccsig_to_sig (int ccsignum)
         return -1;
 #endif
       default:
-        fprintf (stderr, "Invalid signal number %d in ccsig_to_sig\n",
+        CC_FPRINTF(stderr, "Invalid signal number %d in ccsig_to_sig\n",
                  ccsignum);
         return -1;
     }
@@ -597,17 +597,17 @@ void CCutil_handler_fatal (int signum)
 #ifdef CCSIGNAL_SYSV
     CCutil_signal_handler (ccsignum, CCutil_handler_fatal);
 #endif
-    fprintf (stderr, "FATAL ERROR - received signal %s (%d/%d)\n",
+    CC_FPRINTF(stderr, "FATAL ERROR - received signal %s (%d/%d)\n",
              ccsignal_name (ccsignum), ccsignum, signum);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 #ifdef HAVE_SLEEP
     for (int i=1; i>0; i--) {
-        fprintf (stderr, "sleeping %d more hours to permit debugger access\n",
+        CC_FPRINTF(stderr, "sleeping %d more hours to permit debugger access\n",
                  i);
         sleep (3600);
     }
 #endif /* HAVE_SLEEP */
-    fprintf (stderr, "FATAL ERROR - exiting\n");
+    CC_FPRINTF(stderr, "FATAL ERROR - exiting\n");
     exit (-1);
 }
 
@@ -618,7 +618,7 @@ void CCutil_handler_warn (int signum)
 #ifdef CCSIGNAL_SIGNAL
     CCutil_signal_handler (ccsignum, CCutil_handler_warn);
 #endif
-    fprintf (stderr, "WARNING - received signal %s (%d/%d)\n",
+    CC_FPRINTF(stderr, "WARNING - received signal %s (%d/%d)\n",
              ccsignal_name (ccsignum), ccsignum, signum);
 }
 
@@ -626,7 +626,7 @@ void CCutil_handler_exit (int signum)
 {
     int ccsignum = CCutil_sig_to_ccsig (signum);
     
-    fprintf (stderr, "EXITING - received signal %s (%d/%d)\n",
+    CC_FPRINTF(stderr, "EXITING - received signal %s (%d/%d)\n",
              ccsignal_name (ccsignum), ccsignum, signum);
     exit (1);
 }

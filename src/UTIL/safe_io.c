@@ -371,7 +371,7 @@ CC_SFILE *CCutil_sopen (const char *f, const char *s)
     } else if (strcmp (s, "w") == 0) {
         return sopen_write (f);
     } else {
-        fprintf (stderr, "Need to specify read/write in CCutil_sopen\n");
+        CC_FPRINTF(stderr, "Need to specify read/write in CCutil_sopen\n");
         return (CC_SFILE *) NULL;
     }
 }
@@ -385,7 +385,7 @@ CC_SFILE *CCutil_sdopen (int d, const char *s)
     } else if (strcmp (s, "rw") == 0) {
         return sdopen_readwrite (d);
     } else {
-        fprintf (stderr, "Need to specify read/write in CCutil_sdopen\n");
+        CC_FPRINTF(stderr, "Need to specify read/write in CCutil_sdopen\n");
         return (CC_SFILE *) NULL;
     }
 }
@@ -411,11 +411,11 @@ static CC_SFILE *sopen_write (const char *f)
     } else {
         t = open (fbuf_N, O_WRONLY | O_CREAT | O_BINARY | O_EXCL, 0644);
         if (t == -1 && errno == EEXIST) {
-            fprintf (stderr, "%s already exists, renaming to %s\n",
+            CC_FPRINTF(stderr, "%s already exists, renaming to %s\n",
                           fbuf_N, fbuf_Nx);
             if (rename (fbuf_N, fbuf_Nx)) {
                 perror (fbuf_Nx);
-                fprintf (stderr, "Couldn't rename %s to %s\n", fbuf_N,
+                CC_FPRINTF(stderr, "Couldn't rename %s to %s\n", fbuf_N,
                          fbuf_Nx);
                 return (CC_SFILE *) NULL;
             }
@@ -423,7 +423,7 @@ static CC_SFILE *sopen_write (const char *f)
         }
         if (t == -1) {
             perror (fbuf_N);
-            fprintf (stderr, "Couldn't open %s for output\n", fbuf_N);
+            CC_FPRINTF(stderr, "Couldn't open %s for output\n", fbuf_N);
             return (CC_SFILE *) NULL;
         }
         s = sdopen_write (t);
@@ -451,7 +451,7 @@ static CC_SFILE *sopen_read (const char *f)
         t = open (f, O_RDONLY | O_BINARY, 0644);
         if (t == -1) {
             perror (f);
-            fprintf (stderr, "Couldn't open for input\n");
+            CC_FPRINTF(stderr, "Couldn't open for input\n");
             s = (CC_SFILE *) NULL;
         }
         s = sdopen_read (t);
@@ -473,7 +473,7 @@ static CC_SFILE *sdopen (int t)
     CC_SFILE *s = (CC_SFILE *) NULL;
 
     if (t < 0) {
-        fprintf (stderr, "Invalid descriptor %d\n", t);
+        CC_FPRINTF(stderr, "Invalid descriptor %d\n", t);
         return (CC_SFILE *) NULL;
     }
 
@@ -538,7 +538,7 @@ int CCutil_swrite (CC_SFILE *f, char *buf, int size)
 int CCutil_swrite_bits (CC_SFILE *f, int x, int xbits)
 {
     if (x < 0) {
-        fprintf (stderr, "CCutil_swrite_bits cannot write negative numbers\n");
+        CC_FPRINTF(stderr, "CCutil_swrite_bits cannot write negative numbers\n");
         return -1;
     }
     return CCutil_swrite_ubits (f, (unsigned int) x, xbits);
@@ -975,7 +975,7 @@ int CCutil_sflush (CC_SFILE *f)
     } else if (f->status == SRW_EMPTY) {
         rval = 0;
     } else {
-        fprintf (stderr, "Buffer %s has invalid status %d\n", f->fname,
+        CC_FPRINTF(stderr, "Buffer %s has invalid status %d\n", f->fname,
                  f->status);
         rval = -1;
     }
@@ -993,10 +993,10 @@ int CCutil_stell (CC_SFILE *f)
         return f->pos + f->chars_in_buffer;
     } else if (f->status == SRW_EMPTY || f->status == SRW_READ ||
                f->status == SRW_WRITE) {
-        fprintf (stderr, "Cannot CCutil_stell for a r/w CC_SFILE\n");
+        CC_FPRINTF(stderr, "Cannot CCutil_stell for a r/w CC_SFILE\n");
         return -1;
     } else {
-        fprintf (stderr, "Buffer %s has invalid status %d\n", f->fname,
+        CC_FPRINTF(stderr, "Buffer %s has invalid status %d\n", f->fname,
                  f->status);
         return -1;
     }
@@ -1013,7 +1013,7 @@ int CCutil_sseek (CC_SFILE *f, int offset)
     if (curloc == offset) return 0;
     if (lseek (f->desc, offset, SEEK_SET) < 0) {
         perror (f->fname);
-        fprintf (stderr, "Unable to lseek on %s\n", f->fname);
+        CC_FPRINTF(stderr, "Unable to lseek on %s\n", f->fname);
         return -1;
     }
     f->chars_in_buffer = 0;
@@ -1044,7 +1044,7 @@ int CCutil_sclose (CC_SFILE *f)
     if (f->desc >= 3) {
         if (close (f->desc)) {
             perror ("close");
-            fprintf (stderr, "Unable to close swrite file %s\n", f->fname);
+            CC_FPRINTF(stderr, "Unable to close swrite file %s\n", f->fname);
             retval = -1;
         }
         if (f->status == SWRITE && f->type == TFILE) {
@@ -1053,7 +1053,7 @@ int CCutil_sclose (CC_SFILE *f)
             rename (f->fname, fbuf_O);
             if (rename (fbuf_N, f->fname)) {
                 perror (f->fname);
-                fprintf (stderr, "Couldn't rename %s to %s\n",
+                CC_FPRINTF(stderr, "Couldn't rename %s to %s\n",
                                                fbuf_N, f->fname);
                 retval = -1;
             }
@@ -1074,7 +1074,7 @@ static int swrite_buffer (CC_SFILE *f)
     if (!f) return -1;
     if (f->status != SWRITE && f->status != SRW_WRITE &&
         f->status != SRW_EMPTY) {
-        fprintf (stderr, "%s not open for output\n", f->fname);
+        CC_FPRINTF(stderr, "%s not open for output\n", f->fname);
         return -1;
     }
 
@@ -1084,11 +1084,11 @@ static int swrite_buffer (CC_SFILE *f)
         n = (int) write (f->desc, p, nleft);
         if (n == -1) {
             if (errno == EINTR) {
-                fprintf (stderr, "swrite_buffer interrupted, retrying\n");
+                CC_FPRINTF(stderr, "swrite_buffer interrupted, retrying\n");
                 continue;
             }
             perror ("write");
-            fprintf (stderr, "swrite_buffer of %d chars to %s failed\n", nleft,
+            CC_FPRINTF(stderr, "swrite_buffer of %d chars to %s failed\n", nleft,
                      f->fname);
             return -1;
         }
@@ -1108,7 +1108,7 @@ static int sread_buffer (CC_SFILE *f)
     if (!f) return -1;
     if (f->status != SREAD && f->status != SRW_READ &&
         f->status != SRW_EMPTY) {
-        fprintf (stderr, "%s not open for input\n", f->fname);
+        CC_FPRINTF(stderr, "%s not open for input\n", f->fname);
         return -1;
     }
 
@@ -1117,7 +1117,7 @@ static int sread_buffer (CC_SFILE *f)
         f->current_buffer_char = -1;
     }
     if (f->chars_in_buffer == CC_SBUFFER_SIZE) {
-        fprintf (stderr, "sread_buffer for %s when buffer full\n", f->fname);
+        CC_FPRINTF(stderr, "sread_buffer for %s when buffer full\n", f->fname);
         return 0;
     }
 
@@ -1127,15 +1127,15 @@ static int sread_buffer (CC_SFILE *f)
 
     if (n == -1) {
         if (errno == EINTR) {
-            fprintf (stderr, "sread_buffer interrupted, retrying\n");
+            CC_FPRINTF(stderr, "sread_buffer interrupted, retrying\n");
             goto retry;
         }
         perror ("read");
-        fprintf (stderr, "sread_buffer failed\n");
+        CC_FPRINTF(stderr, "sread_buffer failed\n");
         return -1;
     }
     if (n == 0) {
-        fprintf (stderr, "sread_buffer encountered EOF\n");
+        CC_FPRINTF(stderr, "sread_buffer encountered EOF\n");
         return -1;
     }
     f->pos += n;
@@ -1180,7 +1180,7 @@ int CCutil_sdelete_file (const char *fname)
     rval = unlink (fname);
     if (rval) {
         perror (fname);
-        fprintf (stderr, "unlink: could not delete %s\n", fname);
+        CC_FPRINTF(stderr, "unlink: could not delete %s\n", fname);
     }
     return rval;
 }
@@ -1200,7 +1200,7 @@ static int prepare_write (CC_SFILE *f)
 {
     if (!f) return -1;
     if (f->status == SREAD) {
-        fprintf (stderr, "%s not open for output\n", f->fname);
+        CC_FPRINTF(stderr, "%s not open for output\n", f->fname);
         return -1;
     } else if (f->status == SRW_READ) {
         f->chars_in_buffer = 0;
@@ -1210,7 +1210,7 @@ static int prepare_write (CC_SFILE *f)
     } else if (f->status == SRW_EMPTY) {
         f->status = SRW_WRITE;
     } else if (f->status != SWRITE && f->status != SRW_WRITE) {
-        fprintf (stderr, "%s has bogus status %d\n", f->fname, f->status);
+        CC_FPRINTF(stderr, "%s has bogus status %d\n", f->fname, f->status);
         return -1;
     }
     
@@ -1221,7 +1221,7 @@ static int prepare_read (CC_SFILE *f)
 {
     if (!f) return -1;
     if (f->status == SWRITE) {
-        fprintf (stderr, "%s not open for input\n", f->fname);
+        CC_FPRINTF(stderr, "%s not open for input\n", f->fname);
         return -1;
     } else if (f->status == SRW_WRITE) {
         if (CCutil_sflush (f)) return -1;
@@ -1231,7 +1231,7 @@ static int prepare_read (CC_SFILE *f)
         f->status = SRW_EMPTY;
     } else if (f->status != SREAD && f->status != SRW_READ &&
                f->status != SRW_EMPTY) {
-        fprintf (stderr, "%s has bogus status %d\n", f->fname, f->status);
+        CC_FPRINTF(stderr, "%s has bogus status %d\n", f->fname, f->status);
         return -1;
     }
     
@@ -1251,7 +1251,7 @@ CC_SFILE *CCutil_snet_open (const char *hname, unsigned short p)
 
     h = gethostbyname (hname);
     if (h == (struct hostent *) NULL) {
-        fprintf (stderr, "cannot get host info for %s\n", hname);
+        CC_FPRINTF(stderr, "cannot get host info for %s\n", hname);
         return (CC_SFILE *) NULL;
     }
     memcpy ((void *) &hsock.sin_addr, (void *) h->h_addr, h->h_length);
@@ -1261,18 +1261,18 @@ CC_SFILE *CCutil_snet_open (const char *hname, unsigned short p)
     s = socket (AF_INET, SOCK_STREAM, 0);
     if (s < 0) {
         perror ("socket");
-        fprintf (stderr, "Unable to get socket\n");
+        CC_FPRINTF(stderr, "Unable to get socket\n");
         return (CC_SFILE *) NULL;
     }
     if (connect (s, (struct sockaddr *) &hsock, sizeof (hsock)) < 0) {
         perror ("connect");
-        fprintf (stderr, "Unable to connect to %s\n", hname);
+        CC_FPRINTF(stderr, "Unable to connect to %s\n", hname);
         return (CC_SFILE *) NULL;
     }
 
     f = sdopen_readwrite (s);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "sdopen_readwrite failed\n");
+        CC_FPRINTF(stderr, "sdopen_readwrite failed\n");
         return (CC_SFILE *) NULL;
     }
 
@@ -1295,13 +1295,13 @@ CC_SFILE *CCutil_snet_receive (CC_SPORT *s)
     t = accept (s->t, (struct sockaddr *) &new, &l);
     if (t < 0) {
         perror ("accept");
-        fprintf (stderr, "accept failed\n");
+        CC_FPRINTF(stderr, "accept failed\n");
         return (CC_SFILE *) NULL;
     }
 
     f = sdopen_readwrite (t);
     if (f == (CC_SFILE *) NULL) {
-        fprintf (stderr, "sdopen_readwrite failed\n");
+        CC_FPRINTF(stderr, "sdopen_readwrite failed\n");
         return (CC_SFILE *) NULL;
     }
 
@@ -1317,7 +1317,7 @@ CC_SPORT *CCutil_snet_listen (unsigned short p)
     s = socket (AF_INET, SOCK_STREAM, 0);
     if (s < 0) {
         perror ("socket");
-        fprintf (stderr, "Unable to get socket\n");
+        CC_FPRINTF(stderr, "Unable to get socket\n");
         goto FAILURE;
     }
 
@@ -1329,19 +1329,19 @@ CC_SPORT *CCutil_snet_listen (unsigned short p)
 
     if (bind (s, (struct sockaddr *) &me, sizeof (me)) < 0) {
         perror ("bind");
-        fprintf (stderr, "Cannot bind socket\n");
+        CC_FPRINTF(stderr, "Cannot bind socket\n");
         goto FAILURE;
     }
 
     if (listen (s, 100) < 0) {
         perror ("listen");
-        fprintf (stderr, "Cannot listen to socket\n");
+        CC_FPRINTF(stderr, "Cannot listen to socket\n");
         goto FAILURE;
     }
 
     sp = CC_SAFE_MALLOC (1, CC_SPORT);
     if (sp == (CC_SPORT *) NULL) {
-        fprintf (stderr, "Out of memory in CCutil_snet_listen\n");
+        CC_FPRINTF(stderr, "Out of memory in CCutil_snet_listen\n");
         goto FAILURE;
     }
 

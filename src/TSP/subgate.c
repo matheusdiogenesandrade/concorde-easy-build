@@ -28,19 +28,19 @@ int main (int ac, char **av)
     char *bosshost = (char *) NULL;
 
     if (ac != 2) {
-        fprintf (stderr, "Usage: %s home_gateway\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s home_gateway\n", av[0]);
         rval = 1; goto CLEANUP;
     }
 
     bosshost = av[1];
 
 
-    printf ("BEGINNING Gateway NET PROCESSING\n\n"); fflush (stdout);
+    CC_PRINTF("BEGINNING Gateway NET PROCESSING\n\n"); CC_FFLUSH(stdout);
 
 
     lport = CCutil_snet_listen (SUBGRUNT_PORT);
     if (lport == (CC_SPORT *) NULL) {                                           
-        fprintf (stderr, "CCutil_snet_listen failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_listen failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -48,7 +48,7 @@ int main (int ac, char **av)
     while (1) {
         s = CCutil_snet_receive (lport);
         if (!s) {
-            fprintf (stderr, "CCutil_snet_receive failed, ignoring\n");
+            CC_FPRINTF(stderr, "CCutil_snet_receive failed, ignoring\n");
             continue;
         }
         rval = CCutil_sread_int (s, &id);
@@ -62,7 +62,7 @@ int main (int ac, char **av)
 
         sgate = CCutil_snet_open (bosshost, SUBBOSS_PORT);
         if (!sgate) {
-            fprintf (stderr, "CCutil_snet_open failed\n");
+            CC_FPRINTF(stderr, "CCutil_snet_open failed\n");
             rval = 1;  goto CLEANUP;
         }
 
@@ -79,7 +79,7 @@ int main (int ac, char **av)
         if (id != -1) {
             nprocessed++;
             cumtime += rtime;
-            printf ("DONE %3d %7.2f sec %4.0f cum %7.0f avg %.2f ", id,
+            CC_PRINTF("DONE %3d %7.2f sec %4.0f cum %7.0f avg %.2f ", id,
                     rbound, rtime, cumtime, cumtime / (double) nprocessed);
         }
 
@@ -109,14 +109,14 @@ int main (int ac, char **av)
              rval = CCutil_writemaster (s, t_ncount, &t_dat, t_perm);
              CCcheck_rval (rval, "CCutil_writemaster failed");
 
-             printf ("WORK %2d\n", new_id);
-             fflush (stdout);
+             CC_PRINTF("WORK %2d\n", new_id);
+             CC_FFLUSH(stdout);
 
              CC_IFFREE (t_perm, int);
              CCutil_freedatagroup (&t_dat);
         } else {
              CCutil_swrite_int (s, -1);
-             printf ("STOP\n"); fflush (stdout);
+             CC_PRINTF("STOP\n"); CC_FFLUSH(stdout);
         }
 
         if (sgate) CCutil_sclose (sgate);

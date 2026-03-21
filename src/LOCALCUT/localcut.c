@@ -104,9 +104,9 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
     ccd.blocked = (int *) NULL;
 
     if (flags.nolift) {
-        printf ("WARNING: nolift %d is turned on.  Will not lift faults\n",
+        CC_PRINTF("WARNING: nolift %d is turned on.  Will not lift faults\n",
                 flags.nolift);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
 #ifdef DUMPGRAPHS
@@ -136,28 +136,28 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
     ccb.u_data = (void *) &ccd;
     
     if (!silent) {
-        printf ("localcuts");
-        if (flags.noshrink) printf (" noshrink");
-        if (flags.uncivilized) printf (" uncivilized");
+        CC_PRINTF("localcuts");
+        if (flags.noshrink) CC_PRINTF(" noshrink");
+        if (flags.uncivilized) CC_PRINTF(" uncivilized");
 #ifdef OLD_VERSION
         if (flags.dummy) {
-            printf (" dummy(%ud/%ud)", flags.spheresize, flags.maxchunksize);
+            CC_PRINTF(" dummy(%ud/%ud)", flags.spheresize, flags.maxchunksize);
         } else if (flags.permute) {
-            printf (" permuted spheres(%ud/%ud)", flags.spheresize,
+            CC_PRINTF(" permuted spheres(%ud/%ud)", flags.spheresize,
                     flags.maxchunksize);
         } else if (flags.weighted) {
-            printf (" weighted spheres(%ud/%ud)", flags.spheresize,
+            CC_PRINTF(" weighted spheres(%ud/%ud)", flags.spheresize,
                     flags.maxchunksize);
         } else if (flags.spheres) {
-            printf (" spheres(%ud/%ud)", flags.spheresize, flags.maxchunksize);
+            CC_PRINTF(" spheres(%ud/%ud)", flags.spheresize, flags.maxchunksize);
         } else {
-            printf (" classes(%ud)",flags.maxchunksize);
+            CC_PRINTF(" classes(%ud)",flags.maxchunksize);
         }
 #else /* OLD_VERSION */
-        printf ("(%ud)",flags.maxchunksize);
+        CC_PRINTF("(%ud)",flags.maxchunksize);
 #endif /* OLD_VERSION */
-        printf ("...");
-        fflush (stdout);
+        CC_PRINTF("...");
+        CC_FFLUSH(stdout);
     }
 
     if (flags.noshrink) {
@@ -165,7 +165,7 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
         rval = CCcut_SRK_trivial (ncount, &cuts.expand);
         CCutil_stop_timer (&timer->find.shrink, 0);
         if (rval) {
-            fprintf (stderr, "CCcut_SRK_trivial failed\n");
+            CC_FPRINTF(stderr, "CCcut_SRK_trivial failed\n");
             goto CLEANUP;
         }
         sncount = ncount;
@@ -178,27 +178,27 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
                             &selist, &sx, &cuts.expand);
         CCutil_stop_timer (&timer->find.shrink, 0);
         if (rval) {
-            fprintf (stderr, "shrink_ones failed\n");
+            CC_FPRINTF(stderr, "shrink_ones failed\n");
             goto CLEANUP;
         }
     }        
 
     if (!silent) {
-        printf (" %d nodes %d edges\n", sncount, secount);
-        fflush (stdout);
+        CC_PRINTF(" %d nodes %d edges\n", sncount, secount);
+        CC_FFLUSH(stdout);
     }
 
 #ifdef OLD_VERSION
     rval = CCchunk_finder (sncount, secount, selist, sx, eps, flags,
                            &timer->find, &ccb, rstate);
     if (rval) {
-        fprintf (stderr, "CCchunk_finder failed\n");
+        CC_FPRINTF(stderr, "CCchunk_finder failed\n");
         goto CLEANUP;
     }
 #else  /* OLD_VERSION */
     ccd.blocked = CC_SAFE_MALLOC (sncount, int);
     if (ccd.blocked == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCchunk_localcuts\n");
+        CC_FPRINTF(stderr, "Out of memory in CCchunk_localcuts\n");
         rval = 1; goto CLEANUP;
     }
     for (i=0; i<sncount; i++) {
@@ -215,15 +215,15 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
         newflags.spheresize = i-2;
 
         if (!silent) {
-            printf ("%1.1d", i%10);
-            fflush (stdout);
+            CC_PRINTF("%1.1d", i%10);
+            CC_FFLUSH(stdout);
         }
 
 #if 0
         rval = CCchunk_finder (sncount, secount, selist, sx, eps, newflags,
                                &timer->find, &ccb, rstate);
         if (rval) {
-            fprintf (stderr, "CCchunk_finder failed\n");
+            CC_FPRINTF(stderr, "CCchunk_finder failed\n");
             goto CLEANUP;
         }
 
@@ -233,7 +233,7 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
         rval = CCchunk_finder (sncount, secount, selist, sx, eps, newflags,
                                &timer->find, &ccb, rstate);
         if (rval) {
-            fprintf (stderr, "CCchunk_finder failed\n");
+            CC_FPRINTF(stderr, "CCchunk_finder failed\n");
             goto CLEANUP;
         }
 
@@ -242,7 +242,7 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
         rval = CCchunk_finder (sncount, secount, selist, sx, eps, newflags,
                                &timer->find, &ccb, rstate);
         if (rval) {
-            fprintf (stderr, "CCchunk_finder failed\n");
+            CC_FPRINTF(stderr, "CCchunk_finder failed\n");
             goto CLEANUP;
         }
 
@@ -252,7 +252,7 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
         rval = CCchunk_finder (sncount, secount, selist, sx, eps, newflags,
                                &timer->find, &ccb, rstate);
         if (rval) {
-            fprintf (stderr, "CCchunk_finder failed\n");
+            CC_FPRINTF(stderr, "CCchunk_finder failed\n");
             goto CLEANUP;
         }
 
@@ -262,17 +262,17 @@ int CCchunk_localcuts (CCtsp_lpcut_in **clist, int *cutcount, int ncount,
         rval = CCchunk_finder (sncount, secount, selist, sx, eps, newflags,
                                &timer->find, &ccb, rstate);
         if (rval) {
-            fprintf (stderr, "CCchunk_finder failed\n");
+            CC_FPRINTF(stderr, "CCchunk_finder failed\n");
             goto CLEANUP;
         }
     }
 
-    if (!silent)  printf ("\n");
+    if (!silent)  CC_PRINTF("\n");
 #endif /* OLD_VERSION */
     st =  CCutil_stop_timer (&timer->all, 0);
     if (!silent) {
-        printf ("localcuts done in %.2f seconds\n", st);
-        fflush (stdout);
+        CC_PRINTF("localcuts done in %.2f seconds\n", st);
+        CC_FFLUSH(stdout);
     }
 
     rval = 0;
@@ -413,39 +413,39 @@ static int found_fault_callback_nolift (CCchunk_graph *chunk,
     CCutil_start_timer (&fcd->lift_t->all);
     CCutil_stop_timer (&fcd->lift_t->all, 0);
     if (fcd->nolift >= 2) {
-        printf ("faulty chunk\n");
-        printf ("%d %d\n", chunk->ncount, chunk->ecount);
+        CC_PRINTF("faulty chunk\n");
+        CC_PRINTF("%d %d\n", chunk->ncount, chunk->ecount);
         for (i=0; i<chunk->ecount; i++) {
-            printf ("%d %d %.16f %d\n",chunk->end0[i], chunk->end1[i], chunk->weight[i],
+            CC_PRINTF("%d %d %.16f %d\n",chunk->end0[i], chunk->end1[i], chunk->weight[i],
                     chunk->fixed[i]);
         }
         for (i=0; i<chunk->ncount; i++) {
-            if (i>0) printf (" ");
-            printf ("%d",chunk->equality[i]);
+            if (i>0) CC_PRINTF(" ");
+            CC_PRINTF("%d",chunk->equality[i]);
         }
-        printf ("\n");
+        CC_PRINTF("\n");
         for (i=0; i<chunk->ecount; i++) {
-            printf ("%d ", fault->a.coef[i]);
+            CC_PRINTF("%d ", fault->a.coef[i]);
         }
-        printf ("<= %d\n", fault->a.rhs);
+        CC_PRINTF("<= %d\n", fault->a.rhs);
         if (fcd->nolift >= 3) {
-            printf ("%d\n", fault->nsols);
+            CC_PRINTF("%d\n", fault->nsols);
             for (i=0; i<fault->nsols; i++) {
                 int j;
                 for (j=0; j<chunk->ecount; j++) {
-                    printf ("%d ", fault->sols[i*chunk->ecount+j]);
+                    CC_PRINTF("%d ", fault->sols[i*chunk->ecount+j]);
                 }
-                printf ("\n");
+                CC_PRINTF("\n");
             }
         } else {
-            printf ("0\n");
+            CC_PRINTF("0\n");
         }
         s = fault->a.rhs;
         for (i=0; i<chunk->ecount; i++) {
             s -= fault->a.coef[i] * chunk->weight[i];
         }
-        printf ("viol %.6f\n", -s);
-        fflush (stdout);
+        CC_PRINTF("viol %.6f\n", -s);
+        CC_FFLUSH(stdout);
     }
     return 0;
 }
@@ -494,12 +494,12 @@ static int shrink_ones (int ncount, int ecount, int *elist, double *dlen,
     int k;
 
     if (CCcut_SRK_buildgraph (&G, ncount, ecount, elist, dlen)) {
-        fprintf (stderr, "buildgraph failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "buildgraph failed in shrink_ones\n");
         return 1;
     }
 
     if (CCcut_SRK_defluff (&G)) {
-        fprintf (stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
         return 1;
     }
 
@@ -508,7 +508,7 @@ static int shrink_ones (int ncount, int ecount, int *elist, double *dlen,
                                       0);
 
     if (CCcut_SRK_grab_edges (&G, oncount, oecount, olist, olen, expand)) {
-        fprintf (stderr, "grab edges failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "grab edges failed in shrink_ones\n");
         CCcut_SRK_free_graph (&G);
         return 1;
     }
@@ -526,7 +526,7 @@ static void dumpgraph (char *fname, int ncount, int ecount, int *elist,
 
     if (!f) {
         perror (fname);
-        fprintf (stderr, "Unable to open %s for output\n", fname);
+        CC_FPRINTF(stderr, "Unable to open %s for output\n", fname);
         return;
     }
 

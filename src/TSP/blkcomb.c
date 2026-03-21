@@ -132,34 +132,34 @@ int CCtsp_block_combs (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     if (cutcount) *cutcount = 0;
 
     if (!silent) {
-        printf ("Block Combs\n"); fflush (stdout);
+        CC_PRINTF("Block Combs\n"); CC_FFLUSH(stdout);
     }
 
     rval = CCtsp_build_lpgraph (&L, ncount, ecount, elist, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpgraph failed\n"); goto CLEANUP;
     }
     rval = CCtsp_build_lpadj (&L, 0, ecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n"); goto CLEANUP;
     }
 
     rval = shrink_ones (&S, ncount, ecount, elist, x, &oncount, &oecount,
                         &oelist, &ox, &expand);
     if (rval) {
-        fprintf (stderr, "shrink_ones failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "shrink_ones failed\n"); goto CLEANUP;
     }
 
     rval = block_combs_work (&L, x, oncount, oecount, oelist, ox, &expand,
                              cuts, &kcount, &viol, &czeit);
     if (rval) {
-        fprintf (stderr, "block_combs_work failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "block_combs_work failed\n"); goto CLEANUP;
     }
     if (cutcount) *cutcount += kcount;
     if (!silent) {
-        printf ("  Type 0: %d cuts  %.4f max violation  %.2f seconds\n",
+        CC_PRINTF("  Type 0: %d cuts  %.4f max violation  %.2f seconds\n",
                              kcount, viol, czeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     CC_IFFREE (oelist, int);
@@ -173,20 +173,20 @@ int CCtsp_block_combs (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
         rval = shrink_extra (&S, &oncount, &oecount, &oelist, &ox, &expand,
                              level);
         if (rval) {
-            fprintf (stderr, "shrink_extra failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "shrink_extra failed\n"); goto CLEANUP;
         }
 
         if (oncount < (.9 * oldcount)) {
             rval = block_combs_work (&L, x, oncount, oecount, oelist, ox,
                                      &expand, cuts, &kcount, &viol, &czeit);
             if (rval) {
-                fprintf (stderr, "block_combs_work failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "block_combs_work failed\n"); goto CLEANUP;
             }
             if (cutcount) *cutcount += kcount;
             if (!silent) {
-                printf ("  Type %d: %d cuts  %.4f max violation  %.2f seconds\n",
+                CC_PRINTF("  Type %d: %d cuts  %.4f max violation  %.2f seconds\n",
                                  level, kcount, viol, czeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             oldcount = oncount;
         }
@@ -202,18 +202,18 @@ int CCtsp_block_combs (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
         rval = shrink_olaf_new (&S, ncount, ecount, elist, x, &oncount,
                         &oecount, &oelist, &ox, &expand, level);
         if (rval) {
-            fprintf (stderr, "shrink_olaf_new failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "shrink_olaf_new failed\n"); goto CLEANUP;
         }
         rval = block_combs_work (&L, x, oncount, oecount, oelist, ox,
                                  &expand, cuts, &kcount, &viol, &czeit);
         if (rval) {
-            fprintf (stderr, "block_combs_work failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "block_combs_work failed\n"); goto CLEANUP;
         }
         if (cutcount) *cutcount += kcount;
         if (!silent) {
-            printf ("  Olaf %d: %d cuts  %.4f max violation  %.2f seconds\n",
+            CC_PRINTF("  Olaf %d: %d cuts  %.4f max violation  %.2f seconds\n",
                                  level, kcount, viol, czeit);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
 
         CC_IFFREE (oelist, int);
@@ -224,8 +224,8 @@ int CCtsp_block_combs (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     }
 
     if (!silent) {
-        printf ("  Total Time in block_combs: %.2f\n", CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("  Total Time in block_combs: %.2f\n", CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
     }
 
 
@@ -274,23 +274,23 @@ static int block_combs_work (CCtsp_lpgraph *L, double *origx, int ncount,
     rval = CCcombs_find_blocks (ncount, ecount, elist, x,
              &nblocks, &blockcnt, &blocks, &ncutnodes, &cutnodes);
     if (rval) {
-        fprintf (stderr, "CCcombs_find_blocks failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcombs_find_blocks failed\n"); goto CLEANUP;
     }
 
     rval = CCcombs_GC_build_graph (&G, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "CCcombs_GC_build_graph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcombs_GC_build_graph failed\n"); goto CLEANUP;
     }
 
     set = CC_SAFE_MALLOC (ncount, int);
     if (set == (int *) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_block_combs\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_block_combs\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = buildgraph (&H, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
 
     for (i = 0; i < ncutnodes; i++) {
@@ -303,7 +303,7 @@ static int block_combs_work (CCtsp_lpgraph *L, double *origx, int ncount,
         rval = greedy_block_comb (&G, L, &H, origx, blockcnt[i], blocks[i], set,
                                   &newcut, &viol, expand, marker);
         if (rval) {
-            fprintf (stderr, "greedy_block_comb failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "greedy_block_comb failed\n"); goto CLEANUP;
         }
         if (newcut) {
             if (viol > CCtsp_MIN_VIOL) {
@@ -325,7 +325,7 @@ static int block_combs_work (CCtsp_lpgraph *L, double *origx, int ncount,
 
     cutadj = CC_SAFE_MALLOC (H.ncount, intptr *);
     if (cutadj == (intptr **) NULL) {
-        fprintf (stderr, "out of memory in CCtsp_block_combs\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_block_combs\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < H.ncount; i++) {
@@ -358,7 +358,7 @@ static int block_combs_work (CCtsp_lpgraph *L, double *origx, int ncount,
                                  blockcnt[jp->this], blocks[jp->this],
                                  set, &newcut, &viol, expand, marker);
                         if (rval) {
-                            fprintf (stderr, "doubleblock_comb failed\n");
+                            CC_FPRINTF(stderr, "doubleblock_comb failed\n");
                             goto CLEANUP;
                         }
                         if (newcut) {
@@ -385,7 +385,7 @@ static int block_combs_work (CCtsp_lpgraph *L, double *origx, int ncount,
                              blockcnt[ip->next->this], blocks[ip->next->this],
                              set, &newcut, &viol, expand, marker);
                     if (rval) {
-                        fprintf (stderr, "greedy_doubleblock_comb failed\n");
+                        CC_FPRINTF(stderr, "greedy_doubleblock_comb failed\n");
                         goto CLEANUP;
                     }
                     if (newcut) {
@@ -447,7 +447,7 @@ static int greedy_doubleblock_comb (CC_GCgraph *G, CCtsp_lpgraph *L, graph *H,
     if (ct) {
         dblock = CC_SAFE_MALLOC (ct, int);
         if (dblock == (int *) NULL) {
-            fprintf (stderr, "out of memory in block_combs\n");
+            CC_FPRINTF(stderr, "out of memory in block_combs\n");
             rval = 0; goto CLEANUP;
         }
         ct = 0;
@@ -464,7 +464,7 @@ static int greedy_doubleblock_comb (CC_GCgraph *G, CCtsp_lpgraph *L, graph *H,
         rval = greedy_block_comb (G, L, H, x, ct, dblock, set,
                                   newcut, viol, expand, marker);
         if (rval) {
-            fprintf (stderr, "greedy_block_comb failed\n");
+            CC_FPRINTF(stderr, "greedy_block_comb failed\n");
             goto CLEANUP;
         }
     }
@@ -496,13 +496,13 @@ static int greedy_block_comb (CC_GCgraph *G, CCtsp_lpgraph *L, graph *H,
 
     wset = CC_SAFE_MALLOC (L->ncount, int);
     if (wset == (int *) NULL) {
-        fprintf (stderr, "out of memory in greedy_block_comb\n");
+        CC_FPRINTF(stderr, "out of memory in greedy_block_comb\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_shrunk_set_to_lpclique (bcnt, block, wset, expand, &handle);
     if (rval) {
-        fprintf (stderr, "CCtsp_shrunk_set_to_lpclique failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_shrunk_set_to_lpclique failed\n"); goto CLEANUP;
     }
     for (i = 0; i < bcnt; i++) {
         G->nodelist[block[i]].mark = marker;
@@ -519,7 +519,7 @@ static int greedy_block_comb (CC_GCgraph *G, CCtsp_lpgraph *L, graph *H,
         teeth    = CC_SAFE_MALLOC (cutcnt, CCtsp_lpclique);
         bigteeth = CC_SAFE_MALLOC (cutcnt + 1, CCtsp_lpclique *);
         if (!teeth || !bigteeth) {
-            fprintf (stderr, "out of memory in greedy_block_comb\n");
+            CC_FPRINTF(stderr, "out of memory in greedy_block_comb\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 0; i < bcnt; i++) {
@@ -531,7 +531,7 @@ static int greedy_block_comb (CC_GCgraph *G, CCtsp_lpgraph *L, graph *H,
                 rval = CCcombs_greedy_cut (G, &setsize, set, marker, 2, 0, 2,
                                            (int *) NULL, &cutval);
                 if (rval) {
-                    fprintf (stderr, "CCcombs_greedy_cut failed\n");
+                    CC_FPRINTF(stderr, "CCcombs_greedy_cut failed\n");
                     goto CLEANUP;
                 }
 
@@ -545,7 +545,7 @@ static int greedy_block_comb (CC_GCgraph *G, CCtsp_lpgraph *L, graph *H,
                         rval = CCtsp_shrunk_set_to_lpclique (setsize, set, wset,
                                            expand, &teeth[tcnt]);
                         if (rval) {
-                            fprintf (stderr, "shrunk_set_to_lpclique failed\n");
+                            CC_FPRINTF(stderr, "shrunk_set_to_lpclique failed\n");
                             goto CLEANUP;
                         }
                         bigteeth[tcnt + 1] = &teeth[tcnt];
@@ -561,7 +561,7 @@ static int greedy_block_comb (CC_GCgraph *G, CCtsp_lpgraph *L, graph *H,
 
     rval = CCtsp_teething_list (L, x, &handle, tcnt, bigteeth, newcut);
     if (rval) {
-        fprintf (stderr, "CCtsp_teething_list failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_teething_list failed\n"); goto CLEANUP;
     }  
 
     if (*newcut) {
@@ -592,14 +592,14 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist, double *x)
     if (ncount) {
         G->nodelist = CC_SAFE_MALLOC (ncount, node);
         if (G->nodelist == (node *) NULL) {
-            fprintf (stderr, "out of memory in buildgraph\n");
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n");
             rval = 1; goto CLEANUP;
         }
     }
     if (ecount) {
         G->adjspace = CC_SAFE_MALLOC (2 * ecount, edge);
         if (G->adjspace == (edge *) NULL) {
-            fprintf (stderr, "out of memory in buildgraph\n");
+            CC_FPRINTF(stderr, "out of memory in buildgraph\n");
             CC_IFFREE (G->nodelist, node);
             rval = 1; goto CLEANUP;
         }
@@ -668,7 +668,7 @@ static void blockcomb_free_world (CCptrworld *intptr_world)
     int total, onlist;
 
     if (intptr_check_leaks (intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (intptr_world);
@@ -681,19 +681,19 @@ static int shrink_ones (CC_SRKgraph *G, int ncount, int ecount, int *elist,
     int k;
 
     if (CCcut_SRK_buildgraph (G, ncount, ecount, elist, dlen)) {
-        fprintf (stderr, "buildgraph failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "buildgraph failed in shrink_ones\n");
         return 1;
     }
     CCcut_SRK_increment_marker (G);
 
     if (CCcut_SRK_defluff (G)) {
-        fprintf (stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
         return 1;
     }
 
     CCcut_SRK_identify_paths_to_edges (G, &k, 0);
     if (CCcut_SRK_grab_edges (G, oncount, oecount, olist, olen, expand)) {
-        fprintf (stderr, "grab edges failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "grab edges failed in shrink_ones\n");
         return 1;
     }
 
@@ -726,7 +726,7 @@ static int shrink_extra (CC_SRKgraph *G, int *oncount, int *oecount,
 
     rval = CCcut_SRK_grab_edges (G, oncount, oecount, olist, olen, expand);
     if (rval) {
-        fprintf (stderr, "grab edges failed\n");
+        CC_FPRINTF(stderr, "grab edges failed\n");
         goto CLEANUP;
     }
 
@@ -742,20 +742,20 @@ static int shrink_olaf_new (CC_SRKgraph *G, int ncount, int ecount, int *elist,
     int rval = 0;
 
     if (CCcut_SRK_buildgraph (G, ncount, ecount, elist, dlen)) {
-        fprintf (stderr, "buildgraph failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "buildgraph failed in shrink_ones\n");
         return 1;
     }
     CCcut_SRK_increment_marker (G);
 
     rval = CCcut_SRK_defluff (G);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_defluff failed in shrink_ones\n");
         goto CLEANUP;
     }
 
     rval = shrink_olaf (G, oncount, oecount, olist, olen, expand, level);
     if (rval) {
-        fprintf (stderr, "shrink_olaf failed\n");
+        CC_FPRINTF(stderr, "shrink_olaf failed\n");
         goto CLEANUP;
     }
 
@@ -800,7 +800,7 @@ static int shrink_olaf (CC_SRKgraph *G, int *oncount, int *oecount,
 
     rval = CCcut_SRK_grab_edges (G, oncount, oecount, olist, olen, expand);
     if (rval) {
-        fprintf (stderr, "grab edges failed\n");
+        CC_FPRINTF(stderr, "grab edges failed\n");
         goto CLEANUP;
     }
 

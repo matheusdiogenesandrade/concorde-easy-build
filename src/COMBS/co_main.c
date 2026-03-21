@@ -55,7 +55,7 @@ int main (int ac, char **av)
     rval = CCutil_getedges_double (&ncount, fname, &ecount, &elist, &ecap,
                                    binary_in);
     if (rval) {
-        fprintf (stderr, "CCutil_getedges_double failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_getedges_double failed\n"); goto CLEANUP;
     }
 
     szeit = CCutil_zeit ();
@@ -63,13 +63,13 @@ int main (int ac, char **av)
     if (blocktest) {
         rval = test_blocks (ncount, ecount, elist, ecap);
         if (rval) {
-            fprintf (stderr, "test_blocks failed\n");
+            CC_FPRINTF(stderr, "test_blocks failed\n");
             goto CLEANUP;
         }
     } 
 
-    printf ("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_PRINTF("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -91,22 +91,22 @@ static int test_blocks (int ncount, int ecount, int *elist, double *ecap)
     rval = CCcombs_find_blocks (ncount, ecount, elist, ecap,
              &nblocks, &blockcnt, &blocks, &ncutnodes, &cutnodes);
     if (rval) {
-        fprintf (stderr, "CCcombs_find_blocks failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcombs_find_blocks failed\n"); goto CLEANUP;
     }
 
-    printf ("Cutnodes: ");
+    CC_PRINTF("Cutnodes: ");
     for (i = 0; i < ncutnodes; i++) {
-        printf ("%d ", cutnodes[i]);
+        CC_PRINTF("%d ", cutnodes[i]);
     }
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 
     for (i = 0; i < nblocks; i++) {
-        printf ("Block %d: ", i); fflush (stdout);
+        CC_PRINTF("Block %d: ", i); CC_FFLUSH(stdout);
         for (j = 0; j < blockcnt[i]; j++) {
-            printf ("%d ", blocks[i][j]);
+            CC_PRINTF("%d ", blocks[i][j]);
         }
-        printf ("\n"); fflush (stdout);
+        CC_PRINTF("\n"); CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -151,21 +151,21 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "usage: %s [- below -] edge_file\n", f);
-    fprintf (stderr, "    b:   binary input file\n");
-    fprintf (stderr, "    B:   find block decomposition\n");
+    CC_FPRINTF(stderr, "usage: %s [- below -] edge_file\n", f);
+    CC_FPRINTF(stderr, "    b:   binary input file\n");
+    CC_FPRINTF(stderr, "    B:   find block decomposition\n");
 }
 
 #if 0
 static int display_all_cuts (double val, int cnt, int *cut, void *pass_param)
 {
     if (pass_param) {
-        fprintf (stderr, "don't know about pass_param in display_all_cuts\n");
+        CC_FPRINTF(stderr, "don't know about pass_param in display_all_cuts\n");
         return 1;
     }
 
     if (cut && cnt) {
-        printf ("Found cut of value %f\n", val); fflush (stdout);
+        CC_PRINTF("Found cut of value %f\n", val); CC_FFLUSH(stdout);
     }
     return 0;
 }

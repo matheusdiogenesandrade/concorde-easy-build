@@ -84,13 +84,13 @@ int main (int ac, char **av)
     CCutil_sprand (seed, &rstate);
     
     if (find_global && violatedcuts) {
-        fprintf (stderr, "use at most one of -p and -c arguments\n");
+        CC_FPRINTF(stderr, "use at most one of -p and -c arguments\n");
         goto CLEANUP;
     }
 
 #ifdef USE_DIRECTED
     if (find_global || violatedcuts) {
-        fprintf (stderr, "not set up for global cut in directed graphs\n");
+        CC_FPRINTF(stderr, "not set up for global cut in directed graphs\n");
         goto CLEANUP;
     }
 #endif
@@ -99,7 +99,7 @@ int main (int ac, char **av)
     rval = CCutil_getedges_double (&ncount, fname, &ecount, &elist, &ecap,
                                    binary_in);
     if (rval) {
-        fprintf (stderr, "CCutil_getedges_double failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_getedges_double failed\n"); goto CLEANUP;
     }
 
     if (showcut) {
@@ -111,7 +111,7 @@ int main (int ac, char **av)
     if (setfname) {
         setin = fopen (setfname, "r");
         if (!setin) {
-            fprintf (stderr, "could not open %s for reading set\n", setfname);
+            CC_FPRINTF(stderr, "could not open %s for reading set\n", setfname);
             rval = 1;  goto CLEANUP;
         }
         fscanf (setin, "%d", &scount);
@@ -121,9 +121,9 @@ int main (int ac, char **av)
         for (i = 0; i < scount; i++) {
             fscanf (setin, "%d", &slist[i]);
         }
-        printf ("Find min-cut containing nodes:");
-        for (i = 0; i < scount; i++) printf (" %d", slist[i]);
-        printf ("\n"); fflush (stdout);
+        CC_PRINTF("Find min-cut containing nodes:");
+        for (i = 0; i < scount; i++) CC_PRINTF(" %d", slist[i]);
+        CC_PRINTF("\n"); CC_FFLUSH(stdout);
 
         rval = CCcut_mincut_containing_set (ncount, ecount, elist, ecap,
                           scount, slist, &val, &cut, &cutcount, 0, &rstate);
@@ -140,10 +140,10 @@ int main (int ac, char **av)
         rval = CCcut_gomory_hu (&T, ncount, ecount, elist, ecap, 0,
                                 (int *) NULL, &rstate);
         if (rval) {
-            fprintf (stderr, "CCcut_gomory_hu failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCcut_gomory_hu failed\n"); goto CLEANUP;
         }
-        printf ("Gomory-Hu Tree: %.2f seconds)\n", CCutil_zeit() - szeit);
-        fflush (stdout);
+        CC_PRINTF("Gomory-Hu Tree: %.2f seconds)\n", CCutil_zeit() - szeit);
+        CC_FFLUSH(stdout);
         if (showcut) {
             CCcut_GHtreeprint (&T);
         }
@@ -154,11 +154,11 @@ int main (int ac, char **av)
         rval = CCcut_mincut (ncount, ecount, elist, ecap, &val, mycut,
                             &cutcount);
         if (rval) {
-            fprintf (stderr, "CCcut_mincut failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCcut_mincut failed\n"); goto CLEANUP;
         }
-        printf ("Minimum Cut Value: %f (%.2f seconds)\n", val,
+        CC_PRINTF("Minimum Cut Value: %f (%.2f seconds)\n", val,
                 CCutil_zeit() - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         if (showcut) display_cut (cut, cutcount);
         goto CLEANUP;
     } else if (violatedcuts) {
@@ -166,10 +166,10 @@ int main (int ac, char **av)
         rval = CCcut_violated_cuts (ncount, ecount, elist, ecap,
                 2.0 - CC_MINCUT_ONE_EPSILON, display_all_cuts, (void *) NULL);
         if (rval) {
-            fprintf (stderr, "CCcut_violated_cuts failed\n");
+            CC_FPRINTF(stderr, "CCcut_violated_cuts failed\n");
             goto CLEANUP;
         }
-        printf ("Running time: %.2f seconds\n", CCutil_zeit() - szeit);
+        CC_PRINTF("Running time: %.2f seconds\n", CCutil_zeit() - szeit);
         goto CLEANUP;
     }
 
@@ -184,15 +184,15 @@ int main (int ac, char **av)
         rval = shrink_ones (ncount, ecount, elist, ecap, &tncount, &tecount,
                             &telist, &tecap, &minval);
         if (rval) {
-            fprintf (stderr, "shrink_ones failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "shrink_ones failed\n"); goto CLEANUP;
         }
-        printf ("Shrunk graph has %d nodes and %d edges\n", tncount, tecount);
+        CC_PRINTF("Shrunk graph has %d nodes and %d edges\n", tncount, tecount);
         if (minval != CC_MINCUT_BIGDOUBLE) {
-            printf ("Shrinking found cut of value %f\n", minval);
+            CC_PRINTF("Shrinking found cut of value %f\n", minval);
         }
-        fflush (stdout);
-        printf ("Time for shrinking: %.2f seconds\n", CCutil_zeit () - sszeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
+        CC_PRINTF("Time for shrinking: %.2f seconds\n", CCutil_zeit () - sszeit);
+        CC_FFLUSH(stdout);
         CC_IFFREE(elist, int);
         CC_IFFREE(ecap, double);
         ncount = tncount;
@@ -209,7 +209,7 @@ int main (int ac, char **av)
 
         rval = duplicate_edges (ncount, ecount, elist, ecap, &telist, &tecap);
         if (rval) {
-            fprintf (stderr, "duplicated_edges failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "duplicated_edges failed\n"); goto CLEANUP;
         }
         CC_IFFREE(elist, int);
         CC_IFFREE(ecap, double);
@@ -226,8 +226,8 @@ int main (int ac, char **av)
     if (sink != -1) {
         if (source < 0 || sink < 0 || source >= ncount ||
             sink >= ncount || source == sink) {
-            printf ("Bad source sink pair\n");
-            fflush (stdout);
+            CC_PRINTF("Bad source sink pair\n");
+            CC_FFLUSH(stdout);
             goto CLEANUP;
         }
 
@@ -235,40 +235,40 @@ int main (int ac, char **av)
         rval = CCcut_mincut_st (ncount, ecount, elist, ecap, source, sink,
                             &val, mycut, &cutcount);
         if (rval) {
-           fprintf (stderr, "mincut_st failed\n"); goto CLEANUP;
+           CC_FPRINTF(stderr, "mincut_st failed\n"); goto CLEANUP;
         }
-        printf ("Cut value: %f\n", val);
-        printf ("Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("Cut value: %f\n", val);
+        CC_PRINTF("Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
 
         if (showcut) display_cut (cut, cutcount);
     } else {
         double minval = CC_MINCUT_BIGDOUBLE;
         double fzeit = CCutil_zeit ();
 
-        printf ("compute all cuts from source node %d\n", source);
-        fflush (stdout);
+        CC_PRINTF("compute all cuts from source node %d\n", source);
+        CC_FFLUSH(stdout);
         for (i = 0; i < ncount; i++) {
             if (i != source) {
                 rval = CCcut_mincut_st (ncount, ecount, elist, ecap, source, i,
                                         &val, (int **) NULL, (int *) NULL);
                 if (rval) {
-                    fprintf (stderr, "mincut_digraph failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "mincut_digraph failed\n"); goto CLEANUP;
                 }
                 if (val < minval)
                     minval = val;
-                printf ("."); fflush (stdout);
+                CC_PRINTF("."); CC_FFLUSH(stdout);
                 if (i % 75 == 0)
-                    printf ("%d\n", i);
+                    CC_PRINTF("%d\n", i);
             }
         }
-        printf ("\nMinimum Cut Value: %f\n", minval);
-        printf ("Running Time: %.2f (seconds)\n", CCutil_zeit () - fzeit);
-        fflush (stdout);
+        CC_PRINTF("\nMinimum Cut Value: %f\n", minval);
+        CC_PRINTF("Running Time: %.2f (seconds)\n", CCutil_zeit () - fzeit);
+        CC_FFLUSH(stdout);
     }
 
-    printf ("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_PRINTF("Total Running Time: %.2f (seconds)\n", CCutil_zeit () - szeit);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -335,31 +335,31 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "usage: %s [- below -] edge_file\n", f);
-    fprintf (stderr, "    b:   binary input file\n");
-    fprintf (stderr, "    C:   display the min cut (or G-H tree)\n");
-    fprintf (stderr, "    c:   display all cuts < 2.0\n");
-    fprintf (stderr, "    G:   find Gomory-Hu tree (no shrinking)\n");
-    fprintf (stderr, "    p:   use Padberg-Rinaldi style shrinking\n");
-    fprintf (stderr, "    r #: random seed\n");
-    fprintf (stderr, "    S:   do not use the TSP shrink routines\n");
-    fprintf (stderr, "    s #: source\n");
-    fprintf (stderr, "    t #: sink\n");
-    fprintf (stderr, "    T f: find min cut containing node set in file f\n");
+    CC_FPRINTF(stderr, "usage: %s [- below -] edge_file\n", f);
+    CC_FPRINTF(stderr, "    b:   binary input file\n");
+    CC_FPRINTF(stderr, "    C:   display the min cut (or G-H tree)\n");
+    CC_FPRINTF(stderr, "    c:   display all cuts < 2.0\n");
+    CC_FPRINTF(stderr, "    G:   find Gomory-Hu tree (no shrinking)\n");
+    CC_FPRINTF(stderr, "    p:   use Padberg-Rinaldi style shrinking\n");
+    CC_FPRINTF(stderr, "    r #: random seed\n");
+    CC_FPRINTF(stderr, "    S:   do not use the TSP shrink routines\n");
+    CC_FPRINTF(stderr, "    s #: source\n");
+    CC_FPRINTF(stderr, "    t #: sink\n");
+    CC_FPRINTF(stderr, "    T f: find min cut containing node set in file f\n");
 }
 
 static void display_cut (int *cut, int count)
 {
     int i;
 
-    printf ("MIN CUT:\n");
+    CC_PRINTF("MIN CUT:\n");
     for (i = 0; i < count; i++) {
-        printf ("%3d ", cut[i]);
+        CC_PRINTF("%3d ", cut[i]);
         if (i % 10 == 9)
-            printf ("\n");
+            CC_PRINTF("\n");
     }
-    if (i % 10) printf ("\n");
-    fflush (stdout);
+    if (i % 10) CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 }
 
 #ifdef USE_DIRECTED_GRAPH
@@ -377,7 +377,7 @@ static int duplicate_edges (int ncount, int ecount, int *elist, double *ecap,
     *tlist = CC_SAFE_MALLOC (4 * ecount, int);
     *tcap  = CC_SAFE_MALLOC (2 * ecount, double);
     if (!*tlist || !*tcap) {
-        fprintf (stderr, "Out of memory in duplicate_edges\n");
+        CC_FPRINTF(stderr, "Out of memory in duplicate_edges\n");
         CC_IFFREE (*tlist, int);
         CC_IFFREE (*tcap, double);
         return 1;
@@ -403,7 +403,7 @@ static int shrink_ones (int ncount, int ecount, int *elist, double *dlen,
     CCcut_SRK_init_graph (&G);
     rval = CCcut_SRK_buildgraph (&G, ncount, ecount, elist, dlen);
     if (rval) {
-        fprintf (stderr, "buildgraph failed in shrink_ones\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed in shrink_ones\n"); goto CLEANUP;
     }
     CCcut_SRK_subtour_shrink (&G, minval, CC_MINCUT_ONE_EPSILON,
             (CC_SRKcallback *) NULL, (int **) NULL, (int *) NULL);
@@ -411,7 +411,7 @@ static int shrink_ones (int ncount, int ecount, int *elist, double *dlen,
     rval = CCcut_SRK_grab_edges (&G, oncount, oecount, olist, olen,
                           (CC_SRKexpinfo *) NULL);
     if (rval) {
-        fprintf (stderr, "grab edges failed in shrink_ones\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "grab edges failed in shrink_ones\n"); goto CLEANUP;
     }
 
 
@@ -424,12 +424,12 @@ CLEANUP:
 static int display_all_cuts (double val, int cnt, int *cut, void *pass_param)
 {
     if (pass_param) {
-        fprintf (stderr, "don't know about pass_param in display_all_cuts\n");
+        CC_FPRINTF(stderr, "don't know about pass_param in display_all_cuts\n");
         return 1;
     }
 
     if (cut && cnt) {
-        printf ("Found cut of value %f\n", val); fflush (stdout);
+        CC_PRINTF("Found cut of value %f\n", val); CC_FFLUSH(stdout);
     }
     return 0;
 }

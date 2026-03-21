@@ -227,7 +227,7 @@ void CCpq_cuttree_freetree (CCtsp_cuttree *t)
     CC_IFFREE (t->nodelist, CCtsp_cutnode);
 
     if (cutnode_check_leaks (&t->cutnode_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding cutnodes\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding cutnodes\n",
                  total - onlist);
     }
     CCptrworld_delete (&t->cutnode_world);
@@ -260,20 +260,20 @@ int CCpq_cuttree_trivial (CCtsp_cuttree *t, int nodecount, int extern_node)
     CCpq_cuttree_init (t);
 
     if (nodecount < 3) {
-        fprintf (stderr, "CCpq_cuttree_trivial can only handle graphs with >= 3 nodes\n");
+        CC_FPRINTF(stderr, "CCpq_cuttree_trivial can only handle graphs with >= 3 nodes\n");
         goto FAILURE;
     }
 
     nodelist = CC_SAFE_MALLOC (nodecount, CCtsp_cutnode);
     if (nodelist == (CCtsp_cutnode *) NULL) {
-        fprintf (stderr, "Out of memory in CCpq_cuttree_trivial\n");
+        CC_FPRINTF(stderr, "Out of memory in CCpq_cuttree_trivial\n");
         goto FAILURE;
     }
 
     root = cutnode_alloc (&t->cutnode_world);
     intern = cutnode_alloc (&t->cutnode_world);
     if (root == (CCtsp_cutnode *) NULL || intern == (CCtsp_cutnode *) NULL) {
-        fprintf (stderr, "cutnode_alloc failed\n");
+        CC_FPRINTF(stderr, "cutnode_alloc failed\n");
         goto FAILURE;
     }
 
@@ -326,25 +326,25 @@ int CCpq_cuttree_update_clean (CCtsp_cuttree *t, int edgecount, int *elist,
 
     rval = CCpq_tree_trivial (&pqt, t->nodecount, t->extern_node);
     if (rval) {
-        fprintf (stderr, "CCpq_tree_trivial failed\n");
+        CC_FPRINTF(stderr, "CCpq_tree_trivial failed\n");
         goto CLEANUP;
     }
 
     rval = cuttree_to_cutgrtree (t, &tgr);
     if (rval) {
-        fprintf (stderr, "cuttree_to_cutgrtree failed\n");
+        CC_FPRINTF(stderr, "cuttree_to_cutgrtree failed\n");
         goto CLEANUP;
     }
 
     rval = cutgrtree_loadx (&tgr, edgecount, elist, x, 1);
     if (rval) {
-        fprintf (stderr, "cutgrtree_loadx failed\n");
+        CC_FPRINTF(stderr, "cutgrtree_loadx failed\n");
         goto CLEANUP;
     }
 
     rval = PQ_add_tight_nodes (CUT_TOL, &pqt, &tgr);
     if (rval) {
-        fprintf (stderr, "PQ_add_tight_nodes failed\n");
+        CC_FPRINTF(stderr, "PQ_add_tight_nodes failed\n");
         goto CLEANUP;
     }
 
@@ -352,13 +352,13 @@ int CCpq_cuttree_update_clean (CCtsp_cuttree *t, int edgecount, int *elist,
 
     rval = PQ_tree_to_cuttree (&pqt, &tnew);
     if (rval) {
-        fprintf (stderr, "PQ_tree_to_cuttree failed\n");
+        CC_FPRINTF(stderr, "PQ_tree_to_cuttree failed\n");
         goto CLEANUP;
     }
 
     rval = cuttree_to_cutgrtree (&tnew, &tgr);
     if (rval) {
-        fprintf (stderr, "cuttree_to_cutgrtree failed\n");
+        CC_FPRINTF(stderr, "cuttree_to_cutgrtree failed\n");
         goto CLEANUP;
     }
 
@@ -366,13 +366,13 @@ int CCpq_cuttree_update_clean (CCtsp_cuttree *t, int edgecount, int *elist,
 
     rval = cutgrtree_loadx (&tgr, edgecount, elist, x, 1);
     if (rval) {
-        fprintf (stderr, "cutgrtree_loadx failed\n");
+        CC_FPRINTF(stderr, "cutgrtree_loadx failed\n");
         goto CLEANUP;
     }
 
     rval = PQ_add_tight_edges (CUT_TOL, &pqt, &tgr);
     if (rval) {
-        fprintf (stderr, "PQ_add_tight_edges failed\n");
+        CC_FPRINTF(stderr, "PQ_add_tight_edges failed\n");
         goto CLEANUP;
     }
 
@@ -380,7 +380,7 @@ int CCpq_cuttree_update_clean (CCtsp_cuttree *t, int edgecount, int *elist,
 
     rval = PQ_tree_to_cuttree (&pqt, &tnew);
     if (rval) {
-        fprintf (stderr, "PQ_tree_to_cuttree failed\n");
+        CC_FPRINTF(stderr, "PQ_tree_to_cuttree failed\n");
         goto CLEANUP;
     }
 
@@ -411,37 +411,37 @@ int CCpq_cuttree_improve_quick (CCtsp_cuttree *t, CCtsp_lpcuts *pool,
 
     rval = CCpq_cuttree_update_clean (t, edgecount, elist, x);
     if (rval) {
-        fprintf (stderr, "CCpq_cuttree_update_clean failed\n");
+        CC_FPRINTF(stderr, "CCpq_cuttree_update_clean failed\n");
         goto CLEANUP;
     }
 
     rval = CCpq_cuttree_to_pq (t, &pqt);
     if (rval) {
-        fprintf (stderr, "CCpq_cuttree_to_pq failed\n");
+        CC_FPRINTF(stderr, "CCpq_cuttree_to_pq failed\n");
         goto CLEANUP;
     }
 
     rval = PQ_tree_load_segments (&pqt, CUT_TOL, edgecount, elist, x);
     if (rval) {
-        fprintf (stderr, "PQ_tree_load_segments failed\n");
+        CC_FPRINTF(stderr, "PQ_tree_load_segments failed\n");
         goto CLEANUP;
     }
 
     rval = PQ_tree_load_pool (&pqt, CUT_TOL, pool, edgecount, elist, x);
     if (rval) {
-        fprintf (stderr, "PQ_tree_load_pool failed\n");
+        CC_FPRINTF(stderr, "PQ_tree_load_pool failed\n");
         goto CLEANUP;
     }
 
     rval = PQ_tree_to_cuttree (&pqt, &tnew);
     if (rval) {
-        fprintf (stderr, "PQ_tree_to_cuttree failed\n");
+        CC_FPRINTF(stderr, "PQ_tree_to_cuttree failed\n");
         goto CLEANUP;
     }
 
     rval = CCpq_cuttree_update_clean (&tnew, edgecount, elist, x);
     if (rval) {
-        fprintf (stderr, "CCpq_cuttree_update_clean failed\n");
+        CC_FPRINTF(stderr, "CCpq_cuttree_update_clean failed\n");
         goto CLEANUP;
     }
 
@@ -450,9 +450,9 @@ int CCpq_cuttree_improve_quick (CCtsp_cuttree *t, CCtsp_lpcuts *pool,
     CCpq_cuttree_init (&tnew);
 
 /*
-    printf ("CCtsp_cuttree improved (quick) in %.2f seconds\n",
+    CC_PRINTF("CCtsp_cuttree improved (quick) in %.2f seconds\n",
             CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 */
 
     rval = 0;
@@ -472,7 +472,7 @@ static int PQ_tree_to_cuttree (CCpq_tree *pqt, CCtsp_cuttree *ct)
 
     ct->nodelist = CC_SAFE_MALLOC (nodecount, CCtsp_cutnode);
     if (ct->nodelist == (CCtsp_cutnode *) NULL) {
-        fprintf (stderr, "Out of memory in PQ_tree_to_cuttree\n");
+        CC_FPRINTF(stderr, "Out of memory in PQ_tree_to_cuttree\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -483,7 +483,7 @@ static int PQ_tree_to_cuttree (CCpq_tree *pqt, CCtsp_cuttree *ct)
     ct->root = pqtree_to_cuttree_work (CCpq_find_root (pqt), pqt->elems,
                                        ct->nodelist, &ct->cutnode_world);
     if (ct->root == (CCtsp_cutnode *) NULL) {
-        fprintf (stderr, "pqtree_to_cuttree_work failed\n");
+        CC_FPRINTF(stderr, "pqtree_to_cuttree_work failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -493,7 +493,7 @@ static int PQ_tree_to_cuttree (CCpq_tree *pqt, CCtsp_cuttree *ct)
 
     newroot = cutnode_alloc (&ct->cutnode_world);
     if (newroot == (CCtsp_cutnode *) NULL) {
-        fprintf (stderr, "Out of memory in PQ_tree_to_cuttree\n");
+        CC_FPRINTF(stderr, "Out of memory in PQ_tree_to_cuttree\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -538,7 +538,7 @@ static CCtsp_cutnode *pqtree_to_cuttree_work (CCpq_node *x, CCpq_node *elems,
 
     n = cutnode_alloc (cutnode_world);
     if (n == (CCtsp_cutnode *) NULL) {
-        fprintf (stderr, "Out of memory in pqtree_to_cuttree_work\n");
+        CC_FPRINTF(stderr, "Out of memory in pqtree_to_cuttree_work\n");
         goto FAILURE;
     }
 
@@ -550,7 +550,7 @@ static CCtsp_cutnode *pqtree_to_cuttree_work (CCpq_node *x, CCpq_node *elems,
     } else if (x->type == PQ_QNODE) {
         n->type = CCtsp_CUT_QNODE;
     } else {
-        fprintf (stderr, "Unknown node type %d\n", x->type);
+        CC_FPRINTF(stderr, "Unknown node type %d\n", x->type);
         goto FAILURE;
     }
 
@@ -576,14 +576,14 @@ static int cuttree_to_cutgrtree (CCtsp_cuttree *t, cutgrtree *tgr)
 
     tgr->nodelist = CC_SAFE_MALLOC (nodecount, cutgrnode);
     if (tgr->nodelist == (cutgrnode *) NULL) {
-        fprintf (stderr, "Out of memory in cuttree_to_cutgrtree\n");
+        CC_FPRINTF(stderr, "Out of memory in cuttree_to_cutgrtree\n");
         return -1;
     }
 
     tgr->root = cuttree_to_cutgrtree_work (t->root, t->nodelist,
                   tgr->nodelist, &tgr->cutgrnode_world, &tgr->cutgradj_world);
     if (tgr->root == (cutgrnode *) NULL) {
-        fprintf (stderr, "cuttree_to_cutgrtree_work failed\n");
+        CC_FPRINTF(stderr, "cuttree_to_cutgrtree_work failed\n");
         cutgrtree_freetree (tgr);
         return -1;
     }
@@ -611,7 +611,7 @@ static cutgrnode *cuttree_to_cutgrtree_work (CCtsp_cutnode *n,
 
     ngr = cutgrnode_alloc (cutgrnode_world);
     if (ngr == (cutgrnode *) NULL) {
-        fprintf (stderr, "Out of memory in cuttree_cutgrtree_work\n");
+        CC_FPRINTF(stderr, "Out of memory in cuttree_cutgrtree_work\n");
         goto FAILURE;
     }
     cutgrnode_init (ngr);
@@ -660,7 +660,7 @@ static int PQ_tree_load_segments (CCpq_tree *pqt, double cut_tol,
 
     endmark = CC_SAFE_MALLOC (nodecount, int);
     if (endmark == (int *) NULL) {
-        fprintf (stderr, "Out of memory in PQ_tree_load_segments\n");
+        CC_FPRINTF(stderr, "Out of memory in PQ_tree_load_segments\n");
         rval = -1; goto CLEANUP;
     }
 
@@ -677,7 +677,7 @@ static int PQ_tree_load_segments (CCpq_tree *pqt, double cut_tol,
             CCpq_add_leaflist (pqt, elist[2*i+1]);
             rval = CCpq_apply (pqt, &status);
             if (rval) {
-                fprintf (stderr, "CCpq_apply failed\n");
+                CC_FPRINTF(stderr, "CCpq_apply failed\n");
                 goto CLEANUP;
             }
             if (status == CCpq_STATUS_NONTRIVIAL) {
@@ -688,7 +688,7 @@ static int PQ_tree_load_segments (CCpq_tree *pqt, double cut_tol,
 
 #ifdef VERBOSE
     if (nontriv) {
-        printf ("%d nontrivial edge cuts added\n", nontriv);
+        CC_PRINTF("%d nontrivial edge cuts added\n", nontriv);
     }
 #endif
 
@@ -708,14 +708,14 @@ static int PQ_tree_load_segments (CCpq_tree *pqt, double cut_tol,
                            elist, x, 2.0 + cut_tol, (void *) &pcs,
                            load_seg_callback);
     if (rval) {
-        fprintf (stderr, "libsub_allcuts failed\n");
+        CC_FPRINTF(stderr, "libsub_allcuts failed\n");
         goto CLEANUP;
     }
 
 #ifdef VERBOSE
-    printf ("CCcut_linsub_allcuts found %d (%d nontriv) cuts in %.2f seconds\n",
+    CC_PRINTF("CCcut_linsub_allcuts found %d (%d nontriv) cuts in %.2f seconds\n",
             pcs.cutcount, pcs.nontrivial, CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 #endif
 
     rval = 0;
@@ -747,7 +747,7 @@ static int load_seg_callback (CC_UNUSED double cut_val, int cut_start,
 
     rval = CCpq_apply (pqt, &status);
     if (rval) {
-        fprintf (stderr, "CCpq_apply failed\n");
+        CC_FPRINTF(stderr, "CCpq_apply failed\n");
         return rval;
     }
     if (status == CCpq_STATUS_NONTRIVIAL) pcs->nontrivial++;
@@ -772,28 +772,28 @@ static int PQ_tree_load_pool (CCpq_tree *pqt, double cut_tol,
                                     &cliquecount, pqt->nodecount, edgecount,
                                     elist, x);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_clique_prices failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_clique_prices failed\n");
         goto CLEANUP;
     }
 
     for (i=0; i<cliquecount; i++) {
         rval = CCtsp_get_clique (pool, cliquenums[i], &c);
         if (rval) {
-            fprintf (stderr, "CCtsp_get_clique failed\n");
+            CC_FPRINTF(stderr, "CCtsp_get_clique failed\n");
             goto CLEANUP;
         }
         rval = CCpq_apply_clique (pqt, c, &status);
         if (rval) {
-            fprintf (stderr, "CCpq_apply_clique failed\n");
+            CC_FPRINTF(stderr, "CCpq_apply_clique failed\n");
             goto CLEANUP;
         }
         if (status == CCpq_STATUS_NONTRIVIAL) nontrivial++;
     }
 
 #ifdef VERBOSE
-    printf ("pool found %d (%d nontriv) cuts in %.2f seconds\n",
+    CC_PRINTF("pool found %d (%d nontriv) cuts in %.2f seconds\n",
             cliquecount, nontrivial, CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 #endif
 
     rval = 0;
@@ -816,7 +816,7 @@ int CCpq_apply_clique (CCpq_tree *pqt, CCtsp_lpclique *c, int *status)
 
     rval = CCpq_apply (pqt, status);
     if (rval) {
-        fprintf (stderr, "CCpq_apply failed\n");
+        CC_FPRINTF(stderr, "CCpq_apply failed\n");
         goto CLEANUP;
     }
 
@@ -859,13 +859,13 @@ static void cutgrtree_freetree (cutgrtree *t)
     CC_IFFREE (t->nodelist, cutgrnode);
 
     if (cutgradj_check_leaks (&t->cutgradj_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding cutgradjs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding cutgradjs\n",
                  total - onlist);
     }
     CCptrworld_delete (&t->cutgradj_world);
 
     if (cutgrnode_check_leaks (&t->cutgrnode_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding cutgrnodes\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding cutgrnodes\n",
                  total - onlist);
     }
     CCptrworld_delete (&t->cutgrnode_world);
@@ -904,12 +904,12 @@ static int cutgrtree_build_leafgraph (cutgrtree *t, int edgecount,
             e2 = nodelist + elist[2*i+1];
             rval = cutgrtree_addadj (e1, e1, e2, x[i], i, &t->cutgradj_world);
             if (rval) {
-                fprintf (stderr, "cutgrtree_addadj failed\n");
+                CC_FPRINTF(stderr, "cutgrtree_addadj failed\n");
                 return rval;
             }
             rval = cutgrtree_addadj (e2, e2, e1, x[i], i, &t->cutgradj_world);
             if (rval) {
-                fprintf (stderr, "cutgrtree_addadj failed\n");
+                CC_FPRINTF(stderr, "cutgrtree_addadj failed\n");
                 return rval;
             }
         }
@@ -923,7 +923,7 @@ static int cutgrtree_addadj (cutgrnode *n, cutgrnode *from, cutgrnode *to,
     cutgradj *a = cutgradj_alloc (cutgradj_world);
 
     if (a == (cutgradj *) NULL) {
-        fprintf (stderr, "Out of memory in cutgrtree_addadj\n");
+        CC_FPRINTF(stderr, "Out of memory in cutgrtree_addadj\n");
         return -1;
     }
     a->to = to;
@@ -957,19 +957,19 @@ static int cutgrtree_loadx (cutgrtree *t, int edgecount, int *elist,
 
     rval = cutgrtree_build_leafgraph (t, edgecount, elist, x);
     if (rval) {
-        fprintf (stderr, "cutgrtree_build_leafgraph failed\n");
+        CC_FPRINTF(stderr, "cutgrtree_build_leafgraph failed\n");
         cutgrtree_free_leafgraph (t);
         return rval;
     }
     rval = cutgrtree_ancestor (t->root, &t->cutgradj_world);
     if (rval) {
-        fprintf (stderr, "cutgrtree_ancestor failed\n");
+        CC_FPRINTF(stderr, "cutgrtree_ancestor failed\n");
         cutgrtree_free_leafgraph (t);
         return rval;
     }
     rval = cutgrtree_penultimate (t->root, &t->cutgradj_world);
     if (rval) {
-        fprintf (stderr, "cutgrtree_penultimate failed\n");
+        CC_FPRINTF(stderr, "cutgrtree_penultimate failed\n");
         cutgrtree_free_leafgraph (t);
         return rval;
     }
@@ -979,15 +979,15 @@ static int cutgrtree_loadx (cutgrtree *t, int edgecount, int *elist,
     }
 
 #ifdef VERBOSE
-    printf ("cutgrtree graph loaded in %.2f seconds\n", CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_PRINTF("cutgrtree graph loaded in %.2f seconds\n", CCutil_zeit() - szeit);
+    CC_FFLUSH(stdout);
 #endif
 
 #ifdef DEBUG
     szeit = CCutil_zeit();
     verify_cutgrtree (t, t->root, edgecount, elist, x);
-    printf ("tree verified in %.2f seconds\n", CCutil_zeit() - szeit);
-    fflush (stdout);
+    CC_PRINTF("tree verified in %.2f seconds\n", CCutil_zeit() - szeit);
+    CC_FFLUSH(stdout);
 #endif
 
     return 0;
@@ -1036,7 +1036,7 @@ static int cutgrtree_ancestor (cutgrnode *n, CCptrworld *cutgradj_world)
                 rval = cutgrtree_addadj (anc, a->from, a->to, a->weight,
                                          a->num, cutgradj_world);
                 if (rval) {
-                    fprintf (stderr, "cutgrtree_addadj failed\n");
+                    CC_FPRINTF(stderr, "cutgrtree_addadj failed\n");
                     return rval;
                 }
                 anc->int_weight += a->weight;
@@ -1068,24 +1068,24 @@ static int cutgrtree_penultimate (cutgrnode *n, CCptrworld *cutgradj_world)
 
 #ifdef DEBUG
         if (f == t) {
-            fprintf (stderr, "Whoops, f = t\n");
+            CC_FPRINTF(stderr, "Whoops, f = t\n");
         }
         if (f->parent != n) {
-            fprintf (stderr, "Whoops, f->parent != n\n");
+            CC_FPRINTF(stderr, "Whoops, f->parent != n\n");
         }
         if (t->parent != n) {
-            fprintf (stderr, "Whoops, t->parent != n\n");
+            CC_FPRINTF(stderr, "Whoops, t->parent != n\n");
         }
 #endif
 
         rval = cutgrtree_addadj (f, f, t, a->weight, a->num, cutgradj_world);
         if (rval) {
-            fprintf (stderr, "cutgrtree_addadj failed\n");
+            CC_FPRINTF(stderr, "cutgrtree_addadj failed\n");
             return rval;
         }
         rval = cutgrtree_addadj (t, t, f, a->weight, a->num, cutgradj_world);
         if (rval) {
-            fprintf (stderr, "cutgrtree_addadj failed\n");
+            CC_FPRINTF(stderr, "cutgrtree_addadj failed\n");
             return rval;
         }
         cutgradj_free (cutgradj_world, a);
@@ -1152,7 +1152,7 @@ static int PQ_add_tight_nodes (double tol, CCpq_tree *pqt, cutgrtree *t)
 
     rval = add_tight_nodes_work (t->root, tol, pqt);
     if (rval) {
-        fprintf (stderr, "add_tight_nodes_work failed\n");
+        CC_FPRINTF(stderr, "add_tight_nodes_work failed\n");
     }
     return rval;
 }
@@ -1191,7 +1191,7 @@ static int add_tight_nodes_work (cutgrnode *n, double tol, CCpq_tree *pqt)
         (cut_weight >= 2.0-tol && cut_weight <= 2.0+tol)) {
         rval = add_node (n, pqt);
         if (rval) {
-            fprintf (stderr, "add_node failed\n");
+            CC_FPRINTF(stderr, "add_node failed\n");
             return rval;
         }
     }
@@ -1216,11 +1216,11 @@ static int add_node (cutgrnode *n, CCpq_tree *pqt)
     rval = CCpq_apply (pqt, &status);
     *(n->leaf_elems_end) = save_next;
     if (rval) {
-        fprintf (stderr, "CCpq_apply failed\n");
+        CC_FPRINTF(stderr, "CCpq_apply failed\n");
         return rval;
     }
     if (status == CCpq_STATUS_NOSOL) {
-        printf ("WARNING: add_node tight cut wouldn't fit\n");
+        CC_PRINTF("WARNING: add_node tight cut wouldn't fit\n");
     }
     return 0;
 }
@@ -1241,11 +1241,11 @@ static int add_node_pair (cutgrnode *n1, cutgrnode *n2, CCpq_tree *pqt)
     *(n1->leaf_elems_end) = save_next1;
     *(n2->leaf_elems_end) = save_next2;
     if (rval) {
-        fprintf (stderr, "CCpq_apply failed\n");
+        CC_FPRINTF(stderr, "CCpq_apply failed\n");
         return rval;
     }
     if (status == CCpq_STATUS_NOSOL) {
-        printf ("WARNING: add_node_pair tight cut wouldn't fit\n");
+        CC_PRINTF("WARNING: add_node_pair tight cut wouldn't fit\n");
     }
     return 0;
 }
@@ -1274,11 +1274,11 @@ static int add_node_complement (cutgrnode *p, cutgrnode *n, CCpq_tree *pqt)
     }
 
     if (rval) {
-        fprintf (stderr, "CCpq_apply failed\n");
+        CC_FPRINTF(stderr, "CCpq_apply failed\n");
         return rval;
     }
     if (status == CCpq_STATUS_NOSOL) {
-        printf ("WARNING: add_complement tight cut wouldn't fit\n");
+        CC_PRINTF("WARNING: add_complement tight cut wouldn't fit\n");
     }
     return 0;
 }
@@ -1294,7 +1294,7 @@ static int PQ_add_tight_edges (double tol, CCpq_tree *pqt, cutgrtree *t)
 
     rval = add_tight_edges_work (t->root, tol, pqt);
     if (rval) {
-        fprintf (stderr, "add_tight_edges_work failed\n");
+        CC_FPRINTF(stderr, "add_tight_edges_work failed\n");
     }
     return rval;
 }
@@ -1307,7 +1307,7 @@ static int add_tight_edges_work (cutgrnode *n, double tol, CCpq_tree *pqt)
     if (n->mark == 0) {
         rval = check_tight_path (n, tol, pqt);
         if (rval) {
-            fprintf (stderr, "check_tight_path failed\n");
+            CC_FPRINTF(stderr, "check_tight_path failed\n");
             return rval;
         }
         n->mark = 1;
@@ -1315,7 +1315,7 @@ static int add_tight_edges_work (cutgrnode *n, double tol, CCpq_tree *pqt)
 
     rval = check_tight_ext (n, tol, pqt);
     if (rval) {
-        fprintf (stderr, "check_tight_ext failed\n");
+        CC_FPRINTF(stderr, "check_tight_ext failed\n");
         return rval;
     }
 
@@ -1351,7 +1351,7 @@ static int check_tight_path (cutgrnode *n, double tol, CCpq_tree *pqt)
     if (a) {
         rval = add_tight_path (end2alt, a->from, n, tol, pqt);
         if (rval) {
-            fprintf (stderr, "add_tight_path failed\n");
+            CC_FPRINTF(stderr, "add_tight_path failed\n");
         }
         return rval;
     }
@@ -1367,7 +1367,7 @@ static int check_tight_path (cutgrnode *n, double tol, CCpq_tree *pqt)
 
     if ((end1->ext_weight >= 1.0-tol && end1->ext_weight <= 1.0+tol) ||
         (end2->ext_weight >= 1.0-tol && end2->ext_weight <= 1.0+tol)) {
-        fprintf (stderr, "Whoa, unexpected external path\n");
+        CC_FPRINTF(stderr, "Whoa, unexpected external path\n");
         return -1;
     }
     if (pathlength > 1) {
@@ -1380,7 +1380,7 @@ static int check_tight_path (cutgrnode *n, double tol, CCpq_tree *pqt)
 
     rval = add_tight_path (end1, end2, (cutgrnode *) NULL, tol, pqt);
     if (rval) {
-        fprintf (stderr, "add_tight_path failed\n");
+        CC_FPRINTF(stderr, "add_tight_path failed\n");
     }
     return rval;
 }
@@ -1431,12 +1431,12 @@ static int add_tight_path (cutgrnode *end1, cutgrnode *end2,
     while (end1 != end2) {
         a = find_path_edge (end1, avoid, tol);
         if (a == (cutgradj *) NULL) {
-            fprintf (stderr, "Whoa, path vanished in add_tight_path\n");
+            CC_FPRINTF(stderr, "Whoa, path vanished in add_tight_path\n");
             return -1;
         }
         rval = add_node_pair (a->from, a->to, pqt);
         if (rval) {
-            fprintf (stderr, "add_node_pair failed\n");
+            CC_FPRINTF(stderr, "add_node_pair failed\n");
             return rval;
         }
         avoid = end1;
@@ -1489,7 +1489,7 @@ static int check_tight_ext (cutgrnode *n, double tol, CCpq_tree *pqt)
     rval = add_tight_path (int_end1, ext_end1, (cutgrnode *) NULL,
                            tol, pqt);
     if (rval) {
-        fprintf (stderr, "add_tight_path failed\n");
+        CC_FPRINTF(stderr, "add_tight_path failed\n");
         return rval;
     }
 
@@ -1497,7 +1497,7 @@ static int check_tight_ext (cutgrnode *n, double tol, CCpq_tree *pqt)
         if (int_end1 == ext_end1 || int_end1->ext_weight <= tol) {
             rval = add_node_complement (n, ext_end1, pqt);
             if (rval) {
-                fprintf (stderr, "add_node_complement failed\n");
+                CC_FPRINTF(stderr, "add_node_complement failed\n");
                 return rval;
             }
         }
@@ -1508,7 +1508,7 @@ static int check_tight_ext (cutgrnode *n, double tol, CCpq_tree *pqt)
         return 0;
     }
     if (ext_end1 == int_end2) {
-        fprintf (stderr, "Whoa, assymetric path\n");
+        CC_FPRINTF(stderr, "Whoa, assymetric path\n");
         return -1;
     }
     a = find_edge (int_end1, int_end2);
@@ -1516,7 +1516,7 @@ static int check_tight_ext (cutgrnode *n, double tol, CCpq_tree *pqt)
         if (int_end2_alt == (cutgrnode *) NULL) {
             rval = add_node_complement (n, ext_end1, pqt);
             if (rval) {
-                fprintf (stderr, "add_node_complement failed\n");
+                CC_FPRINTF(stderr, "add_node_complement failed\n");
             }
             return rval;
         }
@@ -1526,17 +1526,17 @@ static int check_tight_ext (cutgrnode *n, double tol, CCpq_tree *pqt)
     rval = add_tight_path (ext_end2, int_end2, (cutgrnode *) NULL,
                            tol, pqt);
     if (rval) {
-        fprintf (stderr, "add_tight_path failed\n");
+        CC_FPRINTF(stderr, "add_tight_path failed\n");
         return rval;
     }
     rval = add_node_complement (n, ext_end1, pqt);
     if (rval) {
-        fprintf (stderr, "add_node_complement failed\n");
+        CC_FPRINTF(stderr, "add_node_complement failed\n");
         return rval;
     }
     rval = add_node_complement (n, ext_end2, pqt);
     if (rval) {
-        fprintf (stderr, "add_node_complement failed\n");
+        CC_FPRINTF(stderr, "add_node_complement failed\n");
         return rval;
     }
     return 0;
@@ -1610,14 +1610,14 @@ int CCpq_cuttree_gen_cliques (CCtsp_cuttree *t, void *u_data,
 
     nodenums = CC_SAFE_MALLOC (t->nodecount, int);
     if (nodenums == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCpq_cuttree_gen_cliques\n");
+        CC_FPRINTF(stderr, "Out of memory in CCpq_cuttree_gen_cliques\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = cuttree_gen_work (t->root, t->nodelist, nodenums, &size,
                              &stop, u_data, cut_callback);
     if (rval) {
-        fprintf (stderr, "cuttree_gen_work failed\n");
+        CC_FPRINTF(stderr, "cuttree_gen_work failed\n");
         goto CLEANUP;
     }
 
@@ -1651,7 +1651,7 @@ static int cuttree_gen_work (CCtsp_cutnode *n, CCtsp_cutnode *nodelist,
         rval = (*cut_callback) (nodenums + loc1, (*size) - loc1,
                                 stop, u_data);
         if (rval) {
-            fprintf (stderr, "cut_callback failed\n");
+            CC_FPRINTF(stderr, "cut_callback failed\n");
             return rval;
         }
         if (*stop) return 0;
@@ -1667,7 +1667,7 @@ static int cuttree_gen_work (CCtsp_cutnode *n, CCtsp_cutnode *nodelist,
                 rval = (*cut_callback) (nodenums + loc1, (*size) - loc1,
                                         stop, u_data);
                 if (rval) {
-                    fprintf (stderr, "cut_callback failed\n");
+                    CC_FPRINTF(stderr, "cut_callback failed\n");
                     return rval;
                 }
                 if (*stop) return 0;
@@ -1701,13 +1701,13 @@ int CCpq_cuttree_build_necklaces (CCtsp_cuttree *t, int ecount, int *elist,
 
     rval = cuttree_to_cutgrtree (t, &cgt);
     if (rval) {
-        fprintf (stderr, "cuttree_to_cutgrtree failed\n");
+        CC_FPRINTF(stderr, "cuttree_to_cutgrtree failed\n");
         goto CLEANUP;
     }
 
     rval = cutgrtree_loadx (&cgt, ecount, elist, x, 0);
     if (rval) {
-        fprintf (stderr, "cutgrtree_loadx failed\n");
+        CC_FPRINTF(stderr, "cutgrtree_loadx failed\n");
         goto CLEANUP;
     }
 
@@ -1715,7 +1715,7 @@ int CCpq_cuttree_build_necklaces (CCtsp_cuttree *t, int ecount, int *elist,
 
     necklist = CC_SAFE_MALLOC (neckcount, CCtsp_cutnode *);
     if (necklist == (CCtsp_cutnode **) NULL) {
-        fprintf (stderr, "Out of memory in CCpq_cuttree_build_necklaces\n");
+        CC_FPRINTF(stderr, "Out of memory in CCpq_cuttree_build_necklaces\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1726,7 +1726,7 @@ int CCpq_cuttree_build_necklaces (CCtsp_cuttree *t, int ecount, int *elist,
     i = 0;
     label_necklaces (cgt.root, necklist, &i, necknum);
     if (i != neckcount) {
-        fprintf (stderr, "label_necklaces != count_necklaces\n");
+        CC_FPRINTF(stderr, "label_necklaces != count_necklaces\n");
         rval = 1; goto CLEANUP;
     }
     *p_neckcount = neckcount;
@@ -1789,15 +1789,15 @@ static void label_necklaces (cutgrnode *n, CCtsp_cutnode **necklist,
 void CCpq_cuttree_display (CCtsp_cuttree *t)
 {
     cuttree_display_work (t->root, t->nodelist);
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 }
 
 void CCpq_cuttree_describe (CCtsp_cuttree *t)
 {
     cuttree_describe_work (t->root);
-    printf ("\n");
-    fflush (stdout);
+    CC_PRINTF("\n");
+    CC_FFLUSH(stdout);
 }
 
 static void cuttree_display_work (CCtsp_cutnode *n, CCtsp_cutnode *nodelist)
@@ -1805,35 +1805,35 @@ static void cuttree_display_work (CCtsp_cutnode *n, CCtsp_cutnode *nodelist)
     CCtsp_cutnode *c;
 
     if (n->type == CCtsp_CUT_EXTERN || n->type == CCtsp_CUT_LEAF) {
-        printf ("%d", (int) (n - nodelist));
+        CC_PRINTF("%d", (int) (n - nodelist));
     } else if (n->type == CCtsp_CUT_ROOT) {
-        printf ("{");
+        CC_PRINTF("{");
         for (c = n->child; c; c = c->sibling) {
             cuttree_display_work (c, nodelist);
-            if (c->sibling) printf (" ");
+            if (c->sibling) CC_PRINTF(" ");
         }
-        printf ("}");
+        CC_PRINTF("}");
     } else if (n->type == CCtsp_CUT_PNODE) {
-        printf ("(");
+        CC_PRINTF("(");
         for (c = n->child; c; c = c->sibling) {
             cuttree_display_work (c, nodelist);
-            if (c->sibling) printf (" ");
+            if (c->sibling) CC_PRINTF(" ");
         }
-        printf (")");
+        CC_PRINTF(")");
     } else if (n->type == CCtsp_CUT_QNODE) {
-        printf ("[");
+        CC_PRINTF("[");
         for (c = n->child; c; c = c->sibling) {
             cuttree_display_work (c, nodelist);
-            if (c->sibling) printf (" ");
+            if (c->sibling) CC_PRINTF(" ");
         }
-        printf ("]");
+        CC_PRINTF("]");
     } else {
-        printf ("?{");
+        CC_PRINTF("?{");
         for (c = n->child; c; c = c->sibling) {
             cuttree_display_work (c, nodelist);
-            if (c->sibling) printf (" ");
+            if (c->sibling) CC_PRINTF(" ");
         }
-        printf ("}?");
+        CC_PRINTF("}?");
     }
 }
 
@@ -1846,7 +1846,7 @@ static void cuttree_describe_work (CCtsp_cutnode *n)
     if (n->type == CCtsp_CUT_EXTERN || n->type == CCtsp_CUT_LEAF) {
         return;
     } else if (n->type == CCtsp_CUT_ROOT || n->type == CCtsp_CUT_PNODE) {
-        printf (n->type == CCtsp_CUT_ROOT ? "{" : "(");
+        CC_PRINTF(n->type == CCtsp_CUT_ROOT ? "{" : "(");
         lcnt = 0;
         ccnt = 0;
         for (c = n->child; c; c = c->sibling) {
@@ -1856,22 +1856,22 @@ static void cuttree_describe_work (CCtsp_cutnode *n)
             ccnt++;
         }
         if (lcnt) {
-            printf ("%d-L", lcnt);
+            CC_PRINTF("%d-L", lcnt);
         }
         if (ccnt > lcnt) {
-            printf (" ");
+            CC_PRINTF(" ");
             for (c = n->child; c; c = c->sibling) {
                 if (c->type != CCtsp_CUT_EXTERN && c->type != CCtsp_CUT_LEAF) {
                     cuttree_describe_work (c);
                     lcnt++;
-                    if (lcnt < ccnt) printf (" ");
+                    if (lcnt < ccnt) CC_PRINTF(" ");
                 }
             }
         }
-        printf (n->type == CCtsp_CUT_ROOT ? "}" : ")");
-        printf ("<%d>", ccnt);
+        CC_PRINTF(n->type == CCtsp_CUT_ROOT ? "}" : ")");
+        CC_PRINTF("<%d>", ccnt);
     } else {
-        printf (n->type == CCtsp_CUT_QNODE ? "[" : "?{");
+        CC_PRINTF(n->type == CCtsp_CUT_QNODE ? "[" : "?{");
         lcnt = 0;
         ccnt = 0;
         for (c = n->child; c; c = c->sibling) {
@@ -1879,19 +1879,19 @@ static void cuttree_describe_work (CCtsp_cutnode *n)
                 lcnt++;
             } else {
                 if (lcnt) {
-                    printf ("%d-L ", lcnt);
+                    CC_PRINTF("%d-L ", lcnt);
                     lcnt = 0;
                 }
                 cuttree_describe_work (c);
-                if (c->sibling) printf (" ");
+                if (c->sibling) CC_PRINTF(" ");
             }
             ccnt++;
         }
         if (lcnt) {
-            printf ("%d-L", lcnt);
+            CC_PRINTF("%d-L", lcnt);
         }
-        printf (n->type == CCtsp_CUT_QNODE ? "]" : "?}");
-        printf ("<%d>", ccnt);
+        CC_PRINTF(n->type == CCtsp_CUT_QNODE ? "]" : "?}");
+        CC_PRINTF("<%d>", ccnt);
     }
 }
 
@@ -1949,15 +1949,15 @@ static void verify_cutgrtree (cutgrtree *t, cutgrnode *n, int edgecount,
         ext_sum - n->ext_weight < -0.0000001 ||
         int_sum2 - n->int_weight > 0.0000001 ||
         int_sum2 - n->int_weight < -0.0000001) {
-        printf ("verify problem, node %d: cnt %d size %d\n",
+        CC_PRINTF("verify problem, node %d: cnt %d size %d\n",
                 n - nodelist, cnt, n->subtree_size);
-        printf ("   int_sum %.7f int_sum2 %.7f int_weight %.7f\n",
+        CC_PRINTF("   int_sum %.7f int_sum2 %.7f int_weight %.7f\n",
                 int_sum, int_sum2, n->int_weight);
-        printf ("   ext_sum %.7f ext_weight %.7f\n",
+        CC_PRINTF("   ext_sum %.7f ext_weight %.7f\n",
                 ext_sum, n->ext_weight);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     } else {
-        putchar ('.'); fflush (stdout);
+        putchar ('.'); CC_FFLUSH(stdout);
     }
     mark_tree (n, 0);
 

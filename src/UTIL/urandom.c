@@ -133,7 +133,7 @@ int main (int ac, char **av)
     CCrandstate rstate;
 
     if (ac < 4) {
-        fprintf (stderr, "Usage: #discard #print #seed\n");
+        CC_FPRINTF(stderr, "Usage: #discard #print #seed\n");
         return 0;
     }
     m = atoi (av[1]);           /* Number to discard initially */
@@ -145,7 +145,7 @@ int main (int ac, char **av)
     for (i = 0; i < m; i++)
         j = CCutil_lprand (&rstate);
     for (i = 0; i < n; i++)
-        printf ("%ld\n", CCutil_lprand (&rstate));
+        CC_PRINTF("%ld\n", CCutil_lprand (&rstate));
     return 0;
 }
 

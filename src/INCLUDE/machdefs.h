@@ -26,6 +26,7 @@
 #endif
 
 #include <stdio.h>
+#include "concorde_io.h"
 
 #ifdef HAVE_STDLIB_H
 # include <stdlib.h>

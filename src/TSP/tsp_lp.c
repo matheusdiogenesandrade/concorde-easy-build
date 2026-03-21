@@ -368,7 +368,7 @@ int CCtsp_init_lp (CCtsp_lp **lp, char *probloc, int probnum,
     double st, val;
 
     if (!ptour) {
-        fprintf (stderr, "must have a permutation tour in CCtsp_init_lp\n");
+        CC_FPRINTF(stderr, "must have a permutation tour in CCtsp_init_lp\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -395,7 +395,7 @@ int CCtsp_init_lp (CCtsp_lp **lp, char *probloc, int probnum,
                          rstate);
     }
     if (rval) {
-        fprintf (stderr, "CCtsp_read_probfile or first_lp failed\n");
+        CC_FPRINTF(stderr, "CCtsp_read_probfile or first_lp failed\n");
         CCtsp_free_tsp_lp_struct (lp);
         rval = 1; goto CLEANUP;
     }
@@ -405,7 +405,7 @@ int CCtsp_init_lp (CCtsp_lp **lp, char *probloc, int probnum,
             rval = CCtsp_edgelist_to_genadj (ncount, excount, exlist, exlen,
                            &((*lp)->fulladj), &((*lp)->fulladjspace));
             if (rval) {
-                fprintf (stderr, "CCtsp_edgelist_to_genadj failed\n");
+                CC_FPRINTF(stderr, "CCtsp_edgelist_to_genadj failed\n");
                 CCtsp_free_tsp_lp_struct (lp);
                 rval = 1; goto CLEANUP;
             }
@@ -417,29 +417,29 @@ int CCtsp_init_lp (CCtsp_lp **lp, char *probloc, int probnum,
 
     if (initial_ub < (*lp)->upperbound) {
         if (!silent) {
-            printf ("Setting upperbound to the initial bound: %.2f\n",
+            CC_PRINTF("Setting upperbound to the initial bound: %.2f\n",
                      initial_ub);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
         (*lp)->upperbound = initial_ub;
     }
 
     rval = CClp_init (&((*lp)->lp));
     if (rval) {
-        fprintf (stderr, "CClp_init failed\n");
+        CC_FPRINTF(stderr, "CClp_init failed\n");
         CCtsp_free_tsp_lp_struct (lp);
         rval = 1; goto CLEANUP;
     }
 
 #ifdef PERTURB_LPS
     if ( CClp_force_perturb ((*lp)->lp) ) {
-        fprintf (stdout, "CClp_force_perturb failed, continuing anyway\n");
+        CC_FPRINTF(stdout, "CClp_force_perturb failed, continuing anyway\n");
     }
 #endif
 
     rval = load_lp (*lp, silent);
     if (rval) {
-        fprintf (stderr, "load_lp failed\n");
+        CC_FPRINTF(stderr, "load_lp failed\n");
         CCtsp_free_tsp_lp_struct (lp);
         rval = 1; goto CLEANUP;
     }
@@ -451,13 +451,13 @@ int CCtsp_init_lp (CCtsp_lp **lp, char *probloc, int probnum,
 
     rval = CCtsp_add_branchhistory_to_lp (*lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_branchhistory_to_lp failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_branchhistory_to_lp failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCpq_cuttree_trivial (&(*lp)->tightcuts, ncount, 0);
     if (rval) {
-        fprintf (stderr, "CCpq_cuttree_trivial failed\n");
+        CC_FPRINTF(stderr, "CCpq_cuttree_trivial failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -466,20 +466,20 @@ int CCtsp_init_lp (CCtsp_lp **lp, char *probloc, int probnum,
 
     st = CCutil_stop_timer (&(*lp)->stats.misc_opt, 0);
     if (!silent) {
-        printf ("Dual opt returned after %.2f seconds\n", st); fflush (stdout);
+        CC_PRINTF("Dual opt returned after %.2f seconds\n", st); CC_FFLUSH(stdout);
     }
 
     if (rval == 2) {
-        fprintf (stderr, "Initial lp infeasible\n");
+        CC_FPRINTF(stderr, "Initial lp infeasible\n");
         goto CLEANUP;
     } else if (rval) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_update_result (*lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_update_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_update_result failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -487,13 +487,13 @@ int CCtsp_init_lp (CCtsp_lp **lp, char *probloc, int probnum,
                         (int **) NULL, (double **) NULL, (double **) NULL,
                         (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
         rval = 1; goto CLEANUP;
     }
 
     if (!silent) {
-        printf ("Initial LP value: %.6f\n", val);
-        fflush (stdout);
+        CC_PRINTF("Initial LP value: %.6f\n", val);
+        CC_FFLUSH(stdout);
     }
     
 CLEANUP:
@@ -552,7 +552,7 @@ static int first_lp (CCtsp_lp *lp, char *probloc, int ncount,
             silent, rstate);
              
     if (rval) {
-        fprintf (stderr, "Fractional matching routine failed\n");
+        CC_FPRINTF(stderr, "Fractional matching routine failed\n");
         CC_FREE (basis, int);
         CC_FREE (match, int);
         return 0;
@@ -560,7 +560,7 @@ static int first_lp (CCtsp_lp *lp, char *probloc, int ncount,
 
     rval = CClp_create_info (&info, ncount, ecount);
     if (rval) {
-        fprintf (stderr, "CClp_create_info failed\n");
+        CC_FPRINTF(stderr, "CClp_create_info failed\n");
         goto CLEANUP;
     }
 
@@ -574,7 +574,7 @@ static int first_lp (CCtsp_lp *lp, char *probloc, int ncount,
     for (i = 0; i < ncount; i++) {
         e = CCtsp_find_edge (&lp->graph, basis[2*i], basis[2*i+1]);
         if (e < 0) {
-            fprintf (stderr, "Basis contains edge %d,%d not in edgelist\n",
+            CC_FPRINTF(stderr, "Basis contains edge %d,%d not in edgelist\n",
                      basis[2*i],basis[2*i+1]);
         } else {
             CClp_set_col_active (info, e);
@@ -584,12 +584,12 @@ static int first_lp (CCtsp_lp *lp, char *probloc, int ncount,
     for (i=0; i <= 6*ncount && match[i] > -1; i += 3) {
         e = CCtsp_find_edge (&lp->graph, match[i], match[i+1]);
         if (e < 0) {
-            fprintf (stderr, "Matching contains edge %d,%d not in edgelist\n",
+            CC_FPRINTF(stderr, "Matching contains edge %d,%d not in edgelist\n",
                      match[i], match[i+1]);
         } else {
             if (!CClp_is_col_active (info, e)) {
                 if (match[i+2] == 1) {
-                    fprintf (stderr, "Edge at 0.5 not in basis\n");
+                    CC_FPRINTF(stderr, "Edge at 0.5 not in basis\n");
                 }
                 CClp_set_col_upper (info, e);
             }
@@ -601,14 +601,14 @@ static int first_lp (CCtsp_lp *lp, char *probloc, int ncount,
 
     rval = CClp_build_warmstart (&(lp->warmstart), info);
     if (rval) {
-        fprintf (stderr, "CClp_build_warmstart failed\n");
+        CC_FPRINTF(stderr, "CClp_build_warmstart failed\n");
         goto CLEANUP;
     }
     
     st = CCutil_stop_timer (&lp->stats.misc, 0);
     if (!silent) {
-        printf ("Total Time for first_lp: %.2f (seconds)\n", st);
-        fflush (stdout);
+        CC_PRINTF("Total Time for first_lp: %.2f (seconds)\n", st);
+        CC_FFLUSH(stdout);
     }
 
     rval = 0;
@@ -779,9 +779,9 @@ int CCtsp_inspect_full_edges (CCtsp_lp *lp)
 
     for (i = 0; i < ecount; i++) {
         if (find_edge_full (lp, edges[i].ends[0], edges[i].ends[1]) == 0) {
-            printf ("edge (%d,%d) not in full list\n",
+            CC_PRINTF("edge (%d,%d) not in full list\n",
                                  edges[i].ends[0], edges[i].ends[1]);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
             return 1;
         }
     }
@@ -1121,7 +1121,7 @@ void CCtsp_init_statistics (CCtsp_statistics *stats)
     CCtsp_init_tighten_info (&stats->tighten_stats);
     CCtsp_init_tighten_info (&stats->extra_tighten_stats);
 
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 }
 
 void CCtsp_output_statistics (CCtsp_statistics *stats)
@@ -1129,7 +1129,7 @@ void CCtsp_output_statistics (CCtsp_statistics *stats)
     double y = 0.0;
     double z = 0.0;
     
-    printf ("    Cutting times:\n");
+    CC_PRINTF("    Cutting times:\n");
     y += CCutil_total_timer (&stats->cuts_filecut, 4);
     z += CCutil_total_timer (&stats->cuts_filecut_opt, 0);
     y += CCutil_total_timer (&stats->cuts_cutpool, 4);
@@ -1195,15 +1195,15 @@ void CCtsp_output_statistics (CCtsp_statistics *stats)
     y += CCutil_total_timer (&stats->cuts_extraconnect, 4);
     z += CCutil_total_timer (&stats->cuts_extraconnect_opt, 0);
     
-    printf ("    Cutting totals:\n");
-    printf ("    Cutting plane heuristics     %9.2f seconds\n", y);
-    printf ("    Cutting plane optimization   %9.2f seconds\n", z);
+    CC_PRINTF("    Cutting totals:\n");
+    CC_PRINTF("    Cutting plane heuristics     %9.2f seconds\n", y);
+    CC_PRINTF("    Cutting plane optimization   %9.2f seconds\n", z);
     CCutil_total_timer (&stats->cutting_inner_loop, 4);
     CCutil_total_timer (&stats->cutting_loop, 4);
     CCutil_total_timer (&stats->sparse_edge_check, 4);
     CCutil_total_timer (&stats->full_edge_check, 4);
 
-    printf ("    LP processing, included in optimization and edge check totals\n");
+    CC_PRINTF("    LP processing, included in optimization and edge check totals\n");
     CCutil_total_timer (&stats->addcuts, 4);
     CCutil_total_timer (&stats->addcuts_opt, 4);
     CCutil_total_timer (&stats->agecuts, 4);
@@ -1213,7 +1213,7 @@ void CCtsp_output_statistics (CCtsp_statistics *stats)
     CCutil_total_timer (&stats->ageedges, 4);
     CCutil_total_timer (&stats->ageedges_opt, 4);
 
-    printf ("    Other times\n");
+    CC_PRINTF("    Other times\n");
     CCutil_total_timer (&stats->strongbranch, 4);
     CCutil_total_timer (&stats->strongbranch_opt, 4);
     CCutil_total_timer (&stats->linkern, 4);
@@ -1221,9 +1221,9 @@ void CCtsp_output_statistics (CCtsp_statistics *stats)
     CCutil_total_timer (&stats->misc_opt, 4);
     CCutil_total_timer (&stats->total, 4);
 
-    printf ("General cut tightening\n");
+    CC_PRINTF("General cut tightening\n");
     CCtsp_print_tighten_info (&stats->tighten_stats);
-    printf ("Heuristic lp and pool tightening\n");
+    CC_PRINTF("Heuristic lp and pool tightening\n");
     CCtsp_print_tighten_info (&stats->extra_tighten_stats);
 }
 
@@ -1248,13 +1248,13 @@ static int load_lp (CCtsp_lp *lp, int silent)
     CCutil_start_timer (&lp->stats.misc);
     
     if (!silent) {
-        printf ("Loading lp..."); fflush (stdout);
+        CC_PRINTF("Loading lp..."); CC_FFLUSH(stdout);
     }
 
     rhs      = CC_SAFE_MALLOC (lp->graph.ncount + lp->cuts.cutcount, double);
     sense    = CC_SAFE_MALLOC (lp->graph.ncount + lp->cuts.cutcount, char);
     if (!rhs || !sense ) {
-       fprintf (stderr, "not enough memory to load problem\n");
+       CC_FPRINTF(stderr, "not enough memory to load problem\n");
        rval = 1;
        goto CLEANUP;
     }
@@ -1282,30 +1282,30 @@ static int load_lp (CCtsp_lp *lp, int silent)
             matbeg, matcnt, matind, matval, lb, ub);
 
     if (rval) {
-        fprintf (stderr, "couldn't load problem\n");
+        CC_FPRINTF(stderr, "couldn't load problem\n");
         goto CLEANUP;
     }
 
     if (lp->warmstart) {
         rval = CClp_load_warmstart (lp->lp, lp->warmstart);
         if (rval) {
-            fprintf (stderr, "CClp_load_warmstart failed\n");
+            CC_FPRINTF(stderr, "CClp_load_warmstart failed\n");
         }
     } else {
-        fprintf (stderr, "No warmstart, stumbling on anyway\n");
+        CC_FPRINTF(stderr, "No warmstart, stumbling on anyway\n");
     }
 
     st = CCutil_stop_timer (&lp->stats.misc, 0);
     if (!silent) {
-        printf ("done in %.2f seconds\n", st);
-        fflush (stdout);
+        CC_PRINTF("done in %.2f seconds\n", st);
+        CC_FFLUSH(stdout);
     }
 
     if (!silent) {
-        printf ("LP has:  %d rows  %d columns  %d nonzeros\n",
+        CC_PRINTF("LP has:  %d rows  %d columns  %d nonzeros\n",
                 CClp_nrows (lp->lp), CClp_ncols (lp->lp),
-                CClp_nnonzeros (lp->lp)); fflush (stdout);
-        fflush (stdout);
+                CClp_nnonzeros (lp->lp)); CC_FFLUSH(stdout);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -1341,7 +1341,7 @@ static int build_lp_cols (CCtsp_lpgraph *g, CCtsp_lpcuts *cuts, int estart,
     int nzlist, nznext;
 
     if (estart >= eend) {
-        fprintf (stderr, "No columns for build_lp_cols to build\n");
+        CC_FPRINTF(stderr, "No columns for build_lp_cols to build\n");
         return 1;
     }
 
@@ -1475,10 +1475,10 @@ int CCtsp_resparsify_lp (CCtsp_lp *lp, int silent)
     CCutil_start_timer (&lp->stats.misc);
 
     if (!silent) {
-        printf ("LP has:  %d rows  %d columns  %d nonzeros\n",
+        CC_PRINTF("LP has:  %d rows  %d columns  %d nonzeros\n",
                 CClp_nrows (lp->lp), CClp_ncols (lp->lp),
                 CClp_nnonzeros (lp->lp));
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
    
 
@@ -1490,7 +1490,7 @@ int CCtsp_resparsify_lp (CCtsp_lp *lp, int silent)
         rval = CCtsp_qsparsify (&lp->sparsifier, g, &nzlist, &newmodcount,
                                 &newmods, &saved);
         if (rval) {
-            fprintf (stderr, "CCtsp_qsparsify failed\n");
+            CC_FPRINTF(stderr, "CCtsp_qsparsify failed\n");
             clear_nzlist (g, nzlist);
             goto CLEANUP;
         }
@@ -1508,13 +1508,13 @@ int CCtsp_resparsify_lp (CCtsp_lp *lp, int silent)
 
     rval = CClp_get_info (lp->lp, &binfo);
     if (rval) {
-        fprintf (stderr, "CClp_get_info failed\n");
+        CC_FPRINTF(stderr, "CClp_get_info failed\n");
         goto CLEANUP;
     }
 
     rval = CClp_build_warmstart (&lp->warmstart, binfo);
     if (rval) {
-        fprintf (stderr, "CClp_build_warmstart failed\n");
+        CC_FPRINTF(stderr, "CClp_build_warmstart failed\n");
         goto CLEANUP;
     }
     CClp_free_info (&binfo);
@@ -1523,7 +1523,7 @@ int CCtsp_resparsify_lp (CCtsp_lp *lp, int silent)
 
     rval = load_lp (lp, silent);
     if (rval) {
-        fprintf (stderr, "load_lp failed\n");
+        CC_FPRINTF(stderr, "load_lp failed\n");
         goto CLEANUP;
     }
 
@@ -1532,7 +1532,7 @@ int CCtsp_resparsify_lp (CCtsp_lp *lp, int silent)
     CCutil_start_timer (&lp->stats.misc_opt);
     rval = CClp_opt (lp->lp, CClp_METHOD_DUAL);
     if (rval) {
-        fprintf (stderr, "reoptimization after sparsify failed\n");
+        CC_FPRINTF(stderr, "reoptimization after sparsify failed\n");
         goto CLEANUP;
     }
     CCutil_stop_timer (&lp->stats.misc_opt, 0);
@@ -1609,14 +1609,14 @@ int CCtsp_get_lp_result (CCtsp_lp *lp, double *lb, double *ub, int *ecount,
     int rval = 0;
 
     if ((elist || x || rc) && lp->result.ecount == 0){
-       fprintf (stderr, "lp->result is not initialized\n");
+       CC_FPRINTF(stderr, "lp->result is not initialized\n");
        return 1;
     }
 
     if (elist) {
         myelist = CC_SAFE_MALLOC (2*lp->result.ecount, int);
         if (!myelist) {
-            fprintf (stderr, "out of memory in CCtsp_get_lp_result\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_get_lp_result\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -1624,7 +1624,7 @@ int CCtsp_get_lp_result (CCtsp_lp *lp, double *lb, double *ub, int *ecount,
     if (x) {
         myx = CC_SAFE_MALLOC (lp->result.ecount, double);
         if (!myx) {
-            fprintf (stderr, "out of memory in CCtsp_get_lp_result\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_get_lp_result\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -1632,7 +1632,7 @@ int CCtsp_get_lp_result (CCtsp_lp *lp, double *lb, double *ub, int *ecount,
     if (rc) {
         myrc = CC_SAFE_MALLOC (lp->result.ecount, double);
         if (!myrc) {
-            fprintf (stderr, "out of memory in CCtsp_get_lp_result\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_get_lp_result\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -1640,7 +1640,7 @@ int CCtsp_get_lp_result (CCtsp_lp *lp, double *lb, double *ub, int *ecount,
     if (node_pi) {
         mynode_pi = CC_SAFE_MALLOC (lp->graph.ncount, double);
         if (!mynode_pi) {
-            fprintf (stderr, "out of memory in CCtsp_get_lp_result\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_get_lp_result\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -1648,7 +1648,7 @@ int CCtsp_get_lp_result (CCtsp_lp *lp, double *lb, double *ub, int *ecount,
     if (cut_pi && lp->cuts.cutcount) {
         mycut_pi = CC_SAFE_MALLOC (lp->cuts.cutcount, double);
         if (!mycut_pi) {
-            fprintf (stderr, "out of memory in CCtsp_get_lp_result\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_get_lp_result\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -1675,7 +1675,7 @@ int CCtsp_get_lp_result (CCtsp_lp *lp, double *lb, double *ub, int *ecount,
     if (node_pi || cut_pi) {
         rval = get_pi (lp, mynode_pi, mycut_pi);
         if (rval) {
-            fprintf (stderr, "get_pi failed\n");
+            CC_FPRINTF(stderr, "get_pi failed\n");
             goto CLEANUP;
         }
         *node_pi = mynode_pi;
@@ -1753,7 +1753,7 @@ int CCtsp_lpcut_in_nzlist (CCtsp_lpgraph *g, CCtsp_lpcut_in *c)
         }
     } else {
         if (c->cliquecount != 1) {
-            fprintf (stderr, "Yipes! Domino without a handle\n");
+            CC_FPRINTF(stderr, "Yipes! Domino without a handle\n");
             exit (1);
         }
         for (i = 0; i < c->dominocount; i++) {
@@ -1779,11 +1779,11 @@ int CCtsp_lpcut_nzlist (CCtsp_lpgraph *g, CCtsp_lpcut *c,
         }
     } else {
         if (c->cliquecount != 1) {
-            fprintf (stderr, "Yipes! Domino without a handle\n");
+            CC_FPRINTF(stderr, "Yipes! Domino without a handle\n");
             exit (1);
         }
         if (!c->dominos) {
-            fprintf (stderr, "Yipes! Dominocount with no dominos\n");
+            CC_FPRINTF(stderr, "Yipes! Dominocount with no dominos\n");
             exit (1);
         }
         for (i = 0; i < c->dominocount; i++) {
@@ -1989,7 +1989,7 @@ int CCtsp_process_cuts (CCtsp_lp *lp, int *pnadded, int tighten,
     CCtsp_lprow cr;
 
 /*
-    printf ("CCtsp_process_cuts (%d, %d)\n", tighten, silent); fflush (stdout);
+    CC_PRINTF("CCtsp_process_cuts (%d, %d)\n", tighten, silent); CC_FFLUSH(stdout);
 */
 
     CCutil_start_timer (&lp->stats.addcuts);
@@ -2025,7 +2025,7 @@ int CCtsp_process_cuts (CCtsp_lp *lp, int *pnadded, int tighten,
                 if (cr.rowcnt > 0) {
                     rval = CCtsp_add_multiple_rows (lp, &cr);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_add_multiple_rows failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_add_multiple_rows failed\n");
                         goto CLEANUP;
                     }
                     CCtsp_free_lprow (&cr);
@@ -2035,15 +2035,15 @@ int CCtsp_process_cuts (CCtsp_lp *lp, int *pnadded, int tighten,
                 if (cr.rowcnt > 0) {
                     rval = CCtsp_add_multiple_rows (lp, &cr);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_add_multiple_rows failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_add_multiple_rows failed\n");
                         goto CLEANUP;
                     }
                     CCtsp_free_lprow (&cr);
                 }
                 rval = update_newcuts (lp, silent, rstate);
                 if (rval == 2) {
-                    printf ("LP is really infeasible (processs_cuts)\n");
-                    fflush (stdout);
+                    CC_PRINTF("LP is really infeasible (processs_cuts)\n");
+                    CC_FFLUSH(stdout);
                     goto CLEANUP;
                 } else if (rval) {
                     goto CLEANUP;
@@ -2071,15 +2071,15 @@ int CCtsp_process_cuts (CCtsp_lp *lp, int *pnadded, int tighten,
         if (cr.rowcnt > 0) {
             rval = CCtsp_add_multiple_rows (lp, &cr);
             if (rval) {
-                fprintf (stderr, "CCtsp_add_multiple_rows failed\n");
+                CC_FPRINTF(stderr, "CCtsp_add_multiple_rows failed\n");
                 goto CLEANUP;
             }
             CCtsp_free_lprow (&cr);
         }
         rval = update_newcuts (lp, silent, rstate);
         if (rval == 2) {
-            printf ("LP is really infeasible (processs_cuts)\n");
-            fflush (stdout);
+            CC_PRINTF("LP is really infeasible (processs_cuts)\n");
+            CC_FFLUSH(stdout);
             goto CLEANUP;
         } else if (rval) {
             goto CLEANUP;
@@ -2146,13 +2146,13 @@ static int checkout_cut (CCtsp_lp *lp, CCtsp_lpcut_in *c, double *x,
         rval = CCtsp_tighten_lpcut_in (g, c, x, &d, &lp->stats.tighten_stats,
                                        (double *) NULL);
         if (rval) {
-            fprintf (stderr, "CCtsp_tighten_lpcut_in failed\n");
+            CC_FPRINTF(stderr, "CCtsp_tighten_lpcut_in failed\n");
             return 2;
         }
     } else {
         rval = CCtsp_copy_lpcut_in (c, &d);
         if (rval) {
-            fprintf (stderr, "CCtsp_copy_lpcut_in failed\n");
+            CC_FPRINTF(stderr, "CCtsp_copy_lpcut_in failed\n");
             return 2;
         }
     }
@@ -2160,7 +2160,7 @@ static int checkout_cut (CCtsp_lp *lp, CCtsp_lpcut_in *c, double *x,
     slack = CCtsp_cutprice (g, &d, x);
     if (slack >= -CCtsp_MIN_VIOL) {
 /*
-        printf ("Slack = %f  ", slack); fflush (stdout); 
+        CC_PRINTF("Slack = %f  ", slack); CC_FFLUSH(stdout); 
         CCtsp_print_lpcut_in (&d);
 */
         CCtsp_free_lpcut_in (&d);
@@ -2170,7 +2170,7 @@ static int checkout_cut (CCtsp_lp *lp, CCtsp_lpcut_in *c, double *x,
 #if 0
     rval = CCverify_cut (&d, CC_TYPE_ALL, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "Discarding invalid cut\n");
+        CC_FPRINTF(stderr, "Discarding invalid cut\n");
         CCtsp_print_lpcut_in (&d);
         CCtsp_free_lpcut_in (&d);
         return 2;
@@ -2193,7 +2193,7 @@ static int update_newcuts (CCtsp_lp *lp, int silent, CCrandstate *rstate)
     double objval;
 
 /*
-    printf ("update_newcuts (%d)\n", silent); fflush (stdout);
+    CC_PRINTF("update_newcuts (%d)\n", silent); CC_FFLUSH(stdout);
 */
 
     CCutil_start_timer (&lp->stats.addcuts_opt);
@@ -2202,8 +2202,8 @@ static int update_newcuts (CCtsp_lp *lp, int silent, CCrandstate *rstate)
         rval = CCtsp_infeas_recover (lp, silent, rstate);
         if (rval == 2) {
             if (!silent) {
-                printf ("Problem is really infeasible (update_newcuts)\n");
-                fflush (stdout);
+                CC_PRINTF("Problem is really infeasible (update_newcuts)\n");
+                CC_FFLUSH(stdout);
                 CCutil_stop_timer (&lp->stats.addcuts_opt, 1);
             } else {
                 CCutil_stop_timer (&lp->stats.addcuts_opt, 0);
@@ -2213,14 +2213,14 @@ static int update_newcuts (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             return 1;
         }
     } else if (rval) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
         return 1;
     }
     CCutil_stop_timer (&lp->stats.addcuts_opt, 0);
 
     rval = CClp_objval (lp->lp, &objval);
     if (rval) {
-        fprintf (stderr, "CClp_objval failed\n");
+        CC_FPRINTF(stderr, "CClp_objval failed\n");
         return 1;
     }
 
@@ -2229,7 +2229,7 @@ static int update_newcuts (CCtsp_lp *lp, int silent, CCrandstate *rstate)
         ndeleted = 0;
         rval = age_cuts (lp, &ndeleted);
         if (rval) {
-            fprintf (stderr, "age_cuts failed\n");
+            CC_FPRINTF(stderr, "age_cuts failed\n");
             return 1;
         }
         CCutil_stop_timer (&lp->stats.agecuts, 0);
@@ -2239,7 +2239,7 @@ static int update_newcuts (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CClp_opt (lp->lp, CClp_METHOD_DUAL);
         }
         if (rval) {
-            fprintf (stderr, "CClp_opt failed\n");
+            CC_FPRINTF(stderr, "CClp_opt failed\n");
             return 1;
         }
         CCutil_stop_timer (&lp->stats.agecuts_opt, 0);
@@ -2248,7 +2248,7 @@ static int update_newcuts (CCtsp_lp *lp, int silent, CCrandstate *rstate)
         ndeleted = 0;
         rval = age_edges (lp, &ndeleted);
         if (rval) {
-            fprintf (stderr, "age_edges failed\n");
+            CC_FPRINTF(stderr, "age_edges failed\n");
             return 1;
         }
         CCutil_stop_timer (&lp->stats.ageedges, 0);
@@ -2258,7 +2258,7 @@ static int update_newcuts (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CClp_opt (lp->lp, CClp_METHOD_DUAL);
         }
         if (rval) {
-            fprintf (stderr, "CClp_opt failed\n");
+            CC_FPRINTF(stderr, "CClp_opt failed\n");
             return 1;
         }
         CCutil_stop_timer (&lp->stats.ageedges_opt, 0);
@@ -2273,23 +2273,23 @@ int CCtsp_infeas_recover (CCtsp_lp *lp, int silent, CCrandstate *rstate)
     int nadded, feasible;
     int rval;
 
-    printf ("infeas_recover ...\n"); fflush (stdout);
+    CC_PRINTF("infeas_recover ...\n"); CC_FFLUSH(stdout);
 
     rval = CCtsp_addbad_variables (lp, (CCtsp_edgegenerator *) NULL, &penalty,
             &nadded, CCtsp_PHASE1_RCTHRESH, CCtsp_PHASE1_MAXPENALTY, 1,
             &feasible, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_addbad_variables failed\n");
+        CC_FPRINTF(stderr, "CCtsp_addbad_variables failed\n");
         return 1;
     }
 
     if (feasible) {
-        printf ("Recovered a feasible LP\n");
-        fflush (stdout);
+        CC_PRINTF("Recovered a feasible LP\n");
+        CC_FFLUSH(stdout);
         return 0;
     } else {
-        printf ("Could not recover a feasible LP\n");
-        fflush (stdout);
+        CC_PRINTF("Could not recover a feasible LP\n");
+        CC_FFLUSH(stdout);
         return 2;
     }
 }
@@ -2321,7 +2321,7 @@ int CCtsp_add_cut (CCtsp_lp *lp, CCtsp_lpcut_in *d, CCtsp_lprow *cr)
     rval = CCtsp_qsparsify (&lp->sparsifier, g, &nzlist, &new.modcount,
             &new.mods, &saved);
     if (rval) {
-        fprintf (stderr, "CCtsp_qsparsify failed\n");
+        CC_FPRINTF(stderr, "CCtsp_qsparsify failed\n");
         CCtsp_unregister_cliques (&lp->cuts, &new);
         CCtsp_unregister_dominos (&lp->cuts, &new);
         CC_IFFREE (new.mods, CCtsp_sparser);
@@ -2331,7 +2331,7 @@ int CCtsp_add_cut (CCtsp_lp *lp, CCtsp_lpcut_in *d, CCtsp_lprow *cr)
     new.age = CCtsp_NEWCUT_AGE;
     rval = CCtsp_copy_skeleton (&d->skel, &new.skel);
     if (rval) {
-        fprintf (stderr, "CCtsp_copy_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_copy_skeleton failed\n");
         CCtsp_unregister_cliques (&lp->cuts, &new);
         CCtsp_unregister_dominos (&lp->cuts, &new);
         CC_IFFREE (new.mods, CCtsp_sparser);
@@ -2342,7 +2342,7 @@ int CCtsp_add_cut (CCtsp_lp *lp, CCtsp_lpcut_in *d, CCtsp_lprow *cr)
 
     newloc = CCtsp_add_cut_to_cutlist (&lp->cuts, &new);
     if (newloc == -1) {
-        fprintf (stderr, "CCtsp_add_cut_to_cutlist failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_cut_to_cutlist failed\n");
         CCtsp_unregister_cliques (&lp->cuts, &new);
         CCtsp_unregister_dominos (&lp->cuts, &new);
         CC_IFFREE (new.mods, CCtsp_sparser);
@@ -2356,7 +2356,7 @@ int CCtsp_add_cut (CCtsp_lp *lp, CCtsp_lpcut_in *d, CCtsp_lprow *cr)
     }
     rval = CCtsp_add_nzlist_to_lp (lp, nzlist, rhs, new.sense, cr);
     if (rval) {
-        fprintf (stderr, "CCtsp_add_nzlist_to_lp failed\n");
+        CC_FPRINTF(stderr, "CCtsp_add_nzlist_to_lp failed\n");
         CCtsp_delete_cut_from_cutlist (&lp->cuts, newloc);
         goto CLEANUP;
     }
@@ -2405,8 +2405,8 @@ int CCtsp_add_nzlist_to_lp (CCtsp_lp *lp, int nzlist, int rhs, char sense,
             }
         }
     } else {
-        printf ("WARNING: Adding an empty cut to the LP\n");
-        fflush (stdout);
+        CC_PRINTF("WARNING: Adding an empty cut to the LP\n");
+        CC_FFLUSH(stdout);
     }
 
     rval = addrow_to_list (nzcnt, drhs, sense, rmatind, rmatval, cr);
@@ -2457,7 +2457,7 @@ int CCtsp_addbad_variables (CCtsp_lp *lp, struct CCtsp_edgegenerator *eg,
     CCutil_start_timer (&lp->stats.addbad);
 
     if (phase1) {
-        printf ("phase 1 addbad_variables\n"); fflush (stdout);
+        CC_PRINTF("phase 1 addbad_variables\n"); CC_FFLUSH(stdout);
     }
 
     if (feasible)
@@ -2477,7 +2477,7 @@ int CCtsp_addbad_variables (CCtsp_lp *lp, struct CCtsp_edgegenerator *eg,
     node_pi    = CC_SAFE_MALLOC (lp->graph.ncount, double);
     node_piest = CC_SAFE_MALLOC (lp->graph.ncount, double);
     if (!genlist || !genlen || !inlist || !prlist || !node_pi || !node_piest) {
-        fprintf (stderr, "out of memory in CCtsp_addbad_variables\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_addbad_variables\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2529,7 +2529,7 @@ int CCtsp_addbad_variables (CCtsp_lp *lp, struct CCtsp_edgegenerator *eg,
                 rval = CCutil_edgehash_add (&eh, genlist[2*i], genlist[2*i+1],
                                             1);
                 if (rval) {
-                    fprintf (stderr, "CCutil_edgehash_add failed\n");
+                    CC_FPRINTF(stderr, "CCutil_edgehash_add failed\n");
                     goto CLEANUP;
                 }
                 if (genlist[2*i] < genlist[2*i+1]) {
@@ -2580,20 +2580,20 @@ int CCtsp_addbad_variables (CCtsp_lp *lp, struct CCtsp_edgegenerator *eg,
             }
             if (phase1) {
                 if (rval == 0) {
-                    printf ("LP is now feasible\n"); fflush (stdout);
+                    CC_PRINTF("LP is now feasible\n"); CC_FFLUSH(stdout);
                     if (feasible) *feasible = 1;
                     goto DONE;
                 } else if (rval != 2) {
-                    fprintf (stderr, "CClp_opt failed\n");
+                    CC_FPRINTF(stderr, "CClp_opt failed\n");
                     goto CLEANUP;
                 }
             } else {
                 if (rval == 2) {
-                    fprintf (stderr, "Adding variables made LP infeasible!\n");
+                    CC_FPRINTF(stderr, "Adding variables made LP infeasible!\n");
                     rval = 1;
                     goto CLEANUP;
                 } else if (rval) {
-                    fprintf (stderr, "CClp_opt failed\n");
+                    CC_FPRINTF(stderr, "CClp_opt failed\n");
                     goto CLEANUP;
                 }
             }
@@ -2674,7 +2674,7 @@ static int phase1_generate_edges (CCtsp_lp *lp, double *node_piest, int nwant,
     *finished = 0;
 
     if (!lp->dat && !lp->full_edges_valid) {
-        fprintf (stderr, "no source of edges to generate\n");
+        CC_FPRINTF(stderr, "no source of edges to generate\n");
         return 1;
     }
 
@@ -2764,15 +2764,15 @@ int CCtsp_eliminate_variables (CCtsp_lp *lp, int eliminate_sparse, int silent)
 
     if (lp->upperbound == CCtsp_LP_MAXDOUBLE ||
             CCbigguy_cmp (lp->exact_lowerbound, CCbigguy_MINBIGGUY) == 0) {
-        printf ("Can't elmininate without upper and lower bounds\n");
-        fflush (stdout);
+        CC_PRINTF("Can't elmininate without upper and lower bounds\n");
+        CC_FFLUSH(stdout);
         return 0;
     }
 
     ub = CCbigguy_dtobigguy (lp->upperbound - 1.0);
     if (CCbigguy_cmp (lp->exact_lowerbound, ub) > 0) {
-        printf ("No need for elimination, bounds are optimal\n");
-        fflush (stdout);
+        CC_PRINTF("No need for elimination, bounds are optimal\n");
+        CC_FFLUSH(stdout);
         return 0;
     }
 
@@ -2780,7 +2780,7 @@ int CCtsp_eliminate_variables (CCtsp_lp *lp, int eliminate_sparse, int silent)
 
     rval = CCtsp_edge_elimination (lp, eliminate_sparse, silent);
     if (rval) {
-        fprintf (stderr, "tsp_edge_elimination failed\n");
+        CC_FPRINTF(stderr, "tsp_edge_elimination failed\n");
         return rval;
     }
 
@@ -2793,9 +2793,9 @@ int CCtsp_eliminate_variables (CCtsp_lp *lp, int eliminate_sparse, int silent)
             rval = CClp_setbnd (lp->lp, k, 'L', 1.0);
             lp->graph.edges[k].fixed = 1;
         } else {
-            printf ("WARNING: Fixed edge (%d, %d) is not in LP\n",
+            CC_PRINTF("WARNING: Fixed edge (%d, %d) is not in LP\n",
                      lp->fixededges[2*i], lp->fixededges[2*i+1]);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
 
@@ -2806,14 +2806,14 @@ int CCtsp_eliminate_variables (CCtsp_lp *lp, int eliminate_sparse, int silent)
             if (!lp->graph.edges[i].fixed && !lp->graph.edges[i].branch) {
                 rval = CClp_delete_column (lp->lp, i);
                 if (rval) {
-                    fprintf (stderr, "CClp_delete_column failed\n");
+                    CC_FPRINTF(stderr, "CClp_delete_column failed\n");
                     return rval;
                 }
                 lp->graph.edges[i].ends[0] = 0;
                 lp->graph.edges[i].ends[1] = 0;
             } else {
-                printf ("WARNING: Tried to eliminate a fixed/branch edge\n");
-                fflush (stdout);
+                CC_PRINTF("WARNING: Tried to eliminate a fixed/branch edge\n");
+                CC_FFLUSH(stdout);
             }
         }
     }
@@ -2825,8 +2825,8 @@ int CCtsp_eliminate_variables (CCtsp_lp *lp, int eliminate_sparse, int silent)
         }
     }
     if (!silent) {
-        printf ("Eliminated %d LP edges\n", lp->graph.ecount - j);
-        fflush (stdout);
+        CC_PRINTF("Eliminated %d LP edges\n", lp->graph.ecount - j);
+        CC_FFLUSH(stdout);
     }
 
     assert (lp->infeasible == 0);
@@ -2834,21 +2834,21 @@ int CCtsp_eliminate_variables (CCtsp_lp *lp, int eliminate_sparse, int silent)
     lp->graph.ecount = j;
     rval = CCtsp_build_lpadj (&lp->graph, 0, lp->graph.ecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n");
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n");
         return rval;
     }
 
     rval = CClp_opt (lp->lp, CClp_METHOD_DUAL);
     if (rval == 2) {
-        fprintf (stderr, "ERROR: edge_elimination created an infeasible LP\n");
+        CC_FPRINTF(stderr, "ERROR: edge_elimination created an infeasible LP\n");
         return 1;
     } else if (rval) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
         return rval;
     }
     rval = CCtsp_update_result (lp);
     if (rval) {
-        fprintf (stderr, "CCtsp_update_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_update_result failed\n");
         return rval;
     }
 
@@ -2917,7 +2917,7 @@ static int pricing_duals (CCtsp_lp *lp, double *node_pi, double *node_piest,
                 }
             }
         } else if (x < -0.001) {
-            fprintf (stderr, "YIPES: We have a negative domino: %f\n", x);
+            CC_FPRINTF(stderr, "YIPES: We have a negative domino: %f\n", x);
             rval = 1;  goto CLEANUP;
         }
     }
@@ -2973,7 +2973,7 @@ static int price_list (CCtsp_lp *lp, int ecount, CCtsp_predge *elist,
                 }
             }
         } else if (x < -0.001) {
-            fprintf (stderr, "YIPES: We have a negative domino: %f\n", x);
+            CC_FPRINTF(stderr, "YIPES: We have a negative domino: %f\n", x);
             rval = 1; goto CLEANUP;
         }
     }
@@ -2992,7 +2992,7 @@ static int price_list (CCtsp_lp *lp, int ecount, CCtsp_predge *elist,
         for (i = 0; i < lp->cuts.cutcount; i++) {
             if (lp->cuts.cuts[i].dominocount > 0) {
                 if (lp->cuts.cuts[i].cliquecount != 1) {
-                    fprintf (stderr, "domoino with no handle\n");
+                    CC_FPRINTF(stderr, "domoino with no handle\n");
                     rval = 1; goto CLEANUP;
                 }
                 ci = lp->cuts.cuts[i].cliques[0];
@@ -3003,7 +3003,7 @@ static int price_list (CCtsp_lp *lp, int ecount, CCtsp_predge *elist,
                         nodom_pi[k] -= x;
                     }
                 } else if (x < -0.001) {
-                    fprintf (stderr, "YIPES: negative domino %f\n", x);
+                    CC_FPRINTF(stderr, "YIPES: negative domino %f\n", x);
                     rval = 1; goto CLEANUP;
                 }
             }
@@ -3256,27 +3256,27 @@ static int age_cuts (CCtsp_lp *lp, int *ndeleted)
     CClp_info *b = (CClp_info *) NULL;
 
 /*
-    printf ("age_cuts () ...\n"); fflush (stdout); 
+    CC_PRINTF("age_cuts () ...\n"); CC_FFLUSH(stdout); 
 */
 
     *ndeleted = 0;
 
     rval = CClp_get_info (lp->lp, &b);
     if (rval) {
-        fprintf (stderr, "CClp_get_info failed\n");
+        CC_FPRINTF(stderr, "CClp_get_info failed\n");
         goto CLEANUP;
     }
 
     if (lp->cuts.cutcount) {
         cut_pi = CC_SAFE_MALLOC (lp->cuts.cutcount, double);
         if (!cut_pi) {
-            fprintf (stderr, "Out of memory in age_cuts\n");
+            CC_FPRINTF(stderr, "Out of memory in age_cuts\n");
             rval = 1; goto CLEANUP;
         }
     }
     rval = get_pi (lp, (double *) NULL, cut_pi);
     if (rval) {
-        fprintf (stderr, "get_pi failed\n");
+        CC_FPRINTF(stderr, "get_pi failed\n");
         goto CLEANUP;
     }
 
@@ -3320,7 +3320,7 @@ static int age_cuts (CCtsp_lp *lp, int *ndeleted)
 
     del = CC_SAFE_MALLOC (lp->cuts.cutcount, int);
     if (!del) {
-        fprintf (stderr, "out of memory in age_cuts\n");
+        CC_FPRINTF(stderr, "out of memory in age_cuts\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0, j = 0; i < lp->cuts.cutcount; i++) {
@@ -3335,7 +3335,7 @@ static int age_cuts (CCtsp_lp *lp, int *ndeleted)
     if (j < lp->cuts.cutcount) {
         rval = lp_delete_cut_set (lp, del);
         if (rval) {
-            fprintf (stderr, "lp_delete_cut_set failed\n");
+            CC_FPRINTF(stderr, "lp_delete_cut_set failed\n");
             goto CLEANUP;
         }
     }
@@ -3363,7 +3363,7 @@ static int age_edges (CCtsp_lp *lp, int *ndeleted)
 
     rval = CClp_get_info (lp->lp, &b);
     if (rval) {
-        fprintf (stderr, "CClp_get_info failed\n");
+        CC_FPRINTF(stderr, "CClp_get_info failed\n");
         goto CLEANUP;
     }
 
@@ -3371,13 +3371,13 @@ static int age_edges (CCtsp_lp *lp, int *ndeleted)
 
     x = CC_SAFE_MALLOC (lp->graph.ecount, double);
     if (x == (double *) NULL) {
-        fprintf (stderr, "Out of memory in age_edges\n");
+        CC_FPRINTF(stderr, "Out of memory in age_edges\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CClp_x (lp->lp, x);
     if (rval) {
-        fprintf (stderr, "CClp_x failed\n");
+        CC_FPRINTF(stderr, "CClp_x failed\n");
         goto CLEANUP;
     }
 
@@ -3406,7 +3406,7 @@ static int age_edges (CCtsp_lp *lp, int *ndeleted)
 
     del = CC_SAFE_MALLOC (lp->graph.ecount, int);
     if (!del) {
-        fprintf (stderr, "out of memory in age_edges\n");
+        CC_FPRINTF(stderr, "out of memory in age_edges\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0, j = 0; i < lp->graph.ecount; i++) {
@@ -3422,7 +3422,7 @@ static int age_edges (CCtsp_lp *lp, int *ndeleted)
     if (j < lp->graph.ecount) {
         rval = lp_delete_var_set (lp, del);
         if (rval) {
-            fprintf (stderr, "lp_delete_var_set failed\n");
+            CC_FPRINTF(stderr, "lp_delete_var_set failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -3431,7 +3431,7 @@ static int age_edges (CCtsp_lp *lp, int *ndeleted)
     lp->graph.ecount = j;
     rval = CCtsp_build_lpadj (&lp->graph, 0, lp->graph.ecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n");
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n");
         goto CLEANUP;
     }
 
@@ -3455,13 +3455,13 @@ static int get_pi (CCtsp_lp *lp, double *node_pi, double *cut_pi)
 
     pi = CC_SAFE_MALLOC (nrows, double);
     if (pi == (double *) NULL) {
-        fprintf (stderr, "Out of memory in get_pi\n");
+        CC_FPRINTF(stderr, "Out of memory in get_pi\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CClp_pi (lp->lp, pi);
     if (rval) {
-        fprintf (stderr, "CClp_pi failed\n");
+        CC_FPRINTF(stderr, "CClp_pi failed\n");
         goto CLEANUP;
     }
 
@@ -3493,7 +3493,7 @@ int CCtsp_add_multiple_rows (CCtsp_lp *lp, CCtsp_lprow *cr)
     rval = CClp_addrows (lp->lp, cr->rowcnt, cr->nzcnt, cr->rhs, cr->sense,
                          cr->begin, cr->indices, cr->entries);
     if (rval) {
-        fprintf (stderr, "Couldn't add rows into LP\n");
+        CC_FPRINTF(stderr, "Couldn't add rows into LP\n");
     }
     return rval;
 }
@@ -3544,7 +3544,7 @@ static int addrow_to_list (int nzcnt, double drhs, char sense,
 
 CLEANUP:
 
-    fprintf (stderr, "out of memory in addrow_to_list\n");
+    CC_FPRINTF(stderr, "out of memory in addrow_to_list\n");
     return rval;
 }
 
@@ -3557,7 +3557,7 @@ static int lp_addcols (CCtsp_lp *lp, int ncols, int nzcnt,
     rval = CClp_addcols (lp->lp, ncols, nzcnt, obj,
                          matbeg, matind, matval, lb, ub);
     if (rval) {
-        fprintf (stderr, "Couldn't add columns into LP\n");
+        CC_FPRINTF(stderr, "Couldn't add columns into LP\n");
     }
     return rval;
 }
@@ -3566,7 +3566,7 @@ int CCtsp_delete_cut (CCtsp_lp *lp, int i)
 {
     int rval = 0;
     rval = CClp_delete_row (lp->lp, lp->graph.ncount + i);
-    if (rval) fprintf (stderr, "CClp_delete_row failed\n");
+    if (rval) CC_FPRINTF(stderr, "CClp_delete_row failed\n");
     return rval;
 }
 
@@ -3579,7 +3579,7 @@ static int lp_delete_cut_set (CCtsp_lp *lp, int *del)
 
     delstat = CC_SAFE_MALLOC (ncount + cutcount, int);
     if (!delstat) {
-        fprintf (stderr, "out of memory in lp_delete_cut_set\n");
+        CC_FPRINTF(stderr, "out of memory in lp_delete_cut_set\n");
         return 1;
     }
     for (i = 0; i < ncount; i++)
@@ -3589,7 +3589,7 @@ static int lp_delete_cut_set (CCtsp_lp *lp, int *del)
 
     rval = CClp_delete_set_of_rows (lp->lp, delstat);
     if (rval) {
-        fprintf (stderr, "CClp_delete_set_of_rows failed\n");
+        CC_FPRINTF(stderr, "CClp_delete_set_of_rows failed\n");
     }
 
     CC_FREE (delstat, int);
@@ -3621,14 +3621,14 @@ int CCtsp_reduced_cost_nearest (CCtsp_lp *lp, int k, int *ecount, int **elist,
     if (rval) return rval;
 
     if (sparse && !lp->fulladj) {
-        printf ("Need fulladj to run sparse nearest\n");
+        CC_PRINTF("Need fulladj to run sparse nearest\n");
         rval = 1;  goto CLEANUP;
     }
 
     node_pi    = CC_SAFE_MALLOC (lp->graph.ncount, double);
     node_piest = CC_SAFE_MALLOC (lp->graph.ncount, double);
     if (!node_pi || !node_piest) {
-        fprintf (stderr, "out of memory in CCtsp_reduced_cost_nearest, pi\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_reduced_cost_nearest, pi\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -3659,15 +3659,15 @@ int CCtsp_reduced_cost_nearest (CCtsp_lp *lp, int k, int *ecount, int **elist,
         bestkl     = CC_SAFE_MALLOC (k+1, double);
         bestki     = CC_SAFE_MALLOC (k+1, int);
         if (!inlist || !bestk || !bestkl || !bestki) {
-            fprintf (stderr, "out of memory in CCtsp_reduced_cost_nearest\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_reduced_cost_nearest\n");
             rval = 1; goto CLEANUP;
         }
 
         for (i = 0; i < ncount; i++) {
             if (i % 100 == 99) {
-                printf ("."); fflush (stdout);
+                CC_PRINTF("."); CC_FFLUSH(stdout);
                 if (i % 5000 == 4999) {
-                    printf ("\n"); fflush (stdout);
+                    CC_PRINTF("\n"); CC_FFLUSH(stdout);
                 }
             }
             incount = 0;
@@ -3714,7 +3714,7 @@ int CCtsp_reduced_cost_nearest (CCtsp_lp *lp, int k, int *ecount, int **elist,
                                                          inlist[bestki[l]].ends[1],
                                                          inlist[bestki[l]].len);
                         if (rval) {
-                            fprintf (stderr, "CCutil_edgehash_add failed\n");
+                            CC_FPRINTF(stderr, "CCutil_edgehash_add failed\n");
                             goto CLEANUP;
                         }
                     }
@@ -3731,10 +3731,10 @@ int CCtsp_reduced_cost_nearest (CCtsp_lp *lp, int k, int *ecount, int **elist,
             e2 = lp->graph.edges[i].ends[1];
             len = CCutil_dat_edgelen (e1, e2, dat);
             if (CCutil_edgehash_find (&eh, e1, e2, &hval) != 0) {
-                printf ("+"); fflush (stdout);
+                CC_PRINTF("+"); CC_FFLUSH(stdout);
                 rval = CCutil_edgehash_add (&eh, e1, e2, len);
                 if (rval) {
-                    fprintf (stderr, "CCutil_edgehash_add failed\n");
+                    CC_FPRINTF(stderr, "CCutil_edgehash_add failed\n");
                     goto CLEANUP;
                 }
             }
@@ -3743,7 +3743,7 @@ int CCtsp_reduced_cost_nearest (CCtsp_lp *lp, int k, int *ecount, int **elist,
 
     rval = CCutil_edgehash_getall (&eh, ecount, elist, &tlen);
     if (rval) {
-        fprintf (stderr, "CCutil_edgehash_getall failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_edgehash_getall failed\n"); goto CLEANUP;
     }
 
     CC_IFFREE (inlist, CCtsp_predge);
@@ -3807,7 +3807,7 @@ static int sparse_nearest (CCtsp_lp *lp, int k, double *node_pi,
         if (adj[i].deg > mdeg) mdeg = adj[i].deg;
     }
     if (mdeg == 0) {
-        fprintf (stderr, "no edges in fulladj\n");
+        CC_FPRINTF(stderr, "no edges in fulladj\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -3837,7 +3837,7 @@ static int sparse_nearest (CCtsp_lp *lp, int k, double *node_pi,
         llist[i] = CC_SAFE_MALLOC (k+1, double);
         ilist[i] = CC_SAFE_MALLOC (k+1, int);
         if (!blist[i] || !llist[i] || !ilist[i]) {
-            fprintf (stderr, "out of memory in CCtsp_reduced_cost_nearest\n");
+            CC_FPRINTF(stderr, "out of memory in CCtsp_reduced_cost_nearest\n");
             rval = 1; goto CLEANUP;
         }
         for (l = 0; l < k; l++) {
@@ -3851,7 +3851,7 @@ static int sparse_nearest (CCtsp_lp *lp, int k, double *node_pi,
 
     i = 0;
     while (i < ncount) {
-        printf ("Process %d\n", i); fflush (stdout);
+        CC_PRINTF("Process %d\n", i); CC_FFLUSH(stdout);
 
         incount = 0;
         for (cnt = 0; cnt < N_MAX_COUNT && i < ncount; cnt++, i++) {
@@ -3884,7 +3884,7 @@ static int sparse_nearest (CCtsp_lp *lp, int k, double *node_pi,
                     rval = CCutil_edgehash_add (eh, i, ilist[i][l], 
                                 CCutil_dat_edgelen (i, ilist[i][l], dat));
                     if (rval) {
-                        fprintf (stderr, "CCutil_edgehash_add failed\n");
+                        CC_FPRINTF(stderr, "CCutil_edgehash_add failed\n");
                         goto CLEANUP;
                     }
                 }
@@ -3941,7 +3941,7 @@ static int lp_delete_var_set (CCtsp_lp *lp, int *del)
 
     rval = CClp_delete_set_of_columns (lp->lp, del);
     if (rval) {
-        fprintf (stderr, "CClp_delete_set_of_columns failed\n");
+        CC_FPRINTF(stderr, "CClp_delete_set_of_columns failed\n");
     }
     return rval;
 }
@@ -3973,11 +3973,11 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
     char nambuf[1024];
 
     if (!lp) {
-        fprintf (stderr, "write_probfile called without an lp\n");
+        CC_FPRINTF(stderr, "write_probfile called without an lp\n");
         return 1;
     }
     if (!lp->graph.ecount) {
-        fprintf (stderr, "write_probfile called with an edgeset\n");
+        CC_FPRINTF(stderr, "write_probfile called with an edgeset\n");
         return 1;
     }
 
@@ -3990,7 +3990,7 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
 
         p = CCtsp_prob_write_name (nambuf);
         if (!p) {
-            fprintf (stderr, "CCtsp_prob_write_name failed\n");
+            CC_FPRINTF(stderr, "CCtsp_prob_write_name failed\n");
             return 1;
         }
     } else {
@@ -3999,34 +3999,34 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
         }
         p = CCtsp_prob_write (fname, lp->id);
         if (!p) {
-            fprintf (stderr, "CCtsp_prob_write failed\n");
+            CC_FPRINTF(stderr, "CCtsp_prob_write failed\n");
             return 1;
         }
     }
 
     if (CCtsp_prob_putname (p, lp->problabel)) {
-        fprintf (stderr, "CCtsp_prob_putname failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_putname failed\n"); goto CLEANUP;
     }
     if (CCtsp_prob_putid (p, lp->id)) {
-        fprintf (stderr, "CCtsp_prob_putid failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_putid failed\n"); goto CLEANUP;
     }
     if (CCtsp_prob_putparent (p, lp->parent_id)) {
-        fprintf (stderr, "CCtsp_prob_putparent failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_putparent failed\n"); goto CLEANUP;
     }
     if (CCtsp_prob_putnnodes (p, lp->graph.ncount)) {
-        fprintf (stderr, "CCtsp_prob_putnodes failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_putnodes failed\n"); goto CLEANUP;
     }
     if (CCtsp_prob_putub (p, lp->upperbound))  {
-        fprintf (stderr, "CCtsp_prob_putub failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_putub failed\n"); goto CLEANUP;
     }
     if (CCtsp_prob_putlb (p, lp->lowerbound)) {
-        fprintf (stderr, "CCtsp_prob_putlb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_putlb failed\n"); goto CLEANUP;
     }
     if (CCtsp_prob_putexactlb (p, lp->exact_lowerbound)) {
-        fprintf (stderr, "CCtsp_prob_puteactlb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_puteactlb failed\n"); goto CLEANUP;
     }
     if (CCtsp_prob_putinfeasible (p, lp->infeasible))  {
-        fprintf (stderr, "CCtsp_prob_putinfeasible failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_prob_putinfeasible failed\n"); goto CLEANUP;
     }
 
     if (probtype != PROBTYPE_LEAF) {
@@ -4039,7 +4039,7 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
         elen = CC_SAFE_MALLOC (ecount, int);
 
         if (!elist || !elen) {
-            fprintf (stderr, "out of memory in write_probfile\n");
+            CC_FPRINTF(stderr, "out of memory in write_probfile\n");
             CC_IFFREE (elist, int);
             CC_IFFREE (elen, int);
             goto CLEANUP;
@@ -4052,7 +4052,7 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
         }
 
         if (CCtsp_prob_putedges (p, lp->graph.ncount, ecount, elist, elen)) {
-            fprintf (stderr, "CCtsp_prob_putedges failed\n");
+            CC_FPRINTF(stderr, "CCtsp_prob_putedges failed\n");
             CC_FREE (elist, int);
             CC_FREE (elen, int);
             goto CLEANUP;
@@ -4062,7 +4062,7 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
     }
 
     if (CCtsp_prob_putcuts (p, lp->graph.ncount, &(lp->cuts))) {
-        fprintf (stderr, "CCtsp_prob_putcuts failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_putcuts failed\n");
         goto CLEANUP;
     }
 
@@ -4070,11 +4070,11 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
         CClp_warmstart *w = (CClp_warmstart *) NULL;
 
         if (CClp_get_warmstart (lp->lp, &w)) {
-            printf ("No warmstart to add to probfile\n");
-            fflush (stdout);
+            CC_PRINTF("No warmstart to add to probfile\n");
+            CC_FFLUSH(stdout);
         } else {
             if (CCtsp_prob_putwarmstart (p, w)) {
-                fprintf (stderr, "CCtsp_prob_putwarmstart failed\n");
+                CC_FPRINTF(stderr, "CCtsp_prob_putwarmstart failed\n");
                 CClp_free_warmstart (&w);
                 goto CLEANUP;
             }
@@ -4085,7 +4085,7 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
     if (probtype != PROBTYPE_LEAF && lp->nfixededges > 0) {
         if (CCtsp_prob_putfixed (p, lp->graph.ncount, lp->nfixededges,
                 lp->fixededges)) {
-            fprintf (stderr, "CCtsp_prob_putfixed failed\n");
+            CC_FPRINTF(stderr, "CCtsp_prob_putfixed failed\n");
             goto CLEANUP;
         }
     }
@@ -4094,7 +4094,7 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
         lp->full_edges_valid) {
         if (CCtsp_prob_putfulladj (p, lp->graph.ncount, lp->fullcount,
                               lp->fulladj)) {
-            fprintf (stderr, "CCtsp_prob_putfulladj failed\n");
+            CC_FPRINTF(stderr, "CCtsp_prob_putfulladj failed\n");
             goto CLEANUP;
         }
     }
@@ -4102,18 +4102,18 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
     if ((probtype == PROBTYPE_LEAF || probtype == PROBTYPE_ROOT) &&
         lp->exact_dual) {
         if (CCtsp_prob_putexactdual (p, lp->exact_dual, lp->graph.ncount)) {
-            fprintf (stderr, "CCtsp_prob_putexact_dual failed\n");
+            CC_FPRINTF(stderr, "CCtsp_prob_putexact_dual failed\n");
             goto CLEANUP;
         }
     }
 
     if (CCtsp_prob_puthistory (p, lp->branchdepth, lp->branchhistory)) {
-        fprintf (stderr, "CCtsp_prob_puthistory failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_puthistory failed\n");
         goto CLEANUP;
     }
 
     if (CCtsp_prob_wclose (p)) {
-        fprintf (stderr, "CCtsp_prob_wclose failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_wclose failed\n");
         return 1;
     }
 
@@ -4121,7 +4121,7 @@ static int write_probfile (CCtsp_lp *lp, int probtype, char *fname)
 
 CLEANUP:
 
-    fprintf (stderr, "write_probfile failed\n");
+    CC_FPRINTF(stderr, "write_probfile failed\n");
 
     if (p)
         CCtsp_prob_wclose (p);
@@ -4135,13 +4135,13 @@ int CCtsp_read_probfile (CCtsp_lp *lp, char *fname, char *probloc, int *ncount,
 
     p = CCtsp_prob_read_name (fname);
     if (!p) {
-        fprintf (stderr, "could not open %s for reading\n", fname);
+        CC_FPRINTF(stderr, "could not open %s for reading\n", fname);
         return 1;
     }
 
     lp->problabel = CCtsp_problabel (fname);
     if (lp->problabel == (char *) NULL) {
-        fprintf (stderr, "CCtsp_problabel failed\n");
+        CC_FPRINTF(stderr, "CCtsp_problabel failed\n");
         CCtsp_prob_rclose (p);
         return 1;
     }
@@ -4162,13 +4162,13 @@ int CCtsp_read_probfile_id (CCtsp_lp *lp, char *name, int id, int *ncount,
 
     p = CCtsp_prob_read (name, id);
     if (!p) {
-        fprintf (stderr, "could not open %s for reading\n", name);
+        CC_FPRINTF(stderr, "could not open %s for reading\n", name);
         return 1;
     }
 
     lp->probloc = CCutil_strdup (name);
     if (lp->probloc == (char *) NULL) {
-        fprintf (stderr, "CCutil_strdup failed\n");
+        CC_FPRINTF(stderr, "CCutil_strdup failed\n");
         CCtsp_prob_rclose (p);
         return 1;
     }
@@ -4189,7 +4189,7 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
     if (rval == -1) goto CLEANUP;
     if (rval == 0) {
         if (ncount != (int *) NULL && *ncount != 0 && tncount != *ncount) {
-            fprintf (stderr, "node counts differ in probfile and input\n");
+            CC_FPRINTF(stderr, "node counts differ in probfile and input\n");
             rval = 1; goto CLEANUP;
         }
         if (ncount != (int *) NULL && *ncount == 0) {
@@ -4197,7 +4197,7 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
         }
     } else {
         if (ncount == (int *) NULL || *ncount == 0) {
-            fprintf (stderr, "node count not present in probfile or input\n");
+            CC_FPRINTF(stderr, "node count not present in probfile or input\n");
             rval = 1; goto CLEANUP;
         } else {
             tncount = *ncount;
@@ -4212,26 +4212,26 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
 
     lp->problabel = CC_SAFE_MALLOC (CCtsp_PROB_FILE_NAME_LEN, char);
     if (!lp->problabel) {
-        fprintf (stderr, "out of memory in read_probfile\n");
+        CC_FPRINTF(stderr, "out of memory in read_probfile\n");
         rval = 1;
         goto CLEANUP;
     }
     rval = CCtsp_prob_getname (p, lp->problabel);
     if (rval == -1) goto CLEANUP;
     if (!silent) {
-        printf ("Prob Name: %s\n", lp->problabel); fflush (stdout);
+        CC_PRINTF("Prob Name: %s\n", lp->problabel); CC_FFLUSH(stdout);
     }
 
     rval = CCtsp_prob_getid (p, &(lp->id));
     if (rval == -1) goto CLEANUP;
     if (!silent) {
-        printf ("Prob ID: %d\n", lp->id); fflush (stdout);
+        CC_PRINTF("Prob ID: %d\n", lp->id); CC_FFLUSH(stdout);
     }
 
     rval = CCtsp_prob_getparent (p, &(lp->parent_id));
     if (rval == -1) goto CLEANUP;
     if (!silent) {
-        printf ("Prob Parent ID: %d\n", lp->parent_id); fflush (stdout);
+        CC_PRINTF("Prob Parent ID: %d\n", lp->parent_id); CC_FFLUSH(stdout);
     }
 
     rval = CCtsp_prob_getub (p, &(lp->upperbound));
@@ -4239,17 +4239,17 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
     rval = CCtsp_prob_getlb (p, &(lp->lowerbound));
     if (rval == -1) goto CLEANUP;
     if (!silent) {
-        printf ("Prob Bounds: (%f, %f)\n", lp->lowerbound, lp->upperbound);
-        fflush (stdout);
+        CC_PRINTF("Prob Bounds: (%f, %f)\n", lp->lowerbound, lp->upperbound);
+        CC_FFLUSH(stdout);
     }
 
     rval = CCtsp_prob_getexactlb (p, &(lp->exact_lowerbound));
     if (rval == -1) goto CLEANUP;
     if (CCbigguy_cmp (lp->exact_lowerbound, CCbigguy_MINBIGGUY) != 0) {
         if (!silent) {
-            printf ("Prob Exact Lowerbound: %f\n",
+            CC_PRINTF("Prob Exact Lowerbound: %f\n",
                              CCbigguy_bigguytod (lp->exact_lowerbound));
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
     }
 
@@ -4257,7 +4257,7 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
     if (rval == -1) goto CLEANUP;
     if (lp->infeasible) {
         if (!silent) {
-            printf ("Prob stored is tagged as infeasible\n"); fflush (stdout);
+            CC_PRINTF("Prob stored is tagged as infeasible\n"); CC_FFLUSH(stdout);
         }
     }
 
@@ -4280,8 +4280,8 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
     if (rval == -1) goto CLEANUP;
     if (!rval) {
         if (!silent) {
-            printf ("Read %d LP fixed edges\n", lp->nfixededges);
-            fflush (stdout);
+            CC_PRINTF("Read %d LP fixed edges\n", lp->nfixededges);
+            CC_FFLUSH(stdout);
         }
         for (i = 0; i < lp->nfixededges; i++) {
             k = CCtsp_find_edge (&(lp->graph), lp->fixededges[2*i],
@@ -4289,27 +4289,27 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
             if (k != -1) {
                 lp->graph.edges[k].fixed = 1;
             } else {
-                printf ("WARNING: File want's to fix a non-lp edge\n");
-                fflush (stdout);
+                CC_PRINTF("WARNING: File want's to fix a non-lp edge\n");
+                CC_FFLUSH(stdout);
             }
         }
     }
 
     rval = CCtsp_prob_getwarmstart (p, &(lp->warmstart), silent);
     if (rval == -1) {
-        fprintf (stderr, "CCtsp_prob_getwarmstart failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_getwarmstart failed\n");
         goto CLEANUP;
     }
 
     rval = CCtsp_prob_getfulladj (p, tncount, &(lp->fullcount),
                              &(lp->fulladj), &(lp->fulladjspace), silent);
     if (rval == -1) {
-        fprintf (stderr, "CCtsp_prob_getfulladj failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_getfulladj failed\n");
         goto CLEANUP;
     }
     if (!rval) {
         if (!silent) {
-            printf ("Read LP full adj\n"); fflush (stdout);
+            CC_PRINTF("Read LP full adj\n"); CC_FFLUSH(stdout);
         }
         if (lp->fullcount) {
             lp->full_edges_valid = 1;
@@ -4318,19 +4318,19 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
 
     rval = CCtsp_prob_getexactdual (p, tncount, &(lp->exact_dual), silent);
     if (rval == -1) {
-        fprintf (stderr, "CCtsp_prob_getexactdual failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_getexactdual failed\n");
         goto CLEANUP;
     }
     if (!rval) {
         if (!silent) {
-            printf ("Read LP exact dual values\n"); fflush (stdout);
+            CC_PRINTF("Read LP exact dual values\n"); CC_FFLUSH(stdout);
         }
     }
 
     rval = CCtsp_prob_gethistory (p, &lp->branchdepth, &lp->branchhistory,
                                   silent);
     if (rval == -1) {
-        fprintf (stderr, "CCtsp_prob_gethistory failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_gethistory failed\n");
         goto CLEANUP;
     }
     if (!rval) {
@@ -4345,12 +4345,12 @@ static int read_probfile (CCtsp_lp *lp, CCtsp_PROB_FILE *p, int *ncount,
 CLEANUP:
 
     if (CCtsp_prob_rclose (p)) {
-        fprintf (stderr, "CCtsp_prob_rclose failed\n");
+        CC_FPRINTF(stderr, "CCtsp_prob_rclose failed\n");
         return 1;
     }
 
     if (!silent) {
-        printf ("Done with read_probfile\n"); fflush (stdout);
+        CC_PRINTF("Done with read_probfile\n"); CC_FFLUSH(stdout);
     }
     return rval;
 }
@@ -4364,13 +4364,13 @@ int CCtsp_dump_rc_nearest (CCtsp_lp *lp, int k, char *fname, int sparse)
     int i;
     int rval = 0;
 
-    printf ("Dumping the %d-nearest rc vector to %s\n", k, fname);
-    fflush (stdout);
+    CC_PRINTF("Dumping the %d-nearest rc vector to %s\n", k, fname);
+    CC_FFLUSH(stdout);
 
     rval = CCtsp_reduced_cost_nearest (lp, k, &rc_count, &rc_list, &rc_len,
                                        sparse);
     if (rval) {
-        fprintf (stderr, "CCtsp_reduced_cost_nearest failed\n");
+        CC_FPRINTF(stderr, "CCtsp_reduced_cost_nearest failed\n");
         goto CLEANUP;
     }
 
@@ -4382,8 +4382,8 @@ int CCtsp_dump_rc_nearest (CCtsp_lp *lp, int k, char *fname, int sparse)
     rval = CCutil_writeedges_double (ncount, fname, rc_count, rc_list,
                                      rc_len, 0);
     if (rval) {
-        fprintf (stderr, "CCutil_writeedges_int failed\n");
-        fflush (stdout);
+        CC_FPRINTF(stderr, "CCutil_writeedges_int failed\n");
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -4403,12 +4403,12 @@ int CCtsp_dump_x (CCtsp_lp *lp, char *fname)
     FILE *out;
     int rval = 0;
 
-    printf ("Dumping the x vector to %s ... ", fname); fflush (stdout);
+    CC_PRINTF("Dumping the x vector to %s ... ", fname); CC_FFLUSH(stdout);
 
     rval = CCtsp_get_lp_result (lp, (double *) NULL, (double *) NULL, &xcount,
              &xlist, &x, (double **) NULL, (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n"); return rval;
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n"); return rval;
     }
 
     for (i = 0; i < xcount; i++) {
@@ -4417,11 +4417,11 @@ int CCtsp_dump_x (CCtsp_lp *lp, char *fname)
         }
     }
 
-    printf ("%d edges, %d nonzero ", xcount, nonzero); fflush (stdout);
+    CC_PRINTF("%d edges, %d nonzero ", xcount, nonzero); CC_FFLUSH(stdout);
     
     out = fopen (fname, "w");
     if (out == (FILE *) NULL) {
-        fprintf (stderr, "could not open %s for writing\n", fname);
+        CC_FPRINTF(stderr, "could not open %s for writing\n", fname);
         rval = 1; goto CLEANUP;
     }
 
@@ -4437,7 +4437,7 @@ int CCtsp_dump_x (CCtsp_lp *lp, char *fname)
         }
     }
     fclose (out);
-    printf ("DONE\n"); fflush (stdout);
+    CC_PRINTF("DONE\n"); CC_FFLUSH(stdout);
 
 CLEANUP:
 
@@ -4468,15 +4468,15 @@ int CCtsp_depot_valid (CCtsp_lp *lp, int ndepot, int *yesno)
         }
     }
 
-    printf ("Depot Total: %lf\n", total); fflush (stdout);
+    CC_PRINTF("Depot Total: %lf\n", total); CC_FFLUSH(stdout);
     if (total >= 0.5) {
-        printf ("Depot nodes are valid\n"); fflush (stdout);
+        CC_PRINTF("Depot nodes are valid\n"); CC_FFLUSH(stdout);
         if (yesno) *yesno = 1;
     } else {
-        printf ("SUB: WARNING - not enough depot nodes\n");
+        CC_PRINTF("SUB: WARNING - not enough depot nodes\n");
         if (yesno) *yesno = 0;
     }
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 

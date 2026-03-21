@@ -182,7 +182,7 @@ int CCkdtree_twoopt_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -196,9 +196,9 @@ int CCkdtree_twoopt_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
     activequeue.bottom = (intptr *) NULL;
 
     if (!silent) {
-        printf ("Find 2-opt Tour starting with tour of length %.2f\n",
+        CC_PRINTF("Find 2-opt Tour starting with tour of length %.2f\n",
                    cycle_length (incycle, ncount, dat));
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     szeit = CCutil_zeit ();
@@ -234,16 +234,16 @@ int CCkdtree_twoopt_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     *val = cycle_length (tour, ncount, dat);
     if (!silent) {
-        printf ("Length of Two-opt Cycle: %.2f\n", *val);
-        fflush (stdout);
+        CC_PRINTF("Length of Two-opt Cycle: %.2f\n", *val);
+        CC_FFLUSH(stdout);
     }
     if (outcycle != (int *) NULL) {
         for (i = 0; i < ncount; i++)
             outcycle[i] = tour[i];
     }
     if (!silent) {
-        printf ("Running time for Two Opt: %.2f\n", CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("Running time for Two Opt: %.2f\n", CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -289,21 +289,21 @@ static int run_two_opt (int ncount, int silent, int *tour,
                             thetree, dat, activequeue, &f)) {
             hit++;
             if (!silent && hit % 1000 == 0) {
-                printf (".");
-                fflush (stdout);
+                CC_PRINTF(".");
+                CC_FFLUSH(stdout);
                 if (hit % 50000 == 0) {
                     flipper_cycle (&f, tour);
-                    printf ("\nCurrent length: %.2f\n",
+                    CC_PRINTF("\nCurrent length: %.2f\n",
                             cycle_length (tour, ncount, dat));
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
             }
         }
     }
 
     if (!silent) {
-        printf ("\nMade %d swaps\n", hit);
-        fflush (stdout);
+        CC_PRINTF("\nMade %d swaps\n", hit);
+        CC_FFLUSH(stdout);
     }
 
     flipper_cycle (&f, tour);
@@ -316,7 +316,7 @@ static void twoopt_free_world (CCptrworld *intptr_world)
     int total, onlist;
 
     if (intptr_check_leaks (intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs\n", total - onlist);
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs\n", total - onlist);
     }
     CCptrworld_delete (intptr_world);
 }
@@ -342,7 +342,7 @@ int CCkdtree_3opt_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -356,9 +356,9 @@ int CCkdtree_3opt_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
     activequeue.bottom = (intptr *) NULL;
 
     if (!silent) {
-        printf ("Find 3-opt Tour starting with tour of length %.2f\n",
+        CC_PRINTF("Find 3-opt Tour starting with tour of length %.2f\n",
                        cycle_length (incycle, ncount, dat));
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     szeit = CCutil_zeit ();
@@ -394,16 +394,16 @@ int CCkdtree_3opt_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     *val = cycle_length (tour, ncount, dat);
     if (!silent) {
-        printf ("Length of 3-opt Cycle: %.2f\n", *val);
-        fflush (stdout);
+        CC_PRINTF("Length of 3-opt Cycle: %.2f\n", *val);
+        CC_FFLUSH(stdout);
     }
     if (outcycle != (int *) NULL) {
         for (i = 0; i < ncount; i++)
             outcycle[i] = tour[i];
     }
     if (!silent) {
-        printf ("Running time for 3-Opt: %.2f\n", CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_PRINTF("Running time for 3-Opt: %.2f\n", CCutil_zeit () - szeit);
+        CC_FFLUSH(stdout);
     }
 
 CLEANUP:
@@ -449,21 +449,21 @@ static int run_3_opt (int ncount, int silent, int *tour,
                                   &f)) {
             hit++;
             if (!silent && hit % 1000 == 0) {
-                printf (".");
-                fflush (stdout);
+                CC_PRINTF(".");
+                CC_FFLUSH(stdout);
                 if (hit % 50000 == 0) {
                     flipper_cycle (&f, tour);
-                    printf ("\nCurrent length: %.2f\n",
+                    CC_PRINTF("\nCurrent length: %.2f\n",
                             cycle_length (tour, ncount, dat));
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
             }
         }
     }
 
     if (!silent) {
-        printf ("\nMade %d swaps\n", hit);
-        fflush (stdout);
+        CC_PRINTF("\nMade %d swaps\n", hit);
+        CC_FFLUSH(stdout);
     }
 
     flipper_cycle (&f, tour);

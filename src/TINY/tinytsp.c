@@ -208,7 +208,7 @@ int CCtiny_bnc_tsp (int ncount, CCdatagroup *dat, double *upbound,
         upper == (int *) NULL ||
         elist == (int *) NULL ||
         elen  == (int *) NULL) {
-        fprintf (stderr, "Out of memory in CCtiny_bnc_tsp\n");
+        CC_FPRINTF(stderr, "Out of memory in CCtiny_bnc_tsp\n");
         rval = -1;
         goto CLEANUP;
     }
@@ -251,7 +251,7 @@ int CCtiny_bnc_msp (int ncount, int ecount, int *elist, int *elen, int depot,
     int *newlower = (int *) NULL;
     int newecount;
 
-    /* printf ("t"); fflush (stdout); */
+    /* CC_PRINTF("t"); CC_FFLUSH(stdout); */
 
     if (optval) {
         *optval = 0.0;
@@ -261,7 +261,7 @@ int CCtiny_bnc_msp (int ncount, int ecount, int *elist, int *elen, int depot,
     rval = permute_edges (ecount, elist, elen, lower, upper,
              &newecount, &newelist, &newelen, &newlower, &newupper, &perm); 
     if (rval) {
-        fprintf (stderr, "permute_edges failed\n");
+        CC_FPRINTF(stderr, "permute_edges failed\n");
         rval = CC_TINYTSP_ERROR;  goto CLEANUP;
     }
 
@@ -269,47 +269,47 @@ int CCtiny_bnc_msp (int ncount, int ecount, int *elist, int *elen, int depot,
                         newupper, upperbound, checkresult, depot, searchlimit,
                         objsense);
     if (rval) {
-        fprintf (stderr, "init_tinylp failed\n");
+        CC_FPRINTF(stderr, "init_tinylp failed\n");
         rval = CC_TINYTSP_ERROR;  goto CLEANUP;
     }
 
     rval = optimize_tinylp (&lp);
     if (rval && rval != 2) {
-        fprintf (stderr, "optimize_tinylp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "optimize_tinylp failed\n"); goto CLEANUP;
     }
 #ifdef TINYNOISY
-    printf ("Initial LP Value: %.4f\n", lp.val); fflush (stdout);
+    CC_PRINTF("Initial LP Value: %.4f\n", lp.val); CC_FFLUSH(stdout);
 #endif
 
     rval = tiny_checkbound (&lp, &cutoff);
     if (rval) {
-        fprintf (stderr, "tiny_checkbound failed\n");
+        CC_FPRINTF(stderr, "tiny_checkbound failed\n");
         rval = CC_TINYTSP_ERROR; goto CLEANUP;
     }
     if (!cutoff) {
         rval = tiny_brancher (&lp, 0);
         if (rval) {
-            fprintf (stderr, "tiny_brancher failed\n");
+            CC_FPRINTF(stderr, "tiny_brancher failed\n");
             rval = CC_TINYTSP_ERROR; goto CLEANUP;
         }
         if (lp.status == CC_TINYTSP_SEARCHLIMITEXCEEDED) {
 #ifdef TIMINGS
-            printf ("Hit Search Limit Nodes: %d   Cuts: %d   Time %.3f\n",
+            CC_PRINTF("Hit Search Limit Nodes: %d   Cuts: %d   Time %.3f\n",
                     lp.nbbnodes, lp.ncuts, CCutil_zeit() - sz);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
 #endif
             rval = CC_TINYTSP_SEARCHLIMITEXCEEDED; goto CLEANUP;
         }
     }
 
 #ifdef TIMINGS
-    printf ("Number of Search Nodes: %d   Cuts: %d   Time %.3f\n",
-            lp.nbbnodes, lp.ncuts, CCutil_zeit() - sz); fflush (stdout);
+    CC_PRINTF("Number of Search Nodes: %d   Cuts: %d   Time %.3f\n",
+            lp.nbbnodes, lp.ncuts, CCutil_zeit() - sz); CC_FFLUSH(stdout);
 #endif
 
     if (!lp.foundtour) {
 #ifdef TINYNOISY
-        printf ("No tour found\n"); fflush (stdout);
+        CC_PRINTF("No tour found\n"); CC_FFLUSH(stdout);
 #endif
         rval = CC_TINYTSP_INFEASIBLE;
     } else {
@@ -317,7 +317,7 @@ int CCtiny_bnc_msp (int ncount, int ecount, int *elist, int *elen, int depot,
             lp.upperbound *= -1;
         }
 #ifdef TINYNOISY
-        printf ("Optimal Value: %.4f\n", lp.upperbound); fflush (stdout);
+        CC_PRINTF("Optimal Value: %.4f\n", lp.upperbound); CC_FFLUSH(stdout);
 #endif
         if (optval) {
             *optval = lp.upperbound;
@@ -336,7 +336,7 @@ CLEANUP:
 
     free_tinylp (&lp);
 
-    /* printf ("T"); fflush (stdout); */
+    /* CC_PRINTF("T"); CC_FFLUSH(stdout); */
 
     return rval;
 }
@@ -406,7 +406,7 @@ static int permute_edges (int ecount, int *elist, int *elen,
 
 CLEANUP:
 
-    fprintf (stderr, "out of memory in permute_depot_edges\n");
+    CC_FPRINTF(stderr, "out of memory in permute_depot_edges\n");
     CC_IFFREE (*newelist, int);
     CC_IFFREE (*newelen, int);
     CC_IFFREE (*perm, int);
@@ -437,17 +437,17 @@ static int init_tinylp (tiny_lp *lp, int ncount, int ecount, int *elist,
     rval = build_graph (&(lp->graph), ncount, ecount, elist, elen,
                         objsense);
     if (rval) {
-        fprintf (stderr, "build_graph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "build_graph failed\n"); goto CLEANUP;
     }
     rval = init_tinycomp (&(lp->comp), ncount);
     if (rval) {
-        fprintf (stderr, "init_tinycomp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "init_tinycomp failed\n"); goto CLEANUP;
     }
 
     lp->lower = CC_SAFE_MALLOC (ecount, double);
     lp->upper = CC_SAFE_MALLOC (ecount, double);
     if (!lp->upper || !lp->lower) {
-        fprintf (stderr, "out of memory in init_tinylp\n");
+        CC_FPRINTF(stderr, "out of memory in init_tinylp\n");
         rval = 1; goto CLEANUP;
     }
     tiny_loadbounds (lp, lower, upper);
@@ -455,7 +455,7 @@ static int init_tinylp (tiny_lp *lp, int ncount, int ecount, int *elist,
     lp->x    = CC_SAFE_MALLOC (ecount, double);
     lp->xsol = CC_SAFE_MALLOC (ecount, double);
     if (!lp->x || !lp->xsol) {
-        fprintf (stderr, "out of memory in init_tinylp\n");
+        CC_FPRINTF(stderr, "out of memory in init_tinylp\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i < ecount; i++) {
@@ -468,7 +468,7 @@ static int init_tinylp (tiny_lp *lp, int ncount, int ecount, int *elist,
         lp->node_pi   = CC_SAFE_MALLOC (ncount, CCbigguy);
         lp->pi_double = CC_SAFE_MALLOC (ncount, double);
         if (!lp->node_pi || !lp->pi_double) {
-            fprintf (stderr, "out of memory in init_tinylp\n");
+            CC_FPRINTF(stderr, "out of memory in init_tinylp\n");
             rval = 1; goto CLEANUP;
         }
         lp->pisize_double = ncount;
@@ -483,15 +483,15 @@ static int init_tinylp (tiny_lp *lp, int ncount, int ecount, int *elist,
 
     rval = CClp_init (&(lp->lp));
     if (rval) {
-        fprintf (stderr, "CClp_init failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_init failed\n"); goto CLEANUP;
     }
     rval = load_tinylp (lp);
     if (rval) {
-        fprintf (stderr, "load_tinylp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "load_tinylp failed\n"); goto CLEANUP;
     }
     rval = CClp_tune_small (lp->lp);
     if (rval) {
-        fprintf (stderr, "CClp_tune_small failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_tune_small failed\n"); goto CLEANUP;
     }
 
     return rval;
@@ -530,7 +530,7 @@ static int load_tinylp (tiny_lp *lp)
 
     rval = CClp_create (lp->lp, "tinylp");
     if (rval) {
-        fprintf (stderr, "CClp_create failed\n");
+        CC_FPRINTF(stderr, "CClp_create failed\n");
         goto CLEANUP;
     }
 
@@ -539,14 +539,14 @@ static int load_tinylp (tiny_lp *lp)
     for (i = 0; i < lp->graph.ncount; i++) {
         rval = CClp_new_row (lp->lp, 'E', 2.0);
         if (rval) {
-            fprintf (stderr, "CClp_new_row failed\n");
+            CC_FPRINTF(stderr, "CClp_new_row failed\n");
             goto CLEANUP;
         }
     }
     if (lp->depot != -1) {
         rval = CClp_change_sense (lp->lp, lp->depot, 'G');
         if (rval) {
-            fprintf (stderr, "CClp_change_sense failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CClp_change_sense failed\n"); goto CLEANUP;
         }
     }
 
@@ -566,7 +566,7 @@ static int load_tinylp (tiny_lp *lp)
                            obj, cmatbeg, cmatind, cmatval,
                            lb, ub);
         if (rval) {
-            fprintf (stderr, "CClp_addcols failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CClp_addcols failed\n"); goto CLEANUP;
         }
     }
 
@@ -583,15 +583,15 @@ static int tiny_setbounds (tiny_lp *lp, int col, int lower, int upper)
 
     rval = CClp_setbnd (lp->lp, col, 'L', (double) lower);
     if (rval) {
-        fprintf (stderr, "CClp_setbnd failed\n"); return rval;
+        CC_FPRINTF(stderr, "CClp_setbnd failed\n"); return rval;
     }
     rval = CClp_setbnd (lp->lp, col, 'U', (double) upper);
     if (rval) {
-        fprintf (stderr, "CClp_setbnd failed\n"); return rval;
+        CC_FPRINTF(stderr, "CClp_setbnd failed\n"); return rval;
     }
     rval = optimize_tinylp (lp);
     if (rval && rval != 2) {
-        fprintf (stderr, "optimize_tinylp failed\n"); return rval;
+        CC_FPRINTF(stderr, "optimize_tinylp failed\n"); return rval;
     }
     return 0;
 }
@@ -608,7 +608,7 @@ static int add_tinycut_list (tiny_lp *lp, tinycut **list, int *nadded)
         if (lp->depot != -1 || c->count <= lp->graph.ncount / 2) {
             rval = add_tinycut (lp, c, &added);
             if (rval) {
-                fprintf (stderr, "add_tinycut failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "add_tinycut failed\n"); goto CLEANUP;
             }
             if (added) {
                 if (nadded) (*nadded)++;
@@ -617,7 +617,7 @@ static int add_tinycut_list (tiny_lp *lp, tinycut **list, int *nadded)
                        &lp->cutsize, lp->ncuts + 1, 1.3,
                        sizeof (tinycut));
                     if (rval) {
-                        fprintf (stderr, "CCutil_reallocrus_scale failed\n");
+                        CC_FPRINTF(stderr, "CCutil_reallocrus_scale failed\n");
                         rval = 1; goto CLEANUP;
                     }
                 }
@@ -660,29 +660,29 @@ static int add_tinycut (tiny_lp *lp, tinycut *c, int *added)
     /*****************   Checking the cut  *****************/
 
     if (c->count <= 2) {
-        fprintf (stderr, "TT Warning: Handle with less than 3 nodes\n");
-        fprintf (stderr, "TT HANDLE: ");
+        CC_FPRINTF(stderr, "TT Warning: Handle with less than 3 nodes\n");
+        CC_FPRINTF(stderr, "TT HANDLE: ");
         for (i = 0; i < c->count; i++) {
-            printf ("%d ",  c->nodes[i]);
+            CC_PRINTF("%d ",  c->nodes[i]);
         }
-        printf ("  Depot = %d  ", lp->depot);
+        CC_PRINTF("  Depot = %d  ", lp->depot);
         if (c->teeth) {
-            printf (" Nteeth = %d\n", c->tcount);
+            CC_PRINTF(" Nteeth = %d\n", c->tcount);
         } else {
-            printf ("\n");
+            CC_PRINTF("\n");
         }
-        fflush (stdout);
+        CC_FFLUSH(stdout);
         return 0;
     }
 
     if (c->teeth) {
         if (c->tcount % 2 == 0) {
-            fprintf (stderr, "TT Warning: Even number of teeth\n");
+            CC_FPRINTF(stderr, "TT Warning: Even number of teeth\n");
             return 0;
         }
         if (c->tcount <= 2) {
             /*
-            fprintf (stderr, "TT Warning: Blossom with less than 3 teeth\n");
+            CC_FPRINTF(stderr, "TT Warning: Blossom with less than 3 teeth\n");
             */
             return 0;
         }
@@ -691,14 +691,14 @@ static int add_tinycut (tiny_lp *lp, tinycut *c, int *added)
             /*
             if (c->teeth[i].ends[0] == lp->depot ||
                 c->teeth[i].ends[1] == lp->depot) {
-                fprintf (stderr, "TT Warning: Tooth contains the depot\n");
+                CC_FPRINTF(stderr, "TT Warning: Tooth contains the depot\n");
                 return 0;
             }
             */
             if (nodelist[c->teeth[i].ends[0]].magic == g->magiclabel &&
                 nodelist[c->teeth[i].ends[1]].magic == g->magiclabel) {
                 /*
-                fprintf (stderr, "TT Warning: Possible duplicate tooth\n");
+                CC_FPRINTF(stderr, "TT Warning: Possible duplicate tooth\n");
                 */
                 return 0;
             } else {
@@ -713,12 +713,12 @@ static int add_tinycut (tiny_lp *lp, tinycut *c, int *added)
         for (i = 0; i < c->tcount; i++) {
             if (nodelist[c->teeth[i].ends[0]].magic != g->magiclabel &&
                 nodelist[c->teeth[i].ends[1]].magic != g->magiclabel) {
-                fprintf (stderr, "TT Warning: Tooth outside of Handle\n");
+                CC_FPRINTF(stderr, "TT Warning: Tooth outside of Handle\n");
                 return 0;
             }
             if (nodelist[c->teeth[i].ends[0]].magic == g->magiclabel &&
                 nodelist[c->teeth[i].ends[1]].magic == g->magiclabel) {
-                fprintf (stderr, "TT Warning: Tooth inside of Handle\n");
+                CC_FPRINTF(stderr, "TT Warning: Tooth inside of Handle\n");
                 return 0;
             }
         }
@@ -770,7 +770,7 @@ static int add_tinycut (tiny_lp *lp, tinycut *c, int *added)
     rmatind = CC_SAFE_MALLOC (nzcount, int);
     rmatval = CC_SAFE_MALLOC (nzcount, double);
     if (!rmatind || !rmatval) {
-        fprintf (stderr, "out of memory in add_tinycut\n");
+        CC_FPRINTF(stderr, "out of memory in add_tinycut\n");
         for (; nzlist; nzlist = nzlist->next) {
             nzlist->coef = 0;
         }
@@ -792,7 +792,7 @@ static int add_tinycut (tiny_lp *lp, tinycut *c, int *added)
     rval = CClp_addrows (lp->lp, 1, nzcount, rhs, sense, rmatbeg, rmatind,
                          rmatval);
     if (rval) {
-        fprintf (stderr, "CClp_addrows failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_addrows failed\n"); goto CLEANUP;
     }
     if (added) *added = 1;
 
@@ -814,19 +814,19 @@ static int optimize_tinylp (tiny_lp *lp)
         return 2;
     }
     if (rval) {
-        fprintf (stderr, "CClp_opt failed\n");
+        CC_FPRINTF(stderr, "CClp_opt failed\n");
         return 1;
     }
 
     rval = CClp_objval (lp->lp, &lp->val);
     if (rval) {
-        fprintf (stderr, "CClp_objval failed\n");
+        CC_FPRINTF(stderr, "CClp_objval failed\n");
         return rval;
     }
 
     rval = CClp_x (lp->lp, lp->x);
     if (rval) {
-        fprintf (stderr, "CClp_x failed\n");
+        CC_FPRINTF(stderr, "CClp_x failed\n");
         return rval;
     }
     return 0;
@@ -841,7 +841,7 @@ static int tiny_pi (tiny_lp *lp)
         rval = CCutil_reallocrus_scale ((void **) &lp->cut_pi,
            &lp->cutpisize, lp->ncuts, 1.3, sizeof (CCbigguy));
         if (rval) {
-            fprintf (stderr, "CCutil_reallocrus_scale failed\n");
+            CC_FPRINTF(stderr, "CCutil_reallocrus_scale failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -849,14 +849,14 @@ static int tiny_pi (tiny_lp *lp)
         rval = CCutil_reallocrus_scale ((void **) &lp->pi_double,
            &lp->pisize_double, ncount + lp->ncuts, 1.3, sizeof (double));
         if (rval) {
-            fprintf (stderr, "CCutil_reallocrus_scale failed\n");
+            CC_FPRINTF(stderr, "CCutil_reallocrus_scale failed\n");
             rval = 1; goto CLEANUP;
         }
     }
 
     rval = CClp_pi (lp->lp, lp->pi_double);
     if (rval) {
-        fprintf (stderr, "CClp_pi failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClp_pi failed\n"); goto CLEANUP;
     }
 
     for (i = 0; i < ncount; i++) {
@@ -962,7 +962,7 @@ static int build_graph (tinygraph *g, int ncount, int ecount, int *elist,
     g->adjspace = CC_SAFE_MALLOC (2*g->ecount, tinyadj);
     g->edgelist = CC_SAFE_MALLOC (g->ecount, tinyedge);
     if (!g->nodelist || !g->adjspace || !g->edgelist) {
-        fprintf (stderr, "out of memory in build_graph\n");
+        CC_FPRINTF(stderr, "out of memory in build_graph\n");
         CC_IFFREE (g->nodelist, tinynode);
         CC_IFFREE (g->adjspace, tinyadj);
         CC_IFFREE (g->edgelist, tinyedge);
@@ -1035,34 +1035,34 @@ static int tiny_connectcut (tiny_lp *lp, tinycomp *t, int *nadded)
     do {
         rval = tiny_connect (&lp->graph, t, lp->x, lp->depot);
         if (rval) {
-            fprintf (stderr, "tiny_connect failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "tiny_connect failed\n"); goto CLEANUP;
         }
 #ifdef TINYNOISY
-        printf ("Number of Components: %d\n", t->ncomp); fflush (stdout);
+        CC_PRINTF("Number of Components: %d\n", t->ncomp); CC_FFLUSH(stdout);
 #endif
 
         if (t->ncomp > 1) {
             rval = add_tinycut_list (lp, &t->complist, &added);
             if (rval) {
-                fprintf (stderr, "add_tinycut_list failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "add_tinycut_list failed\n"); goto CLEANUP;
             }
             if (added) {
                 if (nadded) (*nadded) += added;
                 rval = optimize_tinylp (lp);
                 if (rval == 2) {
 #ifdef TINYNOISY
-                    printf ("LP is infeasible\n"); fflush (stdout);
+                    CC_PRINTF("LP is infeasible\n"); CC_FFLUSH(stdout);
 #endif
                     rval = 0; goto CLEANUP;
                 } else if (rval) {
-                    fprintf (stderr, "optimize_tinylp failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "optimize_tinylp failed\n"); goto CLEANUP;
                 } else {
 #ifdef TINYNOISY
-                    printf ("LP Value: %.4f\n", lp->val); fflush (stdout);
+                    CC_PRINTF("LP Value: %.4f\n", lp->val); CC_FFLUSH(stdout);
 #endif
                 }
             } else {
-                fprintf (stderr, "error in connect loop\n");
+                CC_FPRINTF(stderr, "error in connect loop\n");
                 rval = 1; goto CLEANUP;
             }
         }
@@ -1079,7 +1079,7 @@ static int init_tinycomp (tinycomp *t, int ncount)
     t->grab = CC_SAFE_MALLOC (ncount, int);
     t->stack = CC_SAFE_MALLOC (ncount, int);
     if (!t->grab || !t->stack) {
-        fprintf (stderr, "out of memory in init_tinycomp\n");
+        CC_FPRINTF(stderr, "out of memory in init_tinycomp\n");
         CC_IFFREE (t->grab, int);
         CC_IFFREE (t->stack, int);
         return 1;
@@ -1121,14 +1121,14 @@ static int tiny_connect (tinygraph *g, tinycomp *tc, double *x, int depot)
             if (count < ncount && count > 2 /* for biconnect case */) {
                 c = CC_SAFE_MALLOC (1, tinycut);
                 if (!c) {
-                    fprintf (stderr, "out of memory in tiny_connect\n");
+                    CC_FPRINTF(stderr, "out of memory in tiny_connect\n");
                     return 1;
                 }
                 c->teeth = (tinytooth *) NULL;
                 c->tcount = 0;
                 c->nodes = CC_SAFE_MALLOC (count, int);
                 if (!c->nodes) {
-                    fprintf (stderr, "out of memory in tiny_connect\n");
+                    CC_FPRINTF(stderr, "out of memory in tiny_connect\n");
                     CC_FREE (c, tinycut);
                     return 1;
                 }
@@ -1189,7 +1189,7 @@ static int exact_subtours (tiny_lp *lp)
 
     elist = CC_SAFE_MALLOC (2*g->ecount, int);
     if (!elist) {
-        fprintf (stderr, "out of memory in exact_subtours\n");
+        CC_FPRINTF(stderr, "out of memory in exact_subtours\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1207,26 +1207,26 @@ static int exact_subtours (tiny_lp *lp)
     rval = CCcut_violated_cuts (g->ncount, g->ecount, elist, lp->x,
                    2.0 - 0.0001, add_exact, (void *) &p);
     if (rval) {
-        fprintf (stderr, "CCcut_violated_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCcut_violated_cuts failed\n"); goto CLEANUP;
     }
 
     if (p.cutcount > 0) {
         rval = add_tinycut_list (lp, &p.cuts, &added);
         if (rval) {
-            fprintf (stderr, "add_tinycut_list failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "add_tinycut_list failed\n"); goto CLEANUP;
         }
         if (added) {
             rval = optimize_tinylp (lp);
             if (rval == 2) {
 #ifdef TINYNOISY
-                printf ("LP is infeasible\n"); fflush (stdout);
+                CC_PRINTF("LP is infeasible\n"); CC_FFLUSH(stdout);
 #endif
                 rval = 0; goto CLEANUP;
             } else if (rval) {
-                fprintf (stderr, "optimize_tinylp failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "optimize_tinylp failed\n"); goto CLEANUP;
             } else {
 #ifdef TINYNOISY
-                printf ("LP Value: %.4f\n", lp->val); fflush (stdout);
+                CC_PRINTF("LP Value: %.4f\n", lp->val); CC_FFLUSH(stdout);
 #endif
             }
         }
@@ -1246,7 +1246,7 @@ static int add_exact (double val, int count, int *cutarray, void *pass_param)
     tinycut *c = (tinycut *) NULL;
 
     if (val > 2.0) {
-        fprintf (stderr, "TT Warning: Cut of value %f in add_exact\n", val);
+        CC_FPRINTF(stderr, "TT Warning: Cut of value %f in add_exact\n", val);
         goto CLEANUP;
     }
 
@@ -1259,7 +1259,7 @@ static int add_exact (double val, int count, int *cutarray, void *pass_param)
 
         c = CC_SAFE_MALLOC (1, tinycut);
         if (!c) {
-            fprintf (stderr, "out of memory in add_exact\n");
+            CC_FPRINTF(stderr, "out of memory in add_exact\n");
             rval = 1; goto CLEANUP;
         }
         c->teeth = (tinytooth *) NULL;
@@ -1268,7 +1268,7 @@ static int add_exact (double val, int count, int *cutarray, void *pass_param)
 
         c->nodes = CC_SAFE_MALLOC (count, int);
         if (!c->nodes) {
-            fprintf (stderr, "out of memory in add_exact\n");
+            CC_FPRINTF(stderr, "out of memory in add_exact\n");
             rval = 1; goto CLEANUP;
         }
         for (j = 0; j < count; j++) {
@@ -1307,13 +1307,13 @@ static int exact_blossoms (tiny_lp *lp)
 
     rval = grab_nonzero_x (lp, &ecount, &elist, &x, X_FLUFF);
     if (rval) {
-        fprintf (stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "grab_nonzero_x failed\n"); goto CLEANUP;
     }
 
     rval =  CCtsp_exactblossom (&cuts, &cutcount, lp->graph.ncount, ecount,
                                 elist, x, &rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_exactblossom failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_exactblossom failed\n"); goto CLEANUP;
     }
 
     if (cutcount) {
@@ -1325,7 +1325,7 @@ static int exact_blossoms (tiny_lp *lp)
             cnext = cut->next;
             rval = lpcut_in_to_tinycut (cut, &tc);
             if (rval) {
-                fprintf (stderr, "lpcut_in_to_tinycut failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "lpcut_in_to_tinycut failed\n"); goto CLEANUP;
             }
             if (tc) {
                 tc->next = tcuts;
@@ -1336,20 +1336,20 @@ static int exact_blossoms (tiny_lp *lp)
         }
         rval = add_tinycut_list (lp, &tcuts, &added);
         if (rval) {
-            fprintf (stderr, "add_tinycut_list failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "add_tinycut_list failed\n"); goto CLEANUP;
         }
         if (added) {
             rval = optimize_tinylp (lp);
             if (rval == 2) {
 #ifdef TINYNOISY
-                printf ("LP is infeasible\n"); fflush (stdout);
+                CC_PRINTF("LP is infeasible\n"); CC_FFLUSH(stdout);
 #endif
                 rval = 0; goto CLEANUP;
             } else if (rval) {
-                fprintf (stderr, "optimize_tinylp failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "optimize_tinylp failed\n"); goto CLEANUP;
             } else {
 #ifdef TINYNOISY
-                printf ("LP Value: %.4f\n", lp->val); fflush (stdout);
+                CC_PRINTF("LP Value: %.4f\n", lp->val); CC_FFLUSH(stdout);
 #endif
             }
         }
@@ -1381,7 +1381,7 @@ static int grab_nonzero_x (tiny_lp *lp, int *ecount, int **elist, double **x,
     *elist = CC_SAFE_MALLOC (2*count, int);
     *x = CC_SAFE_MALLOC (count, double);
     if (!(*elist) || !(*x)) {
-        fprintf (stderr, "out of memory in grab_nonzero_x\n");
+        CC_FPRINTF(stderr, "out of memory in grab_nonzero_x\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1416,7 +1416,7 @@ static int lpcut_in_to_tinycut (CCtsp_lpcut_in *in, tinycut **out)
 
     c = CC_SAFE_MALLOC (1, tinycut);
     if (!c) {
-        fprintf (stderr, "out of memory in lpcut_in_to_tinycut\n");
+        CC_FPRINTF(stderr, "out of memory in lpcut_in_to_tinycut\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1428,23 +1428,23 @@ static int lpcut_in_to_tinycut (CCtsp_lpcut_in *in, tinycut **out)
 
     rval = CCtsp_clique_to_array (&in->cliques[0], &c->nodes, &c->count);
     if (rval) {
-        fprintf (stderr, "CCtsp_clique_to_array failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_clique_to_array failed\n"); goto CLEANUP;
     }
 
     if (in->cliquecount > 1) {
         c->teeth = CC_SAFE_MALLOC (in->cliquecount - 1, tinytooth);
         if (!c->teeth) {
-            fprintf (stderr, "out of memory in lpcut_in_to_tinycut\n");
+            CC_FPRINTF(stderr, "out of memory in lpcut_in_to_tinycut\n");
             rval = 1; goto CLEANUP;
         }
         for (i = 1; i < in->cliquecount; i++) {
             rval = CCtsp_clique_to_array (&in->cliques[i], &ar, &icount);
             if (rval) {
-                fprintf (stderr, "CCtsp_clique_to_array failed\n");
+                CC_FPRINTF(stderr, "CCtsp_clique_to_array failed\n");
                 goto CLEANUP;
             }
             if (icount != 2) {   /* Not a blossom */
-                printf ("Not a blossom\n"); fflush (stdout);
+                CC_PRINTF("Not a blossom\n"); CC_FFLUSH(stdout);
                 free_tinycut (c);
                 CC_IFFREE (c, tinycut);
                 goto CLEANUP;
@@ -1507,7 +1507,7 @@ static int tiny_blossom (tiny_lp *lp, int *nadded)
                 rval = blossom_grab (g, lp->depot, lp->x, tc->grab, count,
                                      &tc->complist, (int *) NULL);
                 if (rval) {
-                    fprintf (stderr, "blossom_grab failed\n");
+                    CC_FPRINTF(stderr, "blossom_grab failed\n");
                     return rval;
                 }
             }
@@ -1517,7 +1517,7 @@ static int tiny_blossom (tiny_lp *lp, int *nadded)
     if (tc->complist) {
         rval = add_tinycut_list (lp, &tc->complist, nadded);
         if (rval) {
-            fprintf (stderr, "add_tinycut_list failed\n");
+            CC_FPRINTF(stderr, "add_tinycut_list failed\n");
             return 0;
         }
     }
@@ -1525,16 +1525,16 @@ static int tiny_blossom (tiny_lp *lp, int *nadded)
         rval = optimize_tinylp (lp);
         if (rval == 2) {
 #ifdef TINYNOISY
-            printf ("LP is infeasible\n"); fflush (stdout);
+            CC_PRINTF("LP is infeasible\n"); CC_FFLUSH(stdout);
 #endif
             return 0;
         } else if (rval) {
-            fprintf (stderr, "optimize_tinylp failed\n");
+            CC_FPRINTF(stderr, "optimize_tinylp failed\n");
             return rval;
         } else {
 #ifdef TINYNOISY
-            printf ("Blossom LP Value: %.4f\n", lp->val);
-            fflush (stdout);
+            CC_PRINTF("Blossom LP Value: %.4f\n", lp->val);
+            CC_FFLUSH(stdout);
 #endif
         }
     }
@@ -1601,7 +1601,7 @@ static int blossom_grab (tinygraph *g, int depot, double *x, int *handle,
     }
 
     if (tcount % 2 == 0) {
-        fprintf (stderr, "TT Warning: Blossom with even number of teeth\n");
+        CC_FPRINTF(stderr, "TT Warning: Blossom with even number of teeth\n");
         return 0;
     }
 
@@ -1614,12 +1614,12 @@ static int blossom_grab (tinygraph *g, int depot, double *x, int *handle,
 
     c = CC_SAFE_MALLOC (1, tinycut);
     if (!c) {
-        fprintf (stderr, "out of memory in blossom_grab\n");
+        CC_FPRINTF(stderr, "out of memory in blossom_grab\n");
         return 1;
     }
     c->nodes = CC_SAFE_MALLOC (count, int);
     if (!c->nodes) {
-        fprintf (stderr, "out of memory in blossom_grab\n");
+        CC_FPRINTF(stderr, "out of memory in blossom_grab\n");
         CC_FREE (c, tinycut);
         return 1;
     }
@@ -1630,7 +1630,7 @@ static int blossom_grab (tinygraph *g, int depot, double *x, int *handle,
 
     c->teeth = CC_SAFE_MALLOC (tcount, tinytooth);
     if (!c->teeth) {
-        fprintf (stderr, "out of memory in blossom_grab\n");
+        CC_FPRINTF(stderr, "out of memory in blossom_grab\n");
         CC_FREE (c->nodes, int);
         CC_FREE (c, tinycut);
         return 1;
@@ -1674,32 +1674,32 @@ static int tiny_brancher (tiny_lp *lp, int depth)
 
     rval = tiny_connectcut (lp, &lp->comp, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "tiny_connectcut failed\n"); return rval;
+        CC_FPRINTF(stderr, "tiny_connectcut failed\n"); return rval;
     }
     rval = tiny_checkbound (lp, &cutoff);
     if (rval) {
-        fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+        CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
     }
     if (cutoff) return 0;
 
     do {
         rval = exact_subtours (lp);
         if (rval) {
-            fprintf (stderr, "exact_subtour failed\n"); return rval;
+            CC_FPRINTF(stderr, "exact_subtour failed\n"); return rval;
         }
         rval = tiny_checkbound (lp, &cutoff);
         if (rval) {
-            fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+            CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
         }
         if (cutoff) return 0;
 
         rval = tiny_blossom (lp, &nadded);
         if (rval) {
-            fprintf (stderr, "tiny_blossom failed\n"); return rval;
+            CC_FPRINTF(stderr, "tiny_blossom failed\n"); return rval;
         }
         rval = tiny_checkbound (lp, &cutoff);
         if (rval) {
-            fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+            CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
         }
         if (cutoff) return 0;
     } while (nadded);
@@ -1707,43 +1707,43 @@ static int tiny_brancher (tiny_lp *lp, int depth)
     if (depth == 0) {
         rval = exact_blossoms (lp);
         if (rval) {
-            fprintf (stderr, "tiny_tighten failed\n"); return rval;
+            CC_FPRINTF(stderr, "tiny_tighten failed\n"); return rval;
         }
         rval = tiny_checkbound (lp, &cutoff);
         if (rval) {
-            fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+            CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
         }
         if (cutoff) return 0;
 
         rval = exact_subtours (lp);
         if (rval) {
-            fprintf (stderr, "exact_subtour failed\n"); return rval;
+            CC_FPRINTF(stderr, "exact_subtour failed\n"); return rval;
         }
         rval = tiny_checkbound (lp, &cutoff);
         if (rval) {
-            fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+            CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
         }
         if (cutoff) return 0;
     }
 
     rval = tiny_connectcut (lp, &lp->comp, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "tiny_connectcut failed\n"); return rval;
+        CC_FPRINTF(stderr, "tiny_connectcut failed\n"); return rval;
     }
     rval = tiny_checkbound (lp, &cutoff);
     if (rval) {
-        fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+        CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
     }
     if (cutoff) return 0;
 
 #ifdef TINYNOISY
-    printf ("Cut LP Value: %.4f\n", lp->val); fflush (stdout);
+    CC_PRINTF("Cut LP Value: %.4f\n", lp->val); CC_FFLUSH(stdout);
 #endif
 
 /*
     for (i = 0; i < lp->graph.ecount; i++) {
         if (lp->x[i] > 0.0) {
-            printf ("%d %d %f\n", lp->graph.edgelist[i].ends[0],
+            CC_PRINTF("%d %d %f\n", lp->graph.edgelist[i].ends[0],
                                   lp->graph.edgelist[i].ends[1],
                                   lp->x[i]);
         }
@@ -1755,10 +1755,10 @@ static int tiny_brancher (tiny_lp *lp, int depth)
     if (next == -1) {
         rval = tiny_checktour (lp, &val);
         if (rval) {
-            fprintf (stderr, "tiny_checktour failed\n"); return 1;
+            CC_FPRINTF(stderr, "tiny_checktour failed\n"); return 1;
         } else {
 #ifdef TINYNOISY
-            printf ("INTEGRAL SOLUTION AT %.2f\n", val);
+            CC_PRINTF("INTEGRAL SOLUTION AT %.2f\n", val);
 #endif
             lp->upperbound = val;
             lp->foundtour = 1;
@@ -1770,27 +1770,27 @@ static int tiny_brancher (tiny_lp *lp, int depth)
     }
 
 #ifdef TINYNOISY
-    printf ("Branch on %d\n", next); fflush (stdout);
+    CC_PRINTF("Branch on %d\n", next); CC_FFLUSH(stdout);
 #endif
 
     rval = tiny_setbounds (lp, next, 0, 0);
     if (rval) {
-        fprintf (stderr, "tiny_setbounds failed\n"); return rval;
+        CC_FPRINTF(stderr, "tiny_setbounds failed\n"); return rval;
     }
     rval = tiny_checkbound (lp, &cutoff);
     if (rval) {
-        fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+        CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
     }
     if (cutoff) {
 #ifdef TINYNOISY
-        printf ("0-Side Does not Need to be Searched: %f\n", lp->val);
-        fflush (stdout);
+        CC_PRINTF("0-Side Does not Need to be Searched: %f\n", lp->val);
+        CC_FFLUSH(stdout);
 #endif
     } else {
 #ifdef TINYNOISY
-        printf ("Evaluate 0-Side of %d (Depth %d, Best %.2f)\n",
+        CC_PRINTF("Evaluate 0-Side of %d (Depth %d, Best %.2f)\n",
                  next, depth, lp->upperbound);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
 #endif
         rval = tiny_brancher (lp, depth + 1);
         if (rval) return rval;
@@ -1799,24 +1799,24 @@ static int tiny_brancher (tiny_lp *lp, int depth)
 
     rval = tiny_setbounds (lp, next, 1, 1);
     if (rval) {
-        fprintf (stderr, "tiny_setbounds failed\n"); return rval;
+        CC_FPRINTF(stderr, "tiny_setbounds failed\n"); return rval;
     }
 
     rval = tiny_checkbound (lp, &cutoff);
     if (rval) {
-        fprintf (stderr, "tiny_checkbound failed\n"); return 1;
+        CC_FPRINTF(stderr, "tiny_checkbound failed\n"); return 1;
     }
     if (cutoff) {
 #ifdef TINYNOISY
-        printf ("1-Side of %d Does not Need to be Searched: %f\n",
+        CC_PRINTF("1-Side of %d Does not Need to be Searched: %f\n",
                   next, lp->val);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
 #endif
     } else {
 #ifdef TINYNOISY
-        printf ("Evaluate 1-Side of %d (Depth %d, Best %.2f)\n",
+        CC_PRINTF("Evaluate 1-Side of %d (Depth %d, Best %.2f)\n",
                  next, depth, lp->upperbound);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
 #endif
         rval = tiny_brancher (lp, depth + 1);
         if (rval) return rval;
@@ -1825,7 +1825,7 @@ static int tiny_brancher (tiny_lp *lp, int depth)
 
     rval = tiny_setbounds (lp, next, 0, 1);
     if (rval) {
-        fprintf (stderr, "tiny_setbounds failed\n"); return rval;
+        CC_FPRINTF(stderr, "tiny_setbounds failed\n"); return rval;
     }
 
     return 0;
@@ -1892,7 +1892,7 @@ static int tiny_checkbound (tiny_lp *lp, int *cutoff)
         if (lp->checkresult) {
             rval = tiny_checkdual (lp, cutoff);
             if (rval) {
-                fprintf (stderr, "tiny_checkdual failed\n");
+                CC_FPRINTF(stderr, "tiny_checkdual failed\n");
                 return rval;
             }
         } else {
@@ -1914,12 +1914,12 @@ static int tiny_checkdual (tiny_lp *lp, int *cutoff)
     CCbigguy bnd, rhs_sum;
 
 #ifdef TINYNOISY
-    printf ("tiny_checkdual ...\n"); fflush (stdout);
+    CC_PRINTF("tiny_checkdual ...\n"); CC_FFLUSH(stdout);
 #endif
 
     rval = tiny_pi (lp);
     if (rval) {
-        fprintf (stderr, "tiny_pi failed\n");
+        CC_FPRINTF(stderr, "tiny_pi failed\n");
         return rval;
     }
 
@@ -1939,7 +1939,7 @@ static int tiny_checkdual (tiny_lp *lp, int *cutoff)
     phase1 = (lp->val == CC_TINYTSP_MAXDOUBLE);
     tiny_price (lp, phase1);
 #ifdef TINYNOISY
-    printf ("rhs_sum = %f\n", CCbigguy_bigguytod (rhs_sum)); fflush (stdout);
+    CC_PRINTF("rhs_sum = %f\n", CCbigguy_bigguytod (rhs_sum)); CC_FFLUSH(stdout);
 #endif
     for (i = 0; i < ecount; i++) {
         k = CCbigguy_cmp (elist[i].rc, CCbigguy_ZERO);
@@ -1957,14 +1957,14 @@ static int tiny_checkdual (tiny_lp *lp, int *cutoff)
     if (phase1) {
         if (CCbigguy_cmp (rhs_sum, CCbigguy_ZERO) <= 0) {
             CClp_dump_lp (lp->lp, "dump.sav");
-            fprintf (stderr, "Infeasible LP with Farkas RHS %f\n",
+            CC_FPRINTF(stderr, "Infeasible LP with Farkas RHS %f\n",
                    CCbigguy_bigguytod (rhs_sum));
             return 1;
         }
         *cutoff = 1;
     } else {
         if (lp->val > CCbigguy_bigguytod (rhs_sum) + 0.5) {
-           fprintf (stderr, "Val: %f   Exact Val: %f\n",
+           CC_FPRINTF(stderr, "Val: %f   Exact Val: %f\n",
                    lp->val, CCbigguy_bigguytod (rhs_sum));
            return 1;
         }
@@ -2047,7 +2047,7 @@ static int tiny_checktour (tiny_lp *lp, double *tourval)
     for (i = 0; i < g->ecount; i++) {
         if (lp->x[i] < lp->lower[i] - CC_TINYTSP_INTTOL ||
             lp->x[i] > lp->upper[i] + CC_TINYTSP_INTTOL) {
-            fprintf (stderr, "variable not between bounds\n");
+            CC_FPRINTF(stderr, "variable not between bounds\n");
             return 1;
         }
         if (lp->x[i] > CC_TINYTSP_INTTOL) {
@@ -2062,19 +2062,19 @@ static int tiny_checktour (tiny_lp *lp, double *tourval)
         }
     }
     if (lp->val < ((double) val) - 0.5)  {
-        fprintf (stderr, "LP val and computed tour length do not agree\n");
+        CC_FPRINTF(stderr, "LP val and computed tour length do not agree\n");
         return 1;
     }
     for (i = 0; i < g->ncount; i++) {
         if (g->nodelist[i].mark != 2 && i != lp->depot) {
-            fprintf (stderr, "node in tour does not have degree 2\n");
+            CC_FPRINTF(stderr, "node in tour does not have degree 2\n");
             return 1;
         }
     }
 
     rval = tiny_connect (&lp->graph, &lp->comp, lp->x, lp->depot);
     if (rval) {
-        fprintf (stderr, "tiny_connect failed\n"); return rval;
+        CC_FPRINTF(stderr, "tiny_connect failed\n"); return rval;
     }
     if (lp->comp.ncomp > 1) {
         tinycut *c, *cnext;
@@ -2083,7 +2083,7 @@ static int tiny_checktour (tiny_lp *lp, double *tourval)
             free_tinycut (c);
             CC_FREE (c, tinycut);
         }
-        fprintf (stderr, "tour is not connected\n");
+        CC_FPRINTF(stderr, "tour is not connected\n");
         return 1;
     }
 
@@ -2097,11 +2097,11 @@ static void print_tinycut (tinycut *c)
 {
     int i;
 
-    printf ("CUT: "); fflush (stdout);
+    CC_PRINTF("CUT: "); CC_FFLUSH(stdout);
     for (i = 0; i < c->count; i++) {
-        printf ("%d ", c->nodes[i]);
+        CC_PRINTF("%d ", c->nodes[i]);
     }
-    printf ("\n"); fflush (stdout);
+    CC_PRINTF("\n"); CC_FFLUSH(stdout);
 }
 #endif /* TINYDEBUG */
 

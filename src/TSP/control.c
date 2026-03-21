@@ -368,7 +368,7 @@ int CCtsp_cutselect_set_tols (CCtsp_cutselect *s, CCtsp_lp *lp, int level,
               (int **) NULL, (double **) NULL, (double **) NULL,
               (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n"); return rval;
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n"); return rval;
     }
 
 #ifdef CCtsp_CUTS_DELTA
@@ -401,9 +401,9 @@ int CCtsp_cutselect_set_tols (CCtsp_cutselect *s, CCtsp_lp *lp, int level,
 
 
     if (!silent) {
-        printf ("Setting tolerances: next cuts %.4f next round %.4f\n",
+        CC_PRINTF("Setting tolerances: next cuts %.4f next round %.4f\n",
                 s->nexttol, s->roundtol);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     return 0;
@@ -421,28 +421,28 @@ int CCtsp_cutting_multiple_loop (CCtsp_lp *lp, CCtsp_cutselect *sel,
     } else {
         for (k = 16; k <= maxlocal; k += 4) {
             sel->maxchunksize = k;
-            printf ("SETTING MAXCHUNKSIZE = %d\n", k); fflush (stdout);
+            CC_PRINTF("SETTING MAXCHUNKSIZE = %d\n", k); CC_FFLUSH(stdout);
             if (update_tol) {
                 rval = CCtsp_cutselect_set_tols (sel, lp, 1, 0);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_cutselect_set_tols failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_cutselect_set_tols failed\n");
                     /* Reset rval, since 2 has a special meaning */
                     rval = 1; goto CLEANUP; 
                 }
             }
             rval = CCtsp_cutting_loop (lp, sel, savelp, silent, rstate);
             if (rval) {
-                fprintf (stderr, "CCtsp_cutting_loop returned %d\n", rval);
+                CC_FPRINTF(stderr, "CCtsp_cutting_loop returned %d\n", rval);
                 goto CLEANUP;
             }
         }
         if (maxlocal % 4 != 0) {
             sel->maxchunksize = maxlocal;
-            printf ("SETTING MAXCHUNKSIZE = %d\n", maxlocal); fflush (stdout);
+            CC_PRINTF("SETTING MAXCHUNKSIZE = %d\n", maxlocal); CC_FFLUSH(stdout);
             if (update_tol) {
                 rval = CCtsp_cutselect_set_tols (sel, lp, 1, 0);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_cutselect_set_tols failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_cutselect_set_tols failed\n");
                     /* Reset rval, since 2 has a special meaning */
                     rval = 1; goto CLEANUP; 
                 }
@@ -500,14 +500,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                                    lp->fulladj, 0, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     } else if (lp->dat) {
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                  (CCtsp_genadj *) NULL, CC_NO_NEAREST, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -516,7 +516,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
               (int **) NULL, (double **) NULL, (double **) NULL,
               (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -528,7 +528,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
 
             rval = CCtsp_resparsify_lp (lp, silent);
             if (rval) {
-                fprintf (stderr, "CCtsp_resparsify_lp failed\n");
+                CC_FPRINTF(stderr, "CCtsp_resparsify_lp failed\n");
                 rval = 1; goto CLEANUP;
             }
 
@@ -544,7 +544,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
             rval = CCtsp_check_integral (lp, &dval, (int **) NULL, &istour,
                                          silent);
             if (rval) {
-                fprintf (stderr, "CCtsp_check_integral failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "CCtsp_check_integral failed\n"); goto CLEANUP;
             }
             if (istour) goto OUT_LOOP;
 
@@ -553,14 +553,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_file_cuts (sel->filecutname, &cuts, &cutcount,
                            lp->graph.ncount, lp->perm);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_file_cuts failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_file_cuts failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_filecut, 0);
                 if (!silent) {
-                    printf ("Found %2d file cuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d file cuts in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_filecut_opt);
@@ -568,7 +568,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_filecut_opt, 0);
@@ -584,22 +584,22 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                           &maxviol, lp->graph.ncount, xcount, xlist, x, 0,
                           rstate);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_search_cutpool failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_search_cutpool failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_cutpool, 0);
                     if (cutcount)  {
                         if (!silent) {
-                            printf ("Found %2d pool cuts (viol %.4f) in %.2f seconds\n",
+                            CC_PRINTF("Found %2d pool cuts (viol %.4f) in %.2f seconds\n",
                                      cutcount, maxviol, z);
-                            fflush (stdout);
+                            CC_FFLUSH(stdout);
                         }
                         CCutil_start_timer (&lp->stats.cuts_cutpool_opt);
                         rval = call_add_cuts (lp, &cuts, &cut_added, &xcount,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_cutpool_opt, 0);
@@ -614,14 +614,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_connect_cuts (&cuts, &cutcount, lp->graph.ncount,
                                            xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_connect_cuts failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_connect_cuts failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_connect, 0);
                 if (!silent) {
-                    printf ("Found %2d connect cuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d connect cuts in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_connect_opt);
@@ -629,7 +629,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_connect_opt, 0);
@@ -642,14 +642,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_segment_cuts (&cuts, &cutcount, lp->graph.ncount,
                                           xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr,  "CCtsp_segment_cuts failed\n");
+                    CC_FPRINTF(stderr,  "CCtsp_segment_cuts failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_segment, 0);
                 if (!silent) {
-                    printf ("Found %2d segment cuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d segment cuts in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_segment_opt);
@@ -657,7 +657,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_segment_opt, 0);
@@ -670,14 +670,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_fastblossom (&cuts, &cutcount, lp->graph.ncount,
                                   xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_fastblossom failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_fastblossom failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_fastblossom, 0);
                 if (!silent) {
-                    printf ("Found %2d Fast Blossoms in %.2f seconds\n",
+                    CC_PRINTF("Found %2d Fast Blossoms in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_fastblossom_opt);
@@ -685,7 +685,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_fastblossom_opt, 0);
@@ -698,14 +698,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_ghfastblossom (&cuts, &cutcount, lp->graph.ncount,
                                   xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_ghfastblossom failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_ghfastblossom failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_ghfastblossom, 0);
                 if (!silent) {
-                    printf ("Found %2d Groetschel-Holland Blossoms in %.2f seconds\n",
+                    CC_PRINTF("Found %2d Groetschel-Holland Blossoms in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_ghfastblossom_opt);
@@ -713,7 +713,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_ghfastblossom_opt, 0);
@@ -729,22 +729,22 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                             sel->remoteport, &cuts, &cutcount, &maxviol,
                             lp->graph.ncount, xcount, xlist, x);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_search_remotepool failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_search_remotepool failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_remotepool, 0);
                     if (cutcount)  {
                         if (!silent) {
-                            printf ("%d remote pool cuts found (viol %.3f) in %.2f seconds\n",
+                            CC_PRINTF("%d remote pool cuts found (viol %.3f) in %.2f seconds\n",
                                      cutcount, maxviol, z);
-                            fflush (stdout);
+                            CC_FFLUSH(stdout);
                         }
                         CCutil_start_timer (&lp->stats.cuts_remotepool_opt);
                         rval = call_add_cuts (lp, &cuts, &cut_added, &xcount,
                                       &xlist, &x, &newval, sel->usetighten,
                                       &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_remotepool_opt, 0);
@@ -759,14 +759,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_block_combs (&cuts, &cutcount, lp->graph.ncount,
                                             xcount, xlist, x, silent);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_block_combs failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_block_combs failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_blockcomb, 0);
                 if (!silent) { 
-                    printf ("Found %2d block_combs in %.2f seconds\n",
+                    CC_PRINTF("Found %2d block_combs in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_blockcomb_opt);
@@ -774,7 +774,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_blockcomb_opt, 0);
@@ -788,14 +788,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x,
                         &lp->stats.extra_tighten_stats);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_block_combs failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_block_combs failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_growcomb, 0);
                 if (!silent) {
-                    printf ("Found %2d grown combs in %.2f seconds\n",
+                    CC_PRINTF("Found %2d grown combs in %.2f seconds\n",
                              cutcount, z);
-                             fflush (stdout);
+                             CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_growcomb_opt);
@@ -803,7 +803,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_growcomb_opt, 0);
@@ -816,19 +816,19 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                lp->graph.ncount, xcount, xlist, x,
                                &lp->stats.extra_tighten_stats);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_pr_cliquetree failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_pr_cliquetree failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 if (!silent) {
-                    printf ("Found %2d PR cliquetrees\n", cutcount);
-                    fflush (stdout);
+                    CC_PRINTF("Found %2d PR cliquetrees\n", cutcount);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     rval = call_add_cuts (lp, &cuts, &cut_added, &xcount,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     if (istour) goto OUT_LOOP;
@@ -840,14 +840,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_exact_subtours (&cuts, &cutcount,
                             lp->graph.ncount, xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_exact_subtours failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_exact_subtours failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
                 if (!silent) {
-                    printf ("Found %2d exact subtours in %.2f seconds\n",
+                    CC_PRINTF("Found %2d exact subtours in %.2f seconds\n",
                             cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -855,7 +855,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
@@ -871,14 +871,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                     rval = CCtsp_exact_subtours (&cuts, &cutcount,
                                 lp->graph.ncount, xcount, xlist, x);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_exact_subtours failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_exact_subtours failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
                     if (!silent) {
-                        printf ("Found %2d exact subtours in %.2f seconds\n",
+                        CC_PRINTF("Found %2d exact subtours in %.2f seconds\n",
                                 cutcount, z);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                     if (cutcount) {
                         CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -886,7 +886,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
@@ -901,9 +901,9 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
 
                 z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
                 if (0 || !silent) {
-                    printf ("Found %2d domino cuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d domino cuts in %.2f seconds\n",
                             cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -911,13 +911,13 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, 0,
                                           &istour, 0 /* silent */, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
                     if (istour) goto OUT_LOOP;
-                    printf ("Added %d shrunk domino cuts\n", cut_added);
-                    fflush (stdout);
+                    CC_PRINTF("Added %d shrunk domino cuts\n", cut_added);
+                    CC_FFLUSH(stdout);
                 }
             }
 
@@ -928,14 +928,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                     rval = CCtsp_exact_subtours (&cuts, &cutcount,
                                 lp->graph.ncount, xcount, xlist, x);
                     if (rval) {
-                        fprintf (stderr, "CCtsp_exact_subtours failed\n");
+                        CC_FPRINTF(stderr, "CCtsp_exact_subtours failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
                     if (!silent) {
-                        printf ("Found %2d exact subtours in %.2f seconds\n",
+                        CC_PRINTF("Found %2d exact subtours in %.2f seconds\n",
                                 cutcount, z);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                     if (cutcount) {
                         CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -943,7 +943,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
@@ -958,9 +958,9 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
 
                 z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
                 if (0 || !silent) {
-                    printf ("Found %2d domino cuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d domino cuts in %.2f seconds\n",
                             cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -968,13 +968,13 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, 0,
                                           &istour, 0 /* silent */, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
                     if (istour) goto OUT_LOOP;
-                    printf ("Added %d domino cuts\n", cut_added);
-                    fflush (stdout);
+                    CC_PRINTF("Added %d domino cuts\n", cut_added);
+                    CC_FFLUSH(stdout);
                 }
             }
 #endif
@@ -984,14 +984,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCtsp_exactblossom (&cuts, &cutcount, lp->graph.ncount,
                                   xcount, xlist, x, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_exactblossom failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_exactblossom failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_exactblossom, 0);
                 if (!silent) {
-                    printf ("Found %2d Exact Blossoms in %.2f seconds\n",
+                    CC_PRINTF("Found %2d Exact Blossoms in %.2f seconds\n",
                             cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_exactblossom_opt);
@@ -999,7 +999,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_exactblossom_opt, 0);
@@ -1014,14 +1014,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 0.5, 500, &maxviol,
                         rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_tighten_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_tighten_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_tighten_lp, 0);
                 if (!silent) {
-                    printf ("Found %2d tighten_lp cuts (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d tighten_lp cuts (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_tighten_lp_opt);
@@ -1029,7 +1029,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_tighten_lp_opt, 0);
@@ -1039,7 +1039,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = grab_close_x (lp->graph.ncount, xcount, xlist, x,
                         &closecount, &closelist, &closex, 0.5);
                 if (rval) {
-                    fprintf (stderr, "grab_close_x failed\n");
+                    CC_FPRINTF(stderr, "grab_close_x failed\n");
                     goto CLEANUP;
                 }
                 rval = CCtsp_tighten_lp (&lp->cuts,
@@ -1047,14 +1047,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, closecount, closelist, closex,
                         0.5, 500, &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_tighten_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_tighten_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_tighten_lp_close, 0);
                 if (!silent) {
-                    printf ("Found %2d CLOSE tighten_lp cuts (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d CLOSE tighten_lp cuts (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_tighten_lp_close_opt);
@@ -1062,7 +1062,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_tighten_lp_close_opt,
@@ -1078,14 +1078,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 10.0, 500,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_double_decker_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_double_decker_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_decker_lp, 0);
                 if (!silent) {
-                    printf ("Found %2d double deckers (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d double deckers (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_decker_lp_opt);
@@ -1093,7 +1093,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_decker_lp_opt, 0);
@@ -1103,7 +1103,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = grab_close_x (lp->graph.ncount, xcount, xlist, x,
                         &closecount, &closelist, &closex, 0.5);
                 if (rval) {
-                    fprintf (stderr, "grab_close_x failed\n");
+                    CC_FPRINTF(stderr, "grab_close_x failed\n");
                     goto CLEANUP;
                 }
                 rval = CCtsp_double_decker_lp (&lp->cuts,
@@ -1111,14 +1111,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, closecount, closelist, closex,
                         10.0, 500, &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_double_decker_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_double_decker_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_decker_lp_close, 0);
                 if (!silent) {
-                    printf ("Found %2d CLOSE double deckers (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d CLOSE double deckers (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_decker_lp_close_opt);
@@ -1126,7 +1126,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_decker_lp_close_opt, 0);
@@ -1142,14 +1142,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 10.0, 500,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_star_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_star_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_star_lp, 0);
                 if (!silent) {
-                    printf ("Found %2d Star Inequalities (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d Star Inequalities (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_star_lp_opt);
@@ -1157,7 +1157,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                 &xlist, &x, &newval, sel->usetighten, &istour,
                                 silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_star_lp_opt, 0);
@@ -1169,7 +1169,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = no_tighten (lp->graph.ncount, xcount, xlist, x, &ttest,
                                    0.20);
                 if (rval) {
-                    fprintf (stderr, "no_tighten failed\n");  goto CLEANUP;
+                    CC_FPRINTF(stderr, "no_tighten failed\n");  goto CLEANUP;
                 }
             }
 
@@ -1180,14 +1180,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 10.0, 500,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_handling_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_handling_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_handling_lp, 0);
                 if (!silent) {
-                    printf ("Found %2d Handling Inequalities (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d Handling Inequalities (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_handling_lp_opt);
@@ -1195,7 +1195,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                 &xlist, &x, &newval, sel->usetighten, &istour,
                                 silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_handling_lp_opt, 0);
@@ -1210,14 +1210,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 10.0, 500,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_cliqutree_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_cliqutree_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_cliquetree_lp, 0);
                 if (!silent) {
-                    printf ("Found %2d comb cliquetrees (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d comb cliquetrees (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_cliquetree_lp_opt);
@@ -1225,7 +1225,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_cliquetree_lp_opt, 0);
@@ -1237,7 +1237,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = no_tighten (lp->graph.ncount, xcount, xlist, x, &ttest,
                                    0.20);
                 if (rval) {
-                    fprintf (stderr, "no_tighten failed\n");  goto CLEANUP;
+                    CC_FPRINTF(stderr, "no_tighten failed\n");  goto CLEANUP;
                 }
             }
 
@@ -1248,14 +1248,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 10.0, 500,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_teething_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_teething_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_teething_lp, 0);
                 if (!silent) {
-                    printf ("Found %2d teethed combs (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d teethed combs (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_teething_lp_opt);
@@ -1263,7 +1263,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_teething_lp_opt, 0);
@@ -1275,7 +1275,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = no_tighten (lp->graph.ncount, xcount, xlist, x, &ttest,
                                    0.2);
                 if (rval) {
-                    fprintf (stderr, "no_tighten failed\n");  goto CLEANUP;
+                    CC_FPRINTF(stderr, "no_tighten failed\n");  goto CLEANUP;
                 }
             }
 
@@ -1287,14 +1287,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 0.1, 1000,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_tighten_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_tighten_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_tighten_pool, 0);
                 if (!silent) {
-                    printf ("Found %2d tighten pool cuts (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d tighten pool cuts (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_tighten_pool_opt);
@@ -1302,7 +1302,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_tighten_pool_opt, 0);
@@ -1317,14 +1317,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 2.0, 1000,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_double_decker_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_double_decker_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_decker_pool, 0);
                 if (!silent) {
-                    printf ("Found %2d pool double deckers (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d pool double deckers (viol %.4f) in %.2f seconds\n",
                             cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_decker_pool_opt);
@@ -1332,7 +1332,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_decker_pool_opt, 0);
@@ -1347,14 +1347,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 2.0, 1000,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_star_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_star_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_star_pool, 0);
                 if (!silent) {
-                    printf ("Found %2d Pool Star Inequalities (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d Pool Star Inequalities (viol %.4f) in %.2f seconds\n",
                                 cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_star_pool_opt);
@@ -1362,7 +1362,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                 &xlist, &x, &newval, sel->usetighten, &istour,
                                 silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_star_pool_opt, 0);
@@ -1377,14 +1377,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 2.0, 1000,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_handling_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_handling_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_handling_pool, 0);
                 if (!silent) {
-                    printf ("Found %2d Pool Handling Inequalities (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d Pool Handling Inequalities (viol %.4f) in %.2f seconds\n",
                              cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_handling_pool_opt);
@@ -1392,7 +1392,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                 &xlist, &x, &newval, sel->usetighten, &istour,
                                 silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_handling_pool_opt, 0);
@@ -1407,14 +1407,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                         lp->graph.ncount, xcount, xlist, x, 0.5, 1000,
                         &maxviol, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_teething_lp failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_teething_lp failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_teething_pool, 0);
                 if (!silent) {
-                    printf ("Found %2d pool teething combs (viol %.4f) in %.2f seconds\n",
+                    CC_PRINTF("Found %2d pool teething combs (viol %.4f) in %.2f seconds\n",
                              cutcount, maxviol, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_teething_pool_opt);
@@ -1422,7 +1422,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_teething_pool_opt, 0);
@@ -1435,21 +1435,21 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCpq_cuttree_improve_quick (&lp->tightcuts, lp->pool,
                             xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr, "CCpq_cuttree_improve_quick failed\n");
+                    CC_FPRINTF(stderr, "CCpq_cuttree_improve_quick failed\n");
                     rval = 1; goto CLEANUP;
                 }
 
                 rval = CCpq_consecutiveones (&cuts, &cutcount, &lp->tightcuts,
                             lp->pool, xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr, "CCpq_consecutiveones failed\n");
+                    CC_FPRINTF(stderr, "CCpq_consecutiveones failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_consecutiveones, 0);
                 if (!silent) {
-                    printf ("Found %2d consecutiveones cuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d consecutiveones cuts in %.2f seconds\n",
                             cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_consecutiveones_opt);
@@ -1457,7 +1457,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_consecutiveones_opt, 0);
@@ -1470,22 +1470,22 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                 rval = CCpq_cuttree_improve_quick (&lp->tightcuts, lp->pool,
                             xcount, xlist, x);
                 if (rval) {
-                    fprintf (stderr, "CCpq_cuttree_improve_quick failed\n");
+                    CC_FPRINTF(stderr, "CCpq_cuttree_improve_quick failed\n");
                     rval = 1; goto CLEANUP;
                 }
 
                 rval = CCpq_necklaces (&cuts, &cutcount, &lp->tightcuts,
                             xcount, xlist, x, rstate);
                 if (rval) {
-                    fprintf (stderr, "CCpq_necklaces failed\n");
+                    CC_FPRINTF(stderr, "CCpq_necklaces failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_necklace, 0);
 
                 if (!silent) {
-                    printf ("Found %2d necklace cuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d necklace cuts in %.2f seconds\n",
                             cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_necklace_opt);
@@ -1493,7 +1493,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_necklace_opt, 0);
@@ -1517,22 +1517,22 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                               xcount, xlist, x, 0.0, flags, &lc_timer, silent,
                               rstate);
                 if (rval) {
-                    fprintf (stderr, "LocalCuts failed\n");
+                    CC_FPRINTF(stderr, "LocalCuts failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                 if (cutcount) {
                     if (!silent) {
-                        printf ("Found %2d LocalCuts in %.2f seconds\n",
+                        CC_PRINTF("Found %2d LocalCuts in %.2f seconds\n",
                                  cutcount, z);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                     CCutil_start_timer (&lp->stats.cuts_localcut_opt);
                     rval = call_add_cuts (lp, &cuts, &cut_added, &xcount,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1569,14 +1569,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                          lp->graph.ncount, xcount, xlist, x, 0.0, flags,
                          &lc_timer, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "LocalCuts failed\n");
+                        CC_FPRINTF(stderr, "LocalCuts failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                     if (!silent) {
-                        printf ("Found %2d LocalCuts in %.2f seconds\n",
+                        CC_PRINTF("Found %2d LocalCuts in %.2f seconds\n",
                                 cutcount, z);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                     if (cutcount) {
                         CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1584,7 +1584,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                          &xlist, &x, &newval, sel->usetighten,
                                          &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1620,14 +1620,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                              lp->graph.ncount, xcount, xlist, x, 0.0, flags,
                              &lc_timer, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "LocalCuts failed\n");
+                        CC_FPRINTF(stderr, "LocalCuts failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                     if (!silent) {
-                        printf ("Found %2d LocalCuts in %.2f seconds\n",
+                        CC_PRINTF("Found %2d LocalCuts in %.2f seconds\n",
                                  cutcount, z);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                     if (cutcount) {
                         CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1635,7 +1635,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                          &xlist, &x, &newval, sel->usetighten,
                                          &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1679,14 +1679,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                   lp->graph.ncount, xcount, xlist, x, 0.0,
                                   flags, &lc_timer, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "LocalCuts failed\n");
+                            CC_FPRINTF(stderr, "LocalCuts failed\n");
                             rval = 1; goto CLEANUP;
                         }
                         z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                         if (!silent) {
-                            printf ("Found %2d LocalCuts in %.2f seconds\n",
+                            CC_PRINTF("Found %2d LocalCuts in %.2f seconds\n",
                                      cutcount, z);
-                            fflush (stdout);
+                            CC_FFLUSH(stdout);
                         }
                         if (cutcount) {
                             CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1695,7 +1695,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                     sel->usetighten, &istour, silent,
                                     rstate);
                             if (rval) {
-                                fprintf (stderr, "call_add_cuts failed\n");
+                                CC_FPRINTF(stderr, "call_add_cuts failed\n");
                                 goto CLEANUP;
                             }
                             CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1727,14 +1727,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                            xcount, xlist, x, 0.0, flags, &lc_timer, silent,
                            rstate);
                 if (rval) {
-                    fprintf (stderr, "LocalCuts failed\n");
+                    CC_FPRINTF(stderr, "LocalCuts failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                 if (!silent) {
-                    printf ("Found %2d LocalCuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d LocalCuts in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1742,7 +1742,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                         &xlist, &x, &newval, sel->usetighten,
                                         &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1768,14 +1768,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                          xcount, xlist, x, 0.0, flags, &lc_timer, silent,
                          rstate);
                 if (rval) {
-                    fprintf (stderr, "LocalCuts failed\n");
+                    CC_FPRINTF(stderr, "LocalCuts failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                 if (!silent) {
-                    printf ("Found %2d LocalCuts in %.2f seconds\n",
+                    CC_PRINTF("Found %2d LocalCuts in %.2f seconds\n",
                              cutcount, z);
-                    fflush (stdout);
+                    CC_FFLUSH(stdout);
                 }
                 if (cutcount) {
                     CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1783,7 +1783,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                           &xlist, &x, &newval, sel->usetighten,
                                           &istour, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "call_add_cuts failed\n");
+                        CC_FPRINTF(stderr, "call_add_cuts failed\n");
                         goto CLEANUP;
                     }
                     CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1797,7 +1797,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
             rval = grab_polished2_x (lp, 0.001,
                                     &closecount, &closelist, &closex);
             if (rval) {
-                fprintf (stderr, "grab_polished_x failed\n");
+                CC_FPRINTF(stderr, "grab_polished_x failed\n");
                 goto CLEANUP;
             }
             
@@ -1852,14 +1852,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                              lp->graph.ncount, closecount, closelist, closex,
                              0.0, flags, &lc_timer, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "LocalCuts failed\n");
+                        CC_FPRINTF(stderr, "LocalCuts failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                     if (!silent) {
-                        printf ("Found %2d POLISHED LocalCuts in %.2f seconds\n",
+                        CC_PRINTF("Found %2d POLISHED LocalCuts in %.2f seconds\n",
                                  cutcount, z);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                     if (cutcount) {
                         CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1867,7 +1867,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                          &xlist, &x, &newval, sel->usetighten,
                                          &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1903,14 +1903,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                              lp->graph.ncount, closecount, closelist, closex,
                              0.0, flags, &lc_timer, silent, rstate);
                     if (rval) {
-                        fprintf (stderr, "LocalCuts failed\n");
+                        CC_FPRINTF(stderr, "LocalCuts failed\n");
                         rval = 1; goto CLEANUP;
                     }
                     z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                     if (!silent) {
-                        printf ("Found %2d POLISHED LocalCuts in %.2f seconds\n",
+                        CC_PRINTF("Found %2d POLISHED LocalCuts in %.2f seconds\n",
                                  cutcount, z);
-                        fflush (stdout);
+                        CC_FFLUSH(stdout);
                     }
                     if (cutcount) {
                         CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1918,7 +1918,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                          &xlist, &x, &newval, sel->usetighten,
                                          &istour, silent, rstate);
                         if (rval) {
-                            fprintf (stderr, "call_add_cuts failed\n");
+                            CC_FPRINTF(stderr, "call_add_cuts failed\n");
                             goto CLEANUP;
                         }
                         CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1961,14 +1961,14 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                  closex, 0.0, flags, &lc_timer, silent,
                                  rstate);
                         if (rval) {
-                            fprintf (stderr, "LocalCuts failed\n");
+                            CC_FPRINTF(stderr, "LocalCuts failed\n");
                             rval = 1; goto CLEANUP;
                         }
                         z = CCutil_stop_timer (&lp->stats.cuts_localcut, 0);
                         if (!silent) {
-                            printf ("Found %2d POLISHED LocalCuts in %.2f seconds\n",
+                            CC_PRINTF("Found %2d POLISHED LocalCuts in %.2f seconds\n",
                                      cutcount, z);
-                            fflush (stdout);
+                            CC_FFLUSH(stdout);
                         }
                         if (cutcount) {
                             CCutil_start_timer (&lp->stats.cuts_localcut_opt);
@@ -1977,7 +1977,7 @@ int CCtsp_cutting_loop (CCtsp_lp *lp, CCtsp_cutselect *sel, int savelp,
                                     sel->usetighten, &istour, silent,
                                     rstate);
                             if (rval) {
-                                fprintf (stderr, "call_add_cuts failed\n");
+                                CC_FPRINTF(stderr, "call_add_cuts failed\n");
                                 goto CLEANUP;
                             }
                             CCutil_stop_timer (&lp->stats.cuts_localcut_opt, 0);
@@ -1999,7 +1999,7 @@ OUT_LOOP:
             rval = sparse_edge_check (lp, &eginside, &edge_added,
                                       (double *) NULL, silent, rstate);
             if (rval) {
-                fprintf (stderr, "sparse_edge_check failed\n");
+                CC_FPRINTF(stderr, "sparse_edge_check failed\n");
                 rval = 1; goto CLEANUP;
             }
             if (!silent) {
@@ -2011,20 +2011,20 @@ OUT_LOOP:
             if (savelp) {
                 rval = CCtsp_write_probfile_sav (lp);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_write_probfile_sav failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_write_probfile_sav failed\n");
                     rval = 1; goto CLEANUP;
                 }
             }
             if (lp->pool && savelp) {
                 char buf[1024];
                 if (!silent) {
-                    printf ("Write Pool: %d cuts\n", lp->pool->cutcount);
-                    fflush (stdout);
+                    CC_PRINTF("Write Pool: %d cuts\n", lp->pool->cutcount);
+                    CC_FFLUSH(stdout);
                 }
                 sprintf (buf, "%s.pul", lp->problabel);
                 rval = CCtsp_write_cutpool (lp->graph.ncount, buf, lp->pool);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_write_cutpool failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_write_cutpool failed\n");
                     rval = 1; goto CLEANUP;
                 }
             }
@@ -2033,7 +2033,7 @@ OUT_LOOP:
                 rval = CCtsp_send_newcuts (lp->graph.ncount, lp->pool,
                         sel->remotehost, sel->remoteport);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_send_newcuts failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_send_newcuts failed\n");
                     rval = 0;
                 }
             }
@@ -2048,16 +2048,16 @@ OUT_LOOP:
 
             if (lp->lowerbound >= lp->upperbound - 0.9) {
                 if (!silent) {
-                    printf ("Stop cutting, lp bound is within 0.9 of upperbound\n");
-                    fflush (stdout);
+                    CC_PRINTF("Stop cutting, lp bound is within 0.9 of upperbound\n");
+                    CC_FFLUSH(stdout);
                 }
                 goto CLEANUP;
             }
             loopcount++;
             if (silent && !lp->full_edges_valid) {
-                printf ("  LP Value %2d: %f  (%.2f seconds)\n", loopcount,
+                CC_PRINTF("  LP Value %2d: %f  (%.2f seconds)\n", loopcount,
                      priceval, CCutil_zeit () - szeit);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
         } while ((newval > oldval + sel->roundtol ||
                   priceval < newval - sel->roundtol) &&
@@ -2067,7 +2067,7 @@ OUT_LOOP:
         CCutil_start_timer (&lp->stats.full_edge_check);
         rval = full_edge_check (lp, &edge_added, silent, rstate);
         if (rval) {
-            fprintf (stderr, "full_edge_check failed\n");
+            CC_FPRINTF(stderr, "full_edge_check failed\n");
             rval = 1; goto CLEANUP;
         }
         if (!silent) {
@@ -2078,7 +2078,7 @@ OUT_LOOP:
         if (savelp) {
             rval = CCtsp_write_probfile_sav (lp);
             if (rval) {
-                fprintf (stderr, "CCtsp_write_probfile_sav failed\n");
+                CC_FPRINTF(stderr, "CCtsp_write_probfile_sav failed\n");
                 rval = 1; goto CLEANUP;
             }
         }
@@ -2088,8 +2088,8 @@ OUT_LOOP:
         if (sel->extra_connect && priceval >= newval - sel->roundtol &&
             loopcount != LOOP_FULL) {
             if (!silent) {
-                printf ("Check connectivity before exiting cutting_loop\n");
-                fflush (stdout);
+                CC_PRINTF("Check connectivity before exiting cutting_loop\n");
+                CC_FFLUSH(stdout);
             }
 
             CCutil_start_timer (&lp->stats.cuts_extraconnect);
@@ -2100,14 +2100,14 @@ OUT_LOOP:
             rval = CCtsp_connect_cuts (&cuts, &cutcount_connect,
                         lp->graph.ncount, xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_connect_cuts failed\n");
+                CC_FPRINTF(stderr, "CCtsp_connect_cuts failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_extraconnect, 0);
             if (!silent) {
-                printf ("Found %2d extra connect cuts in %.2f seconds\n",
+                CC_PRINTF("Found %2d extra connect cuts in %.2f seconds\n",
                          cutcount_connect, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount_connect) {
                 CCutil_start_timer (&lp->stats.cuts_extraconnect_opt);
@@ -2115,7 +2115,7 @@ OUT_LOOP:
                                       &xlist, &x, &newval, sel->usetighten,
                                       (int *) NULL, silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n");
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n");
                     goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_extraconnect_opt, 0);
@@ -2134,7 +2134,7 @@ OUT_LOOP:
             lp->lowerbound < lp->upperbound - 0.9) {
             rval = CCtsp_cutselect_set_tols (sel, lp, 1, silent);
             if (rval) {
-                fprintf (stderr, "CCtsp_cutselect_set_tols failed\n");
+                CC_FPRINTF(stderr, "CCtsp_cutselect_set_tols failed\n");
                 rval = 1;  goto CLEANUP;
             }
             loopcount = LOOP_FULL;  /* to run again */
@@ -2145,15 +2145,15 @@ OUT_LOOP:
 CLEANUP:
 
     if (rval == 2) {
-        printf ("LP is infeasible in cutting_loop\n");
-        fflush (stdout);
+        CC_PRINTF("LP is infeasible in cutting_loop\n");
+        CC_FFLUSH(stdout);
     } else if (rval) {
-        fprintf (stderr, "failure in cutting_loop\n");
+        CC_FPRINTF(stderr, "failure in cutting_loop\n");
     }
     if (!silent) {
         CCutil_stop_timer (&lp->stats.cutting_loop, 1);
-        printf ("Number of outside rounds: %d\n", outside);
-        fflush (stdout);
+        CC_PRINTF("Number of outside rounds: %d\n", outside);
+        CC_FFLUSH(stdout);
     } else {
         CCutil_stop_timer (&lp->stats.cutting_loop, 0);
     }
@@ -2194,14 +2194,14 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                                          lp->fulladj, 0, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     } else if (lp->dat) {
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                 (CCtsp_genadj *) NULL, CC_NO_NEAREST_SUBTOUR, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -2210,7 +2210,7 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
               (int *) NULL, (int **) NULL, (double **) NULL, (double **) NULL,
               (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2229,14 +2229,14 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CCtsp_connect_cuts (&cuts, &cutcount, lp->graph.ncount,
                                        xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_connect_cuts failed\n");
+                CC_FPRINTF(stderr, "CCtsp_connect_cuts failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_connect, 0);
             if (!silent) {
-                printf ("Found %2d connect cuts in %.2f seconds\n",
+                CC_PRINTF("Found %2d connect cuts in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_connect_opt);
@@ -2244,7 +2244,7 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                          &xlist, &x, &newval, tighten, (int *) NULL, 
                          silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_connect_opt, 0);
             }
@@ -2255,14 +2255,14 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CCtsp_shrink_subtours (&cuts, &cutcount, lp->graph.ncount,
                                          xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_shrink_subtours failed\n");
+                CC_FPRINTF(stderr, "CCtsp_shrink_subtours failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
             if (!silent) {
-                printf ("Found %2d shrink subtours in %.2f seconds\n",
+                CC_PRINTF("Found %2d shrink subtours in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -2270,7 +2270,7 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                           &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
             }
@@ -2282,14 +2282,14 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CCtsp_segment_cuts (&cuts, &cutcount, lp->graph.ncount,
                                       xcount, xlist, x);
             if (rval) {
-                fprintf (stderr,  "CCtsp_segment_cuts failed\n");
+                CC_FPRINTF(stderr,  "CCtsp_segment_cuts failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_segment, 0);
             if (!silent) {
-                printf ("Found %2d segment cuts in %.2f seconds\n",
+                CC_PRINTF("Found %2d segment cuts in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_segment_opt);
@@ -2297,7 +2297,7 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                           &xlist, &x, &newval, tighten, (int *) NULL, 
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_segment_opt, 0);
             }
@@ -2309,14 +2309,14 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CCtsp_exact_subtours (&cuts, &cutcount, lp->graph.ncount,
                                          xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_exact_subtours failed\n");
+                CC_FPRINTF(stderr, "CCtsp_exact_subtours failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
             if (!silent) {
-                printf ("Found %2d exact subtours in %.2f seconds\n",
+                CC_PRINTF("Found %2d exact subtours in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -2324,7 +2324,7 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                           &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
             }
@@ -2337,7 +2337,7 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                 rval = sparse_edge_check (lp, &eginside, &edge_added,
                                           (double *) NULL, silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "sparse_edge_check failed\n");
+                    CC_FPRINTF(stderr, "sparse_edge_check failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 if (!silent) {
@@ -2355,15 +2355,15 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             if (silent) {
                 rval = lp_value (lp, &priceval);
                 if (rval) {rval = 1; goto CLEANUP;}
-                printf ("  LP Value %2d: %f\n", inside, priceval);
-                fflush (stdout);
+                CC_PRINTF("  LP Value %2d: %f\n", inside, priceval);
+                CC_FFLUSH(stdout);
             }
         } while (edge_added || cut_added);
 
         CCutil_start_timer (&lp->stats.full_edge_check);
         rval = full_edge_check (lp, &edge_added, silent, rstate);
         if (rval) {
-            fprintf (stderr, "full_edge_check failed\n");
+            CC_FPRINTF(stderr, "full_edge_check failed\n");
             rval = 1; goto CLEANUP;
         }
         if (!silent) {
@@ -2377,19 +2377,19 @@ int CCtsp_subtour_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
 CLEANUP:
 
     if (rval == 2) {
-        printf ("LP is infeasible in subtour_loop\n");
-        fflush (stdout);
+        CC_PRINTF("LP is infeasible in subtour_loop\n");
+        CC_FFLUSH(stdout);
     } else if (rval) {
-        fprintf (stderr, "failure in subtour_loop\n");
+        CC_FPRINTF(stderr, "failure in subtour_loop\n");
     }
     z = CCutil_stop_timer (&lp->stats.cutting_loop, 1);
-    printf ("Time in cutting routine: %.2f\n", z);
+    CC_PRINTF("Time in cutting routine: %.2f\n", z);
     CCutil_total_timer (&lp->stats.cuts_connect, 1);
     CCutil_total_timer (&lp->stats.cuts_segment, 1);
     CCutil_total_timer (&lp->stats.cuts_exactsubtour, 1);
 
-    printf ("Number of outside rounds: %d (%d inside)\n", outside, inside);
-    fflush (stdout);
+    CC_PRINTF("Number of outside rounds: %d (%d inside)\n", outside, inside);
+    CC_FFLUSH(stdout);
 
     if (eginside.ncount)
         CCtsp_free_edgegenerator (&eginside);
@@ -2419,14 +2419,14 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                                          lp->fulladj, 0, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     } else if (lp->dat) {
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                 (CCtsp_genadj *) NULL, CC_NO_NEAREST_SUBTOUR, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -2435,7 +2435,7 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
               (int *) NULL, (int **) NULL, (double **) NULL, (double **) NULL,
               (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2455,14 +2455,14 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CCtsp_fastblossom (&cuts, &cutcount, lp->graph.ncount,
                                   xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_fastblossom failed\n");
+                CC_FPRINTF(stderr, "CCtsp_fastblossom failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_fastblossom, 0);
             if (!silent) {
-                printf ("Found %2d Fast Blossoms in %.2f seconds\n",
+                CC_PRINTF("Found %2d Fast Blossoms in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_fastblossom_opt);
@@ -2470,7 +2470,7 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                           &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_fastblossom_opt, 0);
             }
@@ -2482,14 +2482,14 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CCtsp_ghfastblossom (&cuts, &cutcount, lp->graph.ncount,
                                   xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_ghfastblossom failed\n");
+                CC_FPRINTF(stderr, "CCtsp_ghfastblossom failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_ghfastblossom, 0);
             if (!silent) {
-                printf ("Found %2d Groetschel-Holland Blossoms in %.2f seconds\n",
+                CC_PRINTF("Found %2d Groetschel-Holland Blossoms in %.2f seconds\n",
                     cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_ghfastblossom_opt);
@@ -2497,7 +2497,7 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                           &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_ghfastblossom_opt, 0);
             }
@@ -2509,14 +2509,14 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             rval = CCtsp_exactblossom (&cuts, &cutcount, lp->graph.ncount,
                                   xcount, xlist, x, rstate);
             if (rval) {
-                fprintf (stderr, "CCtsp_exactblossom failed\n");
+                CC_FPRINTF(stderr, "CCtsp_exactblossom failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_exactblossom, 0);
             if (!silent) {
-                printf ("Found %2d Exact Blossoms in %.2f seconds\n",
+                CC_PRINTF("Found %2d Exact Blossoms in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_exactblossom_opt);
@@ -2524,7 +2524,7 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                           &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_exactblossom_opt, 0);
             }
@@ -2537,7 +2537,7 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
                 rval = sparse_edge_check (lp, &eginside, &edge_added,
                                           (double *) NULL, silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "sparse_edge_check failed\n");
+                    CC_FPRINTF(stderr, "sparse_edge_check failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 if (!silent) {
@@ -2555,15 +2555,15 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
             if (silent) {
                 rval = lp_value (lp, &priceval);
                 if (rval) {rval = 1; goto CLEANUP;}
-                printf ("  LP Value %2d: %f\n", inside, priceval);
-                fflush (stdout);
+                CC_PRINTF("  LP Value %2d: %f\n", inside, priceval);
+                CC_FFLUSH(stdout);
             }
         } while (edge_added || cut_added);
 
         CCutil_start_timer (&lp->stats.full_edge_check);
         rval = full_edge_check (lp, &edge_added, silent, rstate);
         if (rval) {
-            fprintf (stderr, "full_edge_check failed\n");
+            CC_FPRINTF(stderr, "full_edge_check failed\n");
             rval = 1; goto CLEANUP;
         }
         if (!silent) {
@@ -2577,18 +2577,18 @@ int CCtsp_blossom_loop (CCtsp_lp *lp, int silent, CCrandstate *rstate)
 CLEANUP:
 
     if (rval == 2) {
-        printf ("LP is infeasible in blossom_loop\n");
-        fflush (stdout);
+        CC_PRINTF("LP is infeasible in blossom_loop\n");
+        CC_FFLUSH(stdout);
     } else if (rval) {
-        fprintf (stderr, "failure in blossom_loop\n");
+        CC_FPRINTF(stderr, "failure in blossom_loop\n");
     }
     z = CCutil_stop_timer (&lp->stats.cutting_loop, 1);
-    printf ("Time in cutting routine: %.2f\n", z);
+    CC_PRINTF("Time in cutting routine: %.2f\n", z);
     CCutil_total_timer (&lp->stats.cuts_fastblossom, 1);
     CCutil_total_timer (&lp->stats.cuts_exactblossom, 1);
 
-    printf ("Number of outside rounds: %d (%d inside)\n", outside, inside);
-    fflush (stdout);
+    CC_PRINTF("Number of outside rounds: %d (%d inside)\n", outside, inside);
+    CC_FFLUSH(stdout);
 
     if (eginside.ncount)
         CCtsp_free_edgegenerator (&eginside);
@@ -2619,14 +2619,14 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                                          lp->fulladj, 0, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     } else if (lp->dat) {
         rval = CCtsp_init_edgegenerator (&eginside, lp->graph.ncount, lp->dat,
                 (CCtsp_genadj *) NULL, CC_NO_NEAREST_SUBTOUR, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator (sparse) failed\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -2635,7 +2635,7 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
               (int *) NULL, (int **) NULL, (double **) NULL, (double **) NULL,
               (double **) NULL, (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2655,14 +2655,14 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
             rval = CCtsp_connect_cuts (&cuts, &cutcount, lp->graph.ncount,
                                        xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_connect_cuts failed\n");
+                CC_FPRINTF(stderr, "CCtsp_connect_cuts failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_connect, 0);
             if (!silent) {
-                printf ("Found %2d connect cuts in %.2f seconds\n",
+                CC_PRINTF("Found %2d connect cuts in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_connect_opt);
@@ -2670,7 +2670,7 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
                          &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_connect_opt, 0);
             }
@@ -2682,14 +2682,14 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
             rval = CCtsp_segment_cuts (&cuts, &cutcount, lp->graph.ncount,
                                       xcount, xlist, x);
             if (rval) {
-                fprintf (stderr,  "CCtsp_segment_cuts failed\n");
+                CC_FPRINTF(stderr,  "CCtsp_segment_cuts failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_segment, 0);
             if (!silent) {
-                printf ("Found %2d segment cuts in %.2f seconds\n",
+                CC_PRINTF("Found %2d segment cuts in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_segment_opt);
@@ -2697,7 +2697,7 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
                           &xlist, &x, &newval, tighten, (int *) NULL, 
                           silent,rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_segment_opt, 0);
             }
@@ -2709,14 +2709,14 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
             rval = CCtsp_exact_subtours (&cuts, &cutcount, lp->graph.ncount,
                                          xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_exact_subtours failed\n");
+                CC_FPRINTF(stderr, "CCtsp_exact_subtours failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_exactsubtour, 0);
             if (!silent) {
-                printf ("Found %2d exact subtours in %.2f seconds\n",
+                CC_PRINTF("Found %2d exact subtours in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_exactsubtour_opt);
@@ -2724,7 +2724,7 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
                           &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_exactsubtour_opt, 0);
             }
@@ -2735,14 +2735,14 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
             rval = CCtsp_fastblossom (&cuts, &cutcount, lp->graph.ncount,
                                   xcount, xlist, x);
             if (rval) {
-                fprintf (stderr, "CCtsp_fastblossom failed\n");
+                CC_FPRINTF(stderr, "CCtsp_fastblossom failed\n");
                 rval = 1; goto CLEANUP;
             }
             z = CCutil_stop_timer (&lp->stats.cuts_fastblossom, 0);
             if (!silent) {
-                printf ("Found %2d Fast Blossoms in %.2f seconds\n",
+                CC_PRINTF("Found %2d Fast Blossoms in %.2f seconds\n",
                          cutcount, z);
-                fflush (stdout);
+                CC_FFLUSH(stdout);
             }
             if (cutcount) {
                 CCutil_start_timer (&lp->stats.cuts_fastblossom_opt);
@@ -2750,7 +2750,7 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
                           &xlist, &x, &newval, tighten, (int *) NULL,
                           silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "call_add_cuts failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "call_add_cuts failed\n"); goto CLEANUP;
                 }
                 CCutil_stop_timer (&lp->stats.cuts_fastblossom_opt, 0);
             }
@@ -2764,7 +2764,7 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
                 rval = sparse_edge_check (lp, &eginside, &edge_added,
                                           (double *) NULL, silent, rstate);
                 if (rval) {
-                    fprintf (stderr, "sparse_edge_check failed\n");
+                    CC_FPRINTF(stderr, "sparse_edge_check failed\n");
                     rval = 1; goto CLEANUP;
                 }
                 if (!silent) {
@@ -2782,15 +2782,15 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
             if (silent) {
                 rval = lp_value (lp, &priceval);
                 if (rval) {rval = 1; goto CLEANUP;}
-                printf ("  LP Value %2d: %f\n", inside, priceval);
-                fflush (stdout);
+                CC_PRINTF("  LP Value %2d: %f\n", inside, priceval);
+                CC_FFLUSH(stdout);
             }
         } while (edge_added || cut_added || blossom_added);
 
         CCutil_start_timer (&lp->stats.full_edge_check);
         rval = full_edge_check (lp, &edge_added, silent, rstate);
         if (rval) {
-            fprintf (stderr, "full_edge_check failed\n");
+            CC_FPRINTF(stderr, "full_edge_check failed\n");
             rval = 1; goto CLEANUP;
         }
         if (!silent) {
@@ -2805,21 +2805,21 @@ int CCtsp_subtour_and_blossom_loop (CCtsp_lp *lp, int silent,
 CLEANUP:
 
     if (rval == 2) {
-        printf ("LP is infeasible in subtour_and_blossom_loop\n");
-        fflush (stdout);
+        CC_PRINTF("LP is infeasible in subtour_and_blossom_loop\n");
+        CC_FFLUSH(stdout);
     } else if (rval) {
-        fprintf (stderr, "failure in subtour_and_blossom_loop\n");
+        CC_FPRINTF(stderr, "failure in subtour_and_blossom_loop\n");
     }
     z = CCutil_stop_timer (&lp->stats.cutting_loop, 1);
-    printf ("Time in cutting routine: %.2f\n", z);
+    CC_PRINTF("Time in cutting routine: %.2f\n", z);
     CCutil_total_timer (&lp->stats.cuts_connect, 1);
     CCutil_total_timer (&lp->stats.cuts_segment, 1);
     CCutil_total_timer (&lp->stats.cuts_exactsubtour, 1);
     CCutil_total_timer (&lp->stats.cuts_fastblossom, 1);
     
 
-    printf ("Number of outside rounds: %d (%d inside)\n", outside, inside);
-    fflush (stdout);
+    CC_PRINTF("Number of outside rounds: %d (%d inside)\n", outside, inside);
+    CC_FFLUSH(stdout);
 
     if (eginside.ncount)
         CCtsp_free_edgegenerator (&eginside);
@@ -2845,30 +2845,30 @@ static int call_add_cuts (CCtsp_lp *lp, CCtsp_lpcut_in **cuts, int *cut_added,
     CCtsp_add_cuts_to_queue (lp, cuts);
     rval = CCtsp_process_cuts (lp, cut_added, tighten, silent, rstate);
     if (rval) {
-        fprintf (stderr, "process_cuts failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "process_cuts failed\n"); goto CLEANUP;
     }
 
     rval = lp_value (lp, val);
     if (rval) {
-        fprintf (stderr, "lp_value failed\n"); rval = 1; goto CLEANUP;
+        CC_FPRINTF(stderr, "lp_value failed\n"); rval = 1; goto CLEANUP;
     }
     if (!silent) {
-        printf ("  Add %2d cuts (Total %d), LP: %f (%.2f seconds)\n",
+        CC_PRINTF("  Add %2d cuts (Total %d), LP: %f (%.2f seconds)\n",
                        *cut_added, lp->cuts.cutcount, *val,
                         CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     rval = lp_x (lp, xcount, xlist, x);
     if (rval) {
-        fprintf (stderr, "lp_x failed\n"); rval = 1; goto CLEANUP;
+        CC_FPRINTF(stderr, "lp_x failed\n"); rval = 1; goto CLEANUP;
     }
 
     if (istour) {
         rval = CCtsp_check_integral (lp, &dval, (int **) NULL, istour,
                                      silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_check_integral failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_check_integral failed\n"); goto CLEANUP;
         }
     } 
 
@@ -2884,7 +2884,7 @@ static int lp_value (CCtsp_lp *lp, double *val)
     rval = CCtsp_get_lp_result (lp, val, (double *) NULL, (int *) NULL,
                  (int **) NULL, (double **) NULL, (double **) NULL,
                  (double **) NULL, (double **) NULL);
-    if (rval) fprintf (stderr, "CCtsp_get_lp_result failed\n");
+    if (rval) CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
     return rval;
 }
 
@@ -2895,7 +2895,7 @@ static int lp_x (CCtsp_lp *lp, int *xcount, int **xlist, double **x)
     rval = CCtsp_get_lp_result (lp, (double *) NULL, (double *) NULL, xcount,
                      xlist, x, (double **) NULL, (double **) NULL,
                      (double **) NULL);
-    if (rval) fprintf (stderr, "CCtsp_get_lp_result failed\n");
+    if (rval) CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
     return rval;
 }
 
@@ -2908,7 +2908,7 @@ int CCtsp_pricing_loop (CCtsp_lp *lp, double *bnd, int silent,
 
     eg.ncount = 0;
     if (!lp->full_edges_valid) {
-        fprintf (stderr, "CCtsp_pricing_loop called without valid edges\n");
+        CC_FPRINTF(stderr, "CCtsp_pricing_loop called without valid edges\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -2916,11 +2916,11 @@ int CCtsp_pricing_loop (CCtsp_lp *lp, double *bnd, int silent,
     rval = CCtsp_init_edgegenerator (&eg, lp->graph.ncount, lp->dat,
                                      lp->fulladj, 0, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_init_edgegenerator failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_init_edgegenerator failed\n"); goto CLEANUP;
     }
     rval = sparse_edge_check (lp, &eg, &nadded, bnd, silent, rstate);
     if (rval) {
-        fprintf (stderr, "sparse_edge_check failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "sparse_edge_check failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -2943,29 +2943,29 @@ static int full_edge_check (CCtsp_lp *lp, int *nadded, int silent,
                     (CCtsp_genadj *) NULL, CCtsp_PRICE_COMPLETE_GRAPH, silent,
                     rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_init_edgegenerator failed\n"); return rval;
+            CC_FPRINTF(stderr, "CCtsp_init_edgegenerator failed\n"); return rval;
         }
 
         rval = CCtsp_addbad_variables (lp, &eg, &penalty, nadded,
                       CCtsp_PRICE_RCTHRESH, CCtsp_PRICE_MAXPENALTY, 0,
                       (int *) NULL, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_addbad_variables failed\n");
+            CC_FPRINTF(stderr, "CCtsp_addbad_variables failed\n");
             CCtsp_free_edgegenerator (&eg);
             return rval;
         }
         CCtsp_free_edgegenerator (&eg);
         if (!silent) {
-            printf ("%d edges added, penalty %f\n", *nadded, penalty);
-            fflush (stdout);
+            CC_PRINTF("%d edges added, penalty %f\n", *nadded, penalty);
+            CC_FFLUSH(stdout);
         }
 
         rval = lp_value (lp, &val);
         if (rval) return rval;
 
         if (val + penalty > lp->lowerbound) {
-            printf ("New lower bound: %f\n", val+ penalty);
-            fflush (stdout);
+            CC_PRINTF("New lower bound: %f\n", val+ penalty);
+            CC_FFLUSH(stdout);
             lp->lowerbound = val + penalty;
         }
     } else {
@@ -2987,23 +2987,23 @@ static int sparse_edge_check (CCtsp_lp *lp, CCtsp_edgegenerator *eg,
                   CCtsp_PRICE_RCTHRESH, CCtsp_PRICE_MAXPENALTY, 0,
                   (int *) NULL, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_addbad_variables failed\n"); return rval;
+            CC_FPRINTF(stderr, "CCtsp_addbad_variables failed\n"); return rval;
         }
 
         rval = lp_value (lp, &val);
-        if (rval) { fprintf (stderr, "lp_value failed\n"); return rval; }
+        if (rval) { CC_FPRINTF(stderr, "lp_value failed\n"); return rval; }
 
         if (!silent) {
-            printf ("(SPARSE) %d edges added, penalty %f, val %f\n",
+            CC_PRINTF("(SPARSE) %d edges added, penalty %f, val %f\n",
                       *nadded, penalty, val);
-            fflush (stdout);
+            CC_FFLUSH(stdout);
         }
 
         if (lp->full_edges_valid) {
             if (val + penalty > lp->lowerbound) {
                 if (!silent) {
-                    printf ("New (node) lower bound: %f\n", val + penalty);
-                    fflush (stdout);
+                    CC_PRINTF("New (node) lower bound: %f\n", val + penalty);
+                    CC_FFLUSH(stdout);
                 }
                 lp->lowerbound = val + penalty;
             }
@@ -3032,7 +3032,7 @@ int CCtsp_bb_cutting (char *probname, int probnum, int prob_newnum, int ncount,
     rval = bb_cutting_work (&lp, probname, probnum, ncount, dat, ptour,
                   *upbound, pool, sel, &cval, level, silent, rstate);
     if (rval) {
-        fprintf (stderr, "bb_cutting_work failed\n"); fflush (stdout);
+        CC_FPRINTF(stderr, "bb_cutting_work failed\n"); CC_FFLUSH(stdout);
         goto CLEANUP;
     }
 
@@ -3043,27 +3043,27 @@ int CCtsp_bb_cutting (char *probname, int probnum, int prob_newnum, int ncount,
     if (cval == CCtsp_LP_MAXDOUBLE) {
         rval = CCtsp_verify_infeasible_lp (lp, &test, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_verify_infeasible_lp failed\n");
+            CC_FPRINTF(stderr, "CCtsp_verify_infeasible_lp failed\n");
             goto CLEANUP;
         }
         if (test) {
-            printf ("verified infeasible LP\n"); fflush (stdout);
+            CC_PRINTF("verified infeasible LP\n"); CC_FFLUSH(stdout);
             *val = CCtsp_LP_MAXDOUBLE;
             *prune = 1;
             rval = CCtsp_write_probleaf_id (lp);
             if (rval) {
-                fprintf (stderr, "CCtsp_write_probleaf_id failed\n");
+                CC_FPRINTF(stderr, "CCtsp_write_probleaf_id failed\n");
                 goto CLEANUP;
             }
             rval = 0;
         } else {
-            fprintf (stderr, "did not verify an infeasible LP\n");
+            CC_FPRINTF(stderr, "did not verify an infeasible LP\n");
             rval = 1; goto CLEANUP;
         }
     } else {
         rval = CCtsp_pricing_loop (lp, val, silent, rstate);
         if (rval) {
-            fprintf (stderr, "CCtsp_pricing_loop failed\n");
+            CC_FPRINTF(stderr, "CCtsp_pricing_loop failed\n");
             rval = 1; goto CLEANUP;
         }
         lp->lowerbound = *val;
@@ -3074,7 +3074,7 @@ int CCtsp_bb_cutting (char *probname, int probnum, int prob_newnum, int ncount,
             rval = CCtsp_call_x_heuristic (lp, &tourval, besttour, silent,
                                            rstate);
             if (rval) {
-                fprintf (stderr, "CCtsp_call_x_heuristic failed\n");
+                CC_FPRINTF(stderr, "CCtsp_call_x_heuristic failed\n");
                 goto CLEANUP;
             }
             if (!silent) {
@@ -3083,7 +3083,7 @@ int CCtsp_bb_cutting (char *probname, int probnum, int prob_newnum, int ncount,
                 CCutil_stop_timer (&lp->stats.linkern, 0);
             }
             if (tourval < lp->upperbound) {
-                printf ("New upperbound from x-heuristic: %.2f\n", tourval);
+                CC_PRINTF("New upperbound from x-heuristic: %.2f\n", tourval);
                 lp->upperbound = tourval;
                 *upbound = tourval;
                 *foundtour = 1;
@@ -3093,23 +3093,23 @@ int CCtsp_bb_cutting (char *probname, int probnum, int prob_newnum, int ncount,
         if (lp->lowerbound >= lp->upperbound - 0.9) {
             rval = CCtsp_verify_lp_prune (lp, &test,  silent);
             if (rval) {
-                fprintf (stderr, "CCtsp_verify_lp_prune failed\n");
+                CC_FPRINTF(stderr, "CCtsp_verify_lp_prune failed\n");
                 goto CLEANUP;
             }
             if (test) {
                 if (!silent) {
-                    printf ("verified that LP can be pruned\n");
-                    fflush (stdout);
+                    CC_PRINTF("verified that LP can be pruned\n");
+                    CC_FFLUSH(stdout);
                 }
                 *prune = 1;
                 rval = CCtsp_write_probleaf_id (lp);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_write_probleaf_id failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_write_probleaf_id failed\n");
                     goto CLEANUP;
                 }
             } else {
-                printf ("exact pricing could not prune the search\n");
-                fflush (stdout);
+                CC_PRINTF("exact pricing could not prune the search\n");
+                CC_FFLUSH(stdout);
                 rval = CCtsp_write_probfile_id (lp);
                 CCcheck_rval (rval, "CCtsp_write_probfile_id failed");
             }
@@ -3141,24 +3141,24 @@ int CCtsp_call_x_heuristic (CCtsp_lp *lp, double *val, int *outcyc,
 
     cyc = CC_SAFE_MALLOC (ncount, int);
     if (!cyc) {
-        fprintf (stderr, "out of memory for cycle\n");
+        CC_FPRINTF(stderr, "out of memory for cycle\n");
         rval = 1; goto CLEANUP;
     }
     rval = CCtsp_get_lp_result (lp, (double *) NULL, (double *) NULL,
          &xcount, &xlist, &x, (double **) NULL, (double **) NULL,
          (double **) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_get_lp_result failed\n");
+        CC_FPRINTF(stderr, "CCtsp_get_lp_result failed\n");
         goto CLEANUP;
     }
 
     rval = CCtsp_x_greedy_tour_lk (lp->dat, ncount, xcount, xlist, x,
                    cyc, val, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCtsp_x_greedy_tour_lk failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_x_greedy_tour_lk failed\n"); goto CLEANUP;
     }
     if (!silent) {
-        printf ("x-heuristic lk  gives: %.2f\n", *val); fflush (stdout);
+        CC_PRINTF("x-heuristic lk  gives: %.2f\n", *val); CC_FFLUSH(stdout);
     }
     if (*val < lp->upperbound) {
         if (outcyc) {
@@ -3189,33 +3189,33 @@ static int bb_cutting_work (CCtsp_lp **lp, char *probname, int probnum,
     rval = CCtsp_bb_init_lp (lp, probname, probnum, ncount, dat, ptour,
                initial_ub, pool, silent, rstate);
     if (rval == 2) {
-        printf ("LP is reported to be infeasible\n"); fflush (stdout);
+        CC_PRINTF("LP is reported to be infeasible\n"); CC_FFLUSH(stdout);
         *val = CCtsp_LP_MAXDOUBLE;
         rval = 0; goto CLEANUP;
     } else if (rval) {
-        fprintf (stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_bb_init_lp failed\n"); goto CLEANUP;
     }
     CCutil_start_timer (&(*lp)->stats.total);
 
     if ((*lp)->lowerbound >= (*lp)->upperbound - 0.9) {
-        printf ("Do not cut, the lp is within 1.0 of the upperbound\n");
-        fflush (stdout);
+        CC_PRINTF("Do not cut, the lp is within 1.0 of the upperbound\n");
+        CC_FFLUSH(stdout);
         *val = (*lp)->lowerbound;
         goto CLEANUP;
     } else {
         rval = CCtsp_cutselect_set_tols (sel, *lp, level, silent);
         if (rval) {
-            fprintf (stderr, "CCtsp_cutselect_set_tols failed\n");
+            CC_FPRINTF(stderr, "CCtsp_cutselect_set_tols failed\n");
             goto CLEANUP;
         }
         
         rval = CCtsp_cutting_loop (*lp, sel, 0, silent, rstate);
         if (rval == 2) {
-            printf ("Cut LP is reported to be infeasible\n"); fflush (stdout);
+            CC_PRINTF("Cut LP is reported to be infeasible\n"); CC_FFLUSH(stdout);
             *val = CCtsp_LP_MAXDOUBLE;
             rval = 0;
         } else if (rval) {
-            fprintf (stderr, "CCtsp_cutting_loop failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_cutting_loop failed\n"); goto CLEANUP;
         } else {
             *val = (*lp)->lowerbound;
         }
@@ -3231,10 +3231,10 @@ CLEANUP:
     /* CCtsp_output_statistics (&(*lp)->stats); */
 
     if (!silent) {
-        printf ("Final LP has %d rows, %d columns, %d nonzeros\n",
+        CC_PRINTF("Final LP has %d rows, %d columns, %d nonzeros\n",
                 CClp_nrows ((*lp)->lp), CClp_ncols ((*lp)->lp),
                 CClp_nnonzeros ((*lp)->lp));
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
     
     return rval;
@@ -3254,7 +3254,7 @@ static int grab_close_x (int ncount, int xcount, int *xlist, double *x,
     *newlist = CC_SAFE_MALLOC (2 * (xcount + ncount), int);
     marks    = CC_SAFE_MALLOC (ncount, char);
     if (!(*newx) || !(*newlist) || !marks) {
-        fprintf (stderr, "out of memory in grab_close_x\n");
+        CC_FPRINTF(stderr, "out of memory in grab_close_x\n");
         CC_IFFREE (*newx, double);
         CC_IFFREE (*newlist, int);
         rval = 1; goto CLEANUP;
@@ -3308,14 +3308,14 @@ static int no_tighten (int ncount, int xcount, int *xlist, double *x, int *test,
 
     rval = CCcut_SRK_buildgraph (&G, ncount, xcount, xlist, x);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_buildgraph failed\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_buildgraph failed\n");
         goto CLEANUP;
     }
     CCcut_SRK_increment_marker (&G);
 
     rval = CCcut_SRK_defluff (&G);
     if (rval) {
-        fprintf (stderr, "CCcut_SRK_defluff failed\n");
+        CC_FPRINTF(stderr, "CCcut_SRK_defluff failed\n");
         goto CLEANUP;
     }
 

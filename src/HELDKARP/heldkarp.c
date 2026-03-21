@@ -120,7 +120,7 @@ int CCheldkarp_small (int ncount, CCdatagroup *dat, double *upbound,
     elist = CC_SAFE_MALLOC (ecount*2, int);
     elen  = CC_SAFE_MALLOC (ecount, int);
     if (elist == (int *) NULL || elen == (int *) NULL) {
-        fprintf (stderr, "out of memory in CCheldkarp_small\n");
+        CC_FPRINTF(stderr, "out of memory in CCheldkarp_small\n");
         rval = HELDKARP_ERROR; goto CLEANUP;
     }
     for (i = 0, k = 0; i < ncount; i++) {
@@ -178,12 +178,12 @@ int CCheldkarp_small_elist (int ncount, int ecount, int *elist, int *elen,
     val = upperbound;
 
     if (ncount > MAX_NODES) {
-        fprintf (stderr, "too many nodes\n");
+        CC_FPRINTF(stderr, "too many nodes\n");
         rval = HELDKARP_ERROR; goto CLEANUP;
     }
     for (i = 0; i < ecount; i++) {
         if (elen[i] > WEIGHT_MAX_EDGE || -elen[i] > WEIGHT_MAX_EDGE) {
-            fprintf (stderr, "edge too long\n"); 
+            CC_FPRINTF(stderr, "edge too long\n"); 
             rval = HELDKARP_ERROR; goto CLEANUP;
         }
     }
@@ -196,7 +196,7 @@ int CCheldkarp_small_elist (int ncount, int ecount, int *elist, int *elen,
     len      = CC_SAFE_MALLOC (ecount, int);
     if (adjlist  == (int **) NULL || padjlist == (int *) NULL ||
         zadjlist == (int *) NULL  ||      len == (int *) NULL) {
-       fprintf (stderr, "out of memory in tiny_heldkarp\n");
+       CC_FPRINTF(stderr, "out of memory in tiny_heldkarp\n");
        rval = HELDKARP_ERROR; goto CLEANUP;
     }
     for (i=0, p = padjlist; i<ncount-1; i++, p += (ncount-1)) {
@@ -225,7 +225,7 @@ int CCheldkarp_small_elist (int ncount, int ecount, int *elist, int *elen,
     besttour = CC_SAFE_MALLOC (ncount, int);
     if (tree == (int *) NULL || y == (int *) NULL || deg == (int *) NULL ||
         besttour == (int *) NULL) {
-        fprintf (stderr, "out of memory in tiny_heldkarp\n"); 
+        CC_FPRINTF(stderr, "out of memory in tiny_heldkarp\n"); 
         rval = HELDKARP_ERROR; goto CLEANUP;
     }
     initial_y (ncount, ecount, elist, len, y);
@@ -233,7 +233,7 @@ int CCheldkarp_small_elist (int ncount, int ecount, int *elist, int *elen,
     efix   = CC_SAFE_MALLOC (ecount, int);
     degfix = CC_SAFE_MALLOC (ncount, int);
     if (efix == (int *) NULL || degfix == (int *) NULL) {
-        fprintf (stderr, "out of memory in tiny_heldkarp\n"); 
+        CC_FPRINTF(stderr, "out of memory in tiny_heldkarp\n"); 
         rval = HELDKARP_ERROR; goto CLEANUP;
     }
     for (i = 0; i < ecount; i++) efix[i] = 0;
@@ -242,7 +242,7 @@ int CCheldkarp_small_elist (int ncount, int ecount, int *elist, int *elen,
     hk_work (ncount, elist, elen, len, adjlist, zadjlist, y, deg, &val, tree,
              foundtour, besttour, efix, degfix, 0, &bbcount, anytour, silent,
              nodelimit);
-    if (silent<2) { printf ("BBnodes: %d\n", bbcount); fflush (stdout); }
+    if (silent<2) { CC_PRINTF("BBnodes: %d\n", bbcount); CC_FFLUSH(stdout); }
 
     if (nodelimit != -1 && bbcount > nodelimit) {
         rval = HELDKARP_SEARCHLIMITEXCEEDED;
@@ -310,11 +310,11 @@ static void hk_work (int ncount, int *elist, int *elen, int *len,
     n1 = elist[2*ebranch+1];
     set_adjlist (n0, n1, adjlist, zadjlist, 0);
 
-    if (!silent && depth < LINE_LEN) { printf ("0"); fflush (stdout); }
+    if (!silent && depth < LINE_LEN) { CC_PRINTF("0"); CC_FFLUSH(stdout); }
     hk_work (ncount, elist, elen, len, adjlist, zadjlist, y, deg, upperbound,
              tree, foundtour, besttour, efix, degfix, depth+1, bbcount,
              just_verify, silent, nodelimit);
-    if (!silent && depth < LINE_LEN) { printf ("\b \b"); fflush (stdout); }
+    if (!silent && depth < LINE_LEN) { CC_PRINTF("\b \b"); CC_FFLUSH(stdout); }
     if (*foundtour == 1 && just_verify == 1) {
         set_adjlist (n0, n1, adjlist, zadjlist, ebranch+1); return;
     }
@@ -325,11 +325,11 @@ static void hk_work (int ncount, int *elist, int *elen, int *len,
         degfix[n1]++;
         set_adjlist (n0, n1, adjlist, zadjlist, -(ebranch+1));
 
-        if (!silent && depth < LINE_LEN) { printf ("1"); fflush (stdout); }
+        if (!silent && depth < LINE_LEN) { CC_PRINTF("1"); CC_FFLUSH(stdout); }
         hk_work (ncount, elist, elen, len, adjlist, zadjlist, y, deg,
                  upperbound, tree, foundtour, besttour, efix, degfix, depth+1,
                  bbcount, just_verify, silent, nodelimit);
-        if (!silent && depth < LINE_LEN) { printf ("\b \b"); fflush (stdout); }
+        if (!silent && depth < LINE_LEN) { CC_PRINTF("\b \b"); CC_FFLUSH(stdout); }
 
         efix[ebranch] = 0;
         degfix[n0]--;
@@ -382,7 +382,7 @@ static void held_karp_bound (int ncount, int *elist, int *elen, int *len,
             }
             for (i = 0, *val = 0; i < ncount; i++) *val += elen[tree[i]];
             if (silent < 2) {
-                printf ("Tour found: %d\n", *val); fflush (stdout);
+                CC_PRINTF("Tour found: %d\n", *val); CC_FFLUSH(stdout);
             }
             return;
         }

@@ -133,7 +133,7 @@ int CCchunk_intmat_build (CCchunk_intmat *mat_p, int ncols)
          mat_p->x      == (CCmatval *) NULL ||
          mat_p->best_x == (CCmatval *) NULL   ) {
         rval = CC_CHUNK_INTMAT_MEMORY;
-        fprintf (stderr, "Out of memory in CCchunk_intmat_build\n");
+        CC_FPRINTF(stderr, "Out of memory in CCchunk_intmat_build\n");
         goto CLEANUP;
     }
 
@@ -173,7 +173,7 @@ static int intmat_realloc (CCchunk_intmat *mat_p)
         if ( factor != (CCmatval *) NULL )  mat_p->factor = factor;
         if ( rperm  != (int *) NULL )  mat_p->rperm  = rperm;
         rval = CC_CHUNK_INTMAT_MEMORY;
-        fprintf (stderr, "Out of memory in intmat_realloc\n");
+        CC_FPRINTF(stderr, "Out of memory in intmat_realloc\n");
         return rval;
     }
     mat_p->matrix   = matrix;
@@ -391,7 +391,7 @@ int CCchunk_intmat_ortho (CCchunk_intmat *mat_p, int *ortho, int *pcol_p,
     }
 
     if ( stage < m ) {
-        fprintf (stderr, "Rows dependent\n");
+        CC_FPRINTF(stderr, "Rows dependent\n");
         rval = CC_CHUNK_INTMAT_ERROR;
         goto CLEANUP;
     }
@@ -405,7 +405,7 @@ int CCchunk_intmat_ortho (CCchunk_intmat *mat_p, int *ortho, int *pcol_p,
         for (j_rhs = n-1; j_rhs >= stage; j_rhs--) {
             rval = intmat_solve (stage, n, rperm, cperm, factor, x, j_rhs);
             if ( rval )  {
-                printf ("col %d intmat_solve overflow, continuing\n", j_rhs);
+                CC_PRINTF("col %d intmat_solve overflow, continuing\n", j_rhs);
                 scan_rval = rval;
                 continue;
             }
@@ -413,11 +413,11 @@ int CCchunk_intmat_ortho (CCchunk_intmat *mat_p, int *ortho, int *pcol_p,
             intmat_reducevec (0, ncols+1, (int *) NULL, x);
 
 #ifdef DUMP_BASIS
-            printf ("BASIS %d:", j_rhs);
+            CC_PRINTF("BASIS %d:", j_rhs);
             for (j=0; j<=ncols; j++) {
-                printf (" %d", x[j]);
+                CC_PRINTF(" %d", x[j]);
             }
-            printf ("\n");
+            CC_PRINTF("\n");
 #endif
 
             x_size = 0;
@@ -427,7 +427,7 @@ int CCchunk_intmat_ortho (CCchunk_intmat *mat_p, int *ortho, int *pcol_p,
 
             if (best_x_size != -1 && x_size > best_x_size) {
 #ifdef DUMP_BASIS
-                printf ("col %d size %d bestsize %d; not as good, continuing\n",
+                CC_PRINTF("col %d size %d bestsize %d; not as good, continuing\n",
                          j_rhs, x_size, best_x_size);
 #endif
                 continue;
@@ -435,7 +435,7 @@ int CCchunk_intmat_ortho (CCchunk_intmat *mat_p, int *ortho, int *pcol_p,
 
             if ( ! vector_multiple ( ncols, x, taboo ) ) {
 #ifdef DUMP_BASIS
-                printf ("col %d size %d bestsize %d new best\n", j_rhs,
+                CC_PRINTF("col %d size %d bestsize %d new best\n", j_rhs,
                         x_size, best_x_size);
 #endif
                 for (j=0; j<=ncols; j++) {
@@ -474,7 +474,7 @@ int CCchunk_intmat_ortho (CCchunk_intmat *mat_p, int *ortho, int *pcol_p,
                 t += MATRIX(i,j) * best_x[j];
             }
             if ( t )  {
-                fprintf (stderr, "WHOA, non-orthogonal orthogonal vector\n");
+                CC_FPRINTF(stderr, "WHOA, non-orthogonal orthogonal vector\n");
                 rval = CC_CHUNK_INTMAT_ERROR;
                 goto CLEANUP;
             }
@@ -489,10 +489,10 @@ int CCchunk_intmat_ortho (CCchunk_intmat *mat_p, int *ortho, int *pcol_p,
 CLEANUP:
 
     if ( rval == CC_CHUNK_INTMAT_OVERFLOW_M ) {
-        fprintf (stderr, "Multiply overflow in CCchunk_intmat_ortho\n");
+        CC_FPRINTF(stderr, "Multiply overflow in CCchunk_intmat_ortho\n");
     }
     if ( rval == CC_CHUNK_INTMAT_OVERFLOW_A ) {
-        fprintf (stderr, "Addition overflow in CCchunk_intmat_ortho\n");
+        CC_FPRINTF(stderr, "Addition overflow in CCchunk_intmat_ortho\n");
     }
 
     return rval;
@@ -659,11 +659,11 @@ static void print_matrix (CCchunk_intmat *mat_p)
 
     for (i=0; i<m; i++) {
         for (j=0; j<n; j++) {
-            printf ("%d ",MATRIX(i, j));
+            CC_PRINTF("%d ",MATRIX(i, j));
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
-    printf ("\n");
+    CC_PRINTF("\n");
 }
 
 static void print_factor (CCchunk_intmat *mat_p)
@@ -682,10 +682,10 @@ static void print_factor (CCchunk_intmat *mat_p)
 
     for (i=0; i<m; i++) {
         for (j=0; j<n; j++) {
-            printf ("%4ld ",FACTOR(rperm[i], cperm[j]));
+            CC_PRINTF("%4ld ",FACTOR(rperm[i], cperm[j]));
         }
-        printf ("\n");
+        CC_PRINTF("\n");
     }
-    printf ("\n");
+    CC_PRINTF("\n");
 }
 */

@@ -74,20 +74,20 @@ int main (int ac, char **av)
 
     rval = CCutil_gettsplib (tspfname, &ncount, &dat);
     if (rval) {
-        fprintf (stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_gettsplib failed\n"); goto CLEANUP;
     }
 
     rval = get_edges (edgefname, eformat, ncount, &ecount, &elist);
     if (rval) {
-        fprintf (stderr, "get_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "get_edges failed\n"); goto CLEANUP;
     }
 
-    printf ("Number of Edges: %d\n", ecount); fflush (stdout);
+    CC_PRINTF("Number of Edges: %d\n", ecount); CC_FFLUSH(stdout);
     if (outfname) {
         rval = CCutil_writeedges (ncount, outfname, ecount, elist, &dat,
                                   binary_out);
         if (rval) {
-            fprintf (stderr, "CCutil_writeedges failed\n");
+            CC_FPRINTF(stderr, "CCutil_writeedges failed\n");
         }
     }
 
@@ -135,13 +135,13 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below]\n", fname);
-    fprintf (stderr, "   -b    write a binary file\n");
-    fprintf (stderr, "   -e    the edge file has floating point third field (ignore it)\n");
-    fprintf (stderr, "   -E f  file with list of edges (default is no length field\n");
-    fprintf (stderr, "   -T f  TSPLIB file to specify lengths\n");
-    fprintf (stderr, "   -o f  output file (for the edge list)\n");
-    fprintf (stderr, " NOTE: -E and -T must be specified\n"); 
+    CC_FPRINTF(stderr, "Usage: %s [-flags below]\n", fname);
+    CC_FPRINTF(stderr, "   -b    write a binary file\n");
+    CC_FPRINTF(stderr, "   -e    the edge file has floating point third field (ignore it)\n");
+    CC_FPRINTF(stderr, "   -E f  file with list of edges (default is no length field\n");
+    CC_FPRINTF(stderr, "   -T f  TSPLIB file to specify lengths\n");
+    CC_FPRINTF(stderr, "   -o f  output file (for the edge list)\n");
+    CC_FPRINTF(stderr, " NOTE: -E and -T must be specified\n"); 
 }
 
 
@@ -155,20 +155,20 @@ static int get_edges (char *fname, int thirdfield, int ncount, int *ecount,
     f = fopen (fname, "r");
     if (f == (FILE *) NULL) {
         perror (fname);
-        fprintf (stderr, "Unable to open %s for input\n", fname);
+        CC_FPRINTF(stderr, "Unable to open %s for input\n", fname);
         return 1;
     }
 
     k = CCutil_readint (f);
     if (k != ncount) {
-        fprintf (stderr, "TSP file and edge file do not match\n");
+        CC_FPRINTF(stderr, "TSP file and edge file do not match\n");
         rval = 1; goto CLEANUP;
     }
 
     *ecount = CCutil_readint (f);
     *elist = CC_SAFE_MALLOC(2 * (*ecount), int);
     if (!(*elist)) {
-        fprintf (stderr, "out of memory n get_edges\n");
+        CC_FPRINTF(stderr, "out of memory n get_edges\n");
         rval = 1; goto CLEANUP;
     }
 

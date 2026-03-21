@@ -193,8 +193,8 @@ int CCtsp_exactblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     int rval = 0;
 
 /*
-    printf ("CCtsp_exactblossom (%d, %d)...\n", ncount, ecount);
-    fflush (stdout);
+    CC_PRINTF("CCtsp_exactblossom (%d, %d)...\n", ncount, ecount);
+    CC_FFLUSH(stdout);
 */
 
     *cutcount = 0;
@@ -204,7 +204,7 @@ int CCtsp_exactblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
     rval = buildgraph (&G, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
 
     for (i = G.ecount, e = G.edgelist; i; i--, e++) {
@@ -249,7 +249,7 @@ int CCtsp_exactblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     gecount /= 2;
 
     if (gecount == 0) {
-        /* printf ("No edges in blossom graph\n");  fflush (stdout); */
+        /* CC_PRINTF("No edges in blossom graph\n");  CC_FFLUSH(stdout); */
         rval = 0; goto CLEANUP; 
     }
 
@@ -257,13 +257,13 @@ int CCtsp_exactblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     gelist = CC_SAFE_MALLOC (2*gecount, int);
     gecap  = CC_SAFE_MALLOC (gecount, double);
     if (!names || !gelist || !gecap) {
-        fprintf (stderr, "out of memory in Xblossom\n");
+        CC_FPRINTF(stderr, "out of memory in Xblossom\n");
         rval = 1; goto CLEANUP;
     }
     if (markcount) {
         marks = CC_SAFE_MALLOC (markcount, int);
         if (!marks) {
-            fprintf (stderr, "out of memory in Xblossom\n");
+            CC_FPRINTF(stderr, "out of memory in Xblossom\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -288,7 +288,7 @@ int CCtsp_exactblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
         rval = CCcut_gomory_hu (&T, gncount, gecount, gelist, gecap, 
                                 markcount, marks, rstate);
         if (rval) {
-            fprintf (stderr, "CCcut_gomory_hu failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCcut_gomory_hu failed\n"); goto CLEANUP;
         }
     }
 
@@ -299,7 +299,7 @@ int CCtsp_exactblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
     if (T.root) {
         rval = searchtree (&G, T.root, names, cuts, cutcount);
         if (rval) {
-            fprintf (stderr, "searchtree failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "searchtree failed\n"); goto CLEANUP;
         }
     }
 
@@ -331,25 +331,25 @@ static void blolink_free (graph *G)
     int total, onlist;
 
     if (edge_check_leaks (&G->edge_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding BLOSSOM-edges\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding BLOSSOM-edges\n",
                  total - onlist);
     }
     CCptrworld_delete (&G->edge_world);
 
     if (edgeptr_check_leaks (&G->edgeptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding BLOSSOM-edgeptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding BLOSSOM-edgeptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (&G->edgeptr_world);
 
     if (node_check_leaks (&G->node_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding BLOSSOM-nodes\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding BLOSSOM-nodes\n",
                  total - onlist);
     }
     CCptrworld_delete (&G->node_world);
 
     if (nodeptr_check_leaks (&G->nodeptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding BLOSSOM-nodeptrs\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding BLOSSOM-nodeptrs\n",
                  total - onlist);
     }
     CCptrworld_delete (&G->nodeptr_world);
@@ -509,7 +509,7 @@ static int searchtree (graph *G, CC_GHnode *n, node **names,
             markcuttree_cut (n, G->magicnum, names);
             rval = loadcuttree_blossom (G,  G->magicnum, cuts, cutcount);
             if (rval) {
-                fprintf (stderr, "loadcuttree_blossom failed\n");
+                CC_FPRINTF(stderr, "loadcuttree_blossom failed\n");
                 goto CLEANUP;
             }
         }
@@ -567,7 +567,7 @@ static int loadcuttree_blossom (graph *G, int v, CCtsp_lpcut_in **cuts,
         rval = work_blossom (G, handle, tcount, teeth, cuts,
                              cutcount);
         if (rval) {
-            fprintf (stderr, "work_blossom failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "work_blossom failed\n"); goto CLEANUP;
         }
     }
 
@@ -600,7 +600,7 @@ static int work_blossom (graph *G, nodeptr *handle, int tcount,
     del = CC_SAFE_MALLOC (G->ncount, int);
     add = CC_SAFE_MALLOC (G->ncount, int);
     if (!t || !hit || !del || !add) {
-        fprintf (stderr, "out of memory in work_blossom\n");
+        CC_FPRINTF(stderr, "out of memory in work_blossom\n");
     }
 
     G->magicnum++;
@@ -664,7 +664,7 @@ static int work_blossom (graph *G, nodeptr *handle, int tcount,
         newhandle = CC_SAFE_MALLOC (newhcount, int);
         newteeth  = CC_SAFE_MALLOC (newtcount, toothobj);
         if (!newhandle || !newteeth) {
-            fprintf (stderr, "out of memory in work_blossom\n");
+            CC_FPRINTF(stderr, "out of memory in work_blossom\n");
             rval = 1; goto CLEANUP;
         }
         k = 0;
@@ -726,7 +726,7 @@ static int add_blossom (graph *G, int hcount, int *handle, int tcount,
 
     rval = CCtsp_construct_skeleton (lc, G->ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n"); goto CLEANUP;
     }
 
     lc->next = *cuts;
@@ -782,7 +782,7 @@ static int buildgraph (graph *G, int ncount, int ecount, int *elist, double *x)
     G->edgelist = CC_SAFE_MALLOC (ecount, edge);
 
     if (!G->nodelist || !G->edgelist) {
-        fprintf (stderr, "out of memory in buildgraph\n");
+        CC_FPRINTF(stderr, "out of memory in buildgraph\n");
         rval = 1; goto CLEANUP;
     }
     G->ncount = ncount;
@@ -869,7 +869,7 @@ int CCtsp_fastblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
     rval = buildgraph (&G, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
 
     k = 0;
@@ -879,7 +879,7 @@ int CCtsp_fastblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
             rval = grab_component (&G, &(G.nodelist[i]), ++k, &handle,
                                    ZEROPLUS, ONEMINUS);
             if (rval) {
-                fprintf (stderr, "grab_component failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "grab_component failed\n"); goto CLEANUP;
             }
             grow_teeth (&G, handle, cuts, cutcount);
             nodeptr_listfree (&G.nodeptr_world, handle);
@@ -947,7 +947,7 @@ static int grow_teeth (graph *G, nodeptr *handle, CCtsp_lpcut_in **cuts,
     if (tcount % 2) {
         rval = work_blossom (G, handle, tcount, teeth, cuts, cutcount);
         if (rval) {
-            fprintf (stderr, "work_blossom failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "work_blossom failed\n"); goto CLEANUP;
         }
     }
 
@@ -977,7 +977,7 @@ int CCtsp_ghfastblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
 
     rval = buildgraph (&G, ncount, ecount, elist, x);
     if (rval) {
-        fprintf (stderr, "buildgraph failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "buildgraph failed\n"); goto CLEANUP;
     }
 
     k = 0;
@@ -987,7 +987,7 @@ int CCtsp_ghfastblossom (CCtsp_lpcut_in **cuts, int *cutcount, int ncount,
             rval = grab_component (&G, &(G.nodelist[i]), ++k, &handle,
                                    ZEROPLUS, 1.0 - GH_EPS);
             if (rval) {
-                fprintf (stderr, "grab_component failed\n"); goto CLEANUP;
+                CC_FPRINTF(stderr, "grab_component failed\n"); goto CLEANUP;
             }
             grow_ghteeth (&G, handle, cuts, cutcount);
             nodeptr_listfree (&G.nodeptr_world, handle);
@@ -1056,7 +1056,7 @@ static int grow_ghteeth (graph *G, nodeptr *handle, CCtsp_lpcut_in **cuts,
     xtlist = CC_SAFE_MALLOC (ptcount, double);
     tperm  = CC_SAFE_MALLOC (ptcount, int);
     if (!tlist || !xtlist || !tperm) {
-        fprintf (stderr, "out of memory in grow_ghteeth\n");
+        CC_FPRINTF(stderr, "out of memory in grow_ghteeth\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -1077,7 +1077,7 @@ static int grow_ghteeth (graph *G, nodeptr *handle, CCtsp_lpcut_in **cuts,
     if (z > (double) hcount + (double) ((i - 1)/2) + BLOTOLERANCE) {
         rval = work_blossom (G, handle, i, teeth, cuts, cutcount);
         if (rval) {
-            fprintf (stderr, "work_blossom failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "work_blossom failed\n"); goto CLEANUP;
         }
     } else {
         while (i < ptcount) {
@@ -1093,7 +1093,7 @@ static int grow_ghteeth (graph *G, nodeptr *handle, CCtsp_lpcut_in **cuts,
             if (z > (double) hcount + (double) ((i - 1)/2) + BLOTOLERANCE) {
                 rval = work_blossom (G, handle, i, teeth, cuts, cutcount);
                 if (rval) {
-                    fprintf (stderr, "work_blossom failed\n"); goto CLEANUP;
+                    CC_FPRINTF(stderr, "work_blossom failed\n"); goto CLEANUP;
                 }
                 break;
             }

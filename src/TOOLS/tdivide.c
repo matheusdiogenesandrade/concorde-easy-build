@@ -97,7 +97,7 @@ int main (int ac, char **av)
     if (rval) return 1;
 
     if (!tspfname) {
-        fprintf (stderr, "No TSPLIB or DAT file specified\n");
+        CC_FPRINTF(stderr, "No TSPLIB or DAT file specified\n");
         goto CLEANUP;
     }
 
@@ -107,7 +107,7 @@ int main (int ac, char **av)
     if (probname) name = get_problabel (probname);
     else          name = get_problabel (tspfname);
 
-    printf ("Name: %s\n", name); fflush (stdout);
+    CC_PRINTF("Name: %s\n", name); CC_FFLUSH(stdout);
 
     if (tsplib_in) {
         rval = CCutil_gettsplib (tspfname, &ncount, &dat);
@@ -120,7 +120,7 @@ int main (int ac, char **av)
     }
 
     if ((norm & CC_NORM_SIZE_BITS) != CC_D2_NORM_SIZE) {
-        fprintf (stderr, "Only set up for 2D norms\n");
+        CC_FPRINTF(stderr, "Only set up for 2D norms\n");
         rval = 1;  goto CLEANUP;
     }
 
@@ -139,7 +139,7 @@ int main (int ac, char **av)
         }
 
         CCutil_cycle_len (ncount, &dat, tour, &val);
-        printf ("Tour Length: %.0f\n", val); fflush (stdout);
+        CC_PRINTF("Tour Length: %.0f\n", val); CC_FFLUSH(stdout);
 
         for (i = 0; i < ncount; i++) {
            invtour[tour[i]] = i;
@@ -148,7 +148,7 @@ int main (int ac, char **av)
 
     if (lkh_part > 0) {
         if (!tour) {
-            fprintf (stderr, "Need to specify a tour for LKH subproblems\n");
+            CC_FPRINTF(stderr, "Need to specify a tour for LKH subproblems\n");
             rval = 1;  goto CLEANUP; 
         }
         rval = create_lkh (name, ncount, &dat, tour, lkh_part, first_bucket,
@@ -157,11 +157,11 @@ int main (int ac, char **av)
     } else if (bound_part > 0) {
         if ((norm & CC_NORM_BITS) != CC_KD_NORM_TYPE &&
                              norm != CC_GEOM) {
-            fprintf (stderr, "Only set up for GEOM and KD-tree norms\n");
+            CC_FPRINTF(stderr, "Only set up for GEOM and KD-tree norms\n");
             rval = 1;  goto CLEANUP;
         }
         if (!tour) {
-            fprintf (stderr, "Need to specify a tour for bound subproblems\n");
+            CC_FPRINTF(stderr, "Need to specify a tour for bound subproblems\n");
             rval = 1;  goto CLEANUP; 
         }
         rval = CCutil_karp_partition (ncount, &dat, bound_part, &pcount,
@@ -170,7 +170,7 @@ int main (int ac, char **av)
 
         no_overlap (pcount, trac, &lap);
         if (lap == 1) {
-            fprintf (stderr, "Error: regions overlap\n");
+            CC_FPRINTF(stderr, "Error: regions overlap\n");
             rval = 1;  goto CLEANUP;
         }
 
@@ -191,7 +191,7 @@ int main (int ac, char **av)
         rval = CCutil_write_subdivision_index (name, ncount, pcount, trac);
         CCcheck_rval (rval, "CCutil_write_subdivision_index failed");
     } else {
-        fprintf (stderr, "No partition type specified\n");
+        CC_FPRINTF(stderr, "No partition type specified\n");
         goto CLEANUP;
     }
 
@@ -251,16 +251,16 @@ static int build_tour_subproblem (CCdatagroup *dat, char *pname, int id,
     }
 
     sprintf (buf, "%s_%d.dat", pname, id);
-    printf ("Create %s\n", buf); fflush (stdout);
+    CC_PRINTF("Create %s\n", buf); CC_FFLUSH(stdout);
     rval = CCutil_writedata (buf, 0, scount, &sdat);
     CCcheck_rval (rval, "CCutil_writedata failed");
 
     sprintf (buf, "%s_%d.nam", pname, id);
-    printf ("Create %s\n", buf); fflush (stdout);
+    CC_PRINTF("Create %s\n", buf); CC_FFLUSH(stdout);
 
     out = fopen (buf, "w");
     if (out == (FILE *) NULL) {
-        fprintf (stderr, "Could not open %s for output\n", buf);
+        CC_FPRINTF(stderr, "Could not open %s for output\n", buf);
         rval = 1;  goto CLEANUP;
     }
     fprintf (out, "%d\n", scount);
@@ -305,7 +305,7 @@ static void no_overlap (int tcount, CCsubdiv *trac, int *yesno)
             in_box (x1, y1, p, yesno, i, j, trac); if (*yesno) return;
         }
     }
-    printf ("Boxes do not overlap -- good\n"); fflush (stdout);
+    CC_PRINTF("Boxes do not overlap -- good\n"); CC_FFLUSH(stdout);
 }
 
 static void in_box (double x, double y, CCsubdiv *b, int *yesno, int i, int j,
@@ -313,10 +313,10 @@ static void in_box (double x, double y, CCsubdiv *b, int *yesno, int i, int j,
 {
     if (x > b->xrange[0] && x < b->xrange[1] && 
         y > b->yrange[0] && y < b->yrange[1]) {
-        fprintf (stderr, "Box %d (%f, %f, %f, %f) intersects\n",
+        CC_FPRINTF(stderr, "Box %d (%f, %f, %f, %f) intersects\n",
             i, trac[i].xrange[0], trac[i].xrange[1], trac[i].yrange[0],
             trac[i].yrange[1]);
-        fprintf (stderr, "Box %d (%f, %f, %f, %f)\n",
+        CC_FPRINTF(stderr, "Box %d (%f, %f, %f, %f)\n",
             j, trac[j].xrange[0], trac[j].xrange[1], trac[j].yrange[0],
             trac[j].yrange[1]);
         *yesno = 1;
@@ -353,7 +353,7 @@ static int create_subproblems (int ncount, CCdatagroup *dat, int *invtour,
 
     for (i = 0; i < ncount; i++) {
         if (hit[i] == 0) {
-            fprintf (stderr, "missed a node in partitions\n");
+            CC_FPRINTF(stderr, "missed a node in partitions\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -390,7 +390,7 @@ static int build_subproblem (CCdatagroup *dat, CCkdtree *kt, int *invtour,
 
         if (xn < sbox->xrange[0] || xn > sbox->xrange[1] ||
             yn < sbox->yrange[0] || yn > sbox->yrange[1]) {
-            fprintf (stderr, "Point (%f,%f) not in Box (%f, %f, %f, %f)\n",
+            CC_FPRINTF(stderr, "Point (%f,%f) not in Box (%f, %f, %f, %f)\n",
                   xn, yn, sbox->xrange[0], sbox->xrange[1], sbox->yrange[0],
                   sbox->yrange[1]);
             rval = 1;  goto CLEANUP;
@@ -399,11 +399,11 @@ static int build_subproblem (CCdatagroup *dat, CCkdtree *kt, int *invtour,
     }
 
     sprintf (buf, "%s_%d.mas", pname, id);
-    printf ("Create %s, with %d depots\n", buf, ndepot); fflush (stdout);
+    CC_PRINTF("Create %s, with %d depots\n", buf, ndepot); CC_FFLUSH(stdout);
 
     for (i = 0; i < scount; i++) {
         if (hit[slist[i]]) {
-            fprintf (stderr, "duplicate node in partitions");
+            CC_FPRINTF(stderr, "duplicate node in partitions");
             rval = 1;  goto CLEANUP;
         }
         hit[slist[i]] = 1;
@@ -433,7 +433,7 @@ static int build_subproblem (CCdatagroup *dat, CCkdtree *kt, int *invtour,
 
     out = CCutil_sopen (buf, "w");
     if (out == (CC_SFILE *) NULL) {
-        fprintf (stderr, "Could not open %s for output\n", buf);
+        CC_FPRINTF(stderr, "Could not open %s for output\n", buf);
         rval = 1;  goto CLEANUP;
     }
 
@@ -578,8 +578,8 @@ static int create_lkh (char *name, int ncount, CCdatagroup *dat, int *tour,
     plist = CC_SAFE_MALLOC (nsub + extra, CCsubdiv_lkh);
     CCcheck_NULL (plist, "out of memory in create_lkh");
 
-    printf ("Create %d LKH subproblems\n", nsub + extra);
-    fflush (stdout);
+    CC_PRINTF("Create %d LKH subproblems\n", nsub + extra);
+    CC_FFLUSH(stdout);
 
     start = 0;
     for (i = 0; i < first; i++) {
@@ -622,11 +622,11 @@ static int create_lkh (char *name, int ncount, CCdatagroup *dat, int *tour,
         CCcheck_rval (rval, "lkh_subproblem failed");
     }
 
-    printf ("Subproblems\n");
+    CC_PRINTF("Subproblems\n");
     for (i = 0; i < nsub + extra; i++) {
-        printf ("%d %d %d %.0f %.0f\n", plist[i].id, plist[i].cnt,
+        CC_PRINTF("%d %d %d %.0f %.0f\n", plist[i].id, plist[i].cnt,
                         plist[i].start, plist[i].origlen, plist[i].newlen);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
 
     rval = CCutil_write_subdivision_lkh_index (name, ncount, nsub+extra,
@@ -731,7 +731,7 @@ static int parseargs (int ac, char **av)
     if (boptind < ac) {
         tspfname = av[boptind++];
     } else {
-        fprintf (stderr, "Missing tspfile\n");
+        CC_FPRINTF(stderr, "Missing tspfile\n");
         usage (av[0]);
         return 1;
     }
@@ -741,19 +741,19 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below] tsp_or_dat file\n", fname);
-    fprintf (stderr, "   -b    datfile in double binary format\n");
-    fprintf (stderr, "   -B    datfile in double integer format\n");
-    fprintf (stderr, "   -f #  size of first bucket for LKH subproblems\n");
-    fprintf (stderr, "   -j #  create tour subproblems with bucketsize #\n");
-    fprintf (stderr, "   -k #  create bound subproblems with bucketsize #\n");
-    fprintf (stderr, "   -l #  create LKH subproblems with bucketsize #\n");
-    fprintf (stderr, "   -m #  number of depots (default 4*sqrt(n)\n");
-    fprintf (stderr, "   -T f  specify a tour (needed for LKH and bound)\n");
-    fprintf (stderr, "   -t    tour file in concorde format (default TSPLIB)\n");
-    fprintf (stderr, "   -P s  specify a name for the output master files\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=L1, 2=L2, 17=GEOM, 18=JOHNSON\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below] tsp_or_dat file\n", fname);
+    CC_FPRINTF(stderr, "   -b    datfile in double binary format\n");
+    CC_FPRINTF(stderr, "   -B    datfile in double integer format\n");
+    CC_FPRINTF(stderr, "   -f #  size of first bucket for LKH subproblems\n");
+    CC_FPRINTF(stderr, "   -j #  create tour subproblems with bucketsize #\n");
+    CC_FPRINTF(stderr, "   -k #  create bound subproblems with bucketsize #\n");
+    CC_FPRINTF(stderr, "   -l #  create LKH subproblems with bucketsize #\n");
+    CC_FPRINTF(stderr, "   -m #  number of depots (default 4*sqrt(n)\n");
+    CC_FPRINTF(stderr, "   -T f  specify a tour (needed for LKH and bound)\n");
+    CC_FPRINTF(stderr, "   -t    tour file in concorde format (default TSPLIB)\n");
+    CC_FPRINTF(stderr, "   -P s  specify a name for the output master files\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=L1, 2=L2, 17=GEOM, 18=JOHNSON\n");
 }
 
 static char *get_problabel (const char *probloc)

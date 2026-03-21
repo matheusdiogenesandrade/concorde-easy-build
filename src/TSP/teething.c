@@ -105,7 +105,7 @@ int CCtsp_teething (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *cut,
     if (cut->cliquecount > 1) {
         rval = CCtsp_test_pure_comb (g->ncount, cut, &test, &ihandle);
         if (rval) {
-            fprintf (stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_test_pure_comb failed\n"); goto CLEANUP;
         }
         if (test != 1) goto CLEANUP;
     } else {
@@ -115,14 +115,14 @@ int CCtsp_teething (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *cut,
     handle = &(cut->cliques[ihandle]);
     bigteeth = CC_SAFE_MALLOC (cut->cliquecount, CCtsp_lpclique *);
     if (!bigteeth) {
-        fprintf (stderr, "out of memory in CCtsp_teething\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_teething\n");
         rval = 1; goto CLEANUP;
     }
     identify_big_teeth (cut, ihandle, &nbig, bigteeth);
 
     rval = CCtsp_teething_list (g, x, handle, nbig, bigteeth, newcut);
     if (rval) {
-        fprintf (stderr, "CCtsp_teething_list failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_teething_list failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -149,7 +149,7 @@ int CCtsp_teething_list (CCtsp_lpgraph *g, double *x, CCtsp_lpclique *handle,
     rval = optimal_pseudocomb (g, x, handle, nbig, bigteeth, &pseudo,
                                &intptr_world, &Rrecord_world);
     if (rval) {
-        fprintf (stderr, "optimal_pseudocomb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "optimal_pseudocomb failed\n"); goto CLEANUP;
     }
 
     if (pseudo.cliquecount == 2 || pseudo.cliquecount == 1) {
@@ -158,24 +158,24 @@ int CCtsp_teething_list (CCtsp_lpgraph *g, double *x, CCtsp_lpclique *handle,
     }
     rval = CCtsp_test_pseudocomb (g->ncount, &pseudo, 0, &test);
     if (rval) {
-        fprintf (stderr, "CCtsp_test_pseudocomb failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_test_pseudocomb failed\n"); goto CLEANUP;
     }
     if (test != 1) {
-        fprintf (stderr, "Not a pseudocomb\n");
+        CC_FPRINTF(stderr, "Not a pseudocomb\n");
         CCtsp_print_lpcut_in (&pseudo);
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_test_teeth_disjoint (g->ncount, &pseudo, 0, &test);
     if (rval) {
-        fprintf (stderr, "CCtsp_test_teeth_disjoint failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_test_teeth_disjoint failed\n"); goto CLEANUP;
     }
 
     if (!test) {
         rval = clean_pseudocomb (g, x, &pseudo, &general, &intptr_world);
         CCtsp_free_lpcut_in (&pseudo);
         if (rval) {
-            fprintf (stderr, "clean_pseudocomb failed\n");
+            CC_FPRINTF(stderr, "clean_pseudocomb failed\n");
             goto CLEANUP;
         }
         if (general.cliquecount <= 2) {
@@ -194,14 +194,14 @@ int CCtsp_teething_list (CCtsp_lpgraph *g, double *x, CCtsp_lpclique *handle,
     }
 
     if ((*newcut)->dominocount != 0) {
-        printf ("TEETHING Yipes %d\n", (*newcut)->dominocount);
-        fflush (stdout);
+        CC_PRINTF("TEETHING Yipes %d\n", (*newcut)->dominocount);
+        CC_FFLUSH(stdout);
         exit (1);
     }
 
     rval = CCtsp_construct_skeleton (*newcut, g->ncount);
     if (rval) {
-        fprintf (stderr, "CCtsp_construct_skeleton failed\n");
+        CC_FPRINTF(stderr, "CCtsp_construct_skeleton failed\n");
         CCtsp_free_lpcut_in (*newcut);
         CC_IFFREE (*newcut, CCtsp_lpcut_in);
         goto CLEANUP;
@@ -209,7 +209,7 @@ int CCtsp_teething_list (CCtsp_lpgraph *g, double *x, CCtsp_lpclique *handle,
 
     rval = CCtsp_test_pure_comb (g->ncount, *newcut, &test, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_test_pure_comb failed\n");
+        CC_FPRINTF(stderr, "CCtsp_test_pure_comb failed\n");
         CCtsp_print_lpcut_in (&general);
         CC_FREE (*newcut, CCtsp_lpcut_in);
         goto CLEANUP;
@@ -249,7 +249,7 @@ static int optimal_pseudocomb (CCtsp_lpgraph *g, double *x,
     hhit = CC_SAFE_MALLOC (ncount, int);
     thit = CC_SAFE_MALLOC (ncount, int);
     if (!hhit || !thit) {
-        fprintf (stderr, "out of memory in optimal_pseudocombn");
+        CC_FPRINTF(stderr, "out of memory in optimal_pseudocombn");
         rval = 1; goto CLEANUP;
     }
 
@@ -259,12 +259,12 @@ static int optimal_pseudocomb (CCtsp_lpgraph *g, double *x,
     grab1 = CC_SAFE_MALLOC (nbig + 1, int);
     usebig = CC_SAFE_MALLOC (nbig + 1, int);
     if (!ro0 || !ro1 || !grab0 || !grab1 || !usebig) {
-        fprintf (stderr, "out of memory in optimal_pseudocomb\n");
+        CC_FPRINTF(stderr, "out of memory in optimal_pseudocomb\n");
         rval = 1; goto CLEANUP;
     }
     R = CC_SAFE_MALLOC (nbig + 1, Rrecord *);
     if (!R) {
-        fprintf (stderr, "out of memory in optimal_pseudocomb\n");
+        CC_FPRINTF(stderr, "out of memory in optimal_pseudocomb\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 0; i <= nbig; i++) {
@@ -312,7 +312,7 @@ static int optimal_pseudocomb (CCtsp_lpgraph *g, double *x,
                 if (add0 != -1 || add1 != -1) {
                     rval = add_to_record (Rrecord_world, &R[i], add0, add1);
                     if (rval) {
-                        fprintf (stderr, "add_to_record failed\n");
+                        CC_FPRINTF(stderr, "add_to_record failed\n");
                         goto CLEANUP;
                     }
                 }
@@ -323,7 +323,7 @@ static int optimal_pseudocomb (CCtsp_lpgraph *g, double *x,
     for (i = 1; i <= nbig; i++) {
         rval = CCtsp_clique_delta (g, x, bigteeth[i], &delta);
         if (rval) {
-            fprintf (stderr, "CCtsp_clique_delta failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCtsp_clique_delta failed\n"); goto CLEANUP;
         }
         if (delta - 3.0 < ro1[i]) {
             ro1[i] = delta - 3.0;
@@ -392,13 +392,13 @@ static int optimal_pseudocomb (CCtsp_lpgraph *g, double *x,
     }
     d->cliques = CC_SAFE_MALLOC (d->cliquecount, CCtsp_lpclique);
     if (!d->cliques) {
-        fprintf (stderr, "out of memory in optimal_pseudocombs\n");
+        CC_FPRINTF(stderr, "out of memory in optimal_pseudocombs\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_copy_lpclique (handle, &d->cliques[0]);
     if (rval) {
-        fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
         CC_FREE (d->cliques, CCtsp_lpclique);
         goto CLEANUP;
     }
@@ -406,7 +406,7 @@ static int optimal_pseudocomb (CCtsp_lpgraph *g, double *x,
         if (ip->this < 0) {
             rval = CCtsp_copy_lpclique (bigteeth[-ip->this], &d->cliques[i]);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
                 for (j = 0; j < i; j++) {
                     CCtsp_free_lpclique (&d->cliques[j]);
                 }
@@ -418,7 +418,7 @@ static int optimal_pseudocomb (CCtsp_lpgraph *g, double *x,
             ends[1] = g->edges[ip->this].ends[1];
             rval = CCtsp_array_to_lpclique (ends, 2, &d->cliques[i]);
             if (rval) {
-                fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
                 for (j = 0; j < i; j++) {
                     CCtsp_free_lpclique (&d->cliques[j]);
                 }
@@ -501,7 +501,7 @@ static int clean_pseudocomb (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *c,
     activeteeth  = CC_SAFE_MALLOC (ccount, int);
     cardteeth    = CC_SAFE_MALLOC (ccount, int);
     if (!hmarks || !activeteeth || !cardteeth) {
-        fprintf (stderr, "out of memory in clean_pseudocomb\n");
+        CC_FPRINTF(stderr, "out of memory in clean_pseudocomb\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -514,7 +514,7 @@ static int clean_pseudocomb (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *c,
 
     inteeth = CC_SAFE_MALLOC (g->ncount, intptr *);
     if (!inteeth) {
-        fprintf (stderr, "out of memory in clean_pseudocomb\n");
+        CC_FPRINTF(stderr, "out of memory in clean_pseudocomb\n");
         rval = 1; goto CLEANUP;
     }
     for (i = 1; i < ccount; i++) {
@@ -604,14 +604,14 @@ static int clean_pseudocomb (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *c,
 
     if (!hcnt) {
         /*
-        printf ("WARNING: generalized comb gets an empty handle\n");
-        fflush (stdout);
+        CC_PRINTF("WARNING: generalized comb gets an empty handle\n");
+        CC_FFLUSH(stdout);
         */
         goto CLEANUP;
     }
     harray = CC_SAFE_MALLOC (hcnt, int);
     if (!harray) {
-        fprintf (stderr, "out of memory in clean_pseudocomb\n");
+        CC_FPRINTF(stderr, "out of memory in clean_pseudocomb\n");
         rval = 1; goto CLEANUP;
     }
     for (ip = hlist, hcnt = 0; ip; ip = ip->next) {
@@ -624,8 +624,8 @@ static int clean_pseudocomb (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *c,
     }
     if (!cnt) {
 /*
-        printf ("WARNING: generalized comb gets no teeth\n");
-        fflush (stdout);
+        CC_PRINTF("WARNING: generalized comb gets no teeth\n");
+        CC_FFLUSH(stdout);
 */
         goto CLEANUP;
     }
@@ -637,7 +637,7 @@ static int clean_pseudocomb (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *c,
             if (activeteeth[i]) {
                 rval = CCtsp_clique_delta (g, x, &c->cliques[i], &delta);
                 if (rval) {
-                    fprintf (stderr, "CCtsp_clique_delta failed\n");
+                    CC_FPRINTF(stderr, "CCtsp_clique_delta failed\n");
                      goto CLEANUP;
                 }
                 if (delta < smalldelta) {
@@ -653,12 +653,12 @@ static int clean_pseudocomb (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *c,
 
     d->cliques = CC_SAFE_MALLOC (cnt, CCtsp_lpclique);
     if (!d->cliques) {
-        fprintf (stderr, "out of memory in clean_pseudocomb\n");
+        CC_FPRINTF(stderr, "out of memory in clean_pseudocomb\n");
         rval = 1; goto CLEANUP;
     }
     rval = CCtsp_array_to_lpclique (harray, hcnt, &d->cliques[0]);
     if (rval) {
-        fprintf (stderr, "CCtsp_array_to_lpclique failed\n");
+        CC_FPRINTF(stderr, "CCtsp_array_to_lpclique failed\n");
         CC_FREE (d->cliques, CCtsp_lpclique);
         goto CLEANUP;
     }
@@ -666,7 +666,7 @@ static int clean_pseudocomb (CCtsp_lpgraph *g, double *x, CCtsp_lpcut_in *c,
         if (activeteeth[i]) {
             rval = CCtsp_copy_lpclique (&c->cliques[i], &d->cliques[cnt++]);
             if (rval) {
-                fprintf (stderr, "CCtsp_copy_lpclique failed\n");
+                CC_FPRINTF(stderr, "CCtsp_copy_lpclique failed\n");
                 for (k = 0; k < cnt; k++) {
                     CCtsp_free_lpclique (&d->cliques[k]);
                 }
@@ -709,7 +709,7 @@ static void teething_free_world (CCptrworld *intptr_world,
     int total, onlist;
 
     if (intptr_check_leaks (intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs in teething\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs in teething\n",
                  total - onlist);
     }
 */
@@ -717,7 +717,7 @@ static void teething_free_world (CCptrworld *intptr_world,
 
 /*
     if (Rrecord_check_leaks (Rrecord_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding Rrecords in teething\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding Rrecords in teething\n",
                  total - onlist);
     }
 */
@@ -748,7 +748,7 @@ static int add_to_record (CCptrworld *Rrecord_world, Rrecord **R, int add0,
     Rrecord *p;
 
     p = Rrecordalloc (Rrecord_world);
-    if (!p) { fprintf (stderr, "Rrecordalloc failed\n"); return 1; }
+    if (!p) { CC_FPRINTF(stderr, "Rrecordalloc failed\n"); return 1; }
     p->add0 = add0;
     p->add1 = add1;
     p->next = *R;

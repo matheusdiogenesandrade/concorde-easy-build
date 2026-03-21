@@ -73,14 +73,14 @@ int main (int ac, char **av)
     if (rval) return rval;
 
     CCutil_sprand (seed, &rstate);
-    printf ("Using random seed %d\n", seed); fflush (stdout);
+    CC_PRINTF("Using random seed %d\n", seed); CC_FFLUSH(stdout);
 
     CCchunk_init_localcut_timer (&timer);
 
     rval = CCutil_getedges_double (&ncount, edgefile, &ecount, &elist,
                                    &x, binary_in);
     if (rval) {
-        fprintf (stderr, "getedges failed\n");
+        CC_FPRINTF(stderr, "getedges failed\n");
         goto CLEANUP;
     }
 
@@ -101,7 +101,7 @@ int main (int ac, char **av)
     rval = CCchunk_localcuts (&cuts, &cutcount, ncount, ecount, elist, x,
                               eps, flags, &timer, run_silently, &rstate);
     if (rval) {
-        fprintf (stderr, "CCchunk_localcuts failed\n");
+        CC_FPRINTF(stderr, "CCchunk_localcuts failed\n");
         goto CLEANUP;
     }
 
@@ -112,13 +112,13 @@ int main (int ac, char **av)
 
     rval = CCtsp_build_lpgraph (&g, ncount, ecount, elist, (int *) NULL);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpgraph failed\n");
+        CC_FPRINTF(stderr, "CCtsp_build_lpgraph failed\n");
         goto CLEANUP;
     }
 
     rval = CCtsp_build_lpadj (&g, 0, g.ecount);
     if (rval) {
-        fprintf (stderr, "CCtsp_build_lpadj failed\n");
+        CC_FPRINTF(stderr, "CCtsp_build_lpadj failed\n");
         goto CLEANUP;
     }
 
@@ -136,30 +136,30 @@ int main (int ac, char **av)
         
         if (cutval > maxval) maxval = cutval;
         if (dumpcuts) {
-            printf ("Cut violation %f:\n", cutval);
+            CC_PRINTF("Cut violation %f:\n", cutval);
             CCtsp_print_lpcut_in (c);
         }
     }
     if (dumpcuts) {
-        printf ("\n");
+        CC_PRINTF("\n");
     }
 
-    printf ("cut slack distribution:\n");
+    CC_PRINTF("cut slack distribution:\n");
     if (cuthist[0]) {
-        printf ("        s <= %.3f: %4d\n", cutthresh[0], cuthist[0]);
+        CC_PRINTF("        s <= %.3f: %4d\n", cutthresh[0], cuthist[0]);
     }
     for (i=1; i<13; i++) {
         if (cuthist[i]) {
-            printf ("%.3f < s <= %.3f: %4d\n", cutthresh[i-1], cutthresh[i],
+            CC_PRINTF("%.3f < s <= %.3f: %4d\n", cutthresh[i-1], cutthresh[i],
                     cuthist[i]);
         }
     }
     if (cuthist[13]) {
-        printf ("%.3f < s         : %4d\n", cutthresh[13], cuthist[13]);
+        CC_PRINTF("%.3f < s         : %4d\n", cutthresh[13], cuthist[13]);
     }
-    printf ("%d cuts (max viol %f) found in %.2f seconds\n",
+    CC_PRINTF("%d cuts (max viol %f) found in %.2f seconds\n",
             cutcount, maxval, szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
     rval = 0;
 
@@ -251,20 +251,20 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "Usage: %s [-see below-] edge_file\n", f);
-    fprintf (stderr, "   -b    edge_file in binary format\n");
-    fprintf (stderr, "   -c    don't civilize chunks\n");
-    fprintf (stderr, "   -C n  max chunk size n\n");
-    fprintf (stderr, "   -d    use dummy spheres\n");
-    fprintf (stderr, "   -D    output the cuts found\n");
-    fprintf (stderr, "   -e    use equivalence classes instead of spheres\n");
-    fprintf (stderr, "   -E f  use epsilon f (default 0.0)\n");
-    fprintf (stderr, "   -f    dump the faulty chunks found\n");
-    fprintf (stderr, "   -F    dump the faulty chunks and tight tours found\n");
-    fprintf (stderr, "   -L    lift the faults found (not with -f or -F)\n");
-    fprintf (stderr, "   -p    use permuted spheres\n");
-    fprintf (stderr, "   -r n  use random seed n\n");
-    fprintf (stderr, "   -s    do not shrink the vector\n");
-    fprintf (stderr, "   -S n  max sphere size n\n");
-    fprintf (stderr, "   -w    use weighted spheres\n");
+    CC_FPRINTF(stderr, "Usage: %s [-see below-] edge_file\n", f);
+    CC_FPRINTF(stderr, "   -b    edge_file in binary format\n");
+    CC_FPRINTF(stderr, "   -c    don't civilize chunks\n");
+    CC_FPRINTF(stderr, "   -C n  max chunk size n\n");
+    CC_FPRINTF(stderr, "   -d    use dummy spheres\n");
+    CC_FPRINTF(stderr, "   -D    output the cuts found\n");
+    CC_FPRINTF(stderr, "   -e    use equivalence classes instead of spheres\n");
+    CC_FPRINTF(stderr, "   -E f  use epsilon f (default 0.0)\n");
+    CC_FPRINTF(stderr, "   -f    dump the faulty chunks found\n");
+    CC_FPRINTF(stderr, "   -F    dump the faulty chunks and tight tours found\n");
+    CC_FPRINTF(stderr, "   -L    lift the faults found (not with -f or -F)\n");
+    CC_FPRINTF(stderr, "   -p    use permuted spheres\n");
+    CC_FPRINTF(stderr, "   -r n  use random seed n\n");
+    CC_FPRINTF(stderr, "   -s    do not shrink the vector\n");
+    CC_FPRINTF(stderr, "   -S n  max sphere size n\n");
+    CC_FPRINTF(stderr, "   -w    use weighted spheres\n");
 }

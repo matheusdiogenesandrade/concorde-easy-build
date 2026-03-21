@@ -80,7 +80,7 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
     scanf("%d%d",&ncount,&ecount);
     c = CCchunk_graph_alloc (ncount, ecount);
     if (!c) {
-        fprintf (stderr, "Unable to allocate CCchunk_graph\n");
+        CC_FPRINTF(stderr, "Unable to allocate CCchunk_graph\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -96,7 +96,7 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
     for (i=0; i<c->ncount; i++) {
         c->members[i] = CC_SAFE_MALLOC (2, int);
         if (!c->members[i]) {
-            fprintf (stderr, "Unable to allocate members\n");
+            CC_FPRINTF(stderr, "Unable to allocate members\n");
             rval = 1; goto CLEANUP;
         }
         c->members[i][0] = i;
@@ -107,7 +107,7 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
     if (!feof (stdin)) {
         f.a.coef = CC_SAFE_MALLOC (c->ecount, int);
         if (f.a.coef == (int *) NULL) {
-            fprintf (stderr, "Out of memory\n");
+            CC_FPRINTF(stderr, "Out of memory\n");
             rval = 1; goto CLEANUP;
         }
 
@@ -119,7 +119,7 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
         if (f.nsols > 0) {
             f.sols = CC_SAFE_MALLOC (c->ecount * f.nsols, int);
             if (f.sols == (int *) NULL) {
-                fprintf (stderr, "Out of memory\n");
+                CC_FPRINTF(stderr, "Out of memory\n");
                 rval = 1; goto CLEANUP;
             }
             for (i=0; i<f.nsols; i++) {
@@ -131,21 +131,21 @@ int main (CC_UNUSED int ac, CC_UNUSED char **av)
 
         ccd.chunk = c;
 
-        printf ("lifting...\n"); fflush (stdout);
+        CC_PRINTF("lifting...\n"); CC_FFLUSH(stdout);
         rval = CCchunk_lift (c, &f, &lift_t, &ccb);
         if (rval) {
-            fprintf (stderr, "CCchunk_lift failed, return code %d\n", rval);
+            CC_FPRINTF(stderr, "CCchunk_lift failed, return code %d\n", rval);
         }
         CCchunk_print_lift_timer (&lift_t);
     } else {
-        printf ("separating...\n"); fflush (stdout);
+        CC_PRINTF("separating...\n"); CC_FFLUSH(stdout);
         rval = CCchunk_separate (c, &separate_t, &fcb);
         if (rval) {
-            fprintf (stderr, "chunk_fault failed, return code %d", rval);
-            if (rval == -1) fprintf (stderr, " (memory)\n");
-            else if (rval == -2) fprintf (stderr, " (determinant)\n");
-            else if (rval == -3) fprintf (stderr, " (simplex iterations)\n");
-            else fprintf (stderr, " (unknown)\n");
+            CC_FPRINTF(stderr, "chunk_fault failed, return code %d", rval);
+            if (rval == -1) CC_FPRINTF(stderr, " (memory)\n");
+            else if (rval == -2) CC_FPRINTF(stderr, " (determinant)\n");
+            else if (rval == -3) CC_FPRINTF(stderr, " (simplex iterations)\n");
+            else CC_FPRINTF(stderr, " (unknown)\n");
         }
         CCchunk_print_separate_timer (&separate_t);
         CCchunk_print_lift_timer (&lift_t);
@@ -163,7 +163,7 @@ static int begin_CCchunk_cut_callback (void *u_data)
     CCchunk_cut_callback_data *ccd = (CCchunk_cut_callback_data *) u_data;
 
     ccd->cutval = 0.0;
-    printf ("CUT FOUND:");
+    CC_PRINTF("CUT FOUND:");
     return 0;
 }
 
@@ -177,7 +177,7 @@ static int add_clique_callback (int *arr, int size, void *u_data)
 
     mark = CC_SAFE_MALLOC (c->ncount, int);
     if (mark == (int *) NULL) {
-        fprintf (stderr, "Out of memory in add_clique_callback\n");
+        CC_FPRINTF(stderr, "Out of memory in add_clique_callback\n");
         return -1;
     }
     for (i=0; i<c->ncount; i++) mark[i] = 0;
@@ -193,20 +193,20 @@ static int add_clique_callback (int *arr, int size, void *u_data)
     ccd->cutval += 2*(size - v);
     CC_FREE (mark, int);
     
-    printf ("[");
+    CC_PRINTF("[");
     for (i=0; i<size; i++) {
-        printf ("%d", arr[i]);
-        if (i != size-1) printf (" ");
+        CC_PRINTF("%d", arr[i]);
+        if (i != size-1) CC_PRINTF(" ");
     }
-    printf ("]");
+    CC_PRINTF("]");
     
     return 0;
 }
 
 static int abort_CCchunk_cut_callback (CC_UNUSED void *u_data)
 {
-    printf ("ABORT BUILDCUT\n");
-    fflush (stdout);
+    CC_PRINTF("ABORT BUILDCUT\n");
+    CC_FFLUSH(stdout);
     return 0;
 }
 
@@ -214,7 +214,7 @@ static int finish_CCchunk_cut_callback (int rhs, int *finished, void *u_data)
 {
     CCchunk_cut_callback_data *ccd = (CCchunk_cut_callback_data *) u_data;
 
-    printf ("[ >= %d]  viol %.6f\n", rhs, rhs - ccd->cutval);
+    CC_PRINTF("[ >= %d]  viol %.6f\n", rhs, rhs - ccd->cutval);
     ccd->cut_count++;
     *finished = !ccd->all_cuts;
     return 0;
@@ -245,13 +245,13 @@ static int found_CCchunk_fault_callback (CCchunk_graph *chunk, CCchunk_fault *fa
         s -= fault->a.coef[i] * chunk->weight[i];
     }
     
-    printf ("Found fault:");
+    CC_PRINTF("Found fault:");
     for (i=0; i<chunk->ecount; i++) {
-        printf (" %d", fault->a.coef[i]);
+        CC_PRINTF(" %d", fault->a.coef[i]);
     }
-    printf (" <= %d\n", fault->a.rhs);
-    printf ("viol %.6f, now lifting...\n", -s);
-    fflush (stdout);
+    CC_PRINTF(" <= %d\n", fault->a.rhs);
+    CC_PRINTF("viol %.6f, now lifting...\n", -s);
+    CC_FFLUSH(stdout);
 
     rval = CCchunk_lift (chunk, fault, fcd->lift_t, &ccb);
     if (rval) return rval;

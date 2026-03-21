@@ -62,20 +62,20 @@ int CCtsp_x_greedy_tour_lk (CCdatagroup *dat, int ncount, int ecount,
 
     *val = 1e30;
     if (!dat) {
-        fprintf (stderr, "no dat in CCtsp_x_greedy_tour_lk\n");
+        CC_FPRINTF(stderr, "no dat in CCtsp_x_greedy_tour_lk\n");
         rval = 1; goto CLEANUP;
     }
 
     gcyc = CC_SAFE_MALLOC (ncount, int);
     if (!gcyc) {
-        fprintf (stderr, "out of memory in CCtsp_x_greedy_tour_lk\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_x_greedy_tour_lk\n");
         rval = 1; goto CLEANUP;
     }
 
     rval = CCtsp_x_greedy_tour (dat, ncount, ecount, elist, x, gcyc,
                  &gval, silent);
     if (rval) {
-        fprintf (stderr, "CCtsp_x_greedy_tour failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCtsp_x_greedy_tour failed\n"); goto CLEANUP;
     }
 
     CCedgegen_init_edgegengroup (&plan);
@@ -84,14 +84,14 @@ int CCtsp_x_greedy_tour_lk (CCdatagroup *dat, int ncount, int ecount,
     rval = CCedgegen_edges (&plan, ncount, dat, (double *) NULL, &tcount,
                             &tlist, silent, rstate);
     if (rval) {
-        fprintf (stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCedgegen_edges failed\n"); goto CLEANUP;
     }
 
     rval = CClinkern_tour (ncount, dat, tcount, tlist, ncount,
              ncount > 1000 ? 500 : ncount/2, gcyc, cyc, val, 1, 0.0,
              0.0, (char *) NULL, CC_LK_GEOMETRIC_KICK, rstate);
     if (rval) {
-        fprintf (stderr, "CClinkern_tour failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CClinkern_tour failed\n"); goto CLEANUP;
     }
 
 CLEANUP:
@@ -115,12 +115,12 @@ int CCtsp_x_greedy_tour (CCdatagroup *dat, int ncount, int ecount, int *elist,
     char *degree = (char *) NULL;
 
     if (!silent) {
-        printf ("CCtsp_x_greedy_tour ...\n"); fflush (stdout);
+        CC_PRINTF("CCtsp_x_greedy_tour ...\n"); CC_FFLUSH(stdout);
     }
 
     *val = 1e30;
     if (!dat) {
-        fprintf (stderr, "no dat in CCtsp_x_greedy_tour\n");
+        CC_FPRINTF(stderr, "no dat in CCtsp_x_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -129,7 +129,7 @@ int CCtsp_x_greedy_tour (CCdatagroup *dat, int ncount, int ecount, int *elist,
     tail     = CC_SAFE_MALLOC (ncount, int);
     tcyc     = CC_SAFE_MALLOC (2 * ncount, int);
     if (!perm || !degree || !tail || !tcyc) {
-        fprintf (stderr, "out of memory in CCtsp_x_greedy_tour\n");
+        CC_FPRINTF(stderr, "out of memory in CCtsp_x_greedy_tour\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -158,7 +158,7 @@ int CCtsp_x_greedy_tour (CCdatagroup *dat, int ncount, int ecount, int *elist,
     }
 
     if (!silent) {
-        printf ("%d edges in x-tour\n", tcount / 2); fflush (stdout);
+        CC_PRINTF("%d edges in x-tour\n", tcount / 2); CC_FFLUSH(stdout);
     }
     a = 0;
     b = 0;
@@ -182,19 +182,19 @@ int CCtsp_x_greedy_tour (CCdatagroup *dat, int ncount, int ecount, int *elist,
     }
 
     if (!silent) {
-        printf ("tour length: %.2f (%.2f seconds)\n",
+        CC_PRINTF("tour length: %.2f (%.2f seconds)\n",
              len, CCutil_zeit () - szeit);
-        fflush (stdout);
+        CC_FFLUSH(stdout);
     }
     *val = len;
 
     rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, cyc);
     if (rval) {
-        fprintf (stderr, "CCutil_edge_to_cycle failed\n");
+        CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n");
         goto CLEANUP;
     }
     if (!istour) {
-        fprintf (stderr, "x-tour has an error\n"); 
+        CC_FPRINTF(stderr, "x-tour has an error\n"); 
         rval = 1; goto CLEANUP;
     }
 

@@ -123,7 +123,7 @@ int CCkdtree_prim_spanningtree (CCkdtree *kt, int ncount, CCdatagroup *dat,
     if (wcoord != (double *) NULL) {
         for (i = 0; i < ncount; i++) {
             if (wcoord[i] < -0.00000001) {
-                fprintf (stderr, "Cannot build with negative node weights\n");
+                CC_FPRINTF(stderr, "Cannot build with negative node weights\n");
                 return 1;
             }
         }
@@ -131,7 +131,7 @@ int CCkdtree_prim_spanningtree (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, wcoord, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -144,8 +144,8 @@ int CCkdtree_prim_spanningtree (CCkdtree *kt, int ncount, CCdatagroup *dat,
     if (!neighbor)
         return 1;
 
-    printf ("Find minimum weight spanning tree\n");
-    fflush (stdout);
+    CC_PRINTF("Find minimum weight spanning tree\n");
+    CC_FFLUSH(stdout);
 
     CCutil_dheap_init (&prim_heap, ncount);
     for (i = 0; i < ncount; i++)
@@ -157,8 +157,8 @@ int CCkdtree_prim_spanningtree (CCkdtree *kt, int ncount, CCdatagroup *dat,
     len = 0.0;
     for (i = 1; i < ncount; i++) {
         if (i % 10000 == 1) {
-            printf (".");
-            fflush (stdout);
+            CC_PRINTF(".");
+            CC_FFLUSH(stdout);
         }
         while (1) {
             n = CCutil_dheap_deletemin (&prim_heap);
@@ -177,13 +177,13 @@ int CCkdtree_prim_spanningtree (CCkdtree *kt, int ncount, CCdatagroup *dat,
         add_primheap (&prim_heap, thetree, n, neighbor, dat, wcoord);
     }
     *val = len;
-    printf ("\nLength of Spanning Tree: %.2f\n", len);
+    CC_PRINTF("\nLength of Spanning Tree: %.2f\n", len);
     if (wcoord != (double *) NULL) {
         double tval = 0.0;
         for (i = 0; i < ncount; i++)
             tval += wcoord[i];
         tval *= 2.0;
-        printf ("TSP BOUND: %.2f\n", len - tval);
+        CC_PRINTF("TSP BOUND: %.2f\n", len - tval);
     }
 
     if (newtree)
@@ -223,7 +223,7 @@ int CCkdtree_greedy_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -233,8 +233,8 @@ int CCkdtree_greedy_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
     }
 
     if (!silent) {
-        printf ("Grow a greedy tour \n");
-        fflush (stdout);
+        CC_PRINTF("Grow a greedy tour \n");
+        CC_FFLUSH(stdout);
     }
 
     if (outcycle) {
@@ -321,7 +321,7 @@ int CCkdtree_greedy_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
         }
         if (i % 10000 == 9999) {
             if (!silent) {
-                printf ("."); fflush (stdout);
+                CC_PRINTF("."); CC_FFLUSH(stdout);
             }
         }
     }
@@ -335,9 +335,9 @@ int CCkdtree_greedy_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
     *val = len;
     if (!silent) {
         if (ncount >= 10000)
-            printf ("\n");
-        printf ("Length of Greedy Tour: %.2f\n", len);
-        fflush (stdout);
+            CC_PRINTF("\n");
+        CC_PRINTF("Length of Greedy Tour: %.2f\n", len);
+        CC_FFLUSH(stdout);
     }
     CCutil_dheap_free (&prim_heap);
 
@@ -345,10 +345,10 @@ int CCkdtree_greedy_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
         int istour;
         rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, outcycle);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: greedy tour is not a tour\n");
+            CC_FPRINTF(stderr, "ERROR: greedy tour is not a tour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -396,7 +396,7 @@ int CCkdtree_far_add_tour (CCkdtree *kt, int ncount, int start,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -405,8 +405,8 @@ int CCkdtree_far_add_tour (CCkdtree *kt, int ncount, int start,
         thetree = kt;
     }
 
-    printf ("Grow a farthest addition tour from node %d \n", start);
-    fflush (stdout);
+    CC_PRINTF("Grow a farthest addition tour from node %d \n", start);
+    CC_FFLUSH(stdout);
 
     neighbor = CC_SAFE_MALLOC (ncount, int);
     if (!neighbor) {
@@ -478,8 +478,8 @@ int CCkdtree_far_add_tour (CCkdtree *kt, int ncount, int start,
             fx->prev = fa;
         }
         if (i % 10000 == 9999) {
-            printf (".");
-            fflush (stdout);
+            CC_PRINTF(".");
+            CC_FFLUSH(stdout);
         }
     }
 
@@ -501,8 +501,8 @@ int CCkdtree_far_add_tour (CCkdtree *kt, int ncount, int start,
 
     *val = len;
     if (ncount >= 10000)
-        printf ("\n");
-    printf ("Length of Farthest Addition Tour: %.2f\n", len);
+        CC_PRINTF("\n");
+    CC_PRINTF("Length of Farthest Addition Tour: %.2f\n", len);
     CCutil_dheap_free (&prim_heap);
 
 CLEANUP:
@@ -541,7 +541,7 @@ int CCkdtree_qboruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -550,8 +550,8 @@ int CCkdtree_qboruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
         thetree = kt;
     }
 
-    printf ("Grow a Quick-Boruvka tour \n");
-    fflush (stdout);
+    CC_PRINTF("Grow a Quick-Boruvka tour \n");
+    CC_FFLUSH(stdout);
 
     if (outcycle) {
         tcyc = CC_SAFE_MALLOC (2 * ncount, int);
@@ -593,7 +593,7 @@ int CCkdtree_qboruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
     if ((dat->norm & CC_NORM_SIZE_BITS) == CC_D2_NORM_SIZE) {
         double sflen;
         if (space_fill_curve (ncount, dat, perm, &sflen)) {
-            fprintf (stderr, "space_fill_curve failed\n");
+            CC_FPRINTF(stderr, "space_fill_curve failed\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -647,8 +647,8 @@ int CCkdtree_qboruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
                     tail[tail[y]] = tail[x];
                 }
                 if (count % 10000 == 9999) {
-                    printf (".");
-                    fflush (stdout);
+                    CC_PRINTF(".");
+                    CC_FFLUSH(stdout);
                 }
                 count++;
             }
@@ -663,17 +663,17 @@ int CCkdtree_qboruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
     len += (double) CCutil_dat_edgelen (x, y, dat);
     *val = len;
     if (ncount >= 10000)
-        printf ("\n");
-    printf ("Length of Quick-Boruvka Tour: %.2f\n", len);
+        CC_PRINTF("\n");
+    CC_PRINTF("Length of Quick-Boruvka Tour: %.2f\n", len);
 
     if (tcyc) {
         int istour;
         rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, outcycle);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: Quick-Boruvka tour is not a tour\n");
+            CC_FPRINTF(stderr, "ERROR: Quick-Boruvka tour is not a tour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -713,7 +713,7 @@ int CCkdtree_boruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -722,8 +722,8 @@ int CCkdtree_boruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
         thetree = kt;
     }
 
-    printf ("Grow a Boruvka tour \n");
-    fflush (stdout);
+    CC_PRINTF("Grow a Boruvka tour \n");
+    CC_FFLUSH(stdout);
 
     if (outcycle) {
         tcyc = CC_SAFE_MALLOC (2 * ncount, int);
@@ -832,8 +832,8 @@ int CCkdtree_boruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
                         tail[tail[y]] = tail[x];
                     }
                     if (count % 10000 == 9999) {
-                        printf (".");
-                        fflush (stdout);
+                        CC_PRINTF(".");
+                        CC_FFLUSH(stdout);
                     }
                     count++;
                 } else {
@@ -856,17 +856,17 @@ int CCkdtree_boruvka_tour (CCkdtree *kt, int ncount, CCdatagroup *dat,
     len += (double) CCutil_dat_edgelen (x, y, dat);
     *val = len;
     if (ncount >= 10000)
-        printf ("\n");
-    printf ("Length of Boruvka Tour: %.0f  (%d Rounds)\n", len, round);
+        CC_PRINTF("\n");
+    CC_PRINTF("Length of Boruvka Tour: %.0f  (%d Rounds)\n", len, round);
 
     if (tcyc) {
         int istour;
         rval = CCutil_edge_to_cycle (ncount, tcyc, &istour, outcycle);
         if (rval) {
-            fprintf (stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_edge_to_cycle failed\n"); goto CLEANUP;
         }
         if (istour == 0) {
-            fprintf (stderr, "ERROR: Boruvka tour is not a tour\n");
+            CC_FPRINTF(stderr, "ERROR: Boruvka tour is not a tour\n");
             rval = 1; goto CLEANUP;
         }
     }
@@ -908,8 +908,8 @@ static int space_fill_curve (int ncount, CCdatagroup *dat, int *outcyc,
     /* From Platzman and Bartholdi, JACM 36 (1989) 719-737. */
 
     if ((dat->norm & CC_NORM_SIZE_BITS) != CC_D2_NORM_SIZE) {
-        printf ("Need a 2-coordinate norm to use space filling curve\n");
-        fflush (stdout);
+        CC_PRINTF("Need a 2-coordinate norm to use space filling curve\n");
+        CC_FFLUSH(stdout);
         return 1;
     }
 
@@ -996,8 +996,8 @@ static int space_fill_curve (int ncount, CCdatagroup *dat, int *outcyc,
     *len = (double) CCutil_dat_edgelen (cyc[ncount - 1], cyc[0], dat);
     for (i = 1; i < ncount; i++)
         (*len) += CCutil_dat_edgelen (cyc[i - 1], cyc[i], dat);
-    printf ("Spacefilling Curve Tour: %.2f\n", *len);
-    fflush (stdout);
+    CC_PRINTF("Spacefilling Curve Tour: %.2f\n", *len);
+    CC_FFLUSH(stdout);
 
     if (th)
         CC_FREE (th, int);

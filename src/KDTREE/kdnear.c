@@ -211,7 +211,7 @@ static int run_kdtree_k_nearest (CCkdtree *kt, int ncount, int k,
     if (wcoord != (double *) NULL) {
         for (i = 0; i < ncount; i++) {
             if (wcoord[i] < -0.00000001) {
-                fprintf (stderr, "Cannot CCkdtree with negative node weights\n");
+                CC_FPRINTF(stderr, "Cannot CCkdtree with negative node weights\n");
                 return 1;
             }
         }
@@ -224,7 +224,7 @@ static int run_kdtree_k_nearest (CCkdtree *kt, int ncount, int k,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, wcoord, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         mykt = &localkt;
@@ -273,11 +273,11 @@ static int run_kdtree_k_nearest (CCkdtree *kt, int ncount, int k,
         }
 /*
         if (n == 0) {
-            printf ("Neighbors of Node %d (%d, %d) :\n", n,
+            CC_PRINTF("Neighbors of Node %d (%d, %d) :\n", n,
                                       (int) dat->x[n], (int) dat->y[n]);
             for (i = 0; i < goal; i++) {
                 if (list[i] != -1) {
-                    printf ("%d  %d (%d, %d)\n", list[i],
+                    CC_PRINTF("%d  %d (%d, %d)\n", list[i],
                       CCutil_dat_edgelen (n, list[i], dat),
                       (int) dat->x[list[i]], (int) dat->y[list[i]]);
                 }
@@ -286,13 +286,13 @@ static int run_kdtree_k_nearest (CCkdtree *kt, int ncount, int k,
 */
         if (!silent) {
             if (n % 1000 == 999) {
-                printf ("."); fflush (stdout);
+                CC_PRINTF("."); CC_FFLUSH(stdout);
             }
         }
     }
   
     if (!silent) {
-        printf (" %d edges\n", ntotal); fflush (stdout);
+        CC_PRINTF(" %d edges\n", ntotal); CC_FFLUSH(stdout);
     }
 
     if (wantlist) {
@@ -319,7 +319,7 @@ static int run_kdtree_k_nearest (CCkdtree *kt, int ncount, int k,
         }
     }
     if (intptr_check_leaks (&intptr_world, &total, &onlist)) {
-        fprintf (stderr, "WARNING: %d outstanding intptrs in kdnear\n",
+        CC_FPRINTF(stderr, "WARNING: %d outstanding intptrs in kdnear\n",
                  total - onlist);
     }
 
@@ -373,7 +373,7 @@ int CCkdtree_node_quadrant_k_nearest (CCkdtree *kt, int ncount, int n, int k,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, wcoord, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -394,7 +394,7 @@ int CCkdtree_node_quadrant_k_nearest (CCkdtree *kt, int ncount, int n, int k,
     localbnds.y[1] = BIGDOUBLE;
     if (q_run_it (thetree, dat, wcoord, llist, &lcount, list, n, k,
                   &localbnds)) {
-        fprintf (stderr, "run_kdtree_node_k_nearest failed\n");
+        CC_FPRINTF(stderr, "run_kdtree_node_k_nearest failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -405,7 +405,7 @@ int CCkdtree_node_quadrant_k_nearest (CCkdtree *kt, int ncount, int n, int k,
     localbnds.y[1] = dat->y[n];
     if (q_run_it (thetree, dat, wcoord, llist, &lcount, list, n, k,
                   &localbnds)) {
-        fprintf (stderr, "run_kdtree_node_k_nearest failed\n");
+        CC_FPRINTF(stderr, "run_kdtree_node_k_nearest failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -416,7 +416,7 @@ int CCkdtree_node_quadrant_k_nearest (CCkdtree *kt, int ncount, int n, int k,
     localbnds.y[1] = dat->y[n];
     if (q_run_it (thetree, dat, wcoord, llist, &lcount, list, n, k,
                   &localbnds)) {
-        fprintf (stderr, "run_kdtree_node_k_nearest failed\n");
+        CC_FPRINTF(stderr, "run_kdtree_node_k_nearest failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -427,7 +427,7 @@ int CCkdtree_node_quadrant_k_nearest (CCkdtree *kt, int ncount, int n, int k,
     localbnds.y[1] = BIGDOUBLE;
     if (q_run_it (thetree, dat, wcoord, llist, &lcount, list, n, k,
                   &localbnds)) {
-        fprintf (stderr, "run_kdtree_node_k_nearest failed\n");
+        CC_FPRINTF(stderr, "run_kdtree_node_k_nearest failed\n");
         rval = 1;
         goto CLEANUP;
     }
@@ -474,7 +474,7 @@ int CCkdtree_node_k_nearest (CCkdtree *kt, int ncount, int n, int k,
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, wcoord, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         thetree = &localkt;
@@ -594,7 +594,7 @@ static int run_kdtree_node_k_nearest (CCkdtree *thetree, CCdatagroup *dat,
     if (num >= NEAR_HEAP_CUTOFF) {
         if (heap_count < num) {
             if (box == (CCkdbnds *) NULL) {
-                fprintf (stderr, "WARNING: There do not exist %d neighbors\n",
+                CC_FPRINTF(stderr, "WARNING: There do not exist %d neighbors\n",
                          num);
             }
             for (i = 0; i < heap_count; i++) {
@@ -614,7 +614,7 @@ static int run_kdtree_node_k_nearest (CCkdtree *thetree, CCdatagroup *dat,
         }
         if (ntot < num) {
             if (box == (CCkdbnds *) NULL) {
-                fprintf (stderr, "WARNING: There do not exist %d neighbors\n",
+                CC_FPRINTF(stderr, "WARNING: There do not exist %d neighbors\n",
                          num);
             }
             for (i = ntot; i < num; i++)
@@ -762,7 +762,7 @@ int CCkdtree_node_nearest (CCkdtree *kt, int n, CCdatagroup *dat,
     CCkdtree *thetree = (CCkdtree *) NULL;
 
     if (kt == (CCkdtree *) NULL) {
-        fprintf (stderr, "ERROR: kt cannot be NULL in CCkdtree_node_nearest)\n");
+        CC_FPRINTF(stderr, "ERROR: kt cannot be NULL in CCkdtree_node_nearest)\n");
         return n;
     }
 
@@ -913,7 +913,7 @@ int CCkdtree_fixed_radius_nearest (CCkdtree *kt, CCdatagroup *dat,
     int target;
 
     if (kt == (CCkdtree *) NULL) {
-        fprintf (stderr, "ERROR: CCkdtree_fixed_radius_nearest needs a CCkdtree\n");
+        CC_FPRINTF(stderr, "ERROR: CCkdtree_fixed_radius_nearest needs a CCkdtree\n");
         return 0;
     }
 
@@ -1088,7 +1088,7 @@ static int fixed_radius_nearest_work (CCkdtree *thetree, CCkdnode *p,
                 break;
             case 2:
             default:
-                fprintf (stderr, "ERROR: split on w without node weights\n");
+                CC_FPRINTF(stderr, "ERROR: split on w without node weights\n");
                 return 0;
             }
             if (thisx < val) {
@@ -1132,13 +1132,13 @@ int CCkdtree_nearest_neighbor_tour (CCkdtree *kt, int ncount, int start,
     int newtree = 0;
 
     if (ncount < 3) {
-        fprintf (stderr, "Cannot find tour in an %d node graph\n", ncount);
+        CC_FPRINTF(stderr, "Cannot find tour in an %d node graph\n", ncount);
         return 1;
     }
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         mykt = &localkt;
@@ -1148,8 +1148,8 @@ int CCkdtree_nearest_neighbor_tour (CCkdtree *kt, int ncount, int start,
     }
 
     /*
-        printf ("Grow nearest neighbor tour from node %d\n", start);
-        fflush (stdout);
+        CC_PRINTF("Grow nearest neighbor tour from node %d\n", start);
+        CC_FFLUSH(stdout);
     */
 
     len = 0.0;
@@ -1186,14 +1186,14 @@ int CCkdtree_nearest_neighbor_2match (CCkdtree *kt, int ncount, int start,
     int rval = 0;
 
     if (ncount < 3) {
-        fprintf (stderr, "Cannot find 2-matching in an %d node graph\n",
+        CC_FPRINTF(stderr, "Cannot find 2-matching in an %d node graph\n",
                  ncount);
         return 1;
     }
 
     if (kt == (CCkdtree *) NULL) {
         if (CCkdtree_build (&localkt, ncount, dat, (double *) NULL, rstate)) {
-            fprintf (stderr, "Unable to build CCkdtree\n");
+            CC_FPRINTF(stderr, "Unable to build CCkdtree\n");
             return 1;
         }
         mykt = &localkt;
@@ -1210,8 +1210,8 @@ int CCkdtree_nearest_neighbor_2match (CCkdtree *kt, int ncount, int start,
     for (i = 0 ; i < ncount; i++)
         mark[i] = 0;
 
-    printf ("Grow nearest neighbor 2-matching from node %d\n", start);
-    fflush (stdout);
+    CC_PRINTF("Grow nearest neighbor 2-matching from node %d\n", start);
+    CC_FFLUSH(stdout);
     szeit = CCutil_zeit ();
     len = 0.0;
 
@@ -1220,7 +1220,7 @@ int CCkdtree_nearest_neighbor_2match (CCkdtree *kt, int ncount, int start,
         if (j == ncount) {
             for (j = 0; j < start && mark[j]; j++);
             if (j == start) {
-                fprintf (stderr, "ERROR in near-2match\n");
+                CC_FPRINTF(stderr, "ERROR in near-2match\n");
                 rval = 1;
                 goto CLEANUP;
             }
@@ -1283,10 +1283,10 @@ int CCkdtree_nearest_neighbor_2match (CCkdtree *kt, int ncount, int start,
     }
 
     *val = len;
-    printf ("%d cycles in 2-matching\n", cyccount);
-    printf ("Running time for Nearest Neighbor 2-match: %.2f\n",
+    CC_PRINTF("%d cycles in 2-matching\n", cyccount);
+    CC_PRINTF("Running time for Nearest Neighbor 2-match: %.2f\n",
                                                   CCutil_zeit () - szeit);
-    fflush (stdout);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 

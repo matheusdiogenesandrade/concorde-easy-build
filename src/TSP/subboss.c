@@ -30,7 +30,7 @@ int main (int ac, char **av)
     char *problabel = (char *) NULL;
 
     if (ac != 2) {
-        fprintf (stderr, "Usage: %s index_file\n", av[0]);
+        CC_FPRINTF(stderr, "Usage: %s index_file\n", av[0]);
         rval = 1; goto CLEANUP;
     }
 
@@ -43,8 +43,8 @@ int main (int ac, char **av)
         else                       slist[i].status = SUB_STAT_DONE;
     }
 
-    printf ("BEGINNING SUBDIV NET PROCESSING: %s\n\n", problabel);
-    fflush (stdout);
+    CC_PRINTF("BEGINNING SUBDIV NET PROCESSING: %s\n\n", problabel);
+    CC_FFLUSH(stdout);
 
     rval = CCutil_genhash_init (&idmap, scount, idcmp, idhash, NULL, 0.8,
                                 0.4);
@@ -60,7 +60,7 @@ int main (int ac, char **av)
 
     lport = CCutil_snet_listen (CC_SUBDIV_PORT);
     if (lport == (CC_SPORT *) NULL) {                                           
-        fprintf (stderr, "CCutil_snet_listen failed\n");
+        CC_FPRINTF(stderr, "CCutil_snet_listen failed\n");
         rval = 1; goto CLEANUP;
     }
 
@@ -68,43 +68,43 @@ int main (int ac, char **av)
     while (nremain) {
         s = CCutil_snet_receive (lport);
         if (!s) {
-            fprintf (stderr, "CCutil_snet_receive failed, ignoring\n");
+            CC_FPRINTF(stderr, "CCutil_snet_receive failed, ignoring\n");
             continue;
         }
         rval = CCutil_sread_int (s, &id);
         if (rval) {
-            fprintf (stderr, "CCutil_sread_int failed, abort connection\n");
+            CC_FPRINTF(stderr, "CCutil_sread_int failed, abort connection\n");
             rval = 0;
             goto CLOSE_CONN;
         }
         rval = CCutil_sread_double (s, &rtime);
         if (rval) {
             rval = 0;
-            fprintf (stderr, "CCutil_sread_double failed, abort connection\n");
+            CC_FPRINTF(stderr, "CCutil_sread_double failed, abort connection\n");
             goto CLOSE_CONN;
         }
         rval = CCutil_sread_double (s, &rbound);
         if (rval) {
             rval = 0;
-            fprintf (stderr, "CCutil_sread_double failed, abort connection\n");
+            CC_FPRINTF(stderr, "CCutil_sread_double failed, abort connection\n");
             goto CLOSE_CONN;
         }
         p = (CCsubdiv *) NULL;
         if (id == -1) goto GIVE_WORK;
         p = (CCsubdiv *) CCutil_genhash_lookup (&idmap, (void *) id);
         if (!p) {
-            fprintf (stderr, "Finished unknown id %d, ignoring\n", id);
+            CC_FPRINTF(stderr, "Finished unknown id %d, ignoring\n", id);
             goto GIVE_WORK;
         }
         if (p->status != SUB_STAT_OPEN && p->status != SUB_STAT_WORK) {
-            fprintf (stderr, "Finished completed node %d, ignoring\n", id);
+            CC_FPRINTF(stderr, "Finished completed node %d, ignoring\n", id);
             goto GIVE_WORK;
         }
         if (rbound >= 0.0)  {
             p->bound = rbound;
             cumbound += rbound;
         } else {
-            printf ("SUBPROBLEM failed\n"); fflush (stdout);
+            CC_PRINTF("SUBPROBLEM failed\n"); CC_FFLUSH(stdout);
             nfail++;
         }
         p->status = SUB_STAT_DONE;
@@ -119,7 +119,7 @@ int main (int ac, char **av)
     GIVE_WORK:
 
         if (p) {
-            printf ("DONE %3d %7.2f sec %4.0f cum %7.0f bnd %.2f ", p->id,
+            CC_PRINTF("DONE %3d %7.2f sec %4.0f cum %7.0f bnd %.2f ", p->id,
                     p->bound, rtime, cumtime, cumbound);
         }
 
@@ -153,17 +153,17 @@ int main (int ac, char **av)
              rval = CCutil_writemaster (s, t_ncount, &t_dat, t_perm);
              CCcheck_rval (rval, "CCutil_writemaster failed");
 
-             printf ("%-4s %2d rem %2d\n",
+             CC_PRINTF("%-4s %2d rem %2d\n",
                      curloc->status == SUB_STAT_OPEN ? "WORK" : "REWK",
                      curloc->id, nremain);
-             fflush (stdout);
+             CC_FFLUSH(stdout);
              curloc->status = SUB_STAT_WORK;
 
 
              CC_IFFREE (t_perm, int);
              CCutil_freedatagroup (&t_dat);
         } else {
-             printf ("\n"); fflush (stdout);
+             CC_PRINTF("\n"); CC_FFLUSH(stdout);
              CCutil_swrite_int (s, -1);
         }
 
@@ -171,9 +171,9 @@ int main (int ac, char **av)
 
         CCutil_sclose (s);
     }
-    printf ("\nFINISHED (%d failures): %.2f seconds\n", nfail, cumtime);
-    printf ("Lower bound: %lf\n", cumbound);
-    fflush (stdout);
+    CC_PRINTF("\nFINISHED (%d failures): %.2f seconds\n", nfail, cumtime);
+    CC_PRINTF("Lower bound: %lf\n", cumbound);
+    CC_FFLUSH(stdout);
 
 CLEANUP:
 

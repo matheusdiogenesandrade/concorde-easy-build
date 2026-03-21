@@ -87,8 +87,8 @@ int main (int ac, char **av)
 
     CCutil_sprand (seed, &rstate);
 
-    printf ("Chained Lin-Kernighan with seed %d\n", seed);
-    fflush (stdout);
+    CC_PRINTF("Chained Lin-Kernighan with seed %d\n", seed);
+    CC_FFLUSH(stdout);
 
     if ((!nnodes_want && !nodefile) || (tsplib_in && !nodefile)) {
         usage (av[0]);
@@ -99,7 +99,7 @@ int main (int ac, char **av)
 
     if (tsplib_in) {
         if (CCutil_gettsplib (nodefile, &ncount, &dat)) {
-            fprintf (stderr, "could not read the TSPLIB file\n");
+            CC_FPRINTF(stderr, "could not read the TSPLIB file\n");
             rval = 1;
             goto CLEANUP;
         }
@@ -141,8 +141,8 @@ int main (int ac, char **av)
         CCcheck_rval (rval, "CCutil_getedgelist failed");
 
         CC_IFFREE (templen, int);
-        printf ("Read good-edge file: %d edges\n", tempcount);
-        fflush (stdout);
+        CC_PRINTF("Read good-edge file: %d edges\n", tempcount);
+        CC_FFLUSH(stdout);
     } else {
         CCedgegengroup plan;
 
@@ -162,9 +162,9 @@ int main (int ac, char **av)
                in_repeater, incycle, outcycle, &val, run_silently, &rstate);
     CCcheck_rval (rval, "CClinkern_path failed");
 
-    printf ("First: %d   Last: %d\n", outcycle[0], outcycle[ncount-1]);
-    printf ("Total Running Time: %.2f\n", CCutil_zeit () - startzeit);
-    fflush (stdout);
+    CC_PRINTF("First: %d   Last: %d\n", outcycle[0], outcycle[ncount-1]);
+    CC_PRINTF("Total Running Time: %.2f\n", CCutil_zeit () - startzeit);
+    CC_FFLUSH(stdout);
 
     if (outfname) {
         rval = CCutil_writecycle (ncount, outfname, outcycle, 0);
@@ -270,22 +270,22 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *f)
 {
-    fprintf (stderr, "usage: %s [- see below -] [tsplib_file or dat_file]\n", f);
-    fprintf (stderr, "   -s #  random number seed\n");
-    fprintf (stderr, "   -k #  number of nodes for random problem\n");
-    fprintf (stderr, "   -G #  use #x# grid for random points, no dups if #<0\n");
-    fprintf (stderr, "   -o f  save final tour\n");
-    fprintf (stderr, "   -q #  use quad #-nearest as the sparse set (default is 2)\n");
-    fprintf (stderr, "   -g f  use the edges in file f as the sparse edge set\n");
-    fprintf (stderr, "   -R #  number of kicks in iterated Lin-Kernighan (default is #nodes)\n");
-    fprintf (stderr, "   -y f  starting cycle\n");
-    fprintf (stderr, "   -Q    run silently\n");
-    fprintf (stderr, "   -b    dat file in binary doubles\n");
-    fprintf (stderr, "   -B    dat file in binary ints\n");
-    fprintf (stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
-    fprintf (stderr, "         0=MAX, 1=JOHNSON, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
-    fprintf (stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
-    fprintf (stderr, "         17=GEOM, 18=L1\n");
+    CC_FPRINTF(stderr, "usage: %s [- see below -] [tsplib_file or dat_file]\n", f);
+    CC_FPRINTF(stderr, "   -s #  random number seed\n");
+    CC_FPRINTF(stderr, "   -k #  number of nodes for random problem\n");
+    CC_FPRINTF(stderr, "   -G #  use #x# grid for random points, no dups if #<0\n");
+    CC_FPRINTF(stderr, "   -o f  save final tour\n");
+    CC_FPRINTF(stderr, "   -q #  use quad #-nearest as the sparse set (default is 2)\n");
+    CC_FPRINTF(stderr, "   -g f  use the edges in file f as the sparse edge set\n");
+    CC_FPRINTF(stderr, "   -R #  number of kicks in iterated Lin-Kernighan (default is #nodes)\n");
+    CC_FPRINTF(stderr, "   -y f  starting cycle\n");
+    CC_FPRINTF(stderr, "   -Q    run silently\n");
+    CC_FPRINTF(stderr, "   -b    dat file in binary doubles\n");
+    CC_FPRINTF(stderr, "   -B    dat file in binary ints\n");
+    CC_FPRINTF(stderr, "   -N #  norm (must specify if dat file is not a TSPLIB file)\n");
+    CC_FPRINTF(stderr, "         0=MAX, 1=JOHNSON, 2=L2, 3=3D, 4=USER, 5=ATT, 6=GEO, 7=MATRIX,\n");
+    CC_FPRINTF(stderr, "         8=DSJRAND, 9=CRYSTAL, 10=SPARSE, 11-15=RH-norm 1-5, 16=TOROIDAL\n");
+    CC_FPRINTF(stderr, "         17=GEOM, 18=L1\n");
 }
 
 static int print_command (int ac, char **av)
@@ -308,7 +308,7 @@ static int print_command (int ac, char **av)
         cmdlen++;
     }
     cmdout[cmdlen-1] = '\0';
-    printf ("%s\n", cmdout); fflush (stdout);
+    CC_PRINTF("%s\n", cmdout); CC_FFLUSH(stdout);
 
 CLEANUP:
 

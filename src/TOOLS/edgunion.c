@@ -68,7 +68,7 @@ int main (int ac, char **av)
     rval = CCutil_getedgelist_n (&ncount, filelist[0], &ecount, &elist,
                                  &elen, 0);
     if (rval) {
-        fprintf (stderr, "CCutil_getedgelist_n failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_getedgelist_n failed\n"); goto CLEANUP;
     }
     CC_IFFREE (elist, int);
     CC_IFFREE (elen, int);
@@ -76,23 +76,23 @@ int main (int ac, char **av)
     rval = CCutil_edge_file_union (ncount, nfiles, filelist, &ecount, &elist,
                                    &elen, mytour, mylen);
     if (rval) {
-        fprintf (stderr, "CCutil_edge_file_union failed\n"); goto CLEANUP;
+        CC_FPRINTF(stderr, "CCutil_edge_file_union failed\n"); goto CLEANUP;
     }
-    printf ("Merged Edge List: %d edges\n", ecount); fflush (stdout);
+    CC_PRINTF("Merged Edge List: %d edges\n", ecount); CC_FFLUSH(stdout);
       
     if (outfname) {
         rval = CCutil_writeedges_int (ncount, outfname, ecount, elist,
                                       elen, 0);
         if (rval) {
-            fprintf (stderr, "CCutil_writeedges_int failed\n"); goto CLEANUP;
+            CC_FPRINTF(stderr, "CCutil_writeedges_int failed\n"); goto CLEANUP;
         }
     }
 
     if (wantlen) {
         if (foundtour == 1) {
-            printf ("Best Tour:  %.0f\n", bestlen); fflush (stdout);
+            CC_PRINTF("Best Tour:  %.0f\n", bestlen); CC_FFLUSH(stdout);
         } else {
-            printf ("No tours\n"); fflush (stdout);
+            CC_PRINTF("No tours\n"); CC_FFLUSH(stdout);
         }
     }
 
@@ -139,7 +139,7 @@ static int parseargs (int ac, char **av)
 
 static void usage (char *fname)
 {
-    fprintf (stderr, "Usage: %s [-flags below] edge_files\n", fname);
-    fprintf (stderr, "   -o f  write merged edge file\n");
-    fprintf (stderr, "   -t    print best tour len (if any are tours)\n");
+    CC_FPRINTF(stderr, "Usage: %s [-flags below] edge_files\n", fname);
+    CC_FPRINTF(stderr, "   -o f  write merged edge file\n");
+    CC_FPRINTF(stderr, "   -t    print best tour len (if any are tours)\n");
 }
