@@ -533,3 +533,12 @@ MigrationBackup/
 
 # End of https://www.gitignore.io/api/c,cmake,linux,clion+all,visualstudio,visualstudiocode
 
+### Concorde upstream CLI (working-directory artefacts next to .tsp inputs) ###
+*.mas
+*.pul
+*.sav
+*.sol
+
+### Python local environments ###
+venv/
+.venv/

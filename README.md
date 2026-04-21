@@ -22,6 +22,61 @@ stackoverflow questions
 
 This repository allows you to build concorde using modern toolchains.
 
+## Standalone build (binary in `./build`)
+
+Configure and compile **from this directory** so all artifacts stay under **`build/`** next to `CMakeLists.txt` (self-contained; no parent project required):
+
+```bash
+export CPLEX_ROOT_DIR=/opt/ibm/ILOG/CPLEX_Studio2211   # Studio root: must contain cplex/ and concert/
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target concorde_cli -j$(nproc)
+```
+
+After a successful build you will have at least:
+
+| Output | Path |
+| :--- | :--- |
+| Upstream TSP driver | **`build/concorde_cli`** |
+| Static library merge | `build/libconcorde_full.a` |
+| Shared library | `build/libconcorde_full.so` |
+| Amalgamated header | `build/concorde.h` |
+
+Run the driver on a TSPLIB file (symmetric `.tsp` only):
+
+```bash
+./build/concorde_cli -s 1 data/tsp/att48.tsp
+```
+
+Optional smoke (same `build/` tree; requires **`bash`** and **`python3`**):
+
+The default smoke runs **`concorde_cli`** on all **111** symmetric `.tsp` fixtures under `data/tsp`, in the same **discover → sort by `DIMENSION` → 10-way partition** order as [`test_concorde_symmetric_suite.cpp`](../../tests/test_concorde_symmetric_suite.cpp) in `concorde_wrapper` (bucket 1/10 through 10/10). Only **process exit code** is checked; the C++ suite proves optimality against `solutions.txt`.
+
+This can take **substantial wall time** (many exact solves). `ctest` sets a **7200 s** timeout on `concorde_cli_tsp_smoke`.
+
+```bash
+export CONCORDE_BIN="$(pwd)/build/concorde_cli"
+export TSP_DIR="$(pwd)/data/tsp"
+bash scripts/run_concorde_cli_tsp_smoke.sh
+```
+
+- **`QUICK=1`**: run only `att48.tsp`, `eil51.tsp`, `pr76.tsp` (fast local check).
+- **`ALL=1`**: same as default (full bucket-aligned run); kept as a no-op alias for older docs.
+
+Print bucket layout without invoking Concorde:
+
+```bash
+python3 scripts/run_concorde_cli_tsp_buckets.py --tsp-dir data/tsp --list-only
+```
+
+CTest (after configure; CMake runs **`find_package(Python3 COMPONENTS Interpreter REQUIRED)`** when `CONCORDE_BUILD_CLI` is on): `cd build && ctest -R concorde_cli_tsp_smoke` (or from anywhere: `ctest --test-dir build -R concorde_cli_tsp_smoke`).
+
+- Turn off the CLI target with **`-DCONCORDE_BUILD_CLI=OFF`**.
+- **`build/`** is a normal CMake out-of-tree directory; keep it out of version control if your workflow ignores local build trees.
+
+### Built via `concorde_wrapper` / COPAlgorithms
+
+When this folder is pulled in with `add_subdirectory` from [`concorde_wrapper`](../CMakeLists.txt), CMake may place the **same** targets under the **parent** build directory (e.g. `…/build/Release/external/concorde_wrapper/concorde-easy-build/`) instead of `./build` here. To always use **`./build/concorde_cli`**, configure this directory standalone as above.
+
 ## License
 
 In this repository, I store a copy of the 2003 version of Concorde, together with a minimal build system.
@@ -44,21 +99,9 @@ I assumed that:
 
 Users not corresponding to this identikit might have to adapt this solution.
 
-I also assume that you are interested in having the following, and nothing else, at the end of the build process:
+I also assume that you are interested in having the following at the end of a **standalone** build (under `build/`):
 
-* The executable (`concorde-bin`).
-* A shared library (`libconcorde_full.so`), an archive file (`libconcorde_full.a`) and an include file (`concorde.h`) to use Concorde with your custom software.
+* The upstream CLI **`concorde_cli`** (from `src/TSP/concorde.c`).
+* **`libconcorde_full.so`**, **`libconcorde_full.a`**, and **`concorde.h`** for embedding Concorde in your own code (you still need to link CPLEX and the usual `pthread` / `m` / `dl`).
 
-## Building
-
-Assume that you have Cplex installed in `/opt/ibm/CPLEX/my-cplex`.
-Building Concorde, then, is as simple as:
-
-```
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DCPLEX_ROOT_DIR=/opt/ibm/CPLEX/my-cplex ..
-make -j5
-```
-
-This will create the four files: `concorde-bin`, `libconcorde_full.so`, `libconcorde_full.a`, and `concorde.h`.
+Older docs referred to `concorde-bin`; that target was renamed to **`concorde_cli`** to avoid clashing with the `concorde` **library** target in CMake.

@@ -1,0 +1,2 @@
+# scripts/run_concorde_cli_tsp_buckets.py uses the Python standard library only.
+# No PyPI packages are required. Use Python 3.9+ if you rely on a local venv for tooling.

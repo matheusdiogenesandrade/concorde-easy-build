@@ -252,6 +252,48 @@ add_custom_command(TARGET concorde POST_BUILD
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/INCLUDE"
         COMMENT "Creating concorde.h")
 
+option(CONCORDE_BUILD_CLI "Build upstream concorde CLI (concorde_cli) for TSPLIB system tests" ON)
+if(CONCORDE_BUILD_CLI)
+    add_executable(concorde_cli src/TSP/concorde.c)
+    target_compile_features(concorde_cli PRIVATE c_std_11)
+    target_include_directories(
+        concorde_cli
+        PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/INCLUDE"
+            "${CMAKE_CURRENT_BINARY_DIR}"
+    )
+    target_compile_options(concorde_cli PRIVATE -Wno-unused-function -Wno-stringop-truncation -Wno-unused-result)
+    add_dependencies(concorde_cli concorde)
+    target_link_libraries(
+        concorde_cli
+        PRIVATE
+            "$<TARGET_FILE_DIR:concorde>/libconcorde_full.a"
+            Cplex::cplex
+            pthread
+            m
+            dl
+    )
+    set_target_properties(concorde_cli PROPERTIES RUNTIME_OUTPUT_NAME concorde_cli)
+
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
+    include(CTest)
+    add_test(
+        NAME concorde_cli_tsp_smoke
+        COMMAND
+            "${CMAKE_COMMAND}" -E env "CONCORDE_BIN=$<TARGET_FILE:concorde_cli>"
+            "TSP_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data/tsp" --
+            bash "${CMAKE_CURRENT_SOURCE_DIR}/scripts/run_concorde_cli_tsp_smoke.sh"
+    )
+    set_tests_properties(
+        concorde_cli_tsp_smoke
+        PROPERTIES
+            LABELS "concorde_cli"
+            # 111 TSPLIB runs; wall time depends on CPLEX and instance sizes.
+            TIMEOUT 7200
+    )
+endif()
+
 # concorde-bin POST_BUILD command disabled since concorde-bin is not built
 # add_custom_command(TARGET concorde-bin POST_BUILD
 #         COMMAND rm -f *.c.o || true
